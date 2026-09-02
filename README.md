@@ -10,10 +10,10 @@ exdate indexes what actually happens: every multiplier update, every corporate a
 that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
 and the health of every Chainlink feed.
 
-> **Status: M1 to M4 shipped.** The indexer, the API, the reconciliation table and
+> **Status: M1 to M5 shipped.** The indexer, the API, the reconciliation table and
 > the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
-> feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 49 reconciliation rows. The
-> SDK is not built yet — it is marked below.
+> feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 49 reconciliation rows, and
+> 43 signed webhook deliveries verified end to end. What is left is listed under Known gaps.
 > Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
@@ -38,7 +38,7 @@ to four weeks. Every input is sourced; see the report.
 pnpm install
 pnpm dev          # indexer + API   http://localhost:42069
 pnpm dev:status   # status page      http://localhost:3000
-pnpm test         # unit tests for @exdate/core and @exdate/api
+pnpm test         # unit tests for @exdate/core, @exdate/api and @exdate/sdk
 pnpm typecheck
 ```
 
@@ -95,6 +95,8 @@ GET /v1/calendar                           issuer corporate actions + pending on
 GET /v1/webhooks                           the event catalogue, the signing scheme, the retries
 GET /v1/:chain/webhooks/events             the outbox: what was noticed, and what each delivery did
 ```
+
+Full reference, with a real captured response for every route: [`docs/api.md`](docs/api.md).
 
 `:chain` accepts `robinhood` or `4663`. Every bigint is a decimal string; anything unobserved is
 `null`, never `0`.
@@ -158,11 +160,22 @@ current backlog once (43 events on 2026-09-02 — 37 declared dividends and 6 re
 delivery is drained at the start of each poll cycle, so it lags an event by up to one interval
 (~60 s by default) against a ~9-minute announcement lead.
 
+## SDK
+
 ```ts
-// M5
-import { exdate } from '@exdate/sdk'
-const y = await exdate.yield('0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC')
+import { createClient } from '@exdate/sdk'
+
+const exdate = createClient({ baseUrl: 'https://api.exdate.xyz' })
+const ledger = await exdate.yield('0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5')
+
+ledger.totals?.dividendGrowthBps    // 20.22 — explained by a paired issuer dividend
+ledger.totals?.unexplainedGrowthBps // 30.73 — steps with no issuer row behind them
 ```
+
+Typed against the API, with the two shapes it cannot afford to get wrong (`YieldLedger`,
+`PendingView`) derived from the functions that produce them. The webhook verifier is the same
+function the sender signs with, and installing the SDK does not drag in the server. Full usage:
+[`packages/sdk/README.md`](packages/sdk/README.md).
 
 ## Repo layout
 
@@ -173,10 +186,10 @@ packages/indexer  Ponder: indexes UIMultiplierUpdated, polls the ERC-8056 views,
                   Chainlink feeds and the issuer's corporate actions, serves the API.
 packages/api      Hono routes over a Repository interface — no SQL, deployable alone.
 apps/status       Next.js App Router status page. Reads the API and nothing else.
-packages/sdk      @exdate/sdk                                             (M5, not started)
+packages/sdk      @exdate/sdk — typed client + webhook verifier. Depends on core only.
 scripts           verification and backfill scripts
 data              committed snapshots of first-party registries and observed events
-docs              Phase 0 report
+docs              Phase 0 report, API reference
 ```
 
 ### Why the history is scanned rather than indexed

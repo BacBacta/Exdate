@@ -326,8 +326,10 @@ export function createApi({
             feed: row.feedProxy,
             verified: row.feedVerified,
             status: health.status,
-            ageSeconds: health.ageSeconds,
-            beyondHeartbeat: health.beyondHeartbeat,
+            // `?? null`: JSON.stringify drops an undefined key, and a missing
+            // field reads as "not part of the shape" rather than "not observed".
+            ageSeconds: health.ageSeconds ?? null,
+            beyondHeartbeat: health.beyondHeartbeat ?? null,
             updatedAt:
               row.feedUpdatedAt === null ? null : new Date(Number(row.feedUpdatedAt) * 1000).toISOString(),
           }

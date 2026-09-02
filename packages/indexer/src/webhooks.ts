@@ -5,6 +5,7 @@ import {
   WEBHOOK_EVENT_ID_HEADER,
   WEBHOOK_MAX_ATTEMPTS,
   WEBHOOK_SIGNATURE_HEADER,
+  type WebhookDataFor,
   type WebhookEndpoint,
   type WebhookEnvelope,
   type WebhookEventType,
@@ -51,13 +52,14 @@ const MAX_DELIVERIES_PER_POLL = Number(process.env.EXDATE_WEBHOOK_MAX_PER_POLL ?
 
 const deliveryId = (eventId: string, endpointId: string) => `${eventId}|${endpointId}`
 
-export interface EnqueueInput {
+export interface EnqueueInput<T extends WebhookEventType = WebhookEventType> {
   chainId: number
-  type: WebhookEventType
+  type: T
   /** What makes this occurrence unique within its type - usually `${token}:${instant}`. */
   subject: string
   token: { address: Address; symbol: string } | null
-  data: Record<string, unknown>
+  /** Typed against the published contract in @exdate/core, so drift is a compile error. */
+  data: WebhookDataFor<T>
   /** Observation time in seconds, from the block being polled. */
   now: bigint
   block?: bigint
@@ -70,9 +72,12 @@ export interface EnqueueInput {
  * anything both the live indexer and the poller can see. Nothing is sent from
  * here.
  */
-export async function enqueueWebhook(context: WebhookContext, input: EnqueueInput): Promise<boolean> {
+export async function enqueueWebhook<T extends WebhookEventType>(
+  context: WebhookContext,
+  input: EnqueueInput<T>,
+): Promise<boolean> {
   const id = webhookEventId(input.type, input.chainId, input.subject)
-  const envelope: WebhookEnvelope = {
+  const envelope: WebhookEnvelope<T> = {
     id,
     type: input.type,
     chainId: input.chainId,

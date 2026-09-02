@@ -118,6 +118,28 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
+  packages/sdk:
+    dependencies:
+      '@exdate/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@exdate/api':
+        specifier: workspace:*
+        version: link:../api
+      '@types/node':
+        specifier: ^22.15.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^7.1.14
+        version: 7.3.6(@types/node@22.20.1)
+      vitest:
+        specifier: ^4.1.11
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(vite@7.3.6(@types/node@22.20.1))
+
 packages:
 
   '@adraffy/ens-normalize@1.11.1':

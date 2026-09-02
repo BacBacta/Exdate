@@ -229,11 +229,12 @@ pnpm workspaces:
 | `packages/indexer` | Ponder + PGlite/Postgres. Indexes `UIMultiplierUpdated`, polls the ERC-8056 views, the Chainlink feeds and the issuer's corporate actions, drains the webhook outbox, and serves the API. |
 | `packages/api` | `@exdate/api` — Hono routes over a `Repository` interface, so it never builds SQL and stays deployable on its own. |
 | `apps/status` | Next.js App Router status page. Reads the API and nothing else. |
-| `packages/sdk` | `@exdate/sdk` — M5, not started. |
+| `packages/sdk` | `@exdate/sdk` — typed client + webhook verifier over `@exdate/core` only, so a consumer never installs the server. Response shapes are hand-declared and compiled against the API's serialisers in `test/contract.assert.ts`. |
 
 Vitest lives in `packages/core` (raw↔UI conversion, reconciliation, pairing, rounds, staleness,
-NFT log filtering, the transport, the committed dataset, opt-in live checks) and `packages/api`
-(serialisation of every state the retrospective/prospective trap can produce). `pnpm test`.
+NFT log filtering, the transport, the webhook scheme, the committed dataset, opt-in live checks),
+`packages/api` (serialisation of every state the retrospective/prospective trap can produce) and `packages/sdk`
+(URL building, typed errors, and a webhook round trip). `pnpm test`.
 
 **Historical prices need no archive node.** `packages/core/src/rounds.ts` binary-searches an
 aggregator's own round history, which is readable from the head — about twelve reads per event, and
@@ -331,6 +332,15 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   required off localhost, secret ≥ 16 chars) and never in a table the API serves; the outbox route
   publishes the host, never the URL or the secret. Signature: HMAC-SHA256 over `${t}.${rawBody}`,
   300 s tolerance, seven retries over ~12 h, then `failed` and kept.
+- 2026-09-02 — The SDK depends on `@exdate/core` only, never on `@exdate/api`: a consumer must not
+  install Hono to read a multiplier. Consequence: response shapes are declared twice, so
+  `packages/sdk/test/contract.assert.ts` compiles them against the serialisers in both directions
+  (assignable, and no key the API adds stays invisible). It immediately caught `/v1/status`
+  serving `ageSeconds`/`beyondHeartbeat` as `undefined` — dropped entirely by `JSON.stringify`,
+  where the rule is null.
+- 2026-09-02 — Webhook payloads are a typed contract in `@exdate/core` (`WebhookData`), and the
+  indexer's `enqueueWebhook` is generic over it. A payload that drifts from what the SDK promises
+  consumers is now a compile error.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -351,7 +361,10 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
       `GET /v1/webhooks` (catalogue + scheme), `GET /v1/:chain/webhooks/events` (outbox).
       Verified end to end against a local receiver that checks the signature with `node:crypto`:
       43 deliveries, 43 valid, 0 failed, and a forged signature rejected.
-- [ ] M5 SDK + docs
+- [x] **M5 SDK + docs** — `packages/sdk`: typed client for every route, `ExdateError` with the
+      status, and the webhook verifier (`webhookFromRequest`, `parseWebhook`) reusing the sender's
+      own function. `docs/api.md` documents every endpoint with a real captured response;
+      `packages/sdk/README.md` documents the client.
 
 ### Known gaps
 

@@ -82,20 +82,107 @@ export const WEBHOOK_EVENTS: readonly {
 ]
 
 /**
+ * The `data` of each event type - the wire contract, declared once.
+ *
+ * The sender is typed against this map, so a payload that drifts from what the
+ * SDK tells consumers to expect is a compile error rather than a surprise in
+ * production. Bigints are decimal strings and anything unobserved is null, the
+ * same rules the REST API follows.
+ */
+export interface WebhookData {
+  'multiplier.scheduled': {
+    currentMultiplier: string
+    newMultiplier: string
+    stepBps: number | null
+    effectiveAt: string
+    secondsUntilEffective: number
+    announcedAt: string | null
+    announcedTx: string | null
+    announcementCount: number | null
+    source: string
+  }
+  'multiplier.applied': {
+    previousMultiplier: string
+    currentMultiplier: string
+    stepBps: number
+    effectiveAt: string
+    observedAtBlock: string
+    /** Why this is an observation and not a log. */
+    basis: string
+  }
+  'feed.stale': FeedTransitionData
+  'feed.resumed': FeedTransitionData
+  'pause.changed': {
+    paused: boolean
+    previousPaused: boolean | null
+    at: string
+    block: string
+    effect: string
+  }
+  'dividend.pending': {
+    actionId: string
+    type: string
+    issuerStatus: string
+    processDate: string | null
+    /** Always true. The issuer's scheduling day is neither the ex-date nor the payable date. */
+    processDateIsNotExDate: true
+    grossPerUnderlyingShare: string | null
+    currency: 'USD'
+    source: string
+  }
+  'dividend.reconciled': {
+    actionId: string
+    processDate: string | null
+    grossPerUnderlyingShare: string | null
+    effectiveAt: string
+    lagDays: number | null
+    observedStepBps: number | null
+    expectedStepBps: number | null
+    /** The measured haircut. Null when the token has no feed to price the step. */
+    impliedHaircutBps: number | null
+    status: string
+    confidence: string
+    note: string | null
+    priceSource: string | null
+  }
+}
+
+export interface FeedTransitionData {
+  feed: string
+  previousStatus: string | null
+  status: string
+  roundId: string
+  answer: string
+  decimals: number
+  updatedAt: string
+  ageSeconds: number | null
+  beyondHeartbeat: boolean | null
+  /** Always true: Chainlink publishes the token price, multiplier included. */
+  answerIncludesMultiplier: true
+}
+
+export type WebhookDataFor<T extends WebhookEventType> = WebhookData[T]
+
+/**
  * The body of every delivery. `data` is event-specific; everything around it is
  * the same shape for all seven types, so a consumer can route on `type` without
- * a per-event parser. Bigints are decimal strings, and anything unobserved is
- * null - the same rules the REST API follows.
+ * a per-event parser.
  */
-export interface WebhookEnvelope<T = Record<string, unknown>> {
+export interface WebhookEnvelope<T extends WebhookEventType = WebhookEventType> {
   id: string
-  type: WebhookEventType
+  type: T
   chainId: number
   /** When exdate observed it, ISO 8601. Not when it happened on chain. */
   observedAt: string
   token: { address: string; symbol: string } | null
-  data: T
+  data: WebhookData[T]
 }
+
+/**
+ * Every envelope, as a union discriminated on `type` - so narrowing on the type
+ * narrows `data` with it.
+ */
+export type AnyWebhookEnvelope = { [T in WebhookEventType]: WebhookEnvelope<T> }[WebhookEventType]
 
 const isEventType = (value: string): value is WebhookEventType =>
   WEBHOOK_EVENTS.some((event) => event.type === value)
