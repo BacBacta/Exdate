@@ -1,0 +1,17 @@
+{
+  "name": "exdate",
+  "private": true,
+  "version": "0.0.0",
+  "description": "The corporate-action layer for tokenized stocks",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "phase0:chain": "node scripts/phase0/check-chain.mjs",
+    "phase0:tokens": "node scripts/phase0/check-tokens.mjs",
+    "phase0:feeds": "node scripts/phase0/check-feeds.mjs",
+    "phase0:events": "node scripts/phase0/find-multiplier-events.mjs",
+    "phase0:snapshot": "node scripts/phase0/snapshot-registry.mjs"
+  }
+}
