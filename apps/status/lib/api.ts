@@ -147,6 +147,27 @@ export interface ReconciliationsResponse {
   reconciliations: ReconciliationView[]
 }
 
+/**
+ * What the page renders from `/v1/:chain/tokens/:addr/yield` - a subset of the
+ * ledger, declared here so the page cannot quietly start showing a field the
+ * API stopped sending. The full shape is typed in @exdate/sdk.
+ */
+export interface YieldLedgerView {
+  token: { address: string; symbol: string }
+  coverage: { closes: boolean | null; closesBasis: string }
+  /** Null unless the ledger closes: see coverage.closesBasis for why. */
+  totals: {
+    distributionsObserved: number
+    underlyingSharesGrowthBps: number | null
+    dividendGrowthBps: number
+    dividendEvents: number
+    unexplainedGrowthBps: number
+    unexplainedEvents: number
+    declaredNotLanded: number
+  } | null
+  notComputed: { field: string; reasonCode: string; detail: string }[]
+}
+
 export class ApiUnreachable extends Error {}
 
 async function get<T>(path: string): Promise<T> {
@@ -164,3 +185,5 @@ export const getTokens = (chain = 'robinhood') => get<TokensResponse>(`/v1/${cha
 export const getCalendar = () => get<CalendarResponse>('/v1/calendar')
 export const getReconciliations = (chain = 'robinhood') =>
   get<ReconciliationsResponse>(`/v1/${chain}/reconciliations`)
+export const getYield = (address: string, chain = 'robinhood') =>
+  get<YieldLedgerView>(`/v1/${chain}/tokens/${address}/yield`)

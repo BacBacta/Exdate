@@ -72,7 +72,8 @@ export const WEBHOOK_EVENTS: readonly {
   {
     type: 'dividend.pending',
     summary: 'The issuer declared a distribution that the multiplier has not reflected.',
-    trigger: 'a new row in GET /rhj/corporate-actions with no multiplier step paired to it.',
+    trigger:
+      'a new row in GET /rhj/corporate-actions with no multiplier step paired to it. On a fresh database the whole outstanding backlog arrives at once, flagged `backlog: true`.',
   },
   {
     type: 'dividend.reconciled',
@@ -123,6 +124,13 @@ export interface WebhookData {
     actionId: string
     type: string
     issuerStatus: string
+    /**
+     * True when this row was already outstanding the first time exdate looked -
+     * a fresh database emits its whole current backlog at once (37 rows on
+     * 2026-09-02). Real events, but not news: a consumer starting up can ignore
+     * them and act only on `backlog: false`.
+     */
+    backlog: boolean
     processDate: string | null
     /** Always true. The issuer's scheduling day is neither the ex-date nor the payable date. */
     processDateIsNotExDate: true

@@ -3,6 +3,7 @@ import { enqueueWebhook } from './webhooks.js'
 import {
   aggregatorV3Abi,
   findRoundAt,
+  kindFromCorporateActionType,
   lagDays,
   pairActionsWithChanges,
   parseDecimal,
@@ -39,11 +40,20 @@ export async function runReconcilePass(
   chainId: number,
   now: bigint,
 ): Promise<number> {
-  const [actionRows, eventRows, tokenRows] = await Promise.all([
+  const [actionRows, eventRows, tokenRows, existingRows] = await Promise.all([
     context.db.sql.select().from(corporateActions),
     context.db.sql.select().from(multiplierEvents),
     context.db.sql.select().from(tokens),
+    context.db.sql.select().from(reconciliations),
   ])
+
+  /**
+   * Nothing reconciled yet, so everything this pass finds was already
+   * outstanding before exdate looked. The dividends are real and the rows are
+   * right, but they are not news, and a consumer subscribing today should be
+   * able to tell the difference - so they go out flagged rather than silenced.
+   */
+  const firstPass = existingRows.length === 0
 
   // Reshape into exactly what the pairing needs. Explicit rather than spread: the
   // pairing decides which declared dividend a haircut belongs to, and a field
@@ -139,6 +149,7 @@ export async function runReconcilePass(
         actionId: action.issuerId,
         type: action.type,
         issuerStatus: action.status,
+        backlog: firstPass,
         processDate: action.processDate,
         processDateIsNotExDate: true,
         grossPerUnderlyingShare: action.rate,
@@ -209,6 +220,23 @@ export async function runReconcilePass(
 
   // --- both sides present: price it and reconcile ---------------------------
   for (const { action, change } of pairing.matched) {
+    // The pairing is the only thing that can classify a step. Magnitude cannot:
+    // DELL's dividend is +0.64 bps, CCL's +214.86 and CRWD's split +30 000, and
+    // they overlap. Written back on every pass, so an action whose type the
+    // issuer corrects is followed rather than frozen at first sight.
+    const kind = kindFromCorporateActionType(action.type)
+    const event = await context.db.find(multiplierEvents, {
+      chainId,
+      token: change.token as Address,
+      effectiveAt: change.effectiveAt,
+    })
+    if (event && event.kind !== kind) {
+      await context.db
+        .update(multiplierEvents, { chainId, token: change.token as Address, effectiveAt: change.effectiveAt })
+        .set({ kind })
+      written++
+    }
+
     const existing = (await context.db.find(reconciliations, { id: action.id })) as any
     if (!needsPricing(existing)) continue
 

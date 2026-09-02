@@ -38,7 +38,7 @@ to four weeks. Every input is sourced; see the report.
 pnpm install
 pnpm dev          # indexer + API   http://localhost:42069
 pnpm dev:status   # status page      http://localhost:3000
-pnpm test         # unit tests for @exdate/core, @exdate/api and @exdate/sdk
+pnpm test         # unit tests: core, api, sdk, and the indexer's webhook outbox
 pnpm typecheck
 ```
 
@@ -155,10 +155,11 @@ by both the live indexer and the poller, carries the id you already have — key
 it. Failures retry seven times over about twelve hours and are then marked `failed` and kept, so a
 consumer that was down can see what it missed at `/v1/:chain/webhooks/events`.
 
-Two things worth knowing before pointing a production consumer at it: a fresh database emits the
-current backlog once (43 events on 2026-09-02 — 37 declared dividends and 6 reconciliations), and
-delivery is drained at the start of each poll cycle, so it lags an event by up to one interval
-(~60 s by default) against a ~9-minute announcement lead.
+Two things worth knowing before pointing a production consumer at it. A fresh database emits the
+current backlog once (43 events on 2026-09-02 — 37 declared dividends and 6 reconciliations);
+those `dividend.pending` payloads carry `backlog: true`, so a consumer starting up can act only on
+`backlog: false`. And delivery is drained at the start of each poll cycle, so it lags an event by
+up to one interval (~60 s by default) against a ~9-minute announcement lead.
 
 ## SDK
 

@@ -341,6 +341,14 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - 2026-09-02 — Webhook payloads are a typed contract in `@exdate/core` (`WebhookData`), and the
   indexer's `enqueueWebhook` is generic over it. A payload that drifts from what the SDK promises
   consumers is now a compile error.
+- 2026-09-02 — Gaps closed: `multiplier_events.kind` is written back from the pairing on every
+  reconcile pass (6 of 12 events classify as `dividend`; the other 6 predate the issuer's
+  one-month feed and stay `unknown`); `dividend.pending` carries `backlog: true` for rows already
+  outstanding at first run rather than hiding them; `feed_rounds` keeps 30 days
+  (`EXDATE_FEED_ROUNDS_RETENTION_DAYS`, newest round per feed always kept) — it is an observation
+  log, not the price history, which is read back from `getRoundData`; the static `tokens` row is
+  written only when it changes; the outbox has unit tests against a fake Ponder store
+  (`ponder:schema` aliased in `packages/indexer/vitest.config.ts`).
 - _(append decisions here as they are made)_
 
 ## Status
@@ -368,16 +376,15 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 ### Known gaps
 
-- `multiplier_events.kind` is still always `unknown`. The pairing now exists in
-  `packages/core/src/pairing.ts`, so writing the issuer's action type back onto the event row is a
-  small remaining step.
-- `feed_rounds` accumulates one row per distinct Chainlink round and nothing prunes it.
-- The poller re-reads all 194 tokens every interval; only rows that changed need writing.
-- `packages/indexer` has no tests of its own (the poller, the sweep, the reconcile pass and the
-  webhook outbox are only exercised by running it — the delivery path was verified live against a
-  local receiver, not in CI). `packages/api` has route and serializer tests.
-- A fresh database emits the whole current backlog of `dividend.pending` once (37 rows on
-  2026-09-02). Real events, but a new consumer sees them all at once.
-- The status page does not surface `/yield` or `/pending`; both are API-only for now.
 - The reconciliation covers cash dividends only. A split matched to a step is written as
   `unsupported_action_type` rather than forced through a per-share model that does not fit it.
+- `token-feed-map.json` is still derived from the ticker (`verified: false` everywhere) — the one
+  place the repo identifies a token by symbol.
+- The poller and the gap sweep have no tests of their own: they need a chain and a Ponder process,
+  so they are exercised by running the indexer. The webhook outbox is unit-tested
+  (`packages/indexer/test/webhooks.test.ts`) and was also verified live against a local receiver.
+- `tokenStates` is written every poll even when nothing moved. Deliberate: `sampledAt` is an
+  observation, and skipping the write would make "checked, unchanged" read as "not checked since".
+  The static registry row is no longer rewritten.
+- The status page surfaces the distribution ledgers and the never-applied dividends; the per-token
+  `/pending` view is API-only.

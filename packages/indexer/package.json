@@ -8,7 +8,8 @@
     "start": "ponder start",
     "serve": "ponder serve",
     "codegen": "ponder codegen",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@exdate/api": "workspace:*",
@@ -20,6 +21,8 @@
   },
   "devDependencies": {
     "typescript": "^5.9.0",
-    "@types/node": "^22.15.0"
+    "@types/node": "^22.15.0",
+    "vitest": "^4.1.11",
+    "vite": "^7.1.14"
   }
 }

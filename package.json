@@ -15,7 +15,7 @@
     "dev:status": "pnpm env:sync && pnpm --filter @exdate/status dev",
     "start": "pnpm env:sync && pnpm --filter @exdate/indexer start",
     "build": "pnpm --filter @exdate/status build",
-    "test": "pnpm -r --filter @exdate/core --filter @exdate/api --filter @exdate/sdk test",
+    "test": "pnpm -r --filter @exdate/core --filter @exdate/api --filter @exdate/sdk --filter @exdate/indexer test",
     "typecheck": "pnpm -r typecheck",
     "registry:generate": "node scripts/generate-registry.mjs",
     "phase0:chain": "node scripts/phase0/check-chain.mjs",

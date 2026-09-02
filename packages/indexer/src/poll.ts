@@ -59,6 +59,14 @@ let corporateActionsNextAt = 0
 const SWEEP_MIN_GAP_BLOCKS = 10_000n
 const SWEEP_CHUNK_BLOCKS = 2_000_000n
 
+/** How long an observed Chainlink round is kept. 0 disables pruning entirely. */
+const RETENTION_DAYS = Number(process.env.EXDATE_FEED_ROUNDS_RETENTION_DAYS ?? 30)
+const RETENTION_SECONDS = BigInt(Math.max(0, Math.floor(RETENTION_DAYS * 86_400)))
+const FEED_ROUNDS_PRUNE_INTERVAL_MS = 60 * 60 * 1000
+/** Bounded per pass so a long-neglected table cannot stall one poll. */
+const FEED_ROUNDS_PRUNE_MAX = 500
+let feedRoundsPruneNextAt = 0
+
 const rpcUrl = process.env.RHC_RPC_URL_ARCHIVE || process.env.RHC_RPC_URL || ROBINHOOD_CHAIN.defaultRpcUrl
 const sweepClient = createPublicClient({
   transport: throttledHttp(rpcUrl, {
@@ -144,30 +152,34 @@ ponder.on('Poll:block', async ({ event, context }) => {
     // than writing a default: a fabricated 1.0 multiplier is worse than a gap.
     if (uiMultiplier === undefined || newUIMultiplier === undefined || effectiveAt === undefined) continue
 
-    await context.db
-      .insert(tokens)
-      .values({
-        chainId,
-        address: token.address,
-        symbol: token.symbol,
-        name: token.name,
-        decimals: token.decimals,
-        isin: token.isin,
-        issuer: ROBINHOOD_CHAIN.issuer,
-        status: token.status,
-        logoUrl: token.logoUrl,
-        feedProxy: token.feedProxy,
-        feedDecimals: token.feedDecimals,
-        feedVerified: token.feedVerified,
-      })
-      .onConflictDoUpdate(() => ({
-        symbol: token.symbol,
-        name: token.name,
-        status: token.status,
-        feedProxy: token.feedProxy,
-        feedDecimals: token.feedDecimals,
-        feedVerified: token.feedVerified,
-      }))
+    // The registry row is static between two generated registries, so it is
+    // written when it is new or when it actually differs - not 194 times a
+    // minute. `tokenStates` below is written every poll on purpose: `sampledAt`
+    // is an observation, and dropping it would make "checked, unchanged"
+    // indistinguishable from "not checked since".
+    const storedToken = await context.db.find(tokens, { chainId, address: token.address })
+    const registryRow = {
+      symbol: token.symbol,
+      name: token.name,
+      decimals: token.decimals,
+      isin: token.isin,
+      status: token.status,
+      logoUrl: token.logoUrl,
+      feedProxy: token.feedProxy,
+      feedDecimals: token.feedDecimals,
+      feedVerified: token.feedVerified,
+    }
+    const registryChanged =
+      storedToken === null ||
+      (Object.keys(registryRow) as (keyof typeof registryRow)[]).some(
+        (key) => storedToken[key] !== registryRow[key],
+      )
+    if (registryChanged) {
+      await context.db
+        .insert(tokens)
+        .values({ chainId, address: token.address, issuer: ROBINHOOD_CHAIN.issuer, ...registryRow })
+        .onConflictDoUpdate(() => registryRow)
+    }
 
     const previous = await context.db.find(tokenStates, { chainId, address: token.address })
 
@@ -340,6 +352,8 @@ ponder.on('Poll:block', async ({ event, context }) => {
     }
   }
 
+  await pruneFeedRounds(context, chainId, now)
+
   // --- Issuer corporate actions ---------------------------------------------
   if (Date.now() >= corporateActionsNextAt) {
     // Set before the call so a failure cannot retry on every block, but a
@@ -349,6 +363,44 @@ ponder.on('Poll:block', async ({ event, context }) => {
     if (ingested) corporateActionsNextAt = Date.now() + CORPORATE_ACTIONS_INTERVAL_MS
   }
 })
+
+/**
+ * Keep `feed_rounds` bounded.
+ *
+ * The table is an observation log - one row per distinct round the poller saw -
+ * and it is not the price history: historical prices are read back from the
+ * aggregator's own `getRoundData` (see packages/core/src/rounds.ts), which
+ * needs no archive node and does not depend on anything stored here. So old
+ * rows can go. AAPL alone would add a row every few minutes forever.
+ *
+ * The newest round of each feed is always kept, so a feed that stopped
+ * publishing keeps its last observation rather than vanishing from the table.
+ */
+async function pruneFeedRounds(context: PollContext, chainId: number, now: bigint) {
+  if (RETENTION_SECONDS <= 0n) return
+  if (Date.now() < feedRoundsPruneNextAt) return
+  feedRoundsPruneNextAt = Date.now() + FEED_ROUNDS_PRUNE_INTERVAL_MS
+
+  const cutoff = now - RETENTION_SECONDS
+  const rows = (await context.db.sql.select().from(feedRounds)).filter((row) => row.chainId === chainId)
+
+  const newestPerFeed = new Map<string, bigint>()
+  for (const row of rows) {
+    const key = String(row.feed).toLowerCase()
+    const seen = newestPerFeed.get(key)
+    if (seen === undefined || row.observedAt > seen) newestPerFeed.set(key, row.observedAt)
+  }
+
+  let pruned = 0
+  for (const row of rows) {
+    if (pruned >= FEED_ROUNDS_PRUNE_MAX) break
+    if (row.observedAt >= cutoff) continue
+    if (newestPerFeed.get(String(row.feed).toLowerCase()) === row.observedAt) continue
+    await context.db.delete(feedRounds, { chainId, feed: row.feed, roundId: row.roundId })
+    pruned++
+  }
+  if (pruned > 0) console.log(`[exdate] pruned ${pruned} feed round(s) older than ${RETENTION_DAYS} days`)
+}
 
 /**
  * Close the window between the committed scan and Ponder's live sync.

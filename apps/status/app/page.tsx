@@ -4,8 +4,10 @@ import {
   getCalendar,
   getReconciliations,
   getTokens,
+  getYield,
   type ReconciliationView,
   type TokenView,
+  type YieldLedgerView,
 } from '../lib/api'
 import { age, bps, daysSince, multiplier, price, shortAddress, utc } from './format'
 
@@ -79,6 +81,16 @@ export default async function Page() {
   const owed = (recon?.reconciliations ?? []).filter(
     (row) => row.status === 'pending' && row.declared?.status === 'CORPORATE_ACTION_STATUS_COMPLETED',
   )
+  /**
+   * One ledger per token that has actually moved - a dozen requests today, not
+   * 194, because a token whose multiplier still reads 1.0 has nothing to show.
+   * A ledger that fails to load drops out of the table rather than taking the
+   * page down with it.
+   */
+  const ledgers = (
+    await Promise.all(moved.map((token) => getYield(token.address).catch(() => null)))
+  ).filter((ledger): ledger is YieldLedgerView => ledger !== null)
+
   const observedAt = polled
     .map((token) => token.multiplier.sampledAt)
     .filter((value): value is string => value !== null)
@@ -287,6 +299,84 @@ export default async function Page() {
             This is the pending-dividend window, observed rather than assumed. It needs both sides:
             the issuer&rsquo;s own record that a dividend was processed, and the absence of any
             matching multiplier step on chain.
+          </p>
+        </>
+      ) : null}
+
+      {ledgers.length > 0 ? (
+        <>
+          <h2>
+            Distribution ledgers
+            <span className="sub">
+              growth in underlying shares per share held, split into what a declared dividend
+              explains and what nothing does
+            </span>
+          </h2>
+          <div className="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>Steps</th>
+                  <th>Growth</th>
+                  <th>Dividends</th>
+                  <th>Unexplained</th>
+                  <th>Owed, not landed</th>
+                  <th>Closes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ledgers.map((ledger) => (
+                  <tr key={ledger.token.address}>
+                    <td className="sym">{ledger.token.symbol}</td>
+                    <td className="num">{ledger.totals?.distributionsObserved ?? '—'}</td>
+                    <td className="num">{bps(ledger.totals?.underlyingSharesGrowthBps ?? null)}</td>
+                    <td className="num">
+                      {ledger.totals ? (
+                        <>
+                          {bps(ledger.totals.dividendGrowthBps)}
+                          <span className="addr"> ({ledger.totals.dividendEvents})</span>
+                        </>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                    <td className="num">
+                      {ledger.totals ? (
+                        <>
+                          {bps(ledger.totals.unexplainedGrowthBps)}
+                          <span className="addr"> ({ledger.totals.unexplainedEvents})</span>
+                        </>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                    <td className="num">{ledger.totals?.declaredNotLanded ?? '—'}</td>
+                    <td>
+                      {ledger.coverage.closes === true ? (
+                        <span className="pill live">yes</span>
+                      ) : (
+                        <span className="pill none" title={ledger.coverage.closesBasis}>
+                          no
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="caption">
+            A step counts as a dividend only where an issuer cash dividend is paired to it
+            <em> and the two reconcile</em> — a split produces the same arithmetic with no economic
+            gain, and a paired dividend whose numbers do not add up is an anomaly, so neither is
+            called yield. &ldquo;Unexplained&rdquo; is therefore those two plus the
+            issuer&rsquo;s own history: its corporate-action feed goes back about a month, so
+            earlier steps have no declared row to match at all. Totals
+            appear only when the ledger closes against the multiplier read at the head. Nothing here
+            is annualised: <code>/v1/:chain/tokens/:addr/yield</code> lists every rate it refuses to
+            compute, with a reason code, and{' '}
+            <code>/v1/:chain/tokens/:addr/pending</code> reports what is owed per token.
           </p>
         </>
       ) : null}
