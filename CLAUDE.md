@@ -457,8 +457,10 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - The five July actions have no declared rate and never will (see the decision log); their steps
   are published as `unmatched` with the reason stated rather than filled in.
 
-- The reconciliation covers cash dividends only. A split matched to a step is written as
-  `unsupported_action_type` rather than forced through a per-share model that does not fit it.
+- No split has ever been reconciled end to end. `reconcileSplit()` exists and is tested, but every
+  split reaches it without a declared ratio — the only one ever observed (CRWD ×4) lost its issuer
+  row, and all 43 archived actions are cash dividends — so it refuses and the row stays
+  `unsupported_action_type` with the observed ratio stated.
 - The token → feed pairing is corroborated for 1 of 35 tokens and named-only for the other 34. No
   first-party link exists to close the gap; a second SGOV-like token (low-volatility underlying,
   large step) would corroborate another row. See `docs/phase-0-verification.md` §14.
