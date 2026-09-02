@@ -61,5 +61,5 @@ export function isFresh(input: FeedHealthInput & { toleranceSeconds: number }): 
   const { updatedAt, nowSeconds, oraclePaused, toleranceSeconds } = input
   if (updatedAt === undefined || updatedAt === 0n) return false
   if (oraclePaused === true) return false
-  return Number(nowSeconds - updatedAt) < toleranceSeconds
+  return Number(nowSeconds - updatedAt) <= toleranceSeconds
 }
