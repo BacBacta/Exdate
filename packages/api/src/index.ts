@@ -5,6 +5,7 @@ import {
   SCANNED_AT,
   SCAN_FROM_BLOCK,
   SCAN_THROUGH_BLOCK,
+  buildPendingView,
   buildYieldLedger,
   feedHealth,
   resolveChain,
@@ -109,6 +110,49 @@ export function createApi({ repository, now = () => BigInt(Math.floor(Date.now()
         reconciliations: rows,
         events,
         scan: { fromBlock: SCAN_FROM_BLOCK, throughBlock: SCAN_THROUGH_BLOCK, scannedAt: SCANNED_AT },
+        nowSeconds: now(),
+        matchWindowDays: MATCH_WINDOW_DAYS,
+      }),
+    )
+  })
+
+  /**
+   * What is owed and has not arrived, for one token: the change already
+   * announced on chain, and every dividend the issuer has declared that the
+   * multiplier has not yet reflected - including the ones the issuer's own feed
+   * marks completed.
+   */
+  app.get('/v1/:chain/tokens/:address/pending', async (c) => {
+    const chain = resolveChain(c.req.param('chain'))
+    if (!chain) return c.json(unknownChain, 404)
+    const address = c.req.param('address')
+    const row = await repository.token(chain.id, address)
+    if (!row) return c.json({ error: 'unknown token', chainId: chain.id, address }, 404)
+    const [rows, events] = await Promise.all([
+      repository.reconciliations(chain.id, address),
+      repository.multiplierEvents(chain.id, address),
+    ])
+    return c.json(
+      buildPendingView({
+        token: {
+          chainId: row.chainId,
+          address: row.address,
+          symbol: row.symbol,
+          decimals: row.decimals,
+          issuer: row.issuer,
+          uiMultiplier: row.uiMultiplier,
+          newUIMultiplier: row.newUIMultiplier,
+          effectiveAt: row.effectiveAt,
+          oraclePaused: row.oraclePaused,
+          sampledAt: row.sampledAt,
+          feedProxy: row.feedProxy,
+          feedVerified: row.feedVerified,
+          feedDecimals: row.feedDecimals,
+          feedAnswer: row.feedAnswer,
+          feedUpdatedAt: row.feedUpdatedAt,
+        },
+        reconciliations: rows,
+        events,
         nowSeconds: now(),
         matchWindowDays: MATCH_WINDOW_DAYS,
       }),

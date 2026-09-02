@@ -318,6 +318,12 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   annualised, trailing and forward figures are absent from the shape and listed under
   `notComputed` with a reason code. Library `packages/core/src/yield.ts`, tests on SGOV's real
   three-step history.
+- 2026-09-02 — `/v1/:chain/tokens/:addr/pending` separates `scheduled` (announced on chain, ~9 min
+  out) from `awaiting` (declared, inside the 4-day window) and `declared_complete_not_on_chain`
+  (the issuer says COMPLETED, the multiplier has not moved). Cash owed per token is stated because
+  it needs no price (`rate × uiMultiplier`); the step a full payment would produce is a
+  **projection** at the latest round, flagged `notAMeasurement`; the landing date and the surviving
+  fraction are refused under `notComputed`. Library `packages/core/src/pending.ts`.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -330,9 +336,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - [x] **M2 net yield + calendar** — `/v1/calendar` serves the issuer's upcoming rows;
       `/v1/:chain/tokens/:addr/yield` serves the distribution ledger (see decision log). The status
       page does not render the ledger yet.
-- [x] **M3 reconciliation** — `reconciliations` table computed live by the poller and served at
+- [x] **M3 reconciliation + pending** — `reconciliations` table computed live by the poller and served at
       `/v1/:chain/reconciliations`; the observed haircut and the never-applied dividends are on the
-      status page. Remaining for M3: `/v1/:chain/tokens/:addr/pending`.
+      status page, and `/v1/:chain/tokens/:addr/pending` reports what is owed and has not arrived.
 - [ ] M4 signed webhooks
 - [ ] M5 SDK + docs
 
@@ -343,9 +349,8 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   small remaining step.
 - `feed_rounds` accumulates one row per distinct Chainlink round and nothing prunes it.
 - The poller re-reads all 194 tokens every interval; only rows that changed need writing.
-- No `/v1/:chain/tokens/:addr/pending` endpoint yet — the data behind it is in `reconciliations`.
 - `packages/indexer` has no tests of its own (the poller, the sweep and the reconcile pass are
   only exercised by running it). `packages/api` has route and serializer tests.
-- The status page does not surface `/yield`; the ledger is API-only for now.
+- The status page does not surface `/yield` or `/pending`; both are API-only for now.
 - The reconciliation covers cash dividends only. A split matched to a step is written as
   `unsupported_action_type` rather than forced through a per-share model that does not fit it.

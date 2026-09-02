@@ -10,10 +10,10 @@ exdate indexes what actually happens: every multiplier update, every corporate a
 that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
 and the health of every Chainlink feed.
 
-> **Status: M1, M2 and the core of M3 shipped.** The indexer, the API, the reconciliation table and
+> **Status: M1, M2 and M3 shipped.** The indexer, the API, the reconciliation table and
 > the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
 > feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 49 reconciliation rows. The
-> pending-dividend endpoint, the webhooks and the SDK are not built yet — they are marked below.
+> webhooks and the SDK are not built yet — they are marked below.
 > Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
@@ -87,6 +87,9 @@ GET /v1/:chain/events                      every multiplier event, newest first
 GET /v1/:chain/reconciliations             declared vs observed, per action  ?token= ?status=
 GET /v1/:chain/tokens/:addr/yield          the distribution ledger: per-payment gross, received,
                                            haircut; growth split dividend / unexplained; no rate
+GET /v1/:chain/tokens/:addr/pending        what is owed and has not arrived: the change already
+                                           announced on chain, and every declared dividend the
+                                           multiplier has not reflected
 GET /v1/status                             every feed: live, stale, paused, and how many have none
 GET /v1/calendar                           issuer corporate actions + pending on-chain updates
 ```
@@ -99,11 +102,12 @@ action, calls a step *yield* only when it is paired with an issuer cash dividend
 figure it refuses to compute (`annualizedYield`, `trailingTwelveMonthYield`, `forwardYield`) with a
 reason code. Nothing in it is per annum.
 
-Not built yet:
-
-```
-GET /v1/:chain/tokens/:addr/pending        dividend owed but not yet reflected            (M3)
-```
+`/pending` keeps three states apart that are usually conflated: `scheduled` (a log is on chain, the
+change is about nine minutes away), `awaiting` (declared, still inside the observed next-business-day
+window) and `declared_complete_not_on_chain` (the issuer's own feed says COMPLETED while the
+multiplier has not moved — seven tokens on 2026-09-02, BND for four weeks). It projects the step a
+full payment would produce at the latest round, marked `notAMeasurement`, and refuses to predict
+when the step will land or how much of it will survive.
 
 Webhooks (M4): `multiplier.scheduled`, `multiplier.applied`, `feed.stale`, `feed.resumed`,
 `pause.changed`, `dividend.pending`, `dividend.reconciled`.
