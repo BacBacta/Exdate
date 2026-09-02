@@ -31,6 +31,11 @@ nowhere else.
 - Block 1 is 2026-04-30; the public mainnet date is 2026-07-01 (≈ block 900 000).
   **Cadence ≈ 0.1 s/block, ≈ 857 000 blocks/day.** Block 0 has timestamp `0` — never use it for math.
 - Single Robinhood-operated sequencer, no permissionless fallback.
+- **Multicall3 is deployed at the canonical address** `0xcA11bde05977b3631167028862bE2a173976CA11`
+  (3 808 bytes). It turns the 194-token poll from 776 `eth_call`s into ~30 requests.
+- **There is no archive.** `eth_call` at `latest - 10 000` already answers
+  `metadata is not found`; only the last few thousand blocks of state are readable. Historical
+  multiplier state must be reconstructed from events, not read back.
 - Primary quote asset is **USDG** (6 decimals), not USDC.
 - Deployed: Uniswap (v3 + v4 hooks), Morpho, Rialto (propAMM), Lighter (orderbook), Chainlink.
 
@@ -148,9 +153,20 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   `data`. Drop any `Transfer` log with `topics.length == 4`.
 - **Beacon proxy**: all 194 tokens are 283-byte EIP-1967 beacon proxies pointing at
   `0xe10b6f6b275de231345c20d14ab812db62151b00`. One upgrade changes every token's ABI at once.
-- **Public RPC cannot backfill.** 429s under light load; `eth_getLogs` caps at 10 000 results (and
-  50 000 on some nodes in the pool — inconsistent) and times out on wide ranges. AAPL alone emits
-  ≈ 375 000 logs/day. A dedicated archive endpoint is required before indexing transfers.
+- **The RPC's limiter is cost-based, not rate-based.** `eth_blockNumber` survives 25 back-to-back
+  calls and even 8 in parallel with zero rejections. `eth_getLogs` is rejected **1 to 4 times out
+  of 8 at any pacing** — serialised with a 150 ms gap changes nothing. Slowing down does not help;
+  retrying does. `packages/core/src/transport.ts` absorbs these so the indexer never sees them.
+- **`eth_getLogs` result caps** at 10 000 (and 50 000 on some nodes in the pool — inconsistent) and
+  times out on wide ranges *without* an address filter. With all 194 addresses **and** a topic
+  filter, a 5 000 000-block query answers in under a second.
+- **Ponder cannot walk this chain's history on the public RPC.** Measured: 25 blocks per 9–16 s.
+  Ponder splits the address list into 4 chunks and sizes each sync round from the previous round's
+  duration, starting at 25 blocks with a ×1.5 ceiling per round — so a slow round never grows.
+  Extrapolated over the 51.7 M blocks since mainnet: **≈ 300 days**. One wide query per 2 000 000
+  blocks does the same scan in 26 requests, about two minutes. Hence the two-tier design below.
+- AAPL alone emits ≈ 375 000 logs/day. A dedicated archive endpoint is required before indexing
+  transfers.
 - A `Transfer` proves custody moved, not that a trade happened. A provable trade needs both legs
   (Stock Token + USDG) in the same `transactionHash`.
 - Mint = transfer from `address(0)`. Burn = transfer to `address(0)`.
@@ -159,8 +175,14 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
 
 ## Observed corporate actions
 
-12 `UIMultiplierUpdated` logs across 9 tokens since 2026-07-02, full data in
-`data/multiplier-events.observed.json`. Rescan: `node scripts/phase0/find-multiplier-events.mjs`.
+**13 `UIMultiplierUpdated` logs = 12 distinct changes across 10 tokens** since 2026-07-02 (CRWD
+announced the same change twice). Full data in `data/multiplier-events.observed.json`.
+Rescan the whole chain: `node scripts/backfill-multiplier-events.mjs`, then
+`node scripts/generate-registry.mjs`.
+
+The most recent is **F (Ford), 2026-09-02, +1.46 bps**, announced 15:00:41 UTC and effective
+15:10:26 UTC — caught the same day, against an issuer row with `processDate` 2026-09-01 and a
+declared rate of $0.15.
 
 Observed step range: **+0.64 bps (DELL) to +214.86 bps (CCL)**, plus CRWD at ×4 (a split). The
 "0.05 %–2 %" band from the kickoff prompt does not hold — do not classify `kind` by magnitude.
@@ -184,12 +206,45 @@ something unexplained. Report the observed number; never claim the decomposition
 
 ## Stack
 
-pnpm workspaces. `packages/indexer` (Ponder + Postgres), `packages/api` (Hono),
-`packages/sdk` (`@exdate/sdk`, viem + fetch), `apps/status` (Next.js App Router). Vitest, focused
-on: raw↔UI conversion, reconciliation logic, staleness detection, NFT log filtering.
+pnpm workspaces:
+
+| Package | What |
+|---|---|
+| `packages/core` | `@exdate/core` — chains, ABIs, WAD maths, staleness, NFT log filtering, reconciliation, the throttled transport, and the generated registry. No I/O, fully unit-tested. |
+| `packages/indexer` | Ponder + PGlite/Postgres. Indexes `UIMultiplierUpdated`, polls the ERC-8056 views, the Chainlink feeds and the issuer's corporate actions, and serves the API. |
+| `packages/api` | `@exdate/api` — Hono routes over a `Repository` interface, so it never builds SQL and stays deployable on its own. |
+| `apps/status` | Next.js App Router status page. Reads the API and nothing else. |
+| `packages/sdk` | `@exdate/sdk` — M5, not started. |
+
+Vitest lives in `packages/core`: 68 tests on raw↔UI conversion, reconciliation, staleness, NFT log
+filtering and the transport. `pnpm test`.
+
+**Two-tier indexing, forced by the RPC (see "Known traps").**
+
+1. *History* — `node scripts/backfill-multiplier-events.mjs` scans the whole chain in 26 requests
+   and writes `data/multiplier-events.observed.json`; `scripts/generate-registry.mjs` turns it into
+   a typed module the poller seeds on first run, with `source = 'onchain:scan'`.
+2. *Live* — Ponder's `StockToken` source starts at `latest` and catches every new event, writing
+   `source = 'onchain:indexer'`, which wins on conflict.
+
+Both tiers are real logs with real transaction hashes; `source` says which scanner found the row.
+Set `RHC_RPC_URL_ARCHIVE` and `RHC_START_BLOCK=900000` to have Ponder own the whole history instead.
 
 Multi-chain from day one — Base / Coinbase B20 is a planned second issuer, so keep `chain_id` and
 `issuer` in every table and never hardcode a single chain.
+
+## Running it
+
+```bash
+pnpm install
+pnpm dev          # Ponder indexer + API on http://localhost:42069
+pnpm dev:status   # status page on http://localhost:3000
+pnpm test
+pnpm typecheck
+```
+
+The poller writes its first rows within one interval (`EXDATE_POLL_INTERVAL_BLOCKS`, default 600
+blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 ## Reference docs
 
@@ -215,13 +270,36 @@ Multi-chain from day one — Base / Coinbase B20 is a planned second issuer, so 
   issuer's own `GET /rhj/corporate-actions`, snapshotted on every poll. No market-data vendor.
   `corporate_actions.source = 'robinhood:/rhj/corporate-actions'`, keep the issuer `id`.
 - 2026-09-02 — No archive RPC before a transfer indexer exists. Nothing in M1–M3 needs one.
+- 2026-09-02 — **Greenlit by the human**: the four proposals above are accepted. M1 built on them.
+- 2026-09-02 — **Two-tier indexing**, forced by measurement, not preference: Ponder's sync loop
+  manages 25 blocks per 9–16 s on the public RPC (≈ 300 days for the full history), while one wide
+  `eth_getLogs` per 2 000 000 blocks scans everything in 26 requests. History comes from
+  `scripts/backfill-multiplier-events.mjs`; Ponder starts at `latest` and owns everything live.
+  Rows carry `source` so the two are never conflated. Reversible in one env var once a dedicated
+  RPC exists (`RHC_START_BLOCK=900000`).
+- 2026-09-02 — The API lives in `packages/api` as Hono routes over a `Repository` interface and is
+  mounted by the indexer's `src/api/index.ts`. One implementation, served next to the data in dev,
+  still deployable on its own later.
 - _(append decisions here as they are made)_
 
 ## Status
 
 - [x] Phase 0 verification report — `docs/phase-0-verification.md`
-- [ ] M1 indexer + status page — **waiting on greenlight**, nothing else blocks it
-- [ ] M2 net yield + calendar — calendar input exists today (31 upcoming rows)
-- [ ] M3 reconciliation + pending dividend — 5 matched, 3 anomalies, 7 pending, already observable
+- [x] **M1 indexer + status page** — 194 tokens polled, 35 feeds live, 12 multiplier events, page
+      renders real mainnet data, 68 tests green. API: `/v1/health`, `/v1/chains`,
+      `/v1/:chain/tokens`, `/v1/:chain/tokens/:address`, `/v1/:chain/events`, `/v1/status`,
+      `/v1/calendar`.
+- [ ] M2 net yield + calendar — `/v1/calendar` already serves the issuer's 31 upcoming rows; the
+      yield endpoint and the `confidence` surface are still to build
+- [ ] M3 reconciliation + pending dividend — the maths is in `packages/core/src/reconcile.ts` and
+      unit-tested against AAPL/SGOV/ASML/CCL/BND; the `reconciliations` table is not written yet
 - [ ] M4 signed webhooks
 - [ ] M5 SDK + docs
+
+### Known gaps in M1
+
+- `multiplier_events.kind` is always `unknown`: nothing joins the issuer's corporate actions to the
+  onchain events yet. That join is M3.
+- `feed_rounds` accumulates one row per distinct Chainlink round and nothing prunes it.
+- The poller re-reads all 194 tokens every interval; only rows that changed need writing.
+- No `reconciliations` table yet, so the haircut is computable but not served.

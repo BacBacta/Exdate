@@ -1,0 +1,194 @@
+import { feedHealth, isPending, WAD } from '@exdate/core'
+import { formatUnits } from 'viem'
+import type { CorporateActionRow, MultiplierEventRow, TokenRow } from './types.js'
+
+/**
+ * Serialisation rules, and they are the honesty policy in code:
+ *
+ *  - every bigint leaves as a decimal string, never a JS number
+ *  - a field exdate has not observed is `null`, never 0 and never a default
+ *  - `state` says explicitly when a token has not been polled yet
+ *  - `scheduled` is populated only when a change is genuinely pending, which
+ *    means `effectiveAt > now` AND `newUIMultiplier != uiMultiplier`
+ */
+
+const iso = (seconds: bigint | null | undefined): string | null =>
+  seconds === null || seconds === undefined || seconds === 0n
+    ? null
+    : new Date(Number(seconds) * 1000).toISOString()
+
+const decimal = (value: bigint | null | undefined, decimals: number): string | null =>
+  value === null || value === undefined ? null : formatUnits(value, decimals)
+
+export interface SerializeOptions {
+  /** Observation time in seconds. Injected so responses are testable. */
+  nowSeconds: bigint
+  explorerUrl: string
+}
+
+export function serializeToken(row: TokenRow, options: SerializeOptions) {
+  const { nowSeconds, explorerUrl } = options
+  const polled = row.uiMultiplier !== null && row.newUIMultiplier !== null && row.effectiveAt !== null
+
+  const pending =
+    polled &&
+    isPending(
+      {
+        uiMultiplier: row.uiMultiplier as bigint,
+        newUIMultiplier: row.newUIMultiplier as bigint,
+        effectiveAt: row.effectiveAt as bigint,
+      },
+      nowSeconds,
+    )
+
+  const health = row.feedProxy
+    ? feedHealth({
+        updatedAt: row.feedUpdatedAt ?? undefined,
+        nowSeconds,
+        oraclePaused: row.oraclePaused ?? undefined,
+        heartbeatSeconds: undefined,
+      })
+    : null
+
+  return {
+    chainId: row.chainId,
+    address: row.address,
+    symbol: row.symbol,
+    name: row.name,
+    decimals: row.decimals,
+    isin: row.isin,
+    issuer: row.issuer,
+    status: row.status,
+    logoUrl: row.logoUrl,
+    explorerUrl: `${explorerUrl}/token/${row.address}`,
+
+    /** 'indexed' once the poller has read the ERC-8056 views for this token. */
+    state: polled ? ('indexed' as const) : ('not_yet_polled' as const),
+
+    multiplier: {
+      current: row.uiMultiplier?.toString() ?? null,
+      currentDecimal: decimal(row.uiMultiplier, 18),
+      /**
+       * Only ever non-null while a change is genuinely pending. `effectiveAt`
+       * on its own is retrospective: it holds the timestamp of the last change
+       * that already took effect, which is why it is reported separately below.
+       */
+      scheduled: pending
+        ? {
+            value: (row.newUIMultiplier as bigint).toString(),
+            valueDecimal: decimal(row.newUIMultiplier, 18),
+            effectiveAt: iso(row.effectiveAt),
+            secondsRemaining: Number((row.effectiveAt as bigint) - nowSeconds),
+          }
+        : null,
+      /** When the multiplier last changed. Null for a token that never moved. */
+      lastChangeEffectiveAt: iso(row.effectiveAt),
+      totalSupplyUI: row.totalSupplyUI?.toString() ?? null,
+      sampledAt: iso(row.sampledAt),
+    },
+
+    events: {
+      count: row.eventCount,
+      last:
+        row.lastEventEffectiveAt === null
+          ? null
+          : {
+              effectiveAt: iso(row.lastEventEffectiveAt),
+              announcedAt: iso(row.lastEventAnnouncedAt),
+              announcementLeadSeconds:
+                row.lastEventAnnouncedAt === null
+                  ? null
+                  : Number(row.lastEventEffectiveAt - row.lastEventAnnouncedAt),
+              announcedTx: row.lastEventAnnouncedTx,
+              announcementCount: row.lastEventAnnouncementCount,
+              source: row.lastEventSource,
+              oldMultiplier: row.lastEventOldMultiplier?.toString() ?? null,
+              newMultiplier: row.lastEventNewMultiplier?.toString() ?? null,
+              stepBps:
+                row.lastEventOldMultiplier && row.lastEventNewMultiplier
+                  ? (Number(row.lastEventNewMultiplier - row.lastEventOldMultiplier) /
+                      Number(row.lastEventOldMultiplier)) *
+                    10_000
+                  : null,
+            },
+    },
+
+    feed:
+      row.feedProxy === null
+        ? null
+        : {
+            proxy: row.feedProxy,
+            /**
+             * False everywhere today. Chainlink names its feeds by ticker and
+             * there is no on-chain token -> aggregator link, so this pairing is
+             * derived rather than verified. Consumers should treat a false here
+             * as a reason to lower their own confidence.
+             */
+            verified: row.feedVerified,
+            decimals: row.feedDecimals,
+            roundId: row.feedRoundId?.toString() ?? null,
+            answer: row.feedAnswer?.toString() ?? null,
+            price: decimal(row.feedAnswer, row.feedDecimals ?? 8),
+            updatedAt: iso(row.feedUpdatedAt),
+            ageSeconds: health?.ageSeconds ?? null,
+            beyondHeartbeat: health?.beyondHeartbeat ?? null,
+            status: health?.status ?? 'unknown',
+            oraclePaused: row.oraclePaused,
+            sampledAt: iso(row.feedSampledAt),
+            /**
+             * The feed answer is total return: it already includes the
+             * multiplier. Multiplying it by uiMultiplier double-counts every
+             * dividend ever paid.
+             */
+            includesMultiplier: true,
+          },
+  }
+}
+
+export function serializeMultiplierEvent(row: MultiplierEventRow, nowSeconds: bigint) {
+  return {
+    chainId: row.chainId,
+    token: row.token,
+    effectiveAt: iso(row.effectiveAt),
+    /** Derived from the clock: no event is emitted when a change takes effect. */
+    applied: row.effectiveAt <= nowSeconds,
+    oldMultiplier: row.oldMultiplier.toString(),
+    newMultiplier: row.newMultiplier.toString(),
+    stepBps: (Number(row.newMultiplier - row.oldMultiplier) / Number(row.oldMultiplier)) * 10_000,
+    announcedAt: iso(row.announcedAt),
+    announcedBlock: row.announcedBlock.toString(),
+    announcedTx: row.announcedTx,
+    announcementLeadSeconds: Number(row.effectiveAt - row.announcedAt),
+    /** Greater than 1 means the schedule was re-announced, as CRWD's was. */
+    announcementCount: row.announcementCount,
+    lastAnnouncedAt: iso(row.lastAnnouncedAt),
+    lastAnnouncedTx: row.lastAnnouncedTx,
+    kind: row.kind,
+    /** Which scanner found the log. Never a source other than the chain. */
+    source: row.source,
+  }
+}
+
+export function serializeCorporateAction(row: CorporateActionRow) {
+  return {
+    id: row.id,
+    chainId: row.chainId,
+    token: row.token,
+    symbol: row.symbol,
+    underlyingSymbol: row.underlyingSymbol,
+    type: row.type,
+    status: row.status,
+    /**
+     * The issuer's scheduling day. Explicitly not the ex-date and not the
+     * payable date; the on-chain effect lands on a later business day.
+     */
+    processDate: row.processDate,
+    rate: row.rate,
+    oldRate: row.oldRate,
+    newRate: row.newRate,
+    source: row.source,
+  }
+}
+
+export const WAD_DECIMALS = 18
+export { WAD }

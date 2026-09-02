@@ -1,0 +1,118 @@
+:root {
+  --bg: #fbfbfa;
+  --panel: #ffffff;
+  --ink: #16181d;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --line: #e6e6e3;
+  --line-strong: #d3d3ce;
+  --accent: #1f6feb;
+  --live: #15803d;
+  --live-bg: #e8f5ec;
+  --stale: #b45309;
+  --stale-bg: #fdf3e3;
+  --paused: #b91c1c;
+  --paused-bg: #fceceb;
+  --none: #6b7280;
+  --none-bg: #f1f1ef;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --panel: #161920;
+    --ink: #e8eaed;
+    --muted: #9aa3af;
+    --faint: #6b7280;
+    --line: #242830;
+    --line-strong: #333945;
+    --accent: #6aa3ff;
+    --live: #6ee7a8;
+    --live-bg: #12291d;
+    --stale: #fbbf5c;
+    --stale-bg: #2c2113;
+    --paused: #fca5a5;
+    --paused-bg: #2c1717;
+    --none: #9aa3af;
+    --none-bg: #1c2027;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+
+header.masthead { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+.masthead h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.02em; }
+.masthead p { margin: 0; color: var(--muted); max-width: 68ch; }
+.masthead .observed { margin-top: 10px; font-family: var(--mono); font-size: 12px; color: var(--faint); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.card .value { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.card .label { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.card .note { color: var(--faint); font-size: 11px; margin-top: 6px; }
+
+h2 { font-size: 16px; margin: 34px 0 10px; letter-spacing: -0.01em; }
+h2 .sub { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 8px; }
+
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; background: var(--bg); position: sticky; top: 0; }
+tbody tr:last-child td { border-bottom: none; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+td.wide { white-space: normal; min-width: 200px; }
+.sym { font-weight: 600; }
+.name { color: var(--muted); font-size: 12px; }
+.addr { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
+.pill {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.pill.live { color: var(--live); background: var(--live-bg); }
+.pill.stale { color: var(--stale); background: var(--stale-bg); }
+.pill.paused { color: var(--paused); background: var(--paused-bg); }
+.pill.unknown, .pill.none { color: var(--none); background: var(--none-bg); }
+
+.dash { color: var(--faint); }
+.up { color: var(--live); }
+
+.banner {
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+.banner h3 { margin: 0 0 6px; font-size: 15px; }
+.banner p { margin: 0 0 6px; color: var(--muted); }
+.banner code { font-family: var(--mono); font-size: 12px; background: var(--none-bg); padding: 1px 5px; border-radius: 4px; }
+
+footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--faint); font-size: 12px; }
+footer p { margin: 0 0 6px; max-width: 78ch; }

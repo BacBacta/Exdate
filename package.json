@@ -5,9 +5,18 @@
   "description": "The corporate-action layer for tokenized stocks",
   "license": "MIT",
   "type": "module",
-  "engines": { "node": ">=22" },
-  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.18.0",
   "scripts": {
+    "dev": "pnpm --filter @exdate/indexer dev",
+    "dev:status": "pnpm --filter @exdate/status dev",
+    "start": "pnpm --filter @exdate/indexer start",
+    "build": "pnpm --filter @exdate/status build",
+    "test": "pnpm --filter @exdate/core test",
+    "typecheck": "pnpm -r typecheck",
+    "registry:generate": "node scripts/generate-registry.mjs",
     "phase0:chain": "node scripts/phase0/check-chain.mjs",
     "phase0:tokens": "node scripts/phase0/check-tokens.mjs",
     "phase0:feeds": "node scripts/phase0/check-feeds.mjs",
@@ -15,5 +24,15 @@
     "phase0:snapshot": "node scripts/phase0/snapshot-registry.mjs",
     "phase0:corporate-actions": "node scripts/phase0/check-corporate-actions.mjs",
     "phase0:feed-price-at": "node scripts/phase0/feed-price-at.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.11",
+    "vite": "^7.1.14"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

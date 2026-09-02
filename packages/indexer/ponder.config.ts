@@ -1,0 +1,91 @@
+import { ROBINHOOD_CHAIN, stockTokenAbi, throttledHttp, tokenAddresses } from '@exdate/core'
+import { createConfig } from 'ponder'
+
+const rpcUrl = process.env.RHC_RPC_URL_ARCHIVE || process.env.RHC_RPC_URL || ROBINHOOD_CHAIN.defaultRpcUrl
+
+/**
+ * Minimum gap between two RPC calls, ms. The public endpoint rejects roughly
+ * half of all eth_getLogs calls whatever the pacing, so the transport retries
+ * rather than relying on this; raise it only if a provider asks for it.
+ */
+const minGapMs = Number(process.env.RHC_RPC_MIN_GAP_MS ?? 80)
+
+/**
+ * Blocks between polls of the ERC-8056 views and the Chainlink feeds.
+ * ~0.1 s per block, so 600 blocks is about a minute.
+ */
+const pollIntervalBlocks = Number(process.env.EXDATE_POLL_INTERVAL_BLOCKS ?? 600)
+
+/**
+ * Where the event sync starts. Defaults to the head, and that default is a
+ * consequence of the endpoint, not a shortcut.
+ *
+ * Ponder splits the 194 addresses into four eth_getLogs calls per sync round
+ * and sizes each round from the previous round's duration, starting at 25
+ * blocks and growing by at most half. On this RPC a round takes 9-16 s, so the
+ * range never leaves its floor: measured at 25 blocks per 12 s, walking the
+ * 51.7 M blocks since the public mainnet date would take about 300 days.
+ *
+ * The full history is instead scanned by scripts/backfill-multiplier-events.mjs
+ * - one wide query per 2 000 000 blocks, 26 requests, about two minutes - and
+ * seeded by the poller. Ponder then does what it is good at: catching every new
+ * event live.
+ *
+ * Point RHC_RPC_URL_ARCHIVE at a dedicated provider and set RHC_START_BLOCK to
+ * 900000 to have Ponder own the whole history instead.
+ */
+const startBlock = process.env.RHC_START_BLOCK ? Number(process.env.RHC_START_BLOCK) : ('latest' as const)
+
+export default createConfig({
+  chains: {
+    robinhood: {
+      id: ROBINHOOD_CHAIN.id,
+      // Absorbs HTTP 429 internally. A surfaced 429 makes Ponder deactivate the
+      // provider and collapse its sync range to the 25-block floor, from which
+      // the backfill never recovers on this endpoint.
+      rpc: throttledHttp(rpcUrl, {
+        minGapMs,
+        timeout: 45_000,
+        onThrottle: ({ method, attempt, delayMs }) => {
+          if (attempt % 4 === 0) {
+            console.warn(`[exdate] ${method} throttled, attempt ${attempt}, backing off ${Math.round(delayMs)}ms`)
+          }
+        },
+      }),
+      // Verified in Phase 0: a 5 000 000-block eth_getLogs filtered on all 194
+      // token addresses answers in under a second when it is not rejected.
+      ethGetLogsBlockRange: Number(process.env.RHC_GET_LOGS_BLOCK_RANGE ?? 2_000_000),
+      pollingInterval: 2_000,
+    },
+  },
+  contracts: {
+    /**
+     * Multiplier events only. Transfers are ~375 000 logs per day for AAPL
+     * alone and nothing in M1-M3 reads them; indexing them needs a paid archive
+     * RPC and buys nothing today. See docs/phase-0-verification.md section 7.
+     */
+    StockToken: {
+      abi: stockTokenAbi,
+      chain: 'robinhood',
+      address: tokenAddresses(ROBINHOOD_CHAIN.id),
+      startBlock,
+      filter: { event: 'UIMultiplierUpdated', args: {} },
+    },
+  },
+  blocks: {
+    /**
+     * The poller starts at the head, never in history.
+     *
+     * Two reasons. Present state is what these views are for - historical
+     * multiplier state is reconstructible from the events themselves. And the
+     * public RPC keeps only a few thousand blocks of state: `eth_call` at
+     * latest-10 000 already answers "metadata is not found", so a historical
+     * poll could not run even if it were useful.
+     */
+    Poll: {
+      chain: 'robinhood',
+      startBlock: 'latest',
+      interval: pollIntervalBlocks,
+    },
+  },
+})

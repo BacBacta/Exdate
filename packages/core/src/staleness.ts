@@ -1,0 +1,65 @@
+import { FEED_HEARTBEAT_SECONDS } from './chains.js'
+
+/**
+ * Chainlink feed health.
+ *
+ * Robinhood tokenized-equity feeds are 24/5 with an 86 400 s heartbeat and a
+ * 0.5 % deviation threshold. Off-hours they simply hold the last answer and
+ * stop publishing, so `updatedAt` is the only honest signal - and roughly 46 %
+ * of transfers happen outside NYSE hours, which is exactly when a lending
+ * market is most exposed to a frozen price.
+ *
+ * Observed on 2026-09-02 during a live US session: SPY 18 h stale, QQQ 4 h,
+ * USDG 21 h. Staleness is the normal state of these feeds, not an incident.
+ */
+export type FeedStatus = 'live' | 'stale' | 'paused' | 'unknown'
+
+export interface FeedHealthInput {
+  /** `updatedAt` from latestRoundData(), seconds. 0n or undefined means no round. */
+  updatedAt: bigint | undefined
+  /** Observation time, seconds. */
+  nowSeconds: bigint
+  /** The token's `oraclePaused()` flag, if it was read. */
+  oraclePaused?: boolean
+  /** Defaults to the 86 400 s heartbeat every Robinhood equity feed declares. */
+  heartbeatSeconds?: number
+}
+
+export interface FeedHealth {
+  status: FeedStatus
+  /** Seconds since the last round, or undefined when there is no round. */
+  ageSeconds: number | undefined
+  /** True once the age exceeds the heartbeat, regardless of the pause flag. */
+  beyondHeartbeat: boolean
+}
+
+export function feedHealth(input: FeedHealthInput): FeedHealth {
+  const { updatedAt, nowSeconds, oraclePaused, heartbeatSeconds = FEED_HEARTBEAT_SECONDS } = input
+
+  if (updatedAt === undefined || updatedAt === 0n) {
+    return { status: 'unknown', ageSeconds: undefined, beyondHeartbeat: false }
+  }
+
+  const ageSeconds = Number(nowSeconds - updatedAt)
+  const beyondHeartbeat = ageSeconds > heartbeatSeconds
+
+  // The pause flag wins for display, because a paused oracle is a deliberate
+  // corporate-action window rather than a silent freeze. Chainlink's own docs
+  // call the flag advisory and not enforced on chain, so the age check below
+  // stays the primary guard and is still reported alongside.
+  if (oraclePaused === true) return { status: 'paused', ageSeconds, beyondHeartbeat }
+
+  return { status: beyondHeartbeat ? 'stale' : 'live', ageSeconds, beyondHeartbeat }
+}
+
+/**
+ * Is this price safe to act on at `nowSeconds`, given a caller's own tolerance?
+ * Callers should pass their real risk bound - the 86 400 s heartbeat is a
+ * publication guarantee, not a freshness guarantee.
+ */
+export function isFresh(input: FeedHealthInput & { toleranceSeconds: number }): boolean {
+  const { updatedAt, nowSeconds, oraclePaused, toleranceSeconds } = input
+  if (updatedAt === undefined || updatedAt === 0n) return false
+  if (oraclePaused === true) return false
+  return Number(nowSeconds - updatedAt) <= toleranceSeconds
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["ponder/virtual", "node"]
+  },
+  "include": ["ponder.config.ts", "ponder.schema.ts", "src", "ponder-env.d.ts"]
+}

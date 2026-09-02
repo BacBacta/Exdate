@@ -10,10 +10,11 @@ exdate indexes what actually happens: every multiplier update, every corporate a
 that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
 and the health of every Chainlink feed.
 
-> **Status: Phase 0 complete, nothing shipped yet.** The chain has been verified, the token registry
-> and feed registry are committed, and the 12 real multiplier events that exist so far are recorded.
-> The API, SDK and status page below describe the target, not something you can call today.
-> Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for what is actually known.
+> **Status: M1 shipped.** The indexer, the API and the status page run against Robinhood Chain
+> mainnet today: 194 tokens polled, 35 Chainlink feeds, 12 real multiplier events, 43 issuer
+> corporate actions. The yield endpoint, the reconciliation table, the webhooks and the SDK are
+> not built yet — they are marked below.
+> Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
 
@@ -24,23 +25,37 @@ and the health of every Chainlink feed.
 | **Feed health** | Feeds are 24/5 and freeze off-hours, but ~46% of transfers happen outside NYSE hours. Lending protocols need to know before they liquidate. |
 
 None of that is hypothetical. On 2026-09-02, mid-session, the SPY feed was **18 hours** stale and
-the QQQ feed **4 hours** stale. Nine tokens have already moved their multiplier — steps ranging from
+the QQQ feed **4 hours** stale. Ten tokens have already moved their multiplier — steps ranging from
 0.64 bps to 214.86 bps — and the onchain warning before a change takes effect is **nine minutes**.
 Only 18% of Stock Tokens have a Chainlink feed at all. Reconciling the issuer's own dividend rates
 against the onchain steps gives a **~34–36 % haircut** on AAPL and SGOV, three events that don't
 reconcile at all, and seven dividends marked *completed* that have not reached the chain after up
 to four weeks. Every input is sourced; see the report.
 
-## What is verified today
+## Run it
+
+```bash
+pnpm install
+pnpm dev          # indexer + API   http://localhost:42069
+pnpm dev:status   # status page      http://localhost:3000
+pnpm test         # 68 unit tests
+pnpm typecheck
+```
+
+The poller writes its first rows within about a minute. Until then the page says so; it never
+shows a zero it has not observed.
+
+### Verification scripts
 
 ```bash
 node scripts/phase0/check-chain.mjs            # chainId 4663, cadence, head
 node scripts/phase0/check-tokens.mjs AAPL SGOV # ERC-20 + ERC-8056 views
 node scripts/phase0/check-feeds.mjs            # every Chainlink feed + its age
-node scripts/phase0/find-multiplier-events.mjs # every UIMultiplierUpdated ever emitted
-node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
 node scripts/phase0/check-corporate-actions.mjs # issuer dividends vs onchain steps
 node scripts/phase0/feed-price-at.mjs <feed> <iso> # Chainlink price at an instant, no archive
+node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
+node scripts/backfill-multiplier-events.mjs    # full-chain event scan, 26 requests
+node scripts/generate-registry.mjs             # snapshots -> typed module
 ```
 
 Committed artifacts, all first-party or read from the chain:
@@ -51,51 +66,76 @@ Committed artifacts, all first-party or read from the chain:
 | `data/robinhood-corporate-actions.snapshot.json` | 43 dividends from the issuer's own feed (12 done, 31 upcoming) |
 | `data/chainlink-feeds.snapshot.json` | 57 Chainlink feeds on Robinhood Chain |
 | `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`** |
-| `data/multiplier-events.observed.json` | the 12 `UIMultiplierUpdated` logs that exist |
+| `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
 
-## Target shape
+## API
+
+```
+GET /v1/health                             build identity
+GET /v1/chains                             supported chains
+GET /v1/:chain/tokens                      every token: multiplier, scheduled update, feed state
+GET /v1/:chain/tokens/:addr                one token plus its full event history
+GET /v1/:chain/events                      every multiplier event, newest first
+GET /v1/status                             every feed: live, stale, paused, and how many have none
+GET /v1/calendar                           issuer corporate actions + pending on-chain updates
+```
+
+`:chain` accepts `robinhood` or `4663`. Every bigint is a decimal string; anything unobserved is
+`null`, never `0`.
+
+Not built yet:
+
+```
+GET /v1/:chain/tokens/:addr/yield          gross, observed, implied haircut, confidence   (M2)
+GET /v1/:chain/tokens/:addr/pending        dividend owed but not yet reflected            (M3)
+GET /v1/reconciliations                    expected vs observed, per event                (M3)
+```
+
+Webhooks (M4): `multiplier.scheduled`, `multiplier.applied`, `feed.stale`, `feed.resumed`,
+`pause.changed`, `dividend.pending`, `dividend.reconciled`.
 
 ```ts
+// M5
 import { exdate } from '@exdate/sdk'
-
 const y = await exdate.yield('0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC')
-// { gross, observed, impliedHaircutBps, confidence }
 ```
-
-```
-GET /v1/:chain/tokens                      verified address → ticker registry
-GET /v1/:chain/tokens/:addr                multiplier, scheduled update, feed state, premium
-GET /v1/:chain/tokens/:addr/yield          gross, observed, implied haircut, confidence
-GET /v1/:chain/tokens/:addr/pending        dividend owed but not yet reflected
-GET /v1/calendar                           upcoming ex-dates and scheduled updates
-GET /v1/reconciliations                    expected vs observed, per event
-GET /v1/status                             every feed: live, stale, paused
-```
-
-Webhooks: `multiplier.scheduled`, `multiplier.applied`, `feed.stale`, `feed.resumed`,
-`pause.changed`, `dividend.pending`, `dividend.reconciled`.
 
 ## Repo layout
 
 ```
-scripts/phase0    verification scripts — the only runnable code today
+packages/core     chains, ABIs, WAD maths, staleness, NFT log filtering, reconciliation,
+                  the throttled RPC transport, the generated registry. No I/O, 68 tests.
+packages/indexer  Ponder: indexes UIMultiplierUpdated, polls the ERC-8056 views, the
+                  Chainlink feeds and the issuer's corporate actions, serves the API.
+packages/api      Hono routes over a Repository interface — no SQL, deployable alone.
+apps/status       Next.js App Router status page. Reads the API and nothing else.
+packages/sdk      @exdate/sdk                                             (M5, not started)
+scripts           verification and backfill scripts
 data              committed snapshots of first-party registries and observed events
 docs              Phase 0 report
-packages/indexer  Ponder + Postgres, multi-chain from day one   (M1)
-packages/api      Hono                                          (M2)
-packages/sdk      @exdate/sdk                                   (M5)
-apps/status       Next.js status page                           (M1)
 ```
+
+### Why the history is scanned rather than indexed
+
+Ponder's sync loop manages **25 blocks per 9–16 s** on the public RPC — about 300 days for the
+51.7 M blocks since mainnet — because the endpoint rejects roughly half of all `eth_getLogs` calls
+at any pacing and Ponder sizes each round from the previous round's duration. One wide query per
+2 000 000 blocks does the same scan in **26 requests, two minutes**.
+
+So history comes from `scripts/backfill-multiplier-events.mjs` and Ponder starts at the head and
+owns everything live. Every row records which scanner found it (`onchain:scan` or
+`onchain:indexer`); both are real logs with real transaction hashes. Point `RHC_RPC_URL_ARCHIVE` at
+a dedicated provider and set `RHC_START_BLOCK=900000` to hand the whole history back to Ponder.
 
 ## Development
 
 ```bash
-cp .env.example .env      # RPC URL, database URL, market-data API key
-node scripts/phase0/check-chain.mjs
+cp .env.example .env      # nothing is required: every default points at the public RPC
 ```
 
-`pnpm install` / `pnpm dev` / `pnpm test` arrive with M1. The Phase 0 scripts are dependency-free —
-plain Node 22, `fetch`, and hand-rolled ABI encoding — so they run against a bare checkout.
+No API key is needed anywhere. The registry, the prices and the corporate actions all come from the
+issuer's own unauthenticated endpoints, and the scripts under `scripts/phase0/` are dependency-free
+— plain Node 22, `fetch`, hand-rolled ABI encoding — so they run against a bare checkout.
 
 See `CLAUDE.md` for verified onchain facts, known traps, and the decision log.
 

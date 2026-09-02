@@ -1,12 +1,14 @@
 {
-  "note": "Every UIMultiplierUpdated log found on Robinhood Chain up to block 52597339 (2026-09-02T13:05Z) for the nine tokens whose registry multiplier is not 1.0. Reproduce with: node scripts/phase0/find-multiplier-events.mjs",
+  "note": "Every UIMultiplierUpdated log on Robinhood Chain, found by scripts/backfill-multiplier-events.mjs. Each row is a real log with its transaction hash; nothing here is derived or estimated.",
   "chainId": 4663,
-  "scannedThroughBlock": 52597339,
-  "scannedAt": "2026-09-02T13:05:00Z",
+  "scannedFromBlock": 900000,
+  "scannedThroughBlock": 52672800,
+  "scannedAt": "2026-09-02T15:13:53.064Z",
   "events": [
     {
+      "chainId": 4663,
       "symbol": "CRWD",
-      "token": "0xea72Ecca2d0f6bFA1394DBBCff85b52CD4233931",
+      "token": "0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931",
       "block": 978630,
       "announcedAt": "2026-07-02T01:01:22Z",
       "effectiveAt": "2026-07-02T13:30:00Z",
@@ -14,12 +16,12 @@
       "oldMultiplier": "1000000000000000000",
       "newMultiplier": "4000000000000000000",
       "stepBps": 30000,
-      "tx": "0x07884f2f2440316a996ab3a9c0f8bce962ec872af6924745f5a04a9e9ac1d31f",
-      "comment": "First announcement. Superseded by an identical re-announcement 11h later."
+      "tx": "0x07884f2f2440316a996ab3a9c0f8bce962ec872af6924745f5a04a9e9ac1d31f"
     },
     {
+      "chainId": 4663,
       "symbol": "CRWD",
-      "token": "0xea72Ecca2d0f6bFA1394DBBCff85b52CD4233931",
+      "token": "0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931",
       "block": 1231096,
       "announcedAt": "2026-07-02T12:15:44Z",
       "effectiveAt": "2026-07-02T13:30:00Z",
@@ -27,12 +29,12 @@
       "oldMultiplier": "1000000000000000000",
       "newMultiplier": "4000000000000000000",
       "stepBps": 30000,
-      "tx": "0x5dbbb9524fc402fea6786eb5a5dd40205ce8c6e848fb313eecedf7e9395f5bf0",
-      "comment": "Re-announcement of the same target and the same effectiveAt."
+      "tx": "0x5dbbb9524fc402fea6786eb5a5dd40205ce8c6e848fb313eecedf7e9395f5bf0"
     },
     {
+      "chainId": 4663,
       "symbol": "SGOV",
-      "token": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
       "block": 4629631,
       "announcedAt": "2026-07-08T20:05:10Z",
       "effectiveAt": "2026-07-08T20:14:32Z",
@@ -43,8 +45,9 @@
       "tx": "0x79292bc8af671bd6fc4ebc8f5e7a27c814d87988e175cbfab2ab1db1df0efbfb"
     },
     {
+      "chainId": 4663,
       "symbol": "MU",
-      "token": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+      "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
       "block": 18239875,
       "announcedAt": "2026-07-24T15:00:40Z",
       "effectiveAt": "2026-07-24T15:10:24Z",
@@ -55,8 +58,9 @@
       "tx": "0x7ceb72589f22e0257aeb44441275c6f9d835d1baa4a0c8f4cf87a4e08286cb69"
     },
     {
+      "chainId": 4663,
       "symbol": "ORCL",
-      "token": "0xb0992820E760d836549ba69BC7598b4af75dEE03",
+      "token": "0xb0992820e760d836549ba69bc7598b4af75dee03",
       "block": 20823272,
       "announcedAt": "2026-07-27T15:00:45Z",
       "effectiveAt": "2026-07-27T15:10:23Z",
@@ -67,8 +71,9 @@
       "tx": "0xdb44087be277205a6819d8656cdd87e1c0a061822798c735f3efdf94bbfc9bd7"
     },
     {
+      "chainId": 4663,
       "symbol": "DELL",
-      "token": "0x941AE714EC6D8130c7B75d67160Ca08f1e7d11Dd",
+      "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
       "block": 26853518,
       "announcedAt": "2026-08-03T15:00:48Z",
       "effectiveAt": "2026-08-03T15:10:23Z",
@@ -79,8 +84,9 @@
       "tx": "0x8881e24ee42a7fdac96523e3166e8361ea72d24c45f2f6991a1da174acb531a8"
     },
     {
+      "chainId": 4663,
       "symbol": "ASML",
-      "token": "0x47F93d52cBeC7C6D2CfC080e154002370a60dAEA",
+      "token": "0x47f93d52cbec7c6d2cfc080e154002370a60daea",
       "block": 29439914,
       "announcedAt": "2026-08-06T15:01:01Z",
       "effectiveAt": "2026-08-06T15:10:25Z",
@@ -91,8 +97,9 @@
       "tx": "0x1f74e07c6a56f9cf89b70d4b09263abe20c577757269be45608af2a30328ee6a"
     },
     {
+      "chainId": 4663,
       "symbol": "SGOV",
-      "token": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
       "block": 30302195,
       "announcedAt": "2026-08-07T15:00:36Z",
       "effectiveAt": "2026-08-07T15:10:24Z",
@@ -103,8 +110,9 @@
       "tx": "0x94aaa4c5c537412b8a5ed4a1933cc8ee7cb3c5bc903a741e11d4aada5dc02ebd"
     },
     {
+      "chainId": 4663,
       "symbol": "COST",
-      "token": "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2",
+      "token": "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2",
       "block": 32889913,
       "announcedAt": "2026-08-10T15:01:06Z",
       "effectiveAt": "2026-08-10T15:10:24Z",
@@ -115,8 +123,9 @@
       "tx": "0x728a9545a0d36b55ef5b4c12a9b9a3565e22167abe78f4453efb78d1292fcf62"
     },
     {
+      "chainId": 4663,
       "symbol": "AAPL",
-      "token": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
       "block": 36345344,
       "announcedAt": "2026-08-14T15:03:06Z",
       "effectiveAt": "2026-08-14T15:12:46Z",
@@ -127,8 +136,9 @@
       "tx": "0x6d72ca599d812b9eb483fa82ba204e6d079e981b675669c9b659b7fac8adff35"
     },
     {
+      "chainId": 4663,
       "symbol": "CCL",
-      "token": "0x9651342CeA770aE9a2969Ba2A52611523146aef9",
+      "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
       "block": 50955407,
       "announcedAt": "2026-08-31T15:01:22Z",
       "effectiveAt": "2026-08-31T15:10:26Z",
@@ -139,8 +149,9 @@
       "tx": "0x391030f47dae3d1ac98f9f4384c31186fad48fae6d62d1b3fae5e1449e2fdd02"
     },
     {
+      "chainId": 4663,
       "symbol": "SGOV",
-      "token": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
       "block": 51269236,
       "announcedAt": "2026-08-31T23:50:51Z",
       "effectiveAt": "2026-09-01T00:00:26Z",
@@ -149,6 +160,19 @@
       "newMultiplier": "1005101770003214918",
       "stepBps": 21.14,
       "tx": "0xf33317c324c4d1d53278dd5c0fcb6ca3afeea41ccf39441ecada548148f5f4e7"
+    },
+    {
+      "chainId": 4663,
+      "symbol": "F",
+      "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+      "block": 52665452,
+      "announcedAt": "2026-09-02T15:00:41Z",
+      "effectiveAt": "2026-09-02T15:10:26Z",
+      "leadMinutes": 9.8,
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000145502866134027",
+      "stepBps": 1.46,
+      "tx": "0x17717969d77a298b876c0c3c735b6367ee1f75e1906f67953a6a30dc35cc442e"
     }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "name": "@exdate/indexer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ponder dev",
+    "start": "ponder start",
+    "serve": "ponder serve",
+    "codegen": "ponder codegen",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@exdate/api": "workspace:*",
+    "@exdate/core": "workspace:*",
+    "hono": "^4.13.5",
+    "ponder": "^0.17.8",
+    "viem": "^2.56.3",
+    "drizzle-orm": "^0.41.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "@types/node": "^22.15.0"
+  }
+}

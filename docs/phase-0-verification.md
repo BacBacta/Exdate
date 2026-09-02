@@ -394,6 +394,59 @@ Read this carefully:
 What this settles: **the reconciliation table can be built and populated today**, with zero
 third-party vendors. Five matched rows, three anomalies, seven pending, six onchain-only.
 
+## 13. What M1 measured, and what it changed
+
+Building the indexer produced four facts Phase 0 had not reached. All are from the same public
+endpoint on 2026-09-02.
+
+**Multicall3 is deployed** at the canonical address `0xcA11bde05977b3631167028862bE2a173976CA11`
+(3 808 bytes of code). The poller reads five ERC-8056 views on 194 tokens plus 35 feeds in about
+thirty requests instead of 776.
+
+**There is no archive at all.** `eth_call` pinned to `latest - 1 000` works; at `latest - 10 000`
+the node answers `metadata is not found`. State history is a few thousand blocks — minutes, not
+days. This is why the poller declares `startBlock: "latest"`: a historical poll is not merely
+wasteful here, it is impossible.
+
+**The rate limiter is cost-based, not rate-based.** Measured:
+
+| Call | Shape | Rejections |
+|---|---|---|
+| `eth_blockNumber` | 25 serial, no gap | 0 / 25 |
+| `eth_blockNumber` | 8 in parallel, 4 rounds | 0 / 32 |
+| `eth_getLogs`, 51 addresses, 25 blocks | serial, no gap | 4 / 8 |
+| `eth_getLogs`, 51 addresses, 25 blocks | serial, 150 ms gap | 1 / 8 |
+| `eth_getLogs`, 194 addresses, 2 000 000 blocks | serial, 150 ms gap | 2 / 8 |
+
+Pacing barely moves the rejection rate. Retrying is what gets a query through, which is what the
+Phase 0 scripts were doing all along without anyone noticing why they worked.
+`packages/core/src/transport.ts` now does the same underneath the indexer.
+
+**Ponder cannot walk this chain's history on this endpoint.** Its historical loop splits the 194
+addresses into four `eth_getLogs` calls per sync round and sizes each round from the previous
+round's duration — starting at 25 blocks, growing by at most half, and only when a round finishes
+inside its target. Here a round takes 9 to 16 seconds, so the range never leaves its floor.
+Measured at 25 blocks per 12 s, the 51.7 M blocks since the public mainnet date would take about
+**300 days**. One wide query per 2 000 000 blocks scans the same range in **26 requests, roughly
+two minutes** — `scripts/backfill-multiplier-events.mjs`.
+
+So M1 indexes in two tiers, and the split is recorded per row rather than hidden:
+
+| Tier | Who | `source` |
+|---|---|---|
+| History | `scripts/backfill-multiplier-events.mjs`, seeded by the poller on first run | `onchain:scan` |
+| Live | Ponder, `startBlock: "latest"` | `onchain:indexer` |
+
+Both are real logs with real transaction hashes; they differ only in which scanner found them, and
+the indexer wins on conflict. Setting `RHC_RPC_URL_ARCHIVE` and `RHC_START_BLOCK=900000` hands the
+whole history back to Ponder without touching code.
+
+**The scan also found a thirteenth log.** A full-chain sweep on 2026-09-02 at 15:13 UTC returned 13
+`UIMultiplierUpdated` logs, one more than §4's targeted scan: **F (Ford), announced 15:00:41 UTC,
+effective 15:10:26 UTC, +1.46 bps** — that same afternoon, against an issuer row carrying
+`processDate` 2026-09-01 and a declared rate of $0.15. Twelve distinct changes across ten tokens,
+since CRWD announced one of them twice.
+
 ---
 
 ## Sources
