@@ -15,14 +15,18 @@ import {
   SCANNED_MULTIPLIER_EVENTS,
   SCAN_THROUGH_BLOCK,
   aggregatorV3Abi,
+  feedHealth,
   feedProxies,
   findToken,
+  isPending,
+  stepBps,
   stockTokenAbi,
   throttledHttp,
   tokenAddresses,
   tokensForChain,
 } from '@exdate/core'
 import { runReconcilePass } from './reconcile-pass.js'
+import { deliverDueWebhooks, enqueueWebhook } from './webhooks.js'
 import { createPublicClient, parseAbiItem, type Address } from 'viem'
 
 /**
@@ -106,6 +110,11 @@ ponder.on('Poll:block', async ({ event, context }) => {
   const reconciled = await runReconcilePass(context, chainId, now)
   if (reconciled > 0) console.log(`[exdate] reconciliation: ${reconciled} row(s) written`)
 
+  // Same reason, same place: drain the webhook outbox on committed state,
+  // before this cycle writes anything new into it.
+  const delivered = await deliverDueWebhooks(context, now)
+  if (delivered > 0) console.log(`[exdate] webhooks: ${delivered} delivery attempt(s)`)
+
   // Every poll, not once per process. Twelve onConflictDoNothing inserts cost
   // nothing, and a module-level "done" flag would survive a transaction that
   // Ponder rolled back and retried - leaving the history dropped for the life
@@ -187,6 +196,55 @@ ponder.on('Poll:block', async ({ event, context }) => {
         sampledBlock: blockNumber,
       }))
 
+    // A change announced and not yet in effect. Both this poller and the live
+    // log handler can see it; the deterministic event id makes the second a
+    // no-op rather than a second delivery.
+    if (isPending({ uiMultiplier, newUIMultiplier, effectiveAt }, now)) {
+      const announcement = await context.db.find(multiplierEvents, { chainId, token: token.address, effectiveAt })
+      await enqueueWebhook(context, {
+        chainId,
+        type: 'multiplier.scheduled',
+        subject: `${token.address}:${effectiveAt}`,
+        token: { address: token.address, symbol: token.symbol },
+        now,
+        block: blockNumber,
+        data: {
+          currentMultiplier: uiMultiplier.toString(),
+          newMultiplier: newUIMultiplier.toString(),
+          stepBps: stepBps(uiMultiplier, newUIMultiplier),
+          effectiveAt: new Date(Number(effectiveAt) * 1000).toISOString(),
+          secondsUntilEffective: Number(effectiveAt - now),
+          announcedAt: announcement ? new Date(Number(announcement.announcedAt) * 1000).toISOString() : null,
+          announcedTx: announcement?.announcedTx ?? null,
+          announcementCount: announcement?.announcementCount ?? null,
+          source: announcement?.source ?? 'onchain:views',
+        },
+      })
+    }
+
+    // The multiplier read on chain has moved since the last poll. There is no
+    // application event to index, so an observed difference is the only
+    // evidence that a scheduled change actually took effect. Never sent on the
+    // first observation of a token: that is a baseline, not a change.
+    if (previous !== null && previous.uiMultiplier !== uiMultiplier) {
+      await enqueueWebhook(context, {
+        chainId,
+        type: 'multiplier.applied',
+        subject: `${token.address}:${effectiveAt}`,
+        token: { address: token.address, symbol: token.symbol },
+        now,
+        block: blockNumber,
+        data: {
+          previousMultiplier: previous.uiMultiplier.toString(),
+          currentMultiplier: uiMultiplier.toString(),
+          stepBps: stepBps(previous.uiMultiplier, uiMultiplier),
+          effectiveAt: new Date(Number(effectiveAt) * 1000).toISOString(),
+          observedAtBlock: blockNumber.toString(),
+          basis: 'uiMultiplier() differs from the previous poll; no log is emitted when a change takes effect',
+        },
+      })
+    }
+
     if (oraclePaused !== undefined) {
       if (previous === null && oraclePaused) {
         // First ever observation and the oracle is already paused: record it as
@@ -200,6 +258,23 @@ ponder.on('Poll:block', async ({ event, context }) => {
           .insert(pauseEvents)
           .values({ chainId, token: token.address, at: now, paused: oraclePaused, block: blockNumber, kind: 'transition' })
           .onConflictDoNothing()
+        await enqueueWebhook(context, {
+          chainId,
+          type: 'pause.changed',
+          subject: `${token.address}:${now}`,
+          token: { address: token.address, symbol: token.symbol },
+          now,
+          block: blockNumber,
+          data: {
+            paused: oraclePaused,
+            previousPaused: previous.oraclePaused,
+            at: new Date(Number(now) * 1000).toISOString(),
+            block: blockNumber.toString(),
+            effect: oraclePaused
+              ? 'the token reports its oracle paused; the Chainlink feed stops publishing while this holds'
+              : 'the token reports its oracle live again',
+          },
+        })
       }
     }
   }
@@ -219,17 +294,49 @@ ponder.on('Poll:block', async ({ event, context }) => {
       const [roundId, answer, startedAt, updatedAt] = round
       // Every Robinhood tokenized-equity feed reports 8 decimals; the value is
       // carried on the token row so the API never has to guess.
-      const decimals = findToken(chainId, registryTokenForFeed(chainId, feed))?.feedDecimals ?? 8
+      const feedToken = findToken(chainId, registryTokenForFeed(chainId, feed))
+      const decimals = feedToken?.feedDecimals ?? 8
 
       await context.db
         .insert(feedRounds)
         .values({ chainId, feed, roundId, answer, decimals, startedAt, updatedAt, observedAt: now })
         .onConflictDoNothing()
 
+      // The health verdict is stored, not derived on read: a feed goes stale by
+      // the clock passing rather than by anything arriving, so the transition
+      // only exists against the previous poll's verdict.
+      const previousFeed = await context.db.find(feedStates, { chainId, feed })
+      const health = feedHealth({ updatedAt, nowSeconds: now })
+
       await context.db
         .insert(feedStates)
-        .values({ chainId, feed, roundId, answer, decimals, updatedAt, sampledAt: now })
-        .onConflictDoUpdate(() => ({ roundId, answer, decimals, updatedAt, sampledAt: now }))
+        .values({ chainId, feed, roundId, answer, decimals, updatedAt, sampledAt: now, status: health.status })
+        .onConflictDoUpdate(() => ({ roundId, answer, decimals, updatedAt, sampledAt: now, status: health.status }))
+
+      const wasLive = previousFeed?.status === 'live'
+      const wasStale = previousFeed?.status === 'stale'
+      if ((wasLive && health.status === 'stale') || (wasStale && health.status === 'live')) {
+        await enqueueWebhook(context, {
+          chainId,
+          type: health.status === 'stale' ? 'feed.stale' : 'feed.resumed',
+          subject: `${feed}:${now}`,
+          token: feedToken ? { address: feedToken.address, symbol: feedToken.symbol } : null,
+          now,
+          block: blockNumber,
+          data: {
+            feed,
+            previousStatus: previousFeed?.status ?? null,
+            status: health.status,
+            roundId: roundId.toString(),
+            answer: answer.toString(),
+            decimals,
+            updatedAt: new Date(Number(updatedAt) * 1000).toISOString(),
+            ageSeconds: health.ageSeconds ?? null,
+            beyondHeartbeat: health.beyondHeartbeat ?? null,
+            answerIncludesMultiplier: true,
+          },
+        })
+      }
     }
   }
 

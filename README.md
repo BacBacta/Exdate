@@ -10,10 +10,10 @@ exdate indexes what actually happens: every multiplier update, every corporate a
 that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
 and the health of every Chainlink feed.
 
-> **Status: M1, M2 and M3 shipped.** The indexer, the API, the reconciliation table and
+> **Status: M1 to M4 shipped.** The indexer, the API, the reconciliation table and
 > the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
 > feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 49 reconciliation rows. The
-> webhooks and the SDK are not built yet — they are marked below.
+> SDK is not built yet — it is marked below.
 > Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
@@ -92,6 +92,8 @@ GET /v1/:chain/tokens/:addr/pending        what is owed and has not arrived: the
                                            multiplier has not reflected
 GET /v1/status                             every feed: live, stale, paused, and how many have none
 GET /v1/calendar                           issuer corporate actions + pending on-chain updates
+GET /v1/webhooks                           the event catalogue, the signing scheme, the retries
+GET /v1/:chain/webhooks/events             the outbox: what was noticed, and what each delivery did
 ```
 
 `:chain` accepts `robinhood` or `4663`. Every bigint is a decimal string; anything unobserved is
@@ -109,8 +111,52 @@ multiplier has not moved — seven tokens on 2026-09-02, BND for four weeks). It
 full payment would produce at the latest round, marked `notAMeasurement`, and refuses to predict
 when the step will land or how much of it will survive.
 
-Webhooks (M4): `multiplier.scheduled`, `multiplier.applied`, `feed.stale`, `feed.resumed`,
-`pause.changed`, `dividend.pending`, `dividend.reconciled`.
+## Webhooks
+
+Seven events: `multiplier.scheduled`, `multiplier.applied`, `feed.stale`, `feed.resumed`,
+`pause.changed`, `dividend.pending`, `dividend.reconciled`. `GET /v1/webhooks` serves the
+catalogue, and each entry states what exdate *observed* to send it — `multiplier.applied` is a
+poller observation, because nothing is emitted on chain when a change takes effect.
+
+Endpoints are configured out of band, because they carry the signing secret:
+
+```
+EXDATE_WEBHOOK_ENDPOINTS=[{"id":"curator","url":"https://…","secret":"…","events":["dividend.reconciled"]}]
+```
+
+Every delivery is signed HMAC-SHA256 over `` `${t}.${rawBody}` `` and carries
+
+```
+exdate-signature: t=<unix seconds>,v1=<hex digest>
+exdate-event: dividend.reconciled
+exdate-event-id: dividend.reconciled:4663:<action>:<processDate>
+```
+
+Verify the **raw bytes**, before parsing the JSON:
+
+```ts
+import { verifySignature } from '@exdate/core'
+
+const raw = await request.text()
+const result = await verifySignature({
+  secret: process.env.WEBHOOK_SECRET!,
+  header: request.headers.get('exdate-signature'),
+  body: raw,
+  nowSeconds: Math.floor(Date.now() / 1000),
+})
+if (!result.valid) return new Response(result.reason, { status: 400 })
+```
+
+The timestamp is inside the signed material and is checked against a 300 s window, so a captured
+delivery cannot be replayed. Event ids are deterministic: a redelivery, or the same occurrence seen
+by both the live indexer and the poller, carries the id you already have — key your bookkeeping on
+it. Failures retry seven times over about twelve hours and are then marked `failed` and kept, so a
+consumer that was down can see what it missed at `/v1/:chain/webhooks/events`.
+
+Two things worth knowing before pointing a production consumer at it: a fresh database emits the
+current backlog once (43 events on 2026-09-02 — 37 declared dividends and 6 reconciliations), and
+delivery is drained at the start of each poll cycle, so it lags an event by up to one interval
+(~60 s by default) against a ~9-minute announcement lead.
 
 ```ts
 // M5

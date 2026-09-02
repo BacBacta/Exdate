@@ -226,7 +226,7 @@ pnpm workspaces:
 | Package | What |
 |---|---|
 | `packages/core` | `@exdate/core` — chains, ABIs, WAD maths, staleness, NFT log filtering, reconciliation, the throttled transport, and the generated registry. No I/O, fully unit-tested. |
-| `packages/indexer` | Ponder + PGlite/Postgres. Indexes `UIMultiplierUpdated`, polls the ERC-8056 views, the Chainlink feeds and the issuer's corporate actions, and serves the API. |
+| `packages/indexer` | Ponder + PGlite/Postgres. Indexes `UIMultiplierUpdated`, polls the ERC-8056 views, the Chainlink feeds and the issuer's corporate actions, drains the webhook outbox, and serves the API. |
 | `packages/api` | `@exdate/api` — Hono routes over a `Repository` interface, so it never builds SQL and stays deployable on its own. |
 | `apps/status` | Next.js App Router status page. Reads the API and nothing else. |
 | `packages/sdk` | `@exdate/sdk` — M5, not started. |
@@ -324,6 +324,13 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   it needs no price (`rate × uiMultiplier`); the step a full payment would produce is a
   **projection** at the latest round, flagged `notAMeasurement`; the landing date and the surviving
   fraction are refused under `notComputed`. Library `packages/core/src/pending.ts`.
+- 2026-09-02 — Webhooks are an **outbox**, not an inline send: events are written to
+  `webhook_events` with a deterministic id and drained at the START of the poll cycle, like the
+  reconcile pass and for the same Ponder reason. An indexing function that awaits someone else's
+  server would stall indexing. Endpoints live in `EXDATE_WEBHOOK_ENDPOINTS` (parsed at boot, https
+  required off localhost, secret ≥ 16 chars) and never in a table the API serves; the outbox route
+  publishes the host, never the URL or the secret. Signature: HMAC-SHA256 over `${t}.${rawBody}`,
+  300 s tolerance, seven retries over ~12 h, then `failed` and kept.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -339,7 +346,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - [x] **M3 reconciliation + pending** — `reconciliations` table computed live by the poller and served at
       `/v1/:chain/reconciliations`; the observed haircut and the never-applied dividends are on the
       status page, and `/v1/:chain/tokens/:addr/pending` reports what is owed and has not arrived.
-- [ ] M4 signed webhooks
+- [x] **M4 signed webhooks** — seven event types written to an outbox by the poller and the live
+      indexer, drained at the start of each poll, HMAC-SHA256 signed with a replay window.
+      `GET /v1/webhooks` (catalogue + scheme), `GET /v1/:chain/webhooks/events` (outbox).
+      Verified end to end against a local receiver that checks the signature with `node:crypto`:
+      43 deliveries, 43 valid, 0 failed, and a forged signature rejected.
 - [ ] M5 SDK + docs
 
 ### Known gaps
@@ -349,8 +360,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   small remaining step.
 - `feed_rounds` accumulates one row per distinct Chainlink round and nothing prunes it.
 - The poller re-reads all 194 tokens every interval; only rows that changed need writing.
-- `packages/indexer` has no tests of its own (the poller, the sweep and the reconcile pass are
-  only exercised by running it). `packages/api` has route and serializer tests.
+- `packages/indexer` has no tests of its own (the poller, the sweep, the reconcile pass and the
+  webhook outbox are only exercised by running it — the delivery path was verified live against a
+  local receiver, not in CI). `packages/api` has route and serializer tests.
+- A fresh database emits the whole current backlog of `dividend.pending` once (37 rows on
+  2026-09-02). Real events, but a new consumer sees them all at once.
 - The status page does not surface `/yield` or `/pending`; both are API-only for now.
 - The reconciliation covers cash dividends only. A split matched to a step is written as
   `unsupported_action_type` rather than forced through a per-share model that does not fit it.

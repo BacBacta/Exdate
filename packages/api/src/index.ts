@@ -5,6 +5,14 @@ import {
   SCANNED_AT,
   SCAN_FROM_BLOCK,
   SCAN_THROUGH_BLOCK,
+  WEBHOOK_DELIVERY_HEADER,
+  WEBHOOK_EVENTS,
+  WEBHOOK_EVENT_HEADER,
+  WEBHOOK_EVENT_ID_HEADER,
+  WEBHOOK_MAX_ATTEMPTS,
+  WEBHOOK_RETRY_SCHEDULE_SECONDS,
+  WEBHOOK_SIGNATURE_HEADER,
+  WEBHOOK_TOLERANCE_SECONDS,
   buildPendingView,
   buildYieldLedger,
   feedHealth,
@@ -17,6 +25,7 @@ import {
   serializeMultiplierEvent,
   serializeReconciliation,
   serializeToken,
+  serializeWebhookEvent,
 } from './serialize.js'
 import type { Repository } from './types.js'
 
@@ -27,15 +36,58 @@ export interface ApiOptions {
   repository: Repository
   /** Injected so responses are deterministic under test. */
   now?: () => bigint
+  /**
+   * How many webhook endpoints the process was started with. The endpoints
+   * themselves carry secrets and are never served; the count is what tells an
+   * operator whether silence means "nothing happened" or "nobody is listening".
+   */
+  webhookEndpointsConfigured?: number
 }
 
-export function createApi({ repository, now = () => BigInt(Math.floor(Date.now() / 1000)) }: ApiOptions) {
+export function createApi({
+  repository,
+  now = () => BigInt(Math.floor(Date.now() / 1000)),
+  webhookEndpointsConfigured = 0,
+}: ApiOptions) {
   const app = new Hono()
 
   app.use('/v1/*', cors())
 
   // Ponder reserves /health and /ready for its own liveness probes.
   app.get('/v1/health', (c) => c.json({ ok: true, registryGeneratedAt: REGISTRY_GENERATED_AT }))
+
+  /**
+   * The webhook contract: what can be sent, how it is signed, how it is retried.
+   *
+   * Served rather than only documented so a consumer can verify a delivery
+   * against the live scheme - the header names and the tolerance are the same
+   * constants the sender uses.
+   */
+  app.get('/v1/webhooks', (c) =>
+    c.json({
+      events: WEBHOOK_EVENTS,
+      signature: {
+        algorithm: 'HMAC-SHA256',
+        header: WEBHOOK_SIGNATURE_HEADER,
+        format: 't=<unix seconds>,v1=<hex digest>',
+        signedMaterial: '`${t}.${rawRequestBody}`',
+        toleranceSeconds: WEBHOOK_TOLERANCE_SECONDS,
+        verify: 'verifySignature() in @exdate/core - the same function that signs',
+        note: 'verify the raw bytes before parsing the JSON; a re-encoded body will not match.',
+      },
+      headers: {
+        event: WEBHOOK_EVENT_HEADER,
+        eventId: WEBHOOK_EVENT_ID_HEADER,
+        delivery: WEBHOOK_DELIVERY_HEADER,
+      },
+      idempotency: {
+        key: WEBHOOK_EVENT_ID_HEADER,
+        note: 'event ids are deterministic, so a redelivery or a second observation of the same occurrence carries the id you already have.',
+      },
+      retries: { scheduleSeconds: WEBHOOK_RETRY_SCHEDULE_SECONDS, maxAttempts: WEBHOOK_MAX_ATTEMPTS },
+      endpointsConfigured: webhookEndpointsConfigured,
+    }),
+  )
 
   app.get('/v1/chains', (c) =>
     c.json({
@@ -209,6 +261,53 @@ export function createApi({ repository, now = () => BigInt(Math.floor(Date.now()
    * ones that do not. A caller must be able to see that most Stock Tokens have
    * no oracle at all rather than infer it from a short list.
    */
+  /**
+   * The outbox: what exdate has noticed, and what came of each delivery.
+   *
+   * Events are recorded whether or not an endpoint is configured, so this is a
+   * usable event log on its own - and the honest answer to "did you send it?".
+   */
+  app.get('/v1/:chain/webhooks/events', async (c) => {
+    const chain = resolveChain(c.req.param('chain'))
+    if (!chain) return c.json(unknownChain, 404)
+    const [events, deliveries] = await Promise.all([
+      repository.webhookEvents(chain.id),
+      repository.webhookDeliveries(chain.id),
+    ])
+    const type = c.req.query('type')
+    const status = c.req.query('status')
+    const limit = Math.min(Number(c.req.query('limit') ?? 100) || 100, 500)
+
+    const byEvent = new Map<string, typeof deliveries>()
+    for (const delivery of deliveries) {
+      const bucket = byEvent.get(delivery.eventId)
+      if (bucket) bucket.push(delivery)
+      else byEvent.set(delivery.eventId, [delivery])
+    }
+
+    const filtered = events.filter(
+      (event) =>
+        (type === undefined || event.type === type) &&
+        (status === undefined || (byEvent.get(event.id) ?? []).some((row) => row.status === status)),
+    )
+    const tally = (value: string) => deliveries.filter((row) => row.status === value).length
+    return c.json({
+      chainId: chain.id,
+      counts: {
+        events: events.length,
+        deliveries: deliveries.length,
+        queued: tally('queued'),
+        delivered: tally('delivered'),
+        failed: tally('failed'),
+      },
+      endpointsConfigured: webhookEndpointsConfigured,
+      returned: Math.min(filtered.length, limit),
+      events: filtered
+        .slice(0, limit)
+        .map((event) => serializeWebhookEvent(event, byEvent.get(event.id) ?? [])),
+    })
+  })
+
   app.get('/v1/status', async (c) => {
     const nowSeconds = now()
     const chains = await Promise.all(

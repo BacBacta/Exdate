@@ -1,6 +1,7 @@
 import { ponder } from 'ponder:registry'
 import { multiplierEvents, tokens } from 'ponder:schema'
-import { findToken, stockTokenAbi } from '@exdate/core'
+import { findToken, stepBps, stockTokenAbi } from '@exdate/core'
+import { enqueueWebhook } from './webhooks.js'
 
 /**
  * `UIMultiplierUpdated` is the only Stock Token event exdate indexes.
@@ -82,4 +83,31 @@ ponder.on('StockToken:UIMultiplierUpdated', async ({ event, context }) => {
       lastAnnouncedTx: event.transaction.hash,
       announcementCount: row.announcementCount + 1,
     }))
+
+  // Notify from here rather than waiting for the next poll: the whole value of
+  // this event is the nine minutes of warning it carries, and a poll interval
+  // spends a tenth of that. The poller enqueues the same id, so whichever gets
+  // there first wins and the other is a no-op. Historical announcements seeded
+  // from the scan are not sent - only a change still ahead of the clock is.
+  if (effectiveAtTimestamp > announcedAt) {
+    await enqueueWebhook(context, {
+      chainId,
+      type: 'multiplier.scheduled',
+      subject: `${token}:${effectiveAtTimestamp}`,
+      token: { address: token, symbol: registryToken?.symbol ?? 'UNKNOWN' },
+      now: announcedAt,
+      block: event.block.number,
+      data: {
+        currentMultiplier: oldMultiplier.toString(),
+        newMultiplier: newMultiplier.toString(),
+        stepBps: oldMultiplier === 0n ? null : stepBps(oldMultiplier, newMultiplier),
+        effectiveAt: new Date(Number(effectiveAtTimestamp) * 1000).toISOString(),
+        secondsUntilEffective: Number(effectiveAtTimestamp - announcedAt),
+        announcedAt: new Date(Number(announcedAt) * 1000).toISOString(),
+        announcedTx: event.transaction.hash,
+        announcementCount: 1,
+        source: 'onchain:indexer',
+      },
+    })
+  }
 })

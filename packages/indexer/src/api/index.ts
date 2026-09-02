@@ -7,7 +7,10 @@ import type {
   ReconciliationRow,
   Repository,
   TokenRow,
+  WebhookDeliveryRow,
+  WebhookEventRow,
 } from '@exdate/api'
+import { endpoints } from '../webhooks.js'
 import type { Address, Hex } from 'viem'
 
 /**
@@ -134,6 +137,19 @@ const repository: Repository = {
       )
   },
 
+  async webhookEvents(chainId) {
+    const rows = await db.select().from(schema.webhookEvents)
+    return rows
+      .filter((row) => row.chainId === chainId)
+      .sort((a, b) => Number(b.createdAt - a.createdAt))
+      .map((row) => ({ ...row, token: (row.token ?? null) as Address | null }) satisfies WebhookEventRow)
+  },
+
+  async webhookDeliveries(chainId) {
+    const rows = await db.select().from(schema.webhookDeliveries)
+    return rows.filter((row) => row.chainId === chainId) satisfies WebhookDeliveryRow[]
+  },
+
   async corporateActions(chainId) {
     const rows = await db.select().from(schema.corporateActions)
     return rows
@@ -142,4 +158,4 @@ const repository: Repository = {
   },
 }
 
-export default createApi({ repository })
+export default createApi({ repository, webhookEndpointsConfigured: endpoints.length })

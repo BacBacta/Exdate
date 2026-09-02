@@ -112,6 +112,35 @@ export interface ReconciliationRow {
   computedAt: bigint
 }
 
+/** A row of the webhook outbox: one real-world occurrence, already serialised. */
+export interface WebhookEventRow {
+  id: string
+  chainId: number
+  type: string
+  token: Address | null
+  /** The exact JSON body that was signed and sent. */
+  payload: string
+  createdAt: bigint
+  createdBlock: bigint | null
+}
+
+/** One attempt log per (event, endpoint). Carries a host, never a full URL or a secret. */
+export interface WebhookDeliveryRow {
+  id: string
+  chainId: number
+  eventId: string
+  type: string
+  endpointId: string
+  host: string
+  status: string
+  attempts: number
+  nextAttemptAt: bigint
+  lastAttemptAt: bigint | null
+  deliveredAt: bigint | null
+  responseStatus: number | null
+  error: string | null
+}
+
 export interface Repository {
   /** Joined token + latest state + latest feed round + event summary. */
   tokens(chainId: number): Promise<TokenRow[]>
@@ -119,4 +148,7 @@ export interface Repository {
   multiplierEvents(chainId: number, address?: string): Promise<MultiplierEventRow[]>
   corporateActions(chainId: number): Promise<CorporateActionRow[]>
   reconciliations(chainId: number, address?: string): Promise<ReconciliationRow[]>
+  /** Newest first. Empty until something has happened - never a placeholder. */
+  webhookEvents(chainId: number): Promise<WebhookEventRow[]>
+  webhookDeliveries(chainId: number): Promise<WebhookDeliveryRow[]>
 }

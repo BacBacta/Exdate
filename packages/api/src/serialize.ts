@@ -1,6 +1,13 @@
 import { REGISTRY_GENERATED_AT, feedHealth, isPending, WAD } from '@exdate/core'
 import { formatUnits } from 'viem'
-import type { CorporateActionRow, MultiplierEventRow, ReconciliationRow, TokenRow } from './types.js'
+import type {
+  CorporateActionRow,
+  MultiplierEventRow,
+  ReconciliationRow,
+  TokenRow,
+  WebhookDeliveryRow,
+  WebhookEventRow,
+} from './types.js'
 
 /**
  * Serialisation rules, and they are the honesty policy in code:
@@ -288,6 +295,47 @@ export function serializeReconciliation(row: ReconciliationRow) {
     },
 
     computedAt: iso(row.computedAt),
+  }
+}
+
+/**
+ * An outbox event with its delivery attempts.
+ *
+ * `payload` is served parsed for readability but the raw string is served
+ * alongside it, because the raw bytes are what the signature covers: a consumer
+ * replaying a delivery must sign that string, not a re-encoding of the object.
+ * Delivery rows carry the endpoint id and host only - the configured URL and
+ * its secret never leave the process.
+ */
+export function serializeWebhookEvent(row: WebhookEventRow, deliveries: readonly WebhookDeliveryRow[]) {
+  let payload: unknown = null
+  try {
+    payload = JSON.parse(row.payload)
+  } catch {
+    payload = null
+  }
+  return {
+    id: row.id,
+    type: row.type,
+    token: row.token,
+    createdAt: iso(row.createdAt),
+    createdBlock: row.createdBlock?.toString() ?? null,
+    payload,
+    /** The exact bytes the signature was computed over. */
+    signedBody: row.payload,
+    deliveries: deliveries.map((delivery) => ({
+      id: delivery.id,
+      endpointId: delivery.endpointId,
+      host: delivery.host,
+      /** queued | delivered | failed */
+      status: delivery.status,
+      attempts: delivery.attempts,
+      nextAttemptAt: iso(delivery.nextAttemptAt),
+      lastAttemptAt: iso(delivery.lastAttemptAt),
+      deliveredAt: iso(delivery.deliveredAt),
+      responseStatus: delivery.responseStatus,
+      error: delivery.error,
+    })),
   }
 }
 

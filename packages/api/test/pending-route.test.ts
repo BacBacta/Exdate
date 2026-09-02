@@ -103,6 +103,8 @@ const repository: Repository = {
   token: async (_chainId, address) => (matches(address) ? token : null),
   multiplierEvents: async (_chainId, address) => (address === undefined || matches(address) ? [event] : []),
   corporateActions: async () => [],
+  webhookEvents: async () => [],
+  webhookDeliveries: async () => [],
   reconciliations: async (_chainId, address) => (address === undefined || matches(address) ? [declared] : []),
 }
 

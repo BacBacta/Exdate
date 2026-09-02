@@ -1,4 +1,5 @@
 import { corporateActions, multiplierEvents, reconciliations, tokens } from 'ponder:schema'
+import { enqueueWebhook } from './webhooks.js'
 import {
   aggregatorV3Abi,
   findRoundAt,
@@ -128,6 +129,23 @@ export async function runReconcilePass(
   for (const action of pairing.unmatchedActions) {
     const existing = await context.db.find(reconciliations, { id: action.id })
     if (existing) continue
+    await enqueueWebhook(context, {
+      chainId,
+      type: 'dividend.pending',
+      subject: action.id,
+      token: action.token ? { address: action.token, symbol: action.symbol } : null,
+      now,
+      data: {
+        actionId: action.issuerId,
+        type: action.type,
+        issuerStatus: action.status,
+        processDate: action.processDate,
+        processDateIsNotExDate: true,
+        grossPerUnderlyingShare: action.rate,
+        currency: 'USD',
+        source: 'robinhood:/rhj/corporate-actions',
+      },
+    })
     await write({
       id: action.id,
       chainId,
@@ -272,6 +290,31 @@ export async function runReconcilePass(
       status: outcome.status,
       confidence: outcome.confidence,
       note: outcome.note ?? null,
+    })
+
+    // The measured haircut, which is the number nobody else publishes. Sent
+    // once per action: `needsPricing` above means a row that already carries a
+    // price is not rewritten, so this cannot fire twice for one dividend.
+    await enqueueWebhook(context, {
+      chainId,
+      type: 'dividend.reconciled',
+      subject: action.id,
+      token: { address: change.token as Address, symbol: action.symbol },
+      now,
+      data: {
+        actionId: action.issuerId,
+        processDate: action.processDate,
+        grossPerUnderlyingShare: action.rate,
+        effectiveAt: new Date(Number(change.effectiveAt) * 1000).toISOString(),
+        lagDays: base.lagDays,
+        observedStepBps: observedStep === null ? null : Number(observedStep) / 1e14,
+        expectedStepBps: outcome.expectedStepWad === undefined ? null : Number(outcome.expectedStepWad) / 1e14,
+        impliedHaircutBps: outcome.impliedHaircutBps ?? null,
+        status: outcome.status,
+        confidence: outcome.confidence,
+        note: outcome.note ?? null,
+        priceSource: priceFields.priceWad === undefined ? null : 'chainlink:getRoundData',
+      },
     })
   }
 

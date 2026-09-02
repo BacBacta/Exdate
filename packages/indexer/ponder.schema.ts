@@ -139,6 +139,13 @@ export const feedStates = onchainTable(
     decimals: t.integer().notNull(),
     updatedAt: t.bigint().notNull(),
     sampledAt: t.bigint().notNull(),
+    /**
+     * The health of this feed at `sampledAt`: live | stale | unknown. Stored
+     * rather than derived on read because a feed goes stale by the clock
+     * passing, not by anything arriving - so the transition that fires
+     * `feed.stale` is only visible against the previous poll's verdict.
+     */
+    status: t.text(),
   }),
   (table) => ({ pk: primaryKey({ columns: [table.chainId, table.feed] }) }),
 )
@@ -289,6 +296,62 @@ export const reconciliations = onchainTable(
  * backfill script uses, and records how far it got here. On the next start-up
  * the sweep resumes from this marker, which is what closes a downtime gap.
  */
+/**
+ * The webhook outbox.
+ *
+ * One row per real-world occurrence, keyed on a deterministic id, so the two
+ * paths that can notice the same schedule - the live indexer and the poller -
+ * insert the same row and the second is a no-op. The payload is stored exactly
+ * as it will be signed and sent: re-serialising JSON before signing is how a
+ * verifier ends up rejecting a delivery that was never tampered with.
+ */
+export const webhookEvents = onchainTable(
+  'webhook_events',
+  (t) => ({
+    /** `${type}:${chainId}:${subject}` - see webhookEventId in @exdate/core. */
+    id: t.text().primaryKey(),
+    chainId: t.integer().notNull(),
+    type: t.text().notNull(),
+    token: t.hex(),
+    /** The exact JSON body. */
+    payload: t.text().notNull(),
+    createdAt: t.bigint().notNull(),
+    createdBlock: t.bigint(),
+  }),
+  (table) => ({
+    typeIdx: index().on(table.chainId, table.type),
+    createdIdx: index().on(table.createdAt),
+  }),
+)
+
+/** One row per (event, endpoint). Kept after a failure, so a consumer that was down can see what it missed. */
+export const webhookDeliveries = onchainTable(
+  'webhook_deliveries',
+  (t) => ({
+    /** `${eventId}|${endpointId}`. */
+    id: t.text().primaryKey(),
+    chainId: t.integer().notNull(),
+    eventId: t.text().notNull(),
+    type: t.text().notNull(),
+    endpointId: t.text().notNull(),
+    /** Host only. The full URL is configuration and is never served by the API. */
+    host: t.text().notNull(),
+    /** queued | delivered | failed */
+    status: t.text().notNull(),
+    attempts: t.integer().notNull(),
+    nextAttemptAt: t.bigint().notNull(),
+    lastAttemptAt: t.bigint(),
+    deliveredAt: t.bigint(),
+    responseStatus: t.integer(),
+    /** The last failure, truncated. Never contains the secret or the signature. */
+    error: t.text(),
+  }),
+  (table) => ({
+    dueIdx: index().on(table.status, table.nextAttemptAt),
+    eventIdx: index().on(table.eventId),
+  }),
+)
+
 export const syncMarkers = onchainTable(
   'sync_markers',
   (t) => ({
