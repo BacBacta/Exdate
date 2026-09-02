@@ -25,7 +25,16 @@ function FeedCell({ token }: { token: TokenView }) {
   return (
     <>
       <span className={`pill ${token.feed.status}`}>{token.feed.status}</span>
-      {token.feed.verified ? null : <span className="addr"> derived</span>}
+      {token.feed.verified ? null : (
+        <span className="addr" title={
+          token.feed.corroborated
+            ? "the token's own multiplier step was seen moving this feed by the step's own size, and no other mapped feed moved closer"
+            : 'paired by ticker; no first-party statement links this token to this feed'
+        }>
+          {' '}
+          {token.feed.corroborated ? 'corroborated' : 'derived'}
+        </span>
+      )}
     </>
   )
 }

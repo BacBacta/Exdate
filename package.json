@@ -24,7 +24,9 @@
     "phase0:events": "node scripts/phase0/find-multiplier-events.mjs",
     "phase0:snapshot": "node scripts/phase0/snapshot-registry.mjs",
     "phase0:corporate-actions": "node scripts/phase0/check-corporate-actions.mjs",
-    "phase0:feed-price-at": "node scripts/phase0/feed-price-at.mjs"
+    "phase0:feed-price-at": "node scripts/phase0/feed-price-at.mjs",
+    "phase0:verify-feed-map": "node scripts/phase0/verify-feed-map.mjs",
+    "phase0:probe-oracle-link": "node scripts/phase0/probe-oracle-link.mjs"
   },
   "devDependencies": {
     "typescript": "^5.9.0",

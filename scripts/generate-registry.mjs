@@ -33,6 +33,7 @@ const tokens = assets
         feedHeartbeatSeconds: feed?.heartbeatSeconds ?? null,
         // Ticker-derived, never issuer-confirmed. See scripts/phase0/map-feeds.mjs.
         feedVerified: feed?.verified ?? false,
+        feedCorroborated: feed?.corroborated ?? false,
       }
     }),
   )
@@ -61,6 +62,12 @@ export interface RegistryToken {
   feedHeartbeatSeconds: number | null
   /** False everywhere today: the pairing is derived from the ticker. */
   feedVerified: boolean
+  /**
+   * The token's own multiplier step was observed moving this feed by the step's
+   * own size, and no other mapped feed moved closer to it. Behavioural
+   * evidence, not a first-party statement - see data/feed-map-verification.json.
+   */
+  feedCorroborated: boolean
 }
 
 export const REGISTRY_TOKENS: readonly RegistryToken[] = ${JSON.stringify(tokens, null, 2)} as const

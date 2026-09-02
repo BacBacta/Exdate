@@ -3,6 +3,7 @@ import { enqueueWebhook } from './webhooks.js'
 import {
   aggregatorV3Abi,
   findRoundAt,
+  findToken,
   kindFromCorporateActionType,
   lagDays,
   pairActionsWithChanges,
@@ -306,6 +307,10 @@ export async function runReconcilePass(
       newMultiplier: change.newMultiplier,
       observedEventCount: eventCountFor(String(change.token)),
       feedVerified: token?.feedVerified ?? false,
+      // From the committed registry rather than the tokens table: corroboration
+      // is a property of the map, established offline by
+      // scripts/phase0/verify-feed-map.mjs, not something the poller observes.
+      feedCorroborated: findToken(chainId, change.token as Address)?.feedCorroborated ?? false,
     })
 
     await write({

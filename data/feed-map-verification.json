@@ -1,0 +1,558 @@
+{
+  "generatedAt": "2026-09-02T20:32:50.485Z",
+  "note": "Corroboration of data/token-feed-map.json. No first-party address-level link exists; see scripts/phase0/verify-feed-map.mjs for what each check does and does not prove.",
+  "registry": {
+    "assets": 194,
+    "distinctTickers": 194,
+    "duplicateTickers": []
+  },
+  "descriptions": [
+    {
+      "symbol": "AAPL",
+      "feedProxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+      "description": "Robinhood AAPL / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "AMD",
+      "feedProxy": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
+      "description": "RHAMD / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "AMZN",
+      "feedProxy": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
+      "description": "Robinhood AMZN / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "ASML",
+      "feedProxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+      "description": "Robinhood ASML / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "BABA",
+      "feedProxy": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
+      "description": "Robinhood BABA / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "CLSK",
+      "feedProxy": "0x810c12D3a554Bc47fd39597Fe3b3AAC4941F50eF",
+      "description": "Robinhood CLSK / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "COIN",
+      "feedProxy": "0xA3a468A452940B7D6b69991207B508c609a98Ef2",
+      "description": "Robinhood COIN / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "CRCL",
+      "feedProxy": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+      "description": "Robinhood CRCL / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "CRWV",
+      "feedProxy": "0xe1b3aABCAFAd1c94708dc1367dcfF8Aa4407487C",
+      "description": "Robinhood CRWV / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "DELL",
+      "feedProxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+      "description": "Robinhood DELL-USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "EWY",
+      "feedProxy": "0xEFdf54610B62A7753Ec30bDc380847c12D32e1D1",
+      "description": "Robinhood EWY / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "GME",
+      "feedProxy": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
+      "description": "Robinhood GME / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "GOOGL",
+      "feedProxy": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
+      "description": "Robinhood GOOGL / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "INTC",
+      "feedProxy": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
+      "description": "RHINTC / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "IONQ",
+      "feedProxy": "0x22EfeC4919baf55F360E0EDee4AbEB26DE4971eb",
+      "description": "Robinhood IONQ / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "META",
+      "feedProxy": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+      "description": "Robinhood META / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "MSFT",
+      "feedProxy": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
+      "description": "RHMSFT / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "MSTR",
+      "feedProxy": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
+      "description": "Robinhood MSTR / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "MU",
+      "feedProxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+      "description": "RHMU / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "NBIS",
+      "feedProxy": "0xE1D87B116Ba0fe898998f1D140339D1fA1E09705",
+      "description": "Robinhood NBIS / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "NVDA",
+      "feedProxy": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+      "description": "RHNVDA / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "ORCL",
+      "feedProxy": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
+      "description": "Robinhood ORCL / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "PLTR",
+      "feedProxy": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
+      "description": "Robinhood PLTR / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "QQQ",
+      "feedProxy": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+      "description": "Robinhood QQQ / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "RGTI",
+      "feedProxy": "0x2A045cF1C49c61c166C036d2f06FA2D2d984f765",
+      "description": "Robinhood RGTI / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "RKLB",
+      "feedProxy": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
+      "description": "Robinhood RKLB / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "SGOV",
+      "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "description": "Robinhood SGOV-USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "SLV",
+      "feedProxy": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
+      "description": "Robinhood SLV / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "SNDK",
+      "feedProxy": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
+      "description": "RHSNDK / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "SPCX",
+      "feedProxy": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
+      "description": "Robinhood SPCX / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "SPY",
+      "feedProxy": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+      "description": "RHSPY / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "TSLA",
+      "feedProxy": "0x4A1166a659A55625345e9515b32adECea5547C38",
+      "description": "RHTSLA / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "TSM",
+      "feedProxy": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
+      "description": "Robinhood TSM / USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "USAR",
+      "feedProxy": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
+      "description": "Robinhood USAR-USD",
+      "mentionsTicker": true
+    },
+    {
+      "symbol": "USO",
+      "feedProxy": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
+      "description": "RHUSO / USD",
+      "mentionsTicker": true
+    }
+  ],
+  "steps": [
+    {
+      "symbol": "SGOV",
+      "token": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "effectiveAt": "2026-07-08T20:14:32Z",
+      "expectedStepBps": 9.5752,
+      "before": {
+        "answer": "10047497294",
+        "updatedAt": "2026-07-08T00:01:04.000Z"
+      },
+      "after": {
+        "answer": "10057120545",
+        "updatedAt": "2026-07-09T00:01:09.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": 9.5778,
+      "residualBps": 0.0026,
+      "gapSeconds": 86405,
+      "noiseBps": 0.0094,
+      "noiseSamples": 5,
+      "medianGapSeconds": 86406,
+      "gapRatio": 1,
+      "signalToNoise": 1018.6,
+      "decisive": true,
+      "toleranceBps": 0.9575,
+      "agrees": true
+    },
+    {
+      "symbol": "MU",
+      "token": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+      "feedProxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+      "effectiveAt": "2026-07-24T15:10:24Z",
+      "expectedStepBps": 0.7482,
+      "before": {
+        "answer": "93191210000",
+        "updatedAt": "2026-07-24T14:50:38.000Z"
+      },
+      "after": {
+        "answer": "93790440000",
+        "updatedAt": "2026-07-24T15:15:09.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": 64.3011,
+      "residualBps": 63.5529,
+      "gapSeconds": 1471,
+      "noiseBps": 62.4151,
+      "noiseSamples": 12,
+      "medianGapSeconds": 330,
+      "gapRatio": 4.46,
+      "signalToNoise": 0,
+      "decisive": false,
+      "toleranceBps": 835.114,
+      "agrees": false
+    },
+    {
+      "symbol": "ORCL",
+      "token": "0xb0992820E760d836549ba69BC7598b4af75dEE03",
+      "feedProxy": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
+      "effectiveAt": "2026-07-27T15:10:23Z",
+      "expectedStepBps": 22.1091,
+      "before": {
+        "answer": "12101865000",
+        "updatedAt": "2026-07-27T15:06:35.000Z"
+      },
+      "after": {
+        "answer": "12166339402",
+        "updatedAt": "2026-07-27T15:23:05.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": 53.2764,
+      "residualBps": 31.1673,
+      "gapSeconds": 990,
+      "noiseBps": 55.3433,
+      "noiseSamples": 12,
+      "medianGapSeconds": 451,
+      "gapRatio": 2.2,
+      "signalToNoise": 0.4,
+      "decisive": false,
+      "toleranceBps": 365.2658,
+      "agrees": false
+    },
+    {
+      "symbol": "DELL",
+      "token": "0x941AE714EC6D8130c7B75d67160Ca08f1e7d11Dd",
+      "feedProxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+      "effectiveAt": "2026-08-03T15:10:23Z",
+      "expectedStepBps": 0.6371,
+      "before": {
+        "answer": "41892730000",
+        "updatedAt": "2026-08-03T15:09:57.000Z"
+      },
+      "after": {
+        "answer": "41647453132",
+        "updatedAt": "2026-08-03T15:27:27.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": -58.5488,
+      "residualBps": -59.1859,
+      "gapSeconds": 1050,
+      "noiseBps": 57.6735,
+      "noiseSamples": 12,
+      "medianGapSeconds": 330,
+      "gapRatio": 3.18,
+      "signalToNoise": 0,
+      "decisive": false,
+      "toleranceBps": 550.2052,
+      "agrees": false
+    },
+    {
+      "symbol": "ASML",
+      "token": "0x47F93d52cBeC7C6D2CfC080e154002370a60dAEA",
+      "feedProxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+      "effectiveAt": "2026-08-06T15:10:25Z",
+      "expectedStepBps": 1.0132,
+      "before": {
+        "answer": "172630000000",
+        "updatedAt": "2026-08-06T14:12:11.000Z"
+      },
+      "after": {
+        "answer": "171726898164",
+        "updatedAt": "2026-08-06T16:01:43.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": -52.3143,
+      "residualBps": -53.3275,
+      "gapSeconds": 6572,
+      "noiseBps": 56.8386,
+      "noiseSamples": 12,
+      "medianGapSeconds": 1650,
+      "gapRatio": 3.98,
+      "signalToNoise": 0,
+      "decisive": false,
+      "toleranceBps": 678.6529,
+      "agrees": false
+    },
+    {
+      "symbol": "SGOV",
+      "token": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "effectiveAt": "2026-08-07T15:10:24Z",
+      "expectedStepBps": 20.2206,
+      "before": {
+        "answer": "10057120681",
+        "updatedAt": "2026-08-07T00:01:33.000Z"
+      },
+      "after": {
+        "answer": "10080465760",
+        "updatedAt": "2026-08-10T00:00:21.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": 23.2125,
+      "residualBps": 2.9919,
+      "gapSeconds": 259128,
+      "noiseBps": 0.9939,
+      "noiseSamples": 12,
+      "medianGapSeconds": 86420,
+      "gapRatio": 3,
+      "signalToNoise": 20.3,
+      "decisive": true,
+      "toleranceBps": 8.9451,
+      "agrees": true
+    },
+    {
+      "symbol": "AAPL",
+      "token": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "feedProxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+      "effectiveAt": "2026-08-14T15:12:46Z",
+      "expectedStepBps": 5.6608,
+      "before": {
+        "answer": "30517105000",
+        "updatedAt": "2026-08-14T14:21:47.000Z"
+      },
+      "after": {
+        "answer": "30547782706",
+        "updatedAt": "2026-08-17T00:00:49.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": 10.0526,
+      "residualBps": 4.3918,
+      "gapSeconds": 207542,
+      "noiseBps": 53.9507,
+      "noiseSamples": 12,
+      "medianGapSeconds": 15124,
+      "gapRatio": 13.72,
+      "signalToNoise": 0.1,
+      "decisive": false,
+      "toleranceBps": 2220.6108,
+      "agrees": false
+    },
+    {
+      "symbol": "SGOV",
+      "token": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "effectiveAt": "2026-09-01T00:00:26Z",
+      "expectedStepBps": 21.1395,
+      "before": {
+        "answer": "10098519427",
+        "updatedAt": "2026-08-31T00:00:41.000Z"
+      },
+      "after": {
+        "answer": "10095459352",
+        "updatedAt": "2026-09-01T00:00:59.000Z"
+      },
+      "atPhaseFloor": false,
+      "observedJumpBps": -3.0302,
+      "residualBps": -24.1697,
+      "gapSeconds": 86418,
+      "noiseBps": 0.9945,
+      "noiseSamples": 12,
+      "medianGapSeconds": 86426,
+      "gapRatio": 1,
+      "signalToNoise": 21.3,
+      "decisive": true,
+      "toleranceBps": 2.9835,
+      "agrees": false
+    }
+  ],
+  "crossChecks": [
+    {
+      "symbol": "SGOV",
+      "effectiveAt": "2026-07-08T20:14:32Z",
+      "expectedStepBps": 9.5752,
+      "assignedRank": 1,
+      "feedsMeasured": 34,
+      "ranked": [
+        {
+          "symbol": "SGOV",
+          "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+          "jumpBps": 9.5778,
+          "residualBps": 0.0026
+        },
+        {
+          "symbol": "RKLB",
+          "feedProxy": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
+          "jumpBps": 50.1681,
+          "residualBps": 40.5929
+        },
+        {
+          "symbol": "TSLA",
+          "feedProxy": "0x4A1166a659A55625345e9515b32adECea5547C38",
+          "jumpBps": 50.2801,
+          "residualBps": 40.7049
+        },
+        {
+          "symbol": "BABA",
+          "feedProxy": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
+          "jumpBps": 50.8619,
+          "residualBps": 41.2867
+        },
+        {
+          "symbol": "MU",
+          "feedProxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+          "jumpBps": 50.8846,
+          "residualBps": 41.3094
+        }
+      ]
+    },
+    {
+      "symbol": "SGOV",
+      "effectiveAt": "2026-08-07T15:10:24Z",
+      "expectedStepBps": 20.2206,
+      "assignedRank": 2,
+      "feedsMeasured": 35,
+      "ranked": [
+        {
+          "symbol": "QQQ",
+          "feedProxy": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+          "jumpBps": 22.189,
+          "residualBps": 1.9684
+        },
+        {
+          "symbol": "SGOV",
+          "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+          "jumpBps": 23.2125,
+          "residualBps": 2.9919
+        },
+        {
+          "symbol": "SPY",
+          "feedProxy": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+          "jumpBps": -5.6352,
+          "residualBps": -25.8558
+        },
+        {
+          "symbol": "TSM",
+          "feedProxy": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
+          "jumpBps": 50.4795,
+          "residualBps": 30.2589
+        },
+        {
+          "symbol": "TSLA",
+          "feedProxy": "0x4A1166a659A55625345e9515b32adECea5547C38",
+          "jumpBps": 50.6754,
+          "residualBps": 30.4548
+        }
+      ]
+    },
+    {
+      "symbol": "SGOV",
+      "effectiveAt": "2026-09-01T00:00:26Z",
+      "expectedStepBps": 21.1395,
+      "assignedRank": 3,
+      "feedsMeasured": 35,
+      "ranked": [
+        {
+          "symbol": "SPY",
+          "feedProxy": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+          "jumpBps": 17.6172,
+          "residualBps": -3.5223
+        },
+        {
+          "symbol": "QQQ",
+          "feedProxy": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+          "jumpBps": 7.269,
+          "residualBps": -13.8705
+        },
+        {
+          "symbol": "SGOV",
+          "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+          "jumpBps": -3.0302,
+          "residualBps": -24.1697
+        },
+        {
+          "symbol": "ASML",
+          "feedProxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+          "jumpBps": 50.3109,
+          "residualBps": 29.1714
+        },
+        {
+          "symbol": "CRCL",
+          "feedProxy": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+          "jumpBps": 50.5824,
+          "residualBps": 29.4429
+        }
+      ]
+    }
+  ]
+}

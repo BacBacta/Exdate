@@ -19,6 +19,12 @@ export interface RegistryToken {
   feedHeartbeatSeconds: number | null
   /** False everywhere today: the pairing is derived from the ticker. */
   feedVerified: boolean
+  /**
+   * The token's own multiplier step was observed moving this feed by the step's
+   * own size, and no other mapped feed moved closer to it. Behavioural
+   * evidence, not a first-party statement - see data/feed-map-verification.json.
+   */
+  feedCorroborated: boolean
 }
 
 export const REGISTRY_TOKENS: readonly RegistryToken[] = [
@@ -34,7 +40,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -48,7 +55,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -62,7 +70,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -76,7 +85,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -90,7 +100,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -104,7 +115,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -118,7 +130,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -132,7 +145,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -146,7 +160,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -160,7 +175,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -174,7 +190,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -188,7 +205,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -202,7 +220,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -216,7 +235,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -230,7 +250,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -244,7 +265,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -258,7 +280,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -272,7 +295,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -286,7 +310,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -300,7 +325,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -314,7 +340,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -328,7 +355,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -342,7 +370,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -356,7 +385,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -370,7 +400,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -384,7 +415,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -398,7 +430,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -412,7 +445,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -426,7 +460,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -440,7 +475,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -454,7 +490,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -468,7 +505,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -482,7 +520,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -496,7 +535,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -510,7 +550,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -524,7 +565,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -538,7 +580,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x810c12D3a554Bc47fd39597Fe3b3AAC4941F50eF",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -552,7 +595,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -566,7 +610,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xA3a468A452940B7D6b69991207B508c609a98Ef2",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -580,7 +625,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -594,7 +640,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -608,7 +655,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -622,7 +670,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -636,7 +685,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -650,7 +700,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xe1b3aABCAFAd1c94708dc1367dcfF8Aa4407487C",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -664,7 +715,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -678,7 +730,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -692,7 +745,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -706,7 +760,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -720,7 +775,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -734,7 +790,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -748,7 +805,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -762,7 +820,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -776,7 +835,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -790,7 +850,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xEFdf54610B62A7753Ec30bDc380847c12D32e1D1",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -804,7 +865,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -818,7 +880,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -832,7 +895,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -846,7 +910,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -860,7 +925,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -874,7 +940,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -888,7 +955,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -902,7 +970,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -916,7 +985,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -930,7 +1000,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -944,7 +1015,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -958,7 +1030,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -972,7 +1045,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -986,7 +1060,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1000,7 +1075,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1014,7 +1090,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1028,7 +1105,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1042,7 +1120,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1056,7 +1135,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1070,7 +1150,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1084,7 +1165,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1098,7 +1180,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1112,7 +1195,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1126,7 +1210,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1140,7 +1225,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1154,7 +1240,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1168,7 +1255,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1182,7 +1270,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x22EfeC4919baf55F360E0EDee4AbEB26DE4971eb",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1196,7 +1285,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1210,7 +1300,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1224,7 +1315,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1238,7 +1330,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1252,7 +1345,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1266,7 +1360,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1280,7 +1375,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1294,7 +1390,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1308,7 +1405,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1322,7 +1420,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1336,7 +1435,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1350,7 +1450,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1364,7 +1465,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1378,7 +1480,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1392,7 +1495,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1406,7 +1510,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1420,7 +1525,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1434,7 +1540,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1448,7 +1555,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1462,7 +1570,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1476,7 +1585,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1490,7 +1600,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1504,7 +1615,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1518,7 +1630,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1532,7 +1645,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1546,7 +1660,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1560,7 +1675,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xE1D87B116Ba0fe898998f1D140339D1fA1E09705",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1574,7 +1690,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1588,7 +1705,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1602,7 +1720,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1616,7 +1735,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1630,7 +1750,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1644,7 +1765,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1658,7 +1780,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1672,7 +1795,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1686,7 +1810,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1700,7 +1825,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1714,7 +1840,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1728,7 +1855,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1742,7 +1870,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1756,7 +1885,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1770,7 +1900,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1784,7 +1915,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1798,7 +1930,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1812,7 +1945,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1826,7 +1960,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1840,7 +1975,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1854,7 +1990,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1868,7 +2005,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1882,7 +2020,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1896,7 +2035,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1910,7 +2050,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1924,7 +2065,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1938,7 +2080,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1952,7 +2095,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1966,7 +2110,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1980,7 +2125,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -1994,7 +2140,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2008,7 +2155,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x2A045cF1C49c61c166C036d2f06FA2D2d984f765",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2022,7 +2170,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2036,7 +2185,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2050,7 +2200,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2064,7 +2215,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2078,7 +2230,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2092,7 +2245,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": true
   },
   {
     "chainId": 4663,
@@ -2106,7 +2260,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2120,7 +2275,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2134,7 +2290,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2148,7 +2305,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2162,7 +2320,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2176,7 +2335,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2190,7 +2350,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2204,7 +2365,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2218,7 +2380,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2232,7 +2395,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2246,7 +2410,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2260,7 +2425,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2274,7 +2440,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2288,7 +2455,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2302,7 +2470,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2316,7 +2485,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2330,7 +2500,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2344,7 +2515,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2358,7 +2530,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2372,7 +2545,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2386,7 +2560,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2400,7 +2575,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2414,7 +2590,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2428,7 +2605,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x4A1166a659A55625345e9515b32adECea5547C38",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2442,7 +2620,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2456,7 +2635,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2470,7 +2650,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2484,7 +2665,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2498,7 +2680,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2512,7 +2695,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2526,7 +2710,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2540,7 +2725,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2554,7 +2740,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2568,7 +2755,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2582,7 +2770,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2596,7 +2785,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2610,7 +2800,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2624,7 +2815,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2638,7 +2830,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2652,7 +2845,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2666,7 +2860,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2680,7 +2875,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2694,7 +2890,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2708,7 +2905,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2722,7 +2920,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   },
   {
     "chainId": 4663,
@@ -2736,11 +2935,12 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedProxy": null,
     "feedDecimals": null,
     "feedHeartbeatSeconds": null,
-    "feedVerified": false
+    "feedVerified": false,
+    "feedCorroborated": false
   }
 ] as const
 
-export const REGISTRY_GENERATED_AT = "2026-09-02T15:14:00.463Z"
+export const REGISTRY_GENERATED_AT = "2026-09-02T20:34:01.714Z"
 
 /**
  * Every UIMultiplierUpdated log on chain, found by

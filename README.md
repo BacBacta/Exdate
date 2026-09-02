@@ -72,7 +72,8 @@ Committed artifacts, all first-party or read from the chain:
 | `data/robinhood-assets.snapshot.json` | 194 Stock Tokens from the issuer's own registry |
 | `data/robinhood-corporate-actions.snapshot.json` | 43 dividends from the issuer's own feed (12 done, 31 upcoming) |
 | `data/chainlink-feeds.snapshot.json` | 57 Chainlink feeds on Robinhood Chain |
-| `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`** |
+| `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`**, one row corroborated |
+| `data/feed-map-verification.json` | what that pairing was actually tested against |
 | `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
 | `data/reconciliations.observed.json` | every declared action against the step it produced, priced at `effectiveAt` |
 
@@ -189,7 +190,8 @@ packages/api      Hono routes over a Repository interface — no SQL, deployable
 apps/status       Next.js App Router status page. Reads the API and nothing else.
 packages/sdk      @exdate/sdk — typed client + webhook verifier. Depends on core only.
 scripts           verification and backfill scripts
-data              committed snapshots of first-party registries and observed events
+data              committed snapshots of first-party registries, observed events, and the
+                  feed-map verification
 docs              Phase 0 report, API reference
 ```
 
@@ -230,3 +232,14 @@ about them is **observed**, never official.
 
 The same rule applies to this repository. Anything derived rather than read — currently the
 token → feed mapping — is committed with `verified: false` and named as a heuristic.
+
+That mapping has since been tested rather than left as an assumption
+([`docs/phase-0-verification.md`](docs/phase-0-verification.md) §14). No first-party, address-level
+link exists — the token contract answers with no address at all, and the probe that establishes
+that is committed. What does exist: all 35 aggregators name their ticker in their own on-chain
+`description()`, the issuer's registry carries 194 distinct tickers for 194 assets, and **SGOV's
+2026-07-08 multiplier step was seen moving its assigned feed by +9.5778 bps against an expected
++9.5752 — on a feed whose ordinary movement is 0.0094 bps, and uniquely closest among all 35 feeds
+measured at that instant**. That row is marked `corroborated`; the other 34 are not, and the
+reconciliation confidence ladder keeps `high` reserved for a first-party statement that does not
+yet exist.

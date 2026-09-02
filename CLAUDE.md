@@ -133,10 +133,27 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
 - Off-hours the feed holds the last price with no heartbeat. Always read `updatedAt` and enforce a
   staleness bound. Also check the token's `oraclePaused()` — when true the feed stops publishing.
   Observed on 2026-09-02 during a live session: SPY 18 h stale, QQQ 4 h stale, USDG 21 h stale.
-- Token → feed mapping: `data/token-feed-map.json`, every row `verified: false`. It is derived from
-  the feed's display name because there is no onchain token→aggregator link. **This is the one place
-  the repo currently identifies a token by symbol.** Do not promote a row without a first-party
-  statement.
+- Token → feed mapping: `data/token-feed-map.json`, every row `verified: false`, and it stays that
+  way: **no first-party, address-level statement links a token to a feed.** Measured, not assumed —
+  the token implementation answers with no address at all (24 selectors probed by
+  `scripts/phase0/probe-oracle-link.mjs`), Chainlink's directory carries no token address, and
+  `/rhj/oracles` and `/rhj/feeds` do not exist. On the aggregator side `aggregator()` does resolve,
+  so proxy → aggregator is on-chain verifiable.
+- What the mapping now rests on instead (`scripts/phase0/verify-feed-map.mjs`, full output in
+  `data/feed-map-verification.json`, method in `docs/phase-0-verification.md` §14):
+  **35/35 aggregators name their ticker in their own on-chain `description()`** (three spellings:
+  `Robinhood AAPL / USD`, `RHAMD / USD`, `Robinhood SGOV-USD`), and the issuer's registry carries
+  **194 distinct tickers for 194 assets**, so a ticker resolves to exactly one address. Each half is
+  first-party; only the join is inference.
+- **One pair is corroborated by behaviour: SGOV.** Its 2026-07-08 step moved its feed by
+  +9.5778 bps against an expected +9.5752, on a feed whose round-to-round noise is 0.0094 bps — and
+  across all 35 mapped feeds at that instant, the assigned one is uniquely closest (next: 40.59 bps
+  away). The other five equity tokens with steps are inconclusive by construction: a 0.5 % deviation
+  threshold puts ~50 bps between consecutive rounds, so a dividend-sized step is invisible.
+  SGOV's 2026-09-01 step disagrees (−3.03 vs +21.14 bps) and is reported as such: the equity leg is
+  unobservable from here, and a total-return feed is designed to stay flat through a step.
+- Confidence ladder, in `reconcile.ts`: ticker match only → `low` always; `feedCorroborated` →
+  `medium` from three events; a first-party address link → `high` from ten, which nothing reaches.
 
 ## Known traps
 
@@ -349,6 +366,12 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   log, not the price history, which is read back from `getRoundData`; the static `tokens` row is
   written only when it changes; the outbox has unit tests against a fake Ponder store
   (`ponder:schema` aliased in `packages/indexer/vitest.config.ts`).
+- 2026-09-02 — The token → feed map is corroborated rather than verified, and the two words now
+  mean different things in code. `verified` stays false everywhere (no first-party address-level
+  statement exists, and that was probed, not assumed); `corroborated` means the token's own
+  multiplier step was seen moving that feed by the step's own size, above the feed's noise, with no
+  other mapped feed closer — true for SGOV alone. `reconcile()` takes `feedCorroborated` and lets it
+  reach `medium`; `high` stays reserved for a first-party link.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -378,8 +401,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 - The reconciliation covers cash dividends only. A split matched to a step is written as
   `unsupported_action_type` rather than forced through a per-share model that does not fit it.
-- `token-feed-map.json` is still derived from the ticker (`verified: false` everywhere) — the one
-  place the repo identifies a token by symbol.
+- The token → feed pairing is corroborated for 1 of 35 tokens and named-only for the other 34. No
+  first-party link exists to close the gap; a second SGOV-like token (low-volatility underlying,
+  large step) would corroborate another row. See `docs/phase-0-verification.md` §14.
 - The poller and the gap sweep have no tests of their own: they need a chain and a Ponder process,
   so they are exercised by running the indexer. The webhook outbox is unit-tested
   (`packages/indexer/test/webhooks.test.ts`) and was also verified live against a local receiver.

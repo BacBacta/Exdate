@@ -247,7 +247,9 @@ console.error(`# ${rows.length} rows: ${rows.filter((r) => r.change).length} wit
 
 for (const row of rows) {
   const feed = feedForToken.get(row.token.toLowerCase())
-  row.feed = feed ? { proxy: feed.feedProxy, verified: feed.verified } : null
+  row.feed = feed
+    ? { proxy: feed.feedProxy, verified: feed.verified, corroborated: feed.corroborated ?? false }
+    : null
 
   if (!row.change) {
     row.status = 'pending'

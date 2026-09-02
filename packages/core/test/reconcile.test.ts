@@ -277,4 +277,15 @@ describe('confidence', () => {
     expect(reconcile({ ...base, observedEventCount: 3, feedVerified: true }).confidence).toBe('medium')
     expect(reconcile({ ...base, observedEventCount: 10, feedVerified: true }).confidence).toBe('high')
   })
+
+  it('lets behavioural corroboration reach medium, and no further', () => {
+    // SGOV: three steps, and the July one moved its feed by exactly its own
+    // size at a thousand times the feed's noise, with no other feed closer.
+    // That is evidence about the pairing, but it is not the issuer saying so,
+    // and `high` is reserved for a first-party address-level statement.
+    expect(reconcile({ ...base, observedEventCount: 3, feedCorroborated: true }).confidence).toBe('medium')
+    expect(reconcile({ ...base, observedEventCount: 50, feedCorroborated: true }).confidence).toBe('medium')
+    // Corroboration does not substitute for a sample either.
+    expect(reconcile({ ...base, observedEventCount: 2, feedCorroborated: true }).confidence).toBe('low')
+  })
 })

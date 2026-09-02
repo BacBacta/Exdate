@@ -80,8 +80,16 @@ export interface TokenView {
   }
   feed: {
     proxy: string
-    /** False everywhere today: the token to feed pairing is derived from the ticker. */
+    /** False everywhere today: no first-party statement links a token to a feed. */
     verified: boolean
+    /**
+     * Behavioural evidence for the pairing: this token's own multiplier step
+     * was seen moving this feed by the step's own size, above the feed's
+     * round-to-round noise, with no other mapped feed closer.
+     */
+    corroborated: boolean
+    /** How the pairing was made in the first place. */
+    pairedBy: string
     decimals: number | null
     roundId: string | null
     answer: string | null

@@ -450,6 +450,70 @@ effective 15:10:26 UTC, +1.46 bps** — that same afternoon, against an issuer r
 `processDate` 2026-09-01 and a declared rate of $0.15. Twelve distinct changes across ten tokens,
 since CRWD announced one of them twice.
 
+## 14. The token → feed mapping, verified as far as it can be — 2026-09-02
+
+`data/token-feed-map.json` pairs a Stock Token with a Chainlink aggregator. It was built from the
+feed's display name, which makes it the one place exdate identifies a token by symbol, and the
+reason every reconciliation row was `confidence: low`. This section is what happened when that
+mapping was actually tested.
+
+**There is no first-party, address-level link, and that is now measured rather than assumed.**
+`scripts/phase0/probe-oracle-link.mjs` pulls every 4-byte selector out of the token
+implementation's own bytecode, calls each one, and reports anything address-shaped. The Stock Token
+answers with **no address at all** — 24 selectors, none returning one. `oraclePaused()` is a flag
+with nothing behind it. Chainlink's directory carries no token address either, and the issuer's API
+publishes no feed (`/rhj/oracles`, `/rhj/feeds` do not exist; the service is gRPC-transcoded and
+answers `Could not resolve … to a method`). The same probe on the aggregator proxy does find one
+real link: selector `0x245a7bfc` (`aggregator()`) returns `0x0E96…f2d8`, matching the directory's
+`contractAddress` for that feed — so proxy → aggregator is verifiable on chain, and token ↔ feed is
+not.
+
+**What the aggregators do say on chain.** `description()`, read by address on all 35 proxies,
+names the ticker on **35 of 35**, in three spellings: `Robinhood AAPL / USD` (23), `RHAMD / USD`
+(9) and `Robinhood SGOV-USD` (3). Read against the issuer's registry, where **194 assets carry 194
+distinct tickers**, a ticker resolves to exactly one contract address — and Chainlink's own
+documentation states one ERC-20 contract per ticker. The mapping therefore no longer rests on a
+JSON file: each half is a first-party statement, and only the join between them is inference.
+
+**The behavioural test.** Chainlink documents the feed as
+`Token Price = Underlying Equity Market Price × Multiplier`, with the multiplier "read from the
+Robinhood token contract via `uiMultiplier()`". So at the instant a token's multiplier steps, its
+feed — and no other — should jump by the step's own size. Both sides of that test are addresses:
+the step comes from the token's logs, the jump from the aggregator's rounds.
+`scripts/phase0/verify-feed-map.mjs` measures it, against a noise floor sampled from each feed's
+own round-to-round movement before the step. Results, all 8 steps on tokens that have a feed:
+
+| Token | Step | Expected | Observed | Noise | Verdict |
+|---|---|---|---|---|---|
+| SGOV | 2026-07-08 | +9.5752 bps | **+9.5778 bps** | 0.0094 bps | agrees, residual 0.0026 bps |
+| SGOV | 2026-08-07 | +20.22 bps | +23.21 bps | 0.99 bps | agrees over a 3-day gap |
+| SGOV | 2026-09-01 | +21.14 bps | −3.03 bps | 0.99 bps | **disagrees** |
+| MU, ORCL, DELL, ASML, AAPL | — | 0.64–22.11 bps | — | 50–62 bps | inconclusive |
+
+The five equity tokens are inconclusive by construction: their feeds publish on a **0.5 %
+deviation threshold**, so consecutive rounds sit ~50 bps apart and a dividend-sized step of a few
+bps is invisible in them. SGOV is the exception — a treasury ETF whose feed moves 0.0094 bps
+between rounds — which is why it is the reference token here as well.
+
+**The negative control.** For each decisive step, the same measurement was run against all 35
+mapped feeds and ranked by how close each came to the expected step. At SGOV's July step the
+assigned feed is **uniquely first of 34**, with a residual of 0.00 bps against 40.59 bps for the
+runner-up. A jump of exactly the right size, on exactly one feed, at exactly that instant.
+
+**The disagreement is reported, not explained away.** At the 2026-09-01 step the feed moved
+−3.03 bps where the multiplier moved +21.14. For that to hold, the underlying equity must have
+moved about −24 bps in the same window — which is what an ex-dividend drop looks like, and would
+mean the total-return feed did exactly its job by staying flat through the event. exdate cannot
+observe the equity leg, so it records the residual and asserts nothing about the cause. The same
+mechanism is a standing limit on this test: a total-return feed is *designed* to absorb a
+multiplier change, so a step and its equity drop cancelling out is evidence of nothing either way.
+
+**What changed as a result.** `token-feed-map.json` keeps `verified: false` on all 35 rows —
+nothing here is a first-party statement about an address — and gains `corroborated`, true for SGOV
+alone, with the evidence attached per row. The reconciliation's confidence ladder now reads:
+ticker match only → `low` always; corroborated → `medium` from three events; first-party link →
+`high` from ten, which nothing reaches today. Full output: `data/feed-map-verification.json`.
+
 ---
 
 ## Sources

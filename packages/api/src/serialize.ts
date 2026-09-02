@@ -1,4 +1,4 @@
-import { REGISTRY_GENERATED_AT, feedHealth, isPending, WAD } from '@exdate/core'
+import { REGISTRY_GENERATED_AT, feedHealth, findToken, isPending, WAD } from '@exdate/core'
 import { formatUnits } from 'viem'
 import type {
   CorporateActionRow,
@@ -143,12 +143,21 @@ export function serializeToken(row: TokenRow, options: SerializeOptions) {
         : {
             proxy: row.feedProxy,
             /**
-             * False everywhere today. Chainlink names its feeds by ticker and
-             * there is no on-chain token -> aggregator link, so this pairing is
-             * derived rather than verified. Consumers should treat a false here
-             * as a reason to lower their own confidence.
+             * False everywhere today: no first-party, address-level statement
+             * links a token to a feed. The token contract exposes no
+             * address-shaped view at all, Chainlink's directory carries no token
+             * address, and the issuer publishes no feed.
              */
             verified: row.feedVerified,
+            /**
+             * Behavioural evidence instead: this token's own multiplier step was
+             * seen moving this feed by the step's own size, above the feed's
+             * round-to-round noise, with no other mapped feed closer. True for
+             * SGOV only - see data/feed-map-verification.json.
+             */
+            corroborated: findToken(row.chainId, row.address)?.feedCorroborated ?? false,
+            /** How the pairing was made in the first place. */
+            pairedBy: 'ticker-heuristic',
             decimals: row.feedDecimals,
             roundId: row.feedRoundId?.toString() ?? null,
             answer: row.feedAnswer?.toString() ?? null,

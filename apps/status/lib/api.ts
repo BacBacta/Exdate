@@ -8,7 +8,10 @@ export const API_URL = process.env.EXDATE_API_URL ?? 'http://localhost:42069'
 
 export interface FeedView {
   proxy: string
+  /** False everywhere: no first-party statement links a token to a feed. */
   verified: boolean
+  /** The token's own multiplier step was seen moving this feed by its own size. */
+  corroborated: boolean
   decimals: number | null
   roundId: string | null
   answer: string | null

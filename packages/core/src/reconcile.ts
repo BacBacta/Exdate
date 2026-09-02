@@ -126,6 +126,14 @@ export interface ReconcileInput {
   /** False when the token -> feed pairing is still a ticker heuristic. */
   feedVerified?: boolean
   /**
+   * The feed pairing is corroborated by behaviour: this token's own multiplier
+   * step was seen moving this feed by the step's own size, louder than the
+   * feed's round-to-round noise, and no other mapped feed moved closer. Weaker
+   * than {@link feedVerified}, which would mean a first-party address-level
+   * statement - there is none for any pair today.
+   */
+  feedCorroborated?: boolean
+  /**
    * Bounds outside which a result is reported as an anomaly rather than a
    * measurement, in basis points. The default admits everything from "holders
    * received 1 % more than declared" to "half the dividend disappeared", which
@@ -167,11 +175,28 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     newMultiplier,
     observedEventCount,
     feedVerified = false,
+    feedCorroborated = false,
     plausibleHaircutBps = DEFAULT_PLAUSIBLE_HAIRCUT_BPS,
   } = input
 
+  /**
+   * Confidence is about the pairing first and the sample second, because a
+   * haircut computed against the wrong feed is wrong however many events back
+   * it up:
+   *
+   *   ticker match only          -> low, always
+   *   corroborated by behaviour  -> medium from three events
+   *   first-party address link   -> high from ten
+   *
+   * Nothing reaches `high` today: no first-party statement links any token to
+   * any feed. See data/feed-map-verification.json for what was actually tested.
+   */
   const confidence: Confidence =
-    observedEventCount < 3 || !feedVerified ? 'low' : observedEventCount < 10 ? 'medium' : 'high'
+    observedEventCount < 3 || !(feedVerified || feedCorroborated)
+      ? 'low'
+      : !feedVerified || observedEventCount < 10
+        ? 'medium'
+        : 'high'
 
   const empty = {
     underlyingPriceWad: undefined,

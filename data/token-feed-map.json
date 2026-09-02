@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-09-02T13:11:07.621Z",
-  "note": "Ticker-derived mapping. See scripts/phase0/map-feeds.mjs. Nothing here is issuer-confirmed.",
+  "note": "Ticker-derived mapping (scripts/phase0/map-feeds.mjs), corroborated by scripts/phase0/verify-feed-map.mjs. `verified` stays false everywhere: no first-party, address-level statement links a token to a feed - the token contract exposes no address-shaped view at all, Chainlink's directory carries no token address, and the issuer publishes no feed. `corroborated` is behavioural evidence, see data/feed-map-verification.json.",
   "tokensTotal": 194,
   "equityFeedsTotal": 35,
   "mapped": 35,
@@ -177,7 +177,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood AAPL / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 1,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -190,7 +202,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHAMD / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -203,7 +227,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood AMZN / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -216,7 +252,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood ASML / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 1,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -229,7 +277,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood BABA / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -242,7 +302,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood CLSK / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -255,7 +327,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood COIN / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -268,7 +352,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood CRCL / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -281,7 +377,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood CRWV / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -294,7 +402,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood DELL-USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 1,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -307,7 +427,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood EWY / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -320,7 +452,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood GME / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -333,7 +477,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood GOOGL / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -346,7 +502,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHINTC / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -359,7 +527,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood IONQ / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -372,7 +552,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood META / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -385,7 +577,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHMSFT / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -398,7 +602,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood MSTR / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -411,7 +627,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHMU / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 1,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -424,7 +652,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood NBIS / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -437,7 +677,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHNVDA / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -450,7 +702,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood ORCL / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 1,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -463,7 +727,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood PLTR / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -476,7 +752,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood QQQ / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -489,7 +777,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood RGTI / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -502,7 +802,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood RKLB / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -515,7 +827,27 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood SGOV-USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 3,
+          "decisive": 3,
+          "agreeing": 2,
+          "best": {
+            "effectiveAt": "2026-07-08T20:14:32Z",
+            "expectedStepBps": 9.5752,
+            "observedJumpBps": 9.5778,
+            "residualBps": 0.0026,
+            "noiseBps": 0.0094,
+            "signalToNoise": 1018.6,
+            "rankAmongMappedFeeds": 1
+          }
+        }
+      },
+      "corroborated": true
     },
     {
       "chainId": 4663,
@@ -528,7 +860,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood SLV / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -541,7 +885,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHSNDK / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -554,7 +910,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood SPCX / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -567,7 +935,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHSPY / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -580,7 +960,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHTSLA / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -593,7 +985,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood TSM / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -606,7 +1010,19 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "Robinhood USAR-USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     },
     {
       "chainId": 4663,
@@ -619,7 +1035,22 @@
       "deviationThresholdPercent": 0.5,
       "marketHours": "us_equities_24/5",
       "matchedBy": "ticker-heuristic",
-      "verified": false
+      "verified": false,
+      "evidence": {
+        "onChainDescription": "RHUSO / USD",
+        "descriptionNamesTicker": true,
+        "tickerIsUniqueInRegistry": true,
+        "multiplierStep": {
+          "stepsObserved": 0,
+          "decisive": 0,
+          "agreeing": 0,
+          "best": null
+        }
+      },
+      "corroborated": false
     }
-  ]
+  ],
+  "verifiedAt": "2026-09-02T20:32:50.485Z",
+  "corroborated": 1,
+  "descriptionsNamingTicker": 35
 }
