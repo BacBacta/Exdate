@@ -181,3 +181,75 @@ export const corporateActions = onchainTable(
     processDateIdx: index().on(table.processDate),
   }),
 )
+
+/**
+ * The differentiating asset: each declared corporate action against the multiplier
+ * step it actually produced.
+ *
+ * Rows are computed by the poller, not indexed from an event, because the price
+ * side needs a Chainlink round lookup and the traditional side comes from an HTTP
+ * API. `priceRoundId` and `priceUpdatedAt` are stored so a reader can re-derive
+ * the haircut from primary sources without trusting this table's arithmetic.
+ *
+ * Every row that carries a haircut also carries the price and the rate it came
+ * from. A row with no reference price carries `impliedReinvestPriceWad` instead -
+ * the price the step would have needed for the declared dividend to have arrived
+ * in full - which is how CCL and COST were caught with no feed at all.
+ */
+export const reconciliations = onchainTable(
+  'reconciliations',
+  (t) => ({
+    /** The issuer's action id, or `${token}:${effectiveAt}` for an unmatched step. */
+    id: t.text().primaryKey(),
+    chainId: t.integer().notNull(),
+    token: t.hex(),
+    symbol: t.text().notNull(),
+
+    // --- traditional side, from GET /rhj/corporate-actions -------------------
+    actionId: t.text(),
+    actionType: t.text(),
+    actionStatus: t.text(),
+    /** The issuer's scheduling day. Not the ex-date and not the payable date. */
+    processDate: t.text(),
+    /** Declared gross amount per underlying share, as the issuer's decimal string. */
+    rate: t.text(),
+
+    // --- on-chain side, from UIMultiplierUpdated ------------------------------
+    effectiveAt: t.bigint(),
+    oldMultiplier: t.bigint(),
+    newMultiplier: t.bigint(),
+    observedStepWad: t.bigint(),
+    /** Calendar days in UTC from processDate to effectiveAt. */
+    lagDays: t.integer(),
+
+    // --- reference price, from Chainlink getRoundData at effectiveAt ----------
+    feed: t.hex(),
+    priceWad: t.bigint(),
+    priceRoundId: t.bigint(),
+    priceUpdatedAt: t.bigint(),
+    /** Seconds the round was already stale when the multiplier took effect. */
+    priceStalenessSeconds: t.integer(),
+    /**
+     * True when the round found is the earliest of the aggregator's current
+     * phase, so the real price at that instant may predate a rollover and be
+     * unreachable. Such a row must not be read as a measurement.
+     */
+    priceAtPhaseFloor: t.boolean(),
+
+    // --- result ---------------------------------------------------------------
+    expectedStepWad: t.bigint(),
+    receivedPerShareWad: t.bigint(),
+    impliedHaircutBps: t.integer(),
+    impliedReinvestPriceWad: t.bigint(),
+    /** pending | matched | anomaly | unmatched */
+    status: t.text().notNull(),
+    /** low | medium | high. Low today for every row: see note on feedVerified. */
+    confidence: t.text().notNull(),
+    note: t.text(),
+    computedAt: t.bigint().notNull(),
+  }),
+  (table) => ({
+    tokenIdx: index().on(table.chainId, table.token),
+    statusIdx: index().on(table.status),
+  }),
+)

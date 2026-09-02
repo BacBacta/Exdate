@@ -1,6 +1,6 @@
 import { feedHealth, isPending, WAD } from '@exdate/core'
 import { formatUnits } from 'viem'
-import type { CorporateActionRow, MultiplierEventRow, TokenRow } from './types.js'
+import type { CorporateActionRow, MultiplierEventRow, ReconciliationRow, TokenRow } from './types.js'
 
 /**
  * Serialisation rules, and they are the honesty policy in code:
@@ -187,6 +187,87 @@ export function serializeCorporateAction(row: CorporateActionRow) {
     oldRate: row.oldRate,
     newRate: row.newRate,
     source: row.source,
+  }
+}
+
+/**
+ * A reconciliation row.
+ *
+ * The invariant this shape enforces: `impliedHaircutBps` is present only when
+ * `gross` and `price` are both present, because a haircut is a statement about
+ * those two numbers and nothing else. Where there is no reference price - 159 of
+ * the 194 tokens have no Chainlink feed at all - the row carries
+ * `impliedReinvestPrice` instead: the price the observed step would have needed
+ * for the declared dividend to have arrived in full. Comparing that to spot is
+ * how an unexplainable event is told apart from a measured one.
+ */
+export function serializeReconciliation(row: ReconciliationRow) {
+  const hasHaircut = row.impliedHaircutBps !== null && row.priceWad !== null && row.rate !== null
+  return {
+    id: row.id,
+    chainId: row.chainId,
+    token: row.token,
+    symbol: row.symbol,
+    /** pending | matched | anomaly | unmatched | unsupported_action_type */
+    status: row.status,
+    confidence: row.confidence,
+    note: row.note,
+
+    declared:
+      row.actionId === null
+        ? null
+        : {
+            actionId: row.actionId,
+            type: row.actionType,
+            status: row.actionStatus,
+            /** The issuer's scheduling day. Not the ex-date and not the payable date. */
+            processDate: row.processDate,
+            /** Gross amount per underlying share, as the issuer states it. */
+            grossPerShare: row.rate,
+            source: 'robinhood:/rhj/corporate-actions',
+          },
+
+    observed:
+      row.effectiveAt === null
+        ? null
+        : {
+            effectiveAt: iso(row.effectiveAt),
+            oldMultiplier: row.oldMultiplier?.toString() ?? null,
+            newMultiplier: row.newMultiplier?.toString() ?? null,
+            stepBps: row.observedStepWad === null ? null : Number(row.observedStepWad) / 1e14,
+            /** Calendar days in UTC from the issuer's processDate to the on-chain effect. */
+            lagDays: row.lagDays,
+            source: 'onchain:UIMultiplierUpdated',
+          },
+
+    price:
+      row.priceWad === null
+        ? null
+        : {
+            value: decimal(row.priceWad, 18),
+            feed: row.feed,
+            roundId: row.priceRoundId?.toString() ?? null,
+            updatedAt: iso(row.priceUpdatedAt),
+            /** How stale the round already was when the multiplier took effect. */
+            stalenessSeconds: row.priceStalenessSeconds,
+            /**
+             * True when this is the earliest round of the aggregator's current
+             * phase, so the real price at that instant may predate a rollover and
+             * be unreachable. Such a row is not a measurement.
+             */
+            atPhaseFloor: row.priceAtPhaseFloor,
+            source: 'chainlink:getRoundData',
+          },
+
+    result: {
+      expectedStepBps: row.expectedStepWad === null ? null : Number(row.expectedStepWad) / 1e14,
+      receivedPerShare: decimal(row.receivedPerShareWad, 18),
+      impliedHaircutBps: hasHaircut ? row.impliedHaircutBps : null,
+      /** Present even with no feed - that is the point of it. */
+      impliedReinvestPrice: decimal(row.impliedReinvestPriceWad, 18),
+    },
+
+    computedAt: iso(row.computedAt),
   }
 }
 

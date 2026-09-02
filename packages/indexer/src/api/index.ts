@@ -1,7 +1,13 @@
 import { db } from 'ponder:api'
 import schema from 'ponder:schema'
 import { createApi } from '@exdate/api'
-import type { CorporateActionRow, MultiplierEventRow, Repository, TokenRow } from '@exdate/api'
+import type {
+  CorporateActionRow,
+  MultiplierEventRow,
+  ReconciliationRow,
+  Repository,
+  TokenRow,
+} from '@exdate/api'
 import type { Address, Hex } from 'viem'
 
 /**
@@ -101,6 +107,31 @@ const repository: Repository = {
       )
       .sort((a, b) => (a.effectiveAt < b.effectiveAt ? 1 : a.effectiveAt > b.effectiveAt ? -1 : 0))
       .map((row) => ({ ...row, token: row.token as Address }) satisfies MultiplierEventRow)
+  },
+
+  async reconciliations(chainId, address) {
+    const rows = await db.select().from(schema.reconciliations)
+    return rows
+      .filter(
+        (row) =>
+          row.chainId === chainId &&
+          (address === undefined || row.token?.toLowerCase() === address.toLowerCase()),
+      )
+      // Newest first by the on-chain effect, falling back to the issuer's date so
+      // a pending row (no step yet) still lands in a sensible place.
+      .sort((a, b) => {
+        const key = (row: (typeof rows)[number]) =>
+          row.effectiveAt !== null
+            ? Number(row.effectiveAt)
+            : row.processDate
+              ? Date.parse(`${row.processDate}T00:00:00Z`) / 1000
+              : 0
+        return key(b) - key(a)
+      })
+      .map(
+        (row) =>
+          ({ ...row, token: (row.token ?? null) as Address | null, feed: (row.feed ?? null) as Address | null }) satisfies ReconciliationRow,
+      )
   },
 
   async corporateActions(chainId) {

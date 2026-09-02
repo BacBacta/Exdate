@@ -18,6 +18,7 @@ import {
   stockTokenAbi,
   tokensForChain,
 } from '@exdate/core'
+import { runReconcilePass } from './reconcile-pass.js'
 import type { Address } from 'viem'
 
 /**
@@ -61,6 +62,16 @@ ponder.on('Poll:block', async ({ event, context }) => {
   if (registry.length === 0) return
 
   const multicallAddress = ROBINHOOD_CHAIN.multicall3Address
+
+  // Reconcile FIRST, on state this handler has not touched yet.
+  //
+  // Ponder buffers writes made inside an indexing function, so a `db.sql` read
+  // issued later in the same handler does not see rows written earlier in it.
+  // Running the pass at the top of the cycle means it reads what previous cycles
+  // committed, which is exactly right: it reconciles past corporate actions, and
+  // one poll interval of latency on a dividend that settled days ago is nothing.
+  const reconciled = await runReconcilePass(context, chainId, now)
+  if (reconciled > 0) console.log(`[exdate] reconciliation: ${reconciled} row(s) written`)
 
   if (!historySeeded) {
     historySeeded = true
@@ -178,8 +189,11 @@ ponder.on('Poll:block', async ({ event, context }) => {
     }
   }
 
-  // --- Issuer corporate actions --------------------------------------------
+  // --- Issuer corporate actions ---------------------------------------------
   if (Date.now() - corporateActionsFetchedAt >= CORPORATE_ACTIONS_INTERVAL_MS) {
+    // Set before the call, not after: a failed fetch must not then retry on
+    // every block. The next attempt comes an hour later, which is the endpoint's
+    // own cache window anyway.
     corporateActionsFetchedAt = Date.now()
     await ingestCorporateActions(context, chainId, now)
   }
@@ -259,7 +273,7 @@ type PollContext = Parameters<Parameters<typeof ponder.on<'Poll:block'>>[1]>[0][
  * about a month deep - snapshotting it on every poll is how exdate accumulates
  * an archive the issuer does not keep.
  */
-async function ingestCorporateActions(context: PollContext, chainId: number, now: bigint) {
+async function ingestCorporateActions(context: PollContext, chainId: number, now: bigint): Promise<boolean> {
   let payload: { corpActions?: unknown[] }
   try {
     const response = await fetch(`${ROBINHOOD_API_BASE}/corporate-actions`, {
@@ -273,7 +287,7 @@ async function ingestCorporateActions(context: PollContext, chainId: number, now
     payload = JSON.parse(text)
   } catch (error) {
     console.warn(`[exdate] corporate-actions fetch failed: ${(error as Error).message}`)
-    return
+    return false
   }
 
   for (const raw of payload.corpActions ?? []) {
@@ -324,4 +338,6 @@ async function ingestCorporateActions(context: PollContext, chainId: number, now
         lastSeenAt: now,
       }))
   }
+
+  return true
 }

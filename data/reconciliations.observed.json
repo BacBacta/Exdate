@@ -170,7 +170,7 @@
         "oldMultiplier": "1000000000000000000",
         "newMultiplier": "1000101323251417769",
         "stepBps": 1.01,
-        "lagDays": 2
+        "lagDays": 1
       },
       "feed": {
         "proxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
@@ -179,12 +179,12 @@
       "observedStepWad": "101323251417769",
       "impliedReinvestPrice": "17933.5540",
       "issuerSpotToday": {
-        "bid": "1676.35",
-        "ask": "1677.45",
-        "mid": "1676.9000",
-        "generatedAt": "2026-09-02T15:43:31.622130567Z",
+        "bid": "1676.19",
+        "ask": "1676.77",
+        "mid": "1676.4800",
+        "generatedAt": "2026-09-02T15:50:21.794200847Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 10.694
+        "impliedOverSpot": 10.697
       },
       "price": {
         "value": "1726.3000",
@@ -233,7 +233,7 @@
         "oldMultiplier": "1000957519890990718",
         "newMultiplier": "1002981519346766532",
         "stepBps": 20.22,
-        "lagDays": 2
+        "lagDays": 1
       },
       "feed": {
         "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
@@ -245,7 +245,7 @@
         "bid": "100.41",
         "ask": "100.42",
         "mid": "100.4150",
-        "generatedAt": "2026-09-02T15:43:24.987532617Z",
+        "generatedAt": "2026-09-02T15:50:20.119084224Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.511
       },
@@ -311,18 +311,18 @@
         "oldMultiplier": "1000000000000000000",
         "newMultiplier": "1000612040296259656",
         "stepBps": 6.12,
-        "lagDays": 4
+        "lagDays": 3
       },
       "feed": null,
       "observedStepWad": "612040296259656",
       "impliedReinvestPrice": "2401.8026",
       "issuerSpotToday": {
-        "bid": "932.11",
-        "ask": "932.47",
-        "mid": "932.2900",
-        "generatedAt": "2026-09-02T15:43:39.453022079Z",
+        "bid": "931.13",
+        "ask": "931.52",
+        "mid": "931.3250",
+        "generatedAt": "2026-09-02T15:50:20.646117231Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 2.576
+        "impliedOverSpot": 2.579
       },
       "status": "anomaly",
       "note": "no Chainlink feed for this token, so there is no reference price to reconcile against"
@@ -345,7 +345,7 @@
         "oldMultiplier": "1000000000000000000",
         "newMultiplier": "1000566080061092436",
         "stepBps": 5.66,
-        "lagDays": 2
+        "lagDays": 1
       },
       "feed": {
         "proxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
@@ -354,12 +354,12 @@
       "observedStepWad": "566080061092436",
       "impliedReinvestPrice": "476.9643",
       "issuerSpotToday": {
-        "bid": "325.35",
-        "ask": "325.38",
-        "mid": "325.3650",
-        "generatedAt": "2026-09-02T15:43:33.725019337Z",
+        "bid": "324.06",
+        "ask": "324.13",
+        "mid": "324.0950",
+        "generatedAt": "2026-09-02T15:50:21.065553570Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 1.466
+        "impliedOverSpot": 1.472
       },
       "price": {
         "value": "305.1711",
@@ -455,16 +455,16 @@
         "oldMultiplier": "1000000000000000000",
         "newMultiplier": "1021486444855206408",
         "stepBps": 214.86,
-        "lagDays": 4
+        "lagDays": 3
       },
       "feed": null,
       "observedStepWad": "21486444855206408",
       "impliedReinvestPrice": "6.9811",
       "issuerSpotToday": {
-        "bid": "23.52",
-        "ask": "23.53",
-        "mid": "23.5250",
-        "generatedAt": "2026-09-02T15:43:38.946621414Z",
+        "bid": "23.48",
+        "ask": "23.49",
+        "mid": "23.4850",
+        "generatedAt": "2026-09-02T15:50:18.201767186Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 0.297
       },
@@ -489,18 +489,18 @@
         "oldMultiplier": "1000000000000000000",
         "newMultiplier": "1000145502866134027",
         "stepBps": 1.46,
-        "lagDays": 2
+        "lagDays": 1
       },
       "feed": null,
       "observedStepWad": "145502866134027",
       "impliedReinvestPrice": "1030.9075",
       "issuerSpotToday": {
-        "bid": "13.84",
-        "ask": "13.85",
-        "mid": "13.8450",
-        "generatedAt": "2026-09-02T15:43:19.957592494Z",
+        "bid": "13.83",
+        "ask": "13.84",
+        "mid": "13.8350",
+        "generatedAt": "2026-09-02T15:50:18.579391727Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 74.461
+        "impliedOverSpot": 74.514
       },
       "status": "anomaly",
       "note": "no Chainlink feed for this token, so there is no reference price to reconcile against"

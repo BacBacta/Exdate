@@ -195,7 +195,11 @@ for (const action of corporateActions) {
           oldMultiplier: group[group.length - 1].oldMultiplier,
           newMultiplier: group[group.length - 1].newMultiplier,
           stepBps: group[group.length - 1].stepBps,
-          lagDays: Math.round((Date.parse(group[0].effectiveAt) - Date.parse(`${processDate}T00:00:00Z`)) / dayMs),
+          // Calendar days in UTC, matching packages/core/src/pairing.ts. Rounding
+          // elapsed time instead would report AAPL's next-business-day step as 2.
+          lagDays: Math.round(
+            (Date.parse(`${group[0].effectiveAt.slice(0, 10)}T00:00:00Z`) - Date.parse(`${processDate}T00:00:00Z`)) / dayMs,
+          ),
         }
       : null,
   })

@@ -1,7 +1,12 @@
 import { CHAINS, REGISTRY_GENERATED_AT, feedHealth, resolveChain } from '@exdate/core'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { serializeCorporateAction, serializeMultiplierEvent, serializeToken } from './serialize.js'
+import {
+  serializeCorporateAction,
+  serializeMultiplierEvent,
+  serializeReconciliation,
+  serializeToken,
+} from './serialize.js'
 import type { Repository } from './types.js'
 
 export * from './types.js'
@@ -72,6 +77,39 @@ export function createApi({ repository, now = () => BigInt(Math.floor(Date.now()
       chainId: chain.id,
       count: events.length,
       events: events.map((event) => serializeMultiplierEvent(event, nowSeconds)),
+    })
+  })
+
+  /**
+   * Every declared corporate action against the multiplier step it produced.
+   *
+   * `?status=` filters; `?token=` narrows to one address. The counts are always
+   * returned in full so that a filtered view cannot read as the whole picture.
+   */
+  app.get('/v1/:chain/reconciliations', async (c) => {
+    const chain = resolveChain(c.req.param('chain'))
+    if (!chain) return c.json(unknownChain, 404)
+    const all = await repository.reconciliations(chain.id)
+    const token = c.req.query('token')
+    const status = c.req.query('status')
+    const rows = all.filter(
+      (row) =>
+        (token === undefined || row.token?.toLowerCase() === token.toLowerCase()) &&
+        (status === undefined || row.status === status),
+    )
+    const tally = (value: string) => all.filter((row) => row.status === value).length
+    return c.json({
+      chainId: chain.id,
+      counts: {
+        total: all.length,
+        matched: tally('matched'),
+        anomaly: tally('anomaly'),
+        pending: tally('pending'),
+        unmatched: tally('unmatched'),
+        unsupportedActionType: tally('unsupported_action_type'),
+      },
+      returned: rows.length,
+      reconciliations: rows.map(serializeReconciliation),
     })
   })
 

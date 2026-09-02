@@ -78,10 +78,42 @@ export interface CorporateActionRow {
   source: string
 }
 
+export interface ReconciliationRow {
+  id: string
+  chainId: number
+  token: Address | null
+  symbol: string
+  actionId: string | null
+  actionType: string | null
+  actionStatus: string | null
+  processDate: string | null
+  rate: string | null
+  effectiveAt: bigint | null
+  oldMultiplier: bigint | null
+  newMultiplier: bigint | null
+  observedStepWad: bigint | null
+  lagDays: number | null
+  feed: Address | null
+  priceWad: bigint | null
+  priceRoundId: bigint | null
+  priceUpdatedAt: bigint | null
+  priceStalenessSeconds: number | null
+  priceAtPhaseFloor: boolean | null
+  expectedStepWad: bigint | null
+  receivedPerShareWad: bigint | null
+  impliedHaircutBps: number | null
+  impliedReinvestPriceWad: bigint | null
+  status: string
+  confidence: string
+  note: string | null
+  computedAt: bigint
+}
+
 export interface Repository {
   /** Joined token + latest state + latest feed round + event summary. */
   tokens(chainId: number): Promise<TokenRow[]>
   token(chainId: number, address: string): Promise<TokenRow | null>
   multiplierEvents(chainId: number, address?: string): Promise<MultiplierEventRow[]>
   corporateActions(chainId: number): Promise<CorporateActionRow[]>
+  reconciliations(chainId: number, address?: string): Promise<ReconciliationRow[]>
 }
