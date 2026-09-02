@@ -11,7 +11,13 @@ node scripts/phase0/check-tokens.mjs AAPL SGOV CRWD
 node scripts/phase0/check-feeds.mjs
 node scripts/phase0/find-multiplier-events.mjs
 node scripts/phase0/map-feeds.mjs
+node scripts/phase0/check-corporate-actions.mjs
+node scripts/phase0/feed-price-at.mjs 0x6B22A786bAa607d76728168703a39Ea9C99f2cD0 2026-08-14T15:12:46Z
 ```
+
+> **Addendum, same day.** §9 originally listed two blockers. Both dissolved once the issuer's
+> REST API was read — see §11 and §12. The original findings are kept as written; §9 is
+> superseded.
 
 ---
 
@@ -33,6 +39,8 @@ node scripts/phase0/map-feeds.mjs
 | 12 | Dividends move the multiplier 0.05 %–2 % | **Corrected** | Observed range **0.0064 % – 2.15 %**, plus one ×4 split |
 | 13 | Chainlink price is total return, already multiplied | **Confirmed by Chainlink** | "Token Price = Underlying Equity Market Price × Multiplier" |
 | 14 | ERC-721 `Transfer` shares topic0 with ERC-20 | **Confirmed by construction** | Both are `keccak("Transfer(address,address,uint256)")`. See §8 |
+| 15 | "Distribution fees and withholding are documented nowhere" | **Confirmed — and now measurable** | The issuer publishes each dividend's gross rate. Two reconciled events show a **~34–36 % haircut**. See §12 |
+| 16 | "A corporate-actions data source has to be bought" *(my own §9)* | **Withdrawn** | `api.robinhood.com/rhj/corporate-actions` is first-party, free, address-keyed. See §11 |
 
 ---
 
@@ -169,8 +177,10 @@ Two consequences for the architecture, both load-bearing:
 
 **The "pending dividend" product does not come from `effectiveAt` at all.** The weeks-long window
 the prompt describes is ex-date (traditional) → multiplier step (onchain). Only the second half is
-onchain. M3 therefore depends entirely on a corporate-actions feed, which is currently the single
-biggest unresolved dependency (§9).
+onchain. The first half comes from the issuer's own corporate-actions feed (§11) — and that feed
+shows seven dividends the issuer marks *completed* that have **not** reached the chain after four
+weeks (§12). The window is real; it is just measured from the issuer's `processDate`, not from
+`effectiveAt`.
 
 ## 6. Chainlink feeds
 
@@ -269,17 +279,18 @@ tens of thousands of successful requests minimum, and it will not complete.
 - **New trap — `effectiveAt` is retrospective.** See §5. Anything treating a non-zero `effectiveAt`
   as a pending update will report 9 phantom pending dividends today.
 
-## 9. What is blocking, ranked
+## 9. What is blocking, ranked — SUPERSEDED, see §11
 
-| # | Item | Why it blocks | Needed by |
-|---|---|---|---|
-| 1 | **Corporate-actions data source** (declared dividends, ex-dates, splits) | Without it there is no `expected_step`, so no haircut, so no `reconciliations` table — the entire differentiating asset. The onchain half is already in hand. | M2 / M3 |
-| 2 | **Dedicated archive RPC** | Public endpoint cannot backfill, and will rate-limit the live poller too | M1 finish |
-| 3 | **Confirmation of the token → feed mapping** | 35 pairs currently rest on a ticker heuristic | M1 status page |
-| 4 | Fee/withholding documentation from the issuer | Expected to stay unavailable — that absence *is* the product. Recorded so we never claim official numbers. | never |
+Original list, kept for the record:
 
-Item 1 is a decision I need from you, not something I can resolve by reading the chain: which
-provider, and what budget. It gates M2 and M3 entirely.
+| # | Item | Status after §11 / §12 |
+|---|---|---|
+| 1 | Corporate-actions data source | **Resolved.** First-party, free: `GET api.robinhood.com/rhj/corporate-actions`. Gap: history starts 2026-08-05, so five July events need a one-off manual seed. |
+| 2 | Dedicated archive RPC | **Not needed for M1–M3.** Multiplier history is 12 logs. Historical feed prices come from `getRoundData()` on current storage (§12), no archive required. Only a transfer indexer would need it. |
+| 3 | Confirmation of the token → feed mapping | Still a heuristic, still `verified: false`. Now lower stakes: `/rhj/prices` gives a first-party reference price for all 194 tokens, feed or not. |
+| 4 | Fee/withholding documentation | Still undocumented. Now **measured** instead: §12. |
+
+Nothing on this list requires a purchase or a vendor decision before M3.
 
 ## 10. Recommended change to the data model
 
@@ -298,7 +309,90 @@ Based on §4 and §5:
 `applied_tx` and `applied_at` are removed because no such transaction or log exists. Keeping them
 would mean showing a column exdate can never fill — exactly what the honesty policy forbids.
 
-Everything else in the proposed model survives Phase 0 unchanged.
+Everything else in the proposed model survives Phase 0 unchanged, with one addition from §11:
+`corporate_actions.source` gets the literal value `robinhood:/rhj/corporate-actions` and the row
+keeps the issuer's `id` (a 0x + 66-hex uid, stable across chains) for deduplication.
+
+## 11. The issuer's REST API — resolves both blockers
+
+`docs.robinhood.com/chain/stock-token-apis` documents three read-only endpoints under
+`https://api.robinhood.com/rhj/`. No auth. Documented limit 60 req/s; in practice `/prices`
+answers `local_rate_limited` after ~5 rapid calls, so poll gently.
+
+| Endpoint | Cache | What it gives exdate |
+|---|---|---|
+| `GET /rhj/assets` | — | The registry (§3). Also `pendingMultiplier` and `pendingMultiplierEffectiveTime` (RFC-3339, present only while a change is pending) — an offchain mirror of `newUIMultiplier()` / `effectiveAt()`. |
+| `GET /rhj/prices/{symbol}` | 15 s | **Raw underlying-equity bid/ask, not multiplier-adjusted**, plus `isTradingHalt`, daily volume, and undocumented `mintBurnTokenVolume` / `mintBurnUsdVolume`. A first-party reference price for all 194 tokens, including the 159 with no Chainlink feed. |
+| `GET /rhj/corporate-actions` | 1 h | **Every dividend and split the issuer processes**, with `cashDividend.rate` (USD per share), `forwardSplit.oldRate/newRate`, `processDate`, `status`, and the token's contract address. The docs say it outright: *"Use this endpoint to reconcile why a token's multiplier changed onchain."* |
+
+Snapshot at `data/robinhood-corporate-actions.snapshot.json` (43 rows, 2026-09-02). Reconcile
+with `node scripts/phase0/check-corporate-actions.mjs`.
+
+What the corporate-actions feed contained on 2026-09-02:
+
+- **43 rows, all `CASH_DIVIDEND`**: 12 `COMPLETED`, 31 `IN_PROGRESS` with a `processDate` and a
+  rate. The 31 upcoming rows — F, KLAC, PFE, JBL, UPS, BND, SHY, … NVDA on 2026-10-01 — **are
+  `/v1/calendar`**, ready today.
+- **History is shallow.** The oldest `COMPLETED` row is `processDate` 2026-08-05. Six onchain
+  events from July and early August (CRWD ×4, SGOV 07-08, MU, ORCL, DELL) and SGOV's 09-01 step
+  have no row. Robinhood keeps roughly a month; exdate keeping it forever is itself part of the
+  product. The five July actions need a one-off manual seed from issuer/company filings.
+- **The CRWD ×4 split is absent** even though `FORWARD_SPLIT` is listed as "active at launch".
+- **`processDate` is not the ex-date or the pay-date** (the docs say so). Empirically it is the
+  business day *before* the onchain `effectiveAt`: AAPL 08-13 → 08-14, SGOV 08-06 → 08-07, ASML
+  08-05 → 08-06, COST 08-07 (Fri) → 08-10 (Mon), CCL 08-28 (Fri) → 08-31 (Mon). Match on address
+  plus a 0–4 day window.
+- **Rate limit behaviour**: `local_rate_limited` is returned as plain text with HTTP 200 on
+  `/prices`. Parse defensively.
+
+## 12. First reconciliation — with every input sourced
+
+Five completed dividends match an onchain multiplier step. For the three whose token has a
+Chainlink feed, the price at the instant the multiplier took effect is readable **without an
+archive node**: `getRoundData(roundId)` reads the aggregator's round history from current storage
+(`scripts/phase0/feed-price-at.mjs`).
+
+Method: a cash dividend of *R* USD/share reinvested at price *P* raises the multiplier by *R / P*.
+`expected_step = R / P`; `observed_step` is the onchain log; `received = P × observed_step`;
+`haircut = 1 − received / R`.
+
+| Token | Gross rate *R* (issuer) | Price *P* (Chainlink, last round ≤ `effectiveAt`) | Expected | Observed | Received / share | **Haircut** |
+|---|---|---|---|---|---|---|
+| AAPL | $0.27 | 305.1710 @ 08-14 14:21 UTC | 8.85 bps | 5.66 bps | $0.1728 | **36.0 %** |
+| SGOV | $0.306812 | 100.5712 @ 08-07 00:01 UTC | 30.51 bps | 20.22 bps | $0.2034 | **33.7 %** |
+| ASML | $1.817086 | 1726.3000 @ 08-06 14:12 UTC | 10.53 bps | 1.01 bps | $0.1749 | 90.4 % → **anomaly** |
+| COST | $1.47 | *no feed* | — | 6.12 bps | — | implied *P* = $2 401.80 vs ~$933 spot → **anomaly** |
+| CCL | $0.15 | *no feed* | — | 214.86 bps | — | implied *P* = $6.98 vs ~$23.9 spot → **anomaly** |
+
+Using the NYSE close of `processDate` instead of the `effectiveAt` round moves AAPL to 36.1 % and
+SGOV to 33.7 % — the result is insensitive to the price choice at this precision.
+
+Read this carefully:
+
+- **AAPL and SGOV agree on a haircut in the mid-30s.** Two independent issuers' dividends, two
+  independent feeds, one number. The US statutory withholding on dividends paid to a non-treaty
+  foreign holder is 30 %; a Jersey issuer holding US equities would be exactly that. The extra
+  4–6 points are unexplained — fees, price slippage on the reinvestment, or rounding. exdate
+  reports the observed number and does **not** claim the decomposition.
+- **ASML, COST and CCL do not reconcile** under the reinvestment model. ASML's step is a tenth
+  of what its rate implies; CCL's is three times larger than its rate could produce; COST's
+  implies a reinvestment price two and a half times spot. These are `status: anomaly` rows — the
+  first three the product will ever show — and they are worth more than the matches: either the
+  issuer's rate is wrong, the model is wrong for ETFs/ADRs, or something is being processed that
+  the feed does not describe. I have not guessed which.
+- **Seven completed dividends have not reached the chain.** BND (08-05), SHY, UMC (08-06), SIMO
+  (08-20), FIX (08-24), CTSH, HWM (08-25) are `COMPLETED` in the issuer's feed, yet on
+  2026-09-02 each token reads `uiMultiplier() == 1.0`, `newUIMultiplier() == 1.0`,
+  `effectiveAt() == 0`, nothing pending. Four weeks for BND. This is the pending-dividend window
+  the prompt described, observed rather than assumed — and exdate is the only thing that can show
+  it, because it needs both sides.
+- **Confidence**: `low` on every row above, by the kickoff's own rule (fewer than three events
+  per token). `P` is the oracle price at activation, not the issuer's execution price, and the
+  issuer does not publish the latter. The numbers are reproducible, sourced, and observed; they are
+  not official.
+
+What this settles: **the reconciliation table can be built and populated today**, with zero
+third-party vendors. Five matched rows, three anomalies, seven pending, six onchain-only.
 
 ---
 
@@ -306,6 +400,7 @@ Everything else in the proposed model survives Phase 0 unchanged.
 
 - Robinhood Chain docs — [building with Stock Tokens](https://docs.robinhood.com/chain/building-with-stock-tokens/), [token contracts](https://docs.robinhood.com/chain/contracts)
 - Robinhood asset registry — `https://api.robinhood.com/rhj/assets` (the endpoint the doc site itself calls)
+- Robinhood Stock Token APIs — [docs](https://docs.robinhood.com/chain/stock-token-apis): `/rhj/assets`, `/rhj/prices/{symbol}`, `/rhj/corporate-actions`
 - Chainlink — [Robinhood tokenized equity feeds](https://docs.chain.link/data-feeds/tokenized-equity-feeds/robinhood), reference-data-directory `feeds-robinhood-mainnet.json`
 - Robinhood Chain mainnet RPC — `https://rpc.mainnet.chain.robinhood.com`
 - [ERC-8056](https://eips.ethereum.org/EIPS/eip-8056)

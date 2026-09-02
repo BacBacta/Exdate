@@ -87,6 +87,28 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   `WETH` `0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73` are **not** Stock Tokens — every ERC-8056
   view reverts on them.
 
+## Issuer REST API — verified 2026-09-02
+
+`docs.robinhood.com/chain/stock-token-apis`. No auth. Base `https://api.robinhood.com/rhj/`.
+
+| Endpoint | Cache | Use |
+|---|---|---|
+| `GET /assets` | — | registry; `pendingMultiplier` + `pendingMultiplierEffectiveTime` (only while pending) |
+| `GET /prices/{symbol}` | 15 s | **raw underlying bid/ask, NOT multiplier-adjusted**; `isTradingHalt`; mint/burn volume |
+| `GET /corporate-actions` | 1 h | every dividend/split the issuer processes: `rate`, `processDate`, `status`, contract address |
+
+- `/corporate-actions` **is the traditional-side source** for `reconciliations`. No vendor needed.
+  Snapshot `data/robinhood-corporate-actions.snapshot.json`; reconcile with
+  `node scripts/phase0/check-corporate-actions.mjs`.
+- **History is ~1 month deep** (oldest row 2026-08-05). Snapshot it continuously; the archive is
+  ours to keep. The five July actions (CRWD, SGOV, MU, ORCL, DELL) need a one-off manual seed.
+- `processDate` ≠ ex-date ≠ pay-date. Empirically the onchain `effectiveAt` lands the **next
+  business day at ~15:10 UTC**. Match on address + 0–4 day window.
+- Rate limiting is real despite the documented 60 req/s: `/prices` returns the plain-text body
+  `local_rate_limited` with HTTP 200. Parse defensively, poll slowly.
+- Historical feed prices do **not** need an archive node: `getRoundData(roundId)` reads round
+  history from current storage. `node scripts/phase0/feed-price-at.mjs <feed> <iso>`.
+
 ## Feeds — verified 2026-09-02
 
 `AggregatorV3Interface.latestRoundData()`, **8 decimals**, total return, **24/5**
@@ -146,6 +168,20 @@ Observed step range: **+0.64 bps (DELL) to +214.86 bps (CCL)**, plus CRWD at ×4
 **SGOV is the reference token**: three chained events (1.0 → 1.000957 → 1.002981 → 1.005101),
 which makes it the right fixture for reconciliation tests.
 
+First reconciliation against the issuer's own rates (`docs/phase-0-verification.md` §12), price =
+Chainlink round at `effectiveAt`, confidence `low`:
+
+| Token | Gross | Received | Haircut | Status |
+|---|---|---|---|---|
+| AAPL | $0.27 | $0.1728 | **36.0 %** | matched |
+| SGOV | $0.306812 | $0.2034 | **33.7 %** | matched |
+| ASML | $1.817086 | $0.1749 | 90.4 % | anomaly |
+| COST, CCL | — | no feed | — | anomaly (implied price far from spot) |
+| BND, SHY, UMC, SIMO, FIX, CTSH, HWM | — | `COMPLETED` by issuer, multiplier still 1.0 | — | **pending** (BND: 4 weeks) |
+
+Mid-30s on two independent tokens is consistent with 30 % US non-resident withholding plus
+something unexplained. Report the observed number; never claim the decomposition.
+
 ## Stack
 
 pnpm workspaces. `packages/indexer` (Ponder + Postgres), `packages/api` (Hono),
@@ -175,13 +211,17 @@ Multi-chain from day one — Base / Coinbase B20 is a planned second issuer, so 
 - 2026-09-02 — **Proposed, pending human greenlight**: M1 indexes multiplier events + polls views
   and feeds, and does **not** index transfers. Transfers are ~100 % of log volume and 0 % of the
   current product, and need a paid archive RPC.
+- 2026-09-02 — **Proposed, pending human greenlight**: the corporate-actions source is the
+  issuer's own `GET /rhj/corporate-actions`, snapshotted on every poll. No market-data vendor.
+  `corporate_actions.source = 'robinhood:/rhj/corporate-actions'`, keep the issuer `id`.
+- 2026-09-02 — No archive RPC before a transfer indexer exists. Nothing in M1–M3 needs one.
 - _(append decisions here as they are made)_
 
 ## Status
 
 - [x] Phase 0 verification report — `docs/phase-0-verification.md`
-- [ ] M1 indexer + status page — **blocked on greenlight**
-- [ ] M2 net yield + calendar — **blocked on a corporate-actions data source**
-- [ ] M3 reconciliation + pending dividend — **blocked on the same**
+- [ ] M1 indexer + status page — **waiting on greenlight**, nothing else blocks it
+- [ ] M2 net yield + calendar — calendar input exists today (31 upcoming rows)
+- [ ] M3 reconciliation + pending dividend — 5 matched, 3 anomalies, 7 pending, already observable
 - [ ] M4 signed webhooks
 - [ ] M5 SDK + docs

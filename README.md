@@ -26,7 +26,10 @@ and the health of every Chainlink feed.
 None of that is hypothetical. On 2026-09-02, mid-session, the SPY feed was **18 hours** stale and
 the QQQ feed **4 hours** stale. Nine tokens have already moved their multiplier — steps ranging from
 0.64 bps to 214.86 bps — and the onchain warning before a change takes effect is **nine minutes**.
-Only 18% of Stock Tokens have a Chainlink feed at all.
+Only 18% of Stock Tokens have a Chainlink feed at all. Reconciling the issuer's own dividend rates
+against the onchain steps gives a **~34–36 % haircut** on AAPL and SGOV, three events that don't
+reconcile at all, and seven dividends marked *completed* that have not reached the chain after up
+to four weeks. Every input is sourced; see the report.
 
 ## What is verified today
 
@@ -36,6 +39,8 @@ node scripts/phase0/check-tokens.mjs AAPL SGOV # ERC-20 + ERC-8056 views
 node scripts/phase0/check-feeds.mjs            # every Chainlink feed + its age
 node scripts/phase0/find-multiplier-events.mjs # every UIMultiplierUpdated ever emitted
 node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
+node scripts/phase0/check-corporate-actions.mjs # issuer dividends vs onchain steps
+node scripts/phase0/feed-price-at.mjs <feed> <iso> # Chainlink price at an instant, no archive
 ```
 
 Committed artifacts, all first-party or read from the chain:
@@ -43,6 +48,7 @@ Committed artifacts, all first-party or read from the chain:
 | File | What |
 |---|---|
 | `data/robinhood-assets.snapshot.json` | 194 Stock Tokens from the issuer's own registry |
+| `data/robinhood-corporate-actions.snapshot.json` | 43 dividends from the issuer's own feed (12 done, 31 upcoming) |
 | `data/chainlink-feeds.snapshot.json` | 57 Chainlink feeds on Robinhood Chain |
 | `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`** |
 | `data/multiplier-events.observed.json` | the 12 `UIMultiplierUpdated` logs that exist |
