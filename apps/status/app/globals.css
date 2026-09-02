@@ -116,3 +116,7 @@ td.wide { white-space: normal; min-width: 200px; }
 
 footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--faint); font-size: 12px; }
 footer p { margin: 0 0 6px; max-width: 78ch; }
+
+.caption { color: var(--muted); font-size: 12.5px; margin: 10px 2px 0; max-width: 88ch; }
+.caption code { font-family: var(--mono); font-size: 11.5px; background: var(--none-bg); padding: 1px 5px; border-radius: 4px; }
+.caption em { font-style: normal; color: var(--ink); font-weight: 600; }

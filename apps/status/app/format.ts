@@ -45,3 +45,12 @@ export function utc(iso: string | null): string {
   const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(iso)
   return match ? `${match[1]} ${match[2]}Z` : iso
 }
+
+/** Whole days from a UTC date string to today. */
+export function daysSince(isoDate: string | null): string {
+  if (!isoDate) return '—'
+  const then = Date.parse(`${isoDate}T00:00:00Z`)
+  if (Number.isNaN(then)) return '—'
+  const days = Math.floor((Date.now() - then) / 86_400_000)
+  return days < 0 ? '—' : `${days}`
+}

@@ -88,6 +88,62 @@ export interface CalendarResponse {
   }[]
 }
 
+export interface ReconciliationView {
+  id: string
+  chainId: number
+  token: string | null
+  symbol: string
+  status: 'pending' | 'matched' | 'anomaly' | 'unmatched' | 'unsupported_action_type'
+  confidence: 'low' | 'medium' | 'high'
+  note: string | null
+  declared: {
+    actionId: string
+    type: string | null
+    status: string | null
+    processDate: string | null
+    grossPerShare: string | null
+    source: string
+  } | null
+  observed: {
+    effectiveAt: string | null
+    oldMultiplier: string | null
+    newMultiplier: string | null
+    stepBps: number | null
+    lagDays: number | null
+    source: string
+  } | null
+  price: {
+    value: string | null
+    feed: string | null
+    roundId: string | null
+    updatedAt: string | null
+    stalenessSeconds: number | null
+    atPhaseFloor: boolean | null
+    source: string
+  } | null
+  result: {
+    expectedStepBps: number | null
+    receivedPerShare: string | null
+    impliedHaircutBps: number | null
+    impliedReinvestPrice: string | null
+  }
+  computedAt: string | null
+}
+
+export interface ReconciliationsResponse {
+  chainId: number
+  counts: {
+    total: number
+    matched: number
+    anomaly: number
+    pending: number
+    unmatched: number
+    unsupportedActionType: number
+  }
+  returned: number
+  reconciliations: ReconciliationView[]
+}
+
 export class ApiUnreachable extends Error {}
 
 async function get<T>(path: string): Promise<T> {
@@ -103,3 +159,5 @@ async function get<T>(path: string): Promise<T> {
 
 export const getTokens = (chain = 'robinhood') => get<TokensResponse>(`/v1/${chain}/tokens`)
 export const getCalendar = () => get<CalendarResponse>('/v1/calendar')
+export const getReconciliations = (chain = 'robinhood') =>
+  get<ReconciliationsResponse>(`/v1/${chain}/reconciliations`)

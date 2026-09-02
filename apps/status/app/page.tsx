@@ -1,5 +1,13 @@
-import { ApiUnreachable, API_URL, getCalendar, getTokens, type TokenView } from '../lib/api'
-import { age, bps, multiplier, price, shortAddress, utc } from './format'
+import {
+  ApiUnreachable,
+  API_URL,
+  getCalendar,
+  getReconciliations,
+  getTokens,
+  type ReconciliationView,
+  type TokenView,
+} from '../lib/api'
+import { age, bps, daysSince, multiplier, price, shortAddress, utc } from './format'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -23,9 +31,15 @@ function FeedCell({ token }: { token: TokenView }) {
 export default async function Page() {
   let data: Awaited<ReturnType<typeof getTokens>>
   let calendar: Awaited<ReturnType<typeof getCalendar>> | null = null
+  let recon: Awaited<ReturnType<typeof getReconciliations>> | null = null
   try {
     data = await getTokens()
-    calendar = await getCalendar().catch(() => null)
+    // The page must still render when a secondary endpoint is unavailable; the
+    // sections it feeds simply do not appear.
+    ;[calendar, recon] = await Promise.all([
+      getCalendar().catch(() => null),
+      getReconciliations().catch(() => null),
+    ])
   } catch (error) {
     if (!(error instanceof ApiUnreachable)) throw error
     return (
@@ -57,6 +71,14 @@ export default async function Page() {
   const tally = (status: string) => withFeed.filter((token) => token.feed?.status === status).length
   const scheduled = polled.filter((token) => token.multiplier.scheduled !== null)
   const upcoming = calendar?.chains.flatMap((chain) => chain.upcomingCorporateActions) ?? []
+  const reconciled = (recon?.reconciliations ?? []).filter(
+    (row) => row.status === 'matched' || row.status === 'anomaly',
+  )
+  // Declared COMPLETED by the issuer, yet no multiplier step has ever landed.
+  // This is the pending-dividend window, observed rather than assumed.
+  const owed = (recon?.reconciliations ?? []).filter(
+    (row) => row.status === 'pending' && row.declared?.status === 'CORPORATE_ACTION_STATUS_COMPLETED',
+  )
   const observedAt = polled
     .map((token) => token.multiplier.sampledAt)
     .filter((value): value is string => value !== null)
@@ -115,6 +137,15 @@ export default async function Page() {
           <div className="label">updates pending now</div>
           <div className="note">announced ~9 min ahead</div>
         </div>
+        {recon ? (
+          <div className="card">
+            <div className="value">
+              {recon.counts.matched} <span className="dash">/</span> {recon.counts.anomaly}
+            </div>
+            <div className="label">reconciled / anomalous</div>
+            <div className="note">{owed.length} declared but never applied</div>
+          </div>
+        ) : null}
       </section>
 
       {scheduled.length > 0 ? (
@@ -149,6 +180,114 @@ export default async function Page() {
               </tbody>
             </table>
           </div>
+        </>
+      ) : null}
+
+      {reconciled.length > 0 ? (
+        <>
+          <h2>
+            Observed haircut
+            <span className="sub">
+              what the issuer declared, against what the multiplier actually delivered
+            </span>
+          </h2>
+          <div className="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>Process date</th>
+                  <th>Gross / share</th>
+                  <th>Observed step</th>
+                  <th>Price at effect</th>
+                  <th>Received / share</th>
+                  <th>Haircut</th>
+                  <th>Implied price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reconciled.map((row) => (
+                  <tr key={row.id}>
+                    <td className="sym">{row.symbol}</td>
+                    <td className="num">{row.declared?.processDate ?? '—'}</td>
+                    <td className="num">{row.declared?.grossPerShare ?? '—'}</td>
+                    <td className="num">{bps(row.observed?.stepBps)}</td>
+                    <td className="num">{price(row.price?.value ?? null)}</td>
+                    <td className="num">
+                      {row.result.receivedPerShare === null
+                        ? '—'
+                        : Number(row.result.receivedPerShare).toFixed(4)}
+                    </td>
+                    <td className="num">
+                      {row.result.impliedHaircutBps === null ? (
+                        <span className="dash">—</span>
+                      ) : (
+                        `${(row.result.impliedHaircutBps / 100).toFixed(1)}%`
+                      )}
+                    </td>
+                    <td className="num">
+                      {row.result.impliedReinvestPrice === null
+                        ? '—'
+                        : Number(row.result.impliedReinvestPrice).toLocaleString('en-US', {
+                            maximumFractionDigits: 2,
+                          })}
+                    </td>
+                    <td>
+                      <span className={`pill ${row.status === 'matched' ? 'live' : 'stale'}`}>{row.status}</span>{' '}
+                      <span className="addr">{row.confidence}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="caption">
+            A dividend of <em>gross</em> per share, reinvested at <em>price</em>, would raise the
+            multiplier by gross ÷ price. The gap between that and the observed step is the haircut.
+            Where a token has no Chainlink feed there is no price to reconcile against, so the row
+            reports the price its step <em>implies</em> instead — compare it to spot: a reinvestment
+            that really happened lands near it. Every row is <code>confidence: low</code>, because
+            the token → feed pairing is still a ticker heuristic and no token has three events yet.
+          </p>
+        </>
+      ) : null}
+
+      {owed.length > 0 ? (
+        <>
+          <h2>
+            Declared complete, never applied on chain
+            <span className="sub">
+              the issuer marks these processed; the multiplier has not moved
+            </span>
+          </h2>
+          <div className="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Process date</th>
+                  <th>Token</th>
+                  <th>Gross / share</th>
+                  <th>Days since</th>
+                </tr>
+              </thead>
+              <tbody>
+                {owed.map((row) => (
+                  <tr key={row.id}>
+                    <td className="num">{row.declared?.processDate ?? '—'}</td>
+                    <td className="sym">{row.symbol}</td>
+                    <td className="num">{row.declared?.grossPerShare ?? '—'}</td>
+                    <td className="num">{daysSince(row.declared?.processDate ?? null)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="caption">
+            This is the pending-dividend window, observed rather than assumed. It needs both sides:
+            the issuer&rsquo;s own record that a dividend was processed, and the absence of any
+            matching multiplier step on chain.
+          </p>
         </>
       ) : null}
 
