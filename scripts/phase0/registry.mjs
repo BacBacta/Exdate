@@ -18,7 +18,12 @@ export async function loadSnapshot() {
 }
 
 export async function writeSnapshot(payload) {
-  await writeFile(SNAPSHOT_PATH, JSON.stringify(payload, null, 2) + '\n')
+  // `fetchedAt` first, so the file says when it was read from the issuer. The
+  // generated registry copies it rather than stamping its own run: regenerating
+  // from unchanged data must produce an unchanged file, or CI cannot tell drift
+  // from a rebuild.
+  const dated = { fetchedAt: new Date().toISOString(), ...payload }
+  await writeFile(SNAPSHOT_PATH, JSON.stringify(dated, null, 2) + '\n')
 }
 
 /** Flatten the registry into one row per (asset, deployment). */

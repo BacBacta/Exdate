@@ -18,6 +18,7 @@
     "test": "pnpm -r --filter @exdate/core --filter @exdate/api --filter @exdate/sdk --filter @exdate/indexer test",
     "typecheck": "pnpm -r typecheck",
     "registry:generate": "node scripts/generate-registry.mjs",
+    "archive:corporate-actions": "node scripts/archive-corporate-actions.mjs",
     "phase0:chain": "node scripts/phase0/check-chain.mjs",
     "phase0:tokens": "node scripts/phase0/check-tokens.mjs",
     "phase0:feeds": "node scripts/phase0/check-feeds.mjs",

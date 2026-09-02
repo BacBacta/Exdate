@@ -9,9 +9,55 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises'
 const root = new URL('../', import.meta.url)
 const read = async (path) => JSON.parse(await readFile(new URL(path, root), 'utf8'))
 
-const assets = (await read('data/robinhood-assets.snapshot.json')).assets ?? []
+const registrySnapshot = await read('data/robinhood-assets.snapshot.json')
+const assets = registrySnapshot.assets ?? []
+/**
+ * When the registry was read from the issuer, not when this script ran.
+ *
+ * Reproducible on purpose: regenerating from unchanged data must produce a
+ * byte-identical file, or CI cannot tell a stale artifact from a rebuild. A
+ * file mtime would not do - git does not preserve it - so the snapshot has to
+ * carry its own date, and a snapshot without one is an error rather than a
+ * guess.
+ */
+if (!registrySnapshot.fetchedAt) {
+  throw new Error('data/robinhood-assets.snapshot.json has no fetchedAt; re-run node scripts/phase0/snapshot-registry.mjs')
+}
 const feedMap = await read('data/token-feed-map.json')
 const scan = await read('data/multiplier-events.observed.json')
+const archive = await read('data/corporate-actions.archive.json').catch(() => ({ actions: [] }))
+
+/**
+ * The issuer's window is about a month deep and has no pagination, so a row that
+ * falls out of it is gone from every first-party source. Flattened here the way
+ * the poller stores it, so a fresh database starts with everything exdate has
+ * ever seen rather than with today's window.
+ */
+const archivedActions = archive.actions.flatMap((action) => {
+  const deployment = (action.deployments ?? []).find((entry) => entry.chainId)
+  if (!deployment) return []
+  const detail = action.details ? Object.values(action.details)[0] : undefined
+  const processDate = action.processDate
+    ? `${action.processDate.year}-${String(action.processDate.month).padStart(2, '0')}-${String(action.processDate.day).padStart(2, '0')}`
+    : null
+  return [
+    {
+      id: `${action.id}:${processDate ?? 'undated'}`,
+      issuerId: action.id,
+      chainId: deployment.chainId,
+      token: deployment.contractAddress,
+      symbol: action.tokenSymbol,
+      underlyingSymbol: detail?.underlyingSymbol ?? null,
+      type: action.type,
+      status: action.status,
+      processDate,
+      rate: detail?.rate ?? null,
+      oldRate: detail?.oldRate ?? null,
+      newRate: detail?.newRate ?? null,
+      firstSeenAt: action.firstSeenAt,
+    },
+  ]
+})
 
 const feedByToken = new Map(feedMap.pairs.map((pair) => [pair.token.toLowerCase(), pair]))
 
@@ -72,7 +118,7 @@ export interface RegistryToken {
 
 export const REGISTRY_TOKENS: readonly RegistryToken[] = ${JSON.stringify(tokens, null, 2)} as const
 
-export const REGISTRY_GENERATED_AT = ${JSON.stringify(new Date().toISOString())}
+export const REGISTRY_GENERATED_AT = ${JSON.stringify(registrySnapshot.fetchedAt)}
 
 /**
  * Every UIMultiplierUpdated log on chain, found by
@@ -103,6 +149,36 @@ export interface ScannedMultiplierEvent {
 
 export const SCANNED_MULTIPLIER_EVENTS: readonly ScannedMultiplierEvent[] = ${JSON.stringify(scan.events, null, 2)} as const
 
+/**
+ * Every corporate action exdate has ever seen the issuer publish, flattened.
+ *
+ * Seeded by the poller with source 'robinhood:/rhj/corporate-actions#archived';
+ * a row still inside the issuer's window is then updated from the live feed and
+ * carries the plain source. Refresh with node scripts/archive-corporate-actions.mjs.
+ *
+ * Only fields that change when the issuer changes something are carried here:
+ * the archive re-dates every row on every run, and copying that through would
+ * rewrite this file daily to say nothing.
+ */
+export interface ArchivedCorporateAction {
+  id: string
+  issuerId: string
+  chainId: number
+  token: Address
+  symbol: string
+  underlyingSymbol: string | null
+  type: string
+  status: string
+  processDate: string | null
+  rate: string | null
+  oldRate: string | null
+  newRate: string | null
+  /** When exdate first saw the issuer publish this row. */
+  firstSeenAt: string
+}
+
+export const ARCHIVED_CORPORATE_ACTIONS: readonly ArchivedCorporateAction[] = ${JSON.stringify(archivedActions, null, 2)} as const
+
 export const SCAN_FROM_BLOCK = ${JSON.stringify(scan.scannedFromBlock)}
 export const SCAN_THROUGH_BLOCK = ${JSON.stringify(scan.scannedThroughBlock)}
 export const SCANNED_AT = ${JSON.stringify(scan.scannedAt)}
@@ -113,5 +189,5 @@ await writeFile(new URL('packages/core/src/generated/registry.ts', root), out)
 
 const withFeed = tokens.filter((token) => token.feedProxy !== null).length
 console.log(
-  `generated ${tokens.length} tokens (${withFeed} with a Chainlink feed) and ${scan.events.length} scanned multiplier events -> packages/core/src/generated/registry.ts`,
+  `generated ${tokens.length} tokens (${withFeed} with a Chainlink feed), ${scan.events.length} scanned multiplier events and ${archivedActions.length} archived corporate actions -> packages/core/src/generated/registry.ts`,
 )

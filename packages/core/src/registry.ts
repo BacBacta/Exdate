@@ -5,11 +5,12 @@ export {
   REGISTRY_TOKENS,
   REGISTRY_GENERATED_AT,
   SCANNED_MULTIPLIER_EVENTS,
+  ARCHIVED_CORPORATE_ACTIONS,
   SCAN_FROM_BLOCK,
   SCAN_THROUGH_BLOCK,
   SCANNED_AT,
 } from './generated/registry.js'
-export type { RegistryToken, ScannedMultiplierEvent } from './generated/registry.js'
+export type { ArchivedCorporateAction, RegistryToken, ScannedMultiplierEvent } from './generated/registry.js'
 
 const byAddress = new Map<string, RegistryToken>(
   REGISTRY_TOKENS.map((token) => [`${token.chainId}:${token.address.toLowerCase()}`, token]),

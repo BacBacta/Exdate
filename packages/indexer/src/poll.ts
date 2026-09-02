@@ -10,6 +10,7 @@ import {
   tokens,
 } from 'ponder:schema'
 import {
+  ARCHIVED_CORPORATE_ACTIONS,
   ROBINHOOD_API_BASE,
   ROBINHOOD_CHAIN,
   SCANNED_MULTIPLIER_EVENTS,
@@ -128,6 +129,7 @@ ponder.on('Poll:block', async ({ event, context }) => {
   // Ponder rolled back and retried - leaving the history dropped for the life
   // of the process.
   await seedScannedHistory(context, chainId)
+  await seedArchivedCorporateActions(context, chainId, now)
   await sweepGap(context, chainId, blockNumber, now)
 
   // --- ERC-8056 views -------------------------------------------------------
@@ -365,6 +367,53 @@ ponder.on('Poll:block', async ({ event, context }) => {
 })
 
 /**
+ * Seed the corporate actions the issuer no longer publishes.
+ *
+ * `GET /rhj/corporate-actions` is a window about a month deep with no
+ * pagination, so a fresh database started today would never learn about a
+ * dividend processed five weeks ago - and the multiplier step it produced would
+ * sit in `reconciliations` as `unmatched` forever. That is exactly what happened
+ * to the five July actions: they fell out of the window before anything was
+ * archiving it, and no first-party source can return them.
+ *
+ * The committed archive (data/corporate-actions.archive.json, refreshed by
+ * scripts/archive-corporate-actions.mjs) is the fix from here on. Rows are
+ * inserted only when absent: anything still inside the window is owned by the
+ * live ingest below, which carries the plain source.
+ */
+async function seedArchivedCorporateActions(context: PollContext, chainId: number, now: bigint) {
+  const seconds = (iso: string) => BigInt(Math.floor(Date.parse(iso) / 1000))
+  let seeded = 0
+  for (const action of ARCHIVED_CORPORATE_ACTIONS) {
+    if (action.chainId !== chainId) continue
+    const inserted = await context.db
+      .insert(corporateActions)
+      .values({
+        id: action.id,
+        issuerId: action.issuerId,
+        chainId,
+        token: action.token,
+        symbol: action.symbol,
+        underlyingSymbol: action.underlyingSymbol,
+        type: action.type,
+        status: action.status,
+        processDate: action.processDate,
+        rate: action.rate,
+        oldRate: action.oldRate,
+        newRate: action.newRate,
+        source: 'robinhood:/rhj/corporate-actions#archived',
+        firstSeenAt: Number.isNaN(Date.parse(action.firstSeenAt)) ? now : seconds(action.firstSeenAt),
+        // Seeding is itself a sighting, and the live ingest re-dates the row a
+        // moment later if the issuer still publishes it.
+        lastSeenAt: now,
+      })
+      .onConflictDoNothing()
+    if (inserted) seeded++
+  }
+  if (seeded > 0) console.log(`[exdate] seeded ${seeded} archived corporate action(s)`)
+}
+
+/**
  * Keep `feed_rounds` bounded.
  *
  * The table is an observation log - one row per distinct round the poller saw -
@@ -600,6 +649,9 @@ async function ingestCorporateActions(context: PollContext, chainId: number, now
       .onConflictDoUpdate(() => ({
         status: values.status,
         rate: values.rate,
+        // A row seeded from the archive carries '#archived' until the live
+        // window confirms it. Leaving it would make every row look historical.
+        source: values.source,
         oldRate: values.oldRate,
         newRate: values.newRate,
         token: values.token,

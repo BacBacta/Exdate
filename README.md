@@ -45,6 +45,12 @@ pnpm typecheck
 The poller writes its first rows within about a minute. Until then the page says so; it never
 shows a zero it has not observed.
 
+Two GitHub Actions run in `.github/workflows`: `ci` typechecks, tests, builds the status page and
+proves the generated registry still matches the data it comes from; `archive-corporate-actions`
+runs daily, merges the issuer's window into `data/corporate-actions.archive.json` and commits it
+only when something changed. The second is not housekeeping — the issuer keeps about a month, so
+every day it does not run is a day of dividend history that becomes unrecoverable.
+
 ### Verification scripts
 
 ```bash
@@ -54,6 +60,9 @@ node scripts/phase0/check-feeds.mjs            # every Chainlink feed + its age
 node scripts/phase0/check-corporate-actions.mjs # issuer dividends vs onchain steps
 node scripts/phase0/feed-price-at.mjs <feed> <iso> # Chainlink price at an instant, no archive
 node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
+node scripts/phase0/probe-oracle-link.mjs      # is there an on-chain token <-> feed link? (no)
+node scripts/phase0/verify-feed-map.mjs        # corroborate the feed map by behaviour
+node scripts/archive-corporate-actions.mjs     # merge today's window into the archive
 node scripts/backfill-multiplier-events.mjs    # full-chain event scan, 26 requests
 node scripts/build-reconciliations.mjs         # declared vs observed, priced at effectiveAt
 node scripts/generate-registry.mjs             # snapshots -> typed module
@@ -76,6 +85,7 @@ Committed artifacts, all first-party or read from the chain:
 | `data/feed-map-verification.json` | what that pairing was actually tested against |
 | `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
 | `data/reconciliations.observed.json` | every declared action against the step it produced, priced at `effectiveAt` |
+| `data/corporate-actions.archive.json` | every action the issuer has published while exdate was watching — its own endpoint keeps about a month |
 
 ## API
 

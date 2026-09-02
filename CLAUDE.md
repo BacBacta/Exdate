@@ -106,8 +106,19 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
 - `/corporate-actions` **is the traditional-side source** for `reconciliations`. No vendor needed.
   Snapshot `data/robinhood-corporate-actions.snapshot.json`; reconcile with
   `node scripts/phase0/check-corporate-actions.mjs`.
-- **History is ~1 month deep** (oldest row 2026-08-05). Snapshot it continuously; the archive is
-  ours to keep. The five July actions (CRWD, SGOV, MU, ORCL, DELL) need a one-off manual seed.
+- **It is a window, not a history.** ~1 month deep (oldest row 2026-08-05), and `limit` is the only
+  request field it accepts — `limit=500` returns the same 43 rows, and `startDate`, `processDate`,
+  `symbol`, `cursor`, `offset` are all rejected by name (the service is gRPC-transcoded and answers
+  `Could not find field X in the type GetCorporateActionsRequest`). **A row that falls out is
+  unrecoverable from every first-party source.** That is what happened to the five July actions
+  behind CRWD, SGOV, MU, ORCL and DELL: their steps are on chain and will never have a declared
+  rate, so they stay `unmatched` — and no seed can fix it without inventing numbers.
+- The fix from here on is `data/corporate-actions.archive.json`, a committed cumulative archive
+  keyed on `(issuer id, processDate)` with `firstSeenAt`/`lastSeenAt` and the status history.
+  `node scripts/archive-corporate-actions.mjs` merges today's window into it (refusing to write on
+  a bad read), a daily GitHub Action keeps it alive, and the poller seeds it into a fresh database
+  with `source = 'robinhood:/rhj/corporate-actions#archived'` — the live feed reclaims the plain
+  source for anything still in the window.
 - **The issuer's `id` names a dividend series, not a payment.** SGOV, SHY and BND carry the same
   `id` on their August and September rows, with a different `processDate`, `rate` and `status` on
   each (3 of 40 ids in the 2026-09-02 snapshot). One action is `(id, processDate)`; keying on `id`
@@ -372,6 +383,16 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   multiplier step was seen moving that feed by the step's own size, above the feed's noise, with no
   other mapped feed closer — true for SGOV alone. `reconcile()` takes `feedCorroborated` and lets it
   reach `medium`; `high` stays reserved for a first-party link.
+- 2026-09-02 — The five July corporate actions **cannot be seeded**: the issuer's endpoint is a
+  window with no pagination and no date filter (probed, not assumed), so their declared rates exist
+  nowhere first-party. Inventing them would break rule 2, so those steps stay `unmatched` and the
+  work went into making the loss impossible from now on: a committed cumulative archive, refreshed
+  daily by CI, seeded into the database on first run.
+- 2026-09-02 — `REGISTRY_GENERATED_AT` now comes from the snapshot's own `fetchedAt` rather than
+  from the codegen run, so regenerating from unchanged data is byte-identical and CI can tell a
+  stale artifact from a rebuild. The generated archive carries only fields that change when the
+  issuer changes something — copying `lastSeenAt` through would rewrite the file daily to say
+  nothing.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -398,6 +419,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
       `packages/sdk/README.md` documents the client.
 
 ### Known gaps
+
+- The five July actions have no declared rate and never will (see the decision log); their steps
+  are published as `unmatched` with the reason stated rather than filled in.
 
 - The reconciliation covers cash dividends only. A split matched to a step is written as
   `unsupported_action_type` rather than forced through a per-share model that does not fit it.

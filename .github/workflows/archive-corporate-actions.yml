@@ -1,0 +1,55 @@
+# Keep the corporate-action archive alive.
+#
+# GET /rhj/corporate-actions is a window about a month deep, with no pagination
+# and no date filter: a row that falls out of it is unrecoverable from every
+# first-party source. That is how the five July actions were lost. Running this
+# daily is what makes "the archive is ours to keep" true rather than aspirational
+# - it needs no deployment and no database, only this repository.
+name: archive-corporate-actions
+
+on:
+  schedule:
+    # 06:20 UTC daily. Off the hour on purpose: scheduled runs cluster there.
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archive-corporate-actions
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The script refuses to write an empty or non-JSON window, so a bad read
+      # leaves the archive untouched rather than pruning it.
+      - name: Merge today's window into the archive
+        run: node scripts/archive-corporate-actions.mjs
+
+      # The typed module the poller seeds from is generated, and CI checks it
+      # against its sources - so an archive commit that skipped this would make
+      # the very next CI run fail on drift.
+      - name: Regenerate the typed registry
+        run: node scripts/generate-registry.mjs
+
+      - name: Commit only if something actually changed
+        run: |
+          if git diff --quiet -- data/corporate-actions.archive.json packages/core/src/generated/registry.ts; then
+            echo "nothing changed"
+            exit 0
+          fi
+          summary=$(node -e "const a=require('./data/corporate-actions.archive.json');process.stdout.write(a.archivedRows+' rows, '+a.beyondWindow+' beyond the window')")
+          git config user.name 'exdate-archive'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/corporate-actions.archive.json packages/core/src/generated/registry.ts
+          git commit -m "Archive corporate actions: $summary"
+          git push

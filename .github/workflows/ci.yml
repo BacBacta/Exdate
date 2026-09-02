@@ -1,0 +1,49 @@
+# Typecheck, test, and prove the committed artifacts still match their sources.
+#
+# Nothing here touches the network beyond installing dependencies: the live-chain
+# checks in packages/core and the live-API checks in packages/sdk are opt-in
+# (EXDATE_INTEGRATION=1) precisely so that CI never fails because a public RPC
+# was rate limiting.
+name: ci
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck every package
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build the status page
+        run: pnpm build
+
+      # The generated registry is committed so the poller can seed history
+      # without a network call. If someone edits data/ and forgets to
+      # regenerate, the two drift silently - so regenerate and demand no diff.
+      - name: The generated registry matches the data it comes from
+        run: |
+          node scripts/generate-registry.mjs
+          git diff --exit-code -- packages/core/src/generated/registry.ts \
+            || { echo "::error::packages/core/src/generated/registry.ts is stale - run pnpm registry:generate"; exit 1; }
