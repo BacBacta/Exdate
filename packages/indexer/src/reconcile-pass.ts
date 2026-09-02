@@ -148,8 +148,22 @@ export async function runReconcilePass(
   }
 
   // --- on-chain step with no issuer row: unmatched --------------------------
+  //
+  // Rewritten every pass, and every `${token}:${effectiveAt}` row whose step
+  // has since found its issuer action is deleted. Otherwise a step first seen
+  // before the issuer's feed caught up would stay published as "unmatched"
+  // alongside its later "matched" row - two contradictory rows for one dividend.
+  const unmatchedIdOf = (change: { token: string; effectiveAt: bigint }) =>
+    `${change.token.toLowerCase()}:${change.effectiveAt}`
+  for (const { change } of pairing.matched) {
+    const stale = await context.db.find(reconciliations, { id: unmatchedIdOf(change) })
+    if (stale) {
+      await context.db.delete(reconciliations, { id: unmatchedIdOf(change) })
+      written++
+    }
+  }
   for (const change of pairing.unmatchedChanges) {
-    const id = `${String(change.token).toLowerCase()}:${change.effectiveAt}`
+    const id = unmatchedIdOf(change)
     const existing = await context.db.find(reconciliations, { id })
     if (existing) continue
     const token = tokenByAddress.get(String(change.token).toLowerCase())
@@ -234,6 +248,7 @@ export async function runReconcilePass(
     const outcome = reconcile({
       rateWad,
       priceWad,
+      priceAtPhaseFloor: (priceFields.priceAtPhaseFloor as boolean | undefined) ?? false,
       oldMultiplier: change.oldMultiplier,
       newMultiplier: change.newMultiplier,
       observedEventCount: eventCountFor(String(change.token)),

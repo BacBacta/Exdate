@@ -1,4 +1,4 @@
-import { feedHealth, isPending, WAD } from '@exdate/core'
+import { REGISTRY_GENERATED_AT, feedHealth, isPending, WAD } from '@exdate/core'
 import { formatUnits } from 'viem'
 import type { CorporateActionRow, MultiplierEventRow, ReconciliationRow, TokenRow } from './types.js'
 
@@ -61,6 +61,12 @@ export function serializeToken(row: TokenRow, options: SerializeOptions) {
     status: row.status,
     logoUrl: row.logoUrl,
     explorerUrl: `${explorerUrl}/token/${row.address}`,
+    /**
+     * symbol, name, isin, status and the feed pairing come from the issuer's
+     * registry as snapshotted at build time - not read live, and not on chain.
+     * The date says how old that snapshot is.
+     */
+    registry: { source: 'robinhood:/rhj/assets', generatedAt: REGISTRY_GENERATED_AT },
 
     /** 'indexed' once the poller has read the ERC-8056 views for this token. */
     state: polled ? ('indexed' as const) : ('not_yet_polled' as const),
@@ -81,19 +87,30 @@ export function serializeToken(row: TokenRow, options: SerializeOptions) {
             secondsRemaining: Number((row.effectiveAt as bigint) - nowSeconds),
           }
         : null,
-      /** When the multiplier last changed. Null for a token that never moved. */
-      lastChangeEffectiveAt: iso(row.effectiveAt),
+      /**
+       * When the multiplier last changed. Null for a token that never moved, and
+       * null while a change is pending: in that window `effectiveAt()` holds the
+       * FUTURE instant, which is reported under `scheduled` and must not be read
+       * as a change that already happened.
+       */
+      lastChangeEffectiveAt: pending ? null : iso(row.effectiveAt),
       totalSupplyUI: row.totalSupplyUI?.toString() ?? null,
       sampledAt: iso(row.sampledAt),
     },
 
     events: {
       count: row.eventCount,
+      /**
+       * The most recently announced event. An announcement lands ~9 minutes
+       * before it takes effect, so `applied` says whether the clock has passed
+       * its effectiveAt - there is no application event to observe.
+       */
       last:
         row.lastEventEffectiveAt === null
           ? null
           : {
               effectiveAt: iso(row.lastEventEffectiveAt),
+              applied: row.lastEventEffectiveAt <= nowSeconds,
               announcedAt: iso(row.lastEventAnnouncedAt),
               announcementLeadSeconds:
                 row.lastEventAnnouncedAt === null

@@ -5,9 +5,10 @@ import { FEED_HEARTBEAT_SECONDS } from './chains.js'
  *
  * Robinhood tokenized-equity feeds are 24/5 with an 86 400 s heartbeat and a
  * 0.5 % deviation threshold. Off-hours they simply hold the last answer and
- * stop publishing, so `updatedAt` is the only honest signal - and roughly 46 %
- * of transfers happen outside NYSE hours, which is exactly when a lending
- * market is most exposed to a frozen price.
+ * stop publishing, so `updatedAt` is the only honest signal. The kickoff brief
+ * states that roughly 46 % of transfers happen outside NYSE hours - a figure
+ * exdate has not measured, since it indexes no transfers - and off-hours is
+ * exactly when a lending market is most exposed to a frozen price.
  *
  * Observed on 2026-09-02 during a live US session: SPY 18 h stale, QQQ 4 h,
  * USDG 21 h. Staleness is the normal state of these feeds, not an incident.
@@ -29,15 +30,19 @@ export interface FeedHealth {
   status: FeedStatus
   /** Seconds since the last round, or undefined when there is no round. */
   ageSeconds: number | undefined
-  /** True once the age exceeds the heartbeat, regardless of the pause flag. */
-  beyondHeartbeat: boolean
+  /**
+   * True once the age exceeds the heartbeat, regardless of the pause flag.
+   * Undefined when there is no round to measure - never false, because "not
+   * beyond the heartbeat" is a claim about a round that does not exist.
+   */
+  beyondHeartbeat: boolean | undefined
 }
 
 export function feedHealth(input: FeedHealthInput): FeedHealth {
   const { updatedAt, nowSeconds, oraclePaused, heartbeatSeconds = FEED_HEARTBEAT_SECONDS } = input
 
   if (updatedAt === undefined || updatedAt === 0n) {
-    return { status: 'unknown', ageSeconds: undefined, beyondHeartbeat: false }
+    return { status: 'unknown', ageSeconds: undefined, beyondHeartbeat: undefined }
   }
 
   const ageSeconds = Number(nowSeconds - updatedAt)

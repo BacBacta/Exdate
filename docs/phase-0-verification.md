@@ -33,7 +33,7 @@ node scripts/phase0/feed-price-at.mjs 0x6B22A786bAa607d76728168703a39Ea9C99f2cD0
 | 6 | ERC-8056 views exist | **Confirmed** | `uiMultiplier`, `newUIMultiplier`, `effectiveAt`, `oraclePaused` all answer |
 | 7 | Chainlink feeds, 8 decimals, 24/5 | **Confirmed** | 35 tokenized-equity feeds, `us_equities_24/5`, 8 decimals |
 | 8 | "200+ Stock Tokens" | **Corrected** | **194** active deployments, all on chain 4663 |
-| 9 | "No `UIMultiplierUpdated` has fired yet; all multipliers read 1.0" | **FALSE** | **12 events across 9 tokens** since 2026-07-02. See §4 |
+| 9 | "No `UIMultiplierUpdated` has fired yet; all multipliers read 1.0" | **FALSE** | **12 logs across 9 tokens** at report time; the full scan in §13 makes it 13 logs, 12 distinct changes, 10 tokens. See §4 |
 | 10 | "The multiplier is applied two to four weeks after the ex-date" | **FALSE onchain** | Announcement → application is **9–10 minutes**. See §5 |
 | 11 | "`newUIMultiplier()` is the scheduled, not-yet-active value" | **Corrected** | It mirrors `uiMultiplier()` when nothing is pending. See §5 |
 | 12 | Dividends move the multiplier 0.05 %–2 % | **Corrected** | Observed range **0.0064 % – 2.15 %**, plus one ×4 split |
@@ -107,8 +107,10 @@ Spot reads on the twelve prompt tokens (all `oraclePaused() == false`):
 
 ## 4. Multiplier events — the prompt's central assumption is wrong
 
-**Twelve `UIMultiplierUpdated` logs, nine tokens, since 2026-07-02.** Full data in
-`data/multiplier-events.observed.json`.
+**Twelve `UIMultiplierUpdated` logs, nine tokens, since 2026-07-02** — as found by the targeted
+scan at report time. The full-chain sweep the same afternoon (§13) found a thirteenth, F, which the
+committed `data/multiplier-events.observed.json` now includes: 13 logs, 12 distinct changes, 10
+tokens.
 
 `topic0 = 0x2205df4534432b2f60654a3fdb48737ffdaf3e9edb1a498bd985bc026b15b055`
 
@@ -142,7 +144,7 @@ What this changes:
   twice, 11 hours apart. `multiplier_events` must be keyed on `(token, effectiveAt)` and upsert on
   re-announcement, keeping every announcement tx — not append blindly, or CRWD becomes two
   corporate actions.
-- **Nine of the twelve events fire at 15:00–15:03 UTC and land at 15:10:2x UTC** (11:10 ET). That
+- **Eight of the twelve events fire at 15:00–15:03 UTC and land at 15:10:2x UTC** (11:10 ET). That
   is a daily batch. The exceptions are both SGOV (20:14 UTC in July, 00:00 UTC in September) and
   CRWD. Do not hardcode the window, but a poller can be cheap outside it.
 
@@ -392,7 +394,8 @@ Read this carefully:
   not official.
 
 What this settles: **the reconciliation table can be built and populated today**, with zero
-third-party vendors. Five matched rows, three anomalies, seven pending, six onchain-only.
+third-party vendors. Five completed dividends paired with a step — two reconcile, three are
+anomalies — plus seven pending and six onchain-only.
 
 ## 13. What M1 measured, and what it changed
 
@@ -401,7 +404,7 @@ endpoint on 2026-09-02.
 
 **Multicall3 is deployed** at the canonical address `0xcA11bde05977b3631167028862bE2a173976CA11`
 (3 808 bytes of code). The poller reads five ERC-8056 views on 194 tokens plus 35 feeds in about
-thirty requests instead of 776.
+thirty requests instead of 1 005.
 
 **There is no archive at all.** `eth_call` pinned to `latest - 1 000` works; at `latest - 10 000`
 the node answers `metadata is not found`. State history is a few thousand blocks — minutes, not

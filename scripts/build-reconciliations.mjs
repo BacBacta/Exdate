@@ -132,7 +132,15 @@ async function roundAt(feed, targetSeconds) {
       hi = mid - 1n
     }
   }
-  return best ? { decimals, phase: Number(phase), roundsInPhase: Number(latestAggregatorRound), ...best } : null
+  return best
+    ? {
+        decimals,
+        phase: Number(phase),
+        roundsInPhase: Number(latestAggregatorRound),
+        atPhaseFloor: (best.roundId & ((1n << 64n) - 1n)) === 1n,
+        ...best,
+      }
+    : null
 }
 
 const seconds = (iso) => Math.floor(Date.parse(iso) / 1000)
@@ -284,14 +292,29 @@ for (const row of rows) {
     row.note = 'no Chainlink round at or before effectiveAt in the current aggregator phase'
     continue
   }
+  if (round.atPhaseFloor) {
+    row.status = 'anomaly'
+    row.note = "the only round available is the first of the aggregator's current phase; the price at effectiveAt may predate a rollover and is not a measurement"
+    continue
+  }
 
-  const priceWad = round.answer * 10n ** BigInt(18 - round.decimals)
+  const tokenPriceWad = round.answer * 10n ** BigInt(18 - round.decimals)
+  // The Chainlink answer is total return: P_token = P_equity x multiplier. The
+  // dividend is paid per underlying share and reinvested at the equity price, so
+  // unwind the multiplier that was in force (oldMultiplier) before comparing.
+  // Same arithmetic as packages/core/src/reconcile.ts underlyingPriceWad().
+  const priceWad = (tokenPriceWad * WAD) / BigInt(row.change.oldMultiplier)
   const expectedStepWad = (rateWad * WAD) / priceWad
   const receivedWad = (priceWad * observedStepWad) / WAD
   const haircutBps = Number(((rateWad - receivedWad) * 10_000n) / rateWad)
+  const haircutBpsPrecise = Number(((rateWad - receivedWad) * 1_000_000n) / rateWad) / 100
 
   row.price = {
-    value: (Number(priceWad) / 1e18).toFixed(4),
+    /** The Chainlink answer as published: the token price, multiplier included. */
+    value: (Number(tokenPriceWad) / 1e18).toFixed(4),
+    /** The equity price it implies at oldMultiplier; the reconciliation input. */
+    underlying: (Number(priceWad) / 1e18).toFixed(4),
+    multiplierInForce: row.change.oldMultiplier,
     roundId: round.roundId.toString(),
     updatedAt: new Date(Number(round.updatedAt) * 1000).toISOString(),
     stalenessSecondsAtEffectiveAt: seconds(row.change.effectiveAt) - Number(round.updatedAt),
@@ -300,11 +323,12 @@ for (const row of rows) {
   row.expectedStepWad = expectedStepWad.toString()
   row.receivedPerShare = (Number(receivedWad) / 1e18).toFixed(6)
   row.impliedHaircutBps = haircutBps
-  row.status = haircutBps >= -100 && haircutBps <= 5_000 ? 'matched' : 'anomaly'
+  // Band checked on the precise value so truncation cannot pull a row inside.
+  row.status = haircutBpsPrecise >= -100 && haircutBpsPrecise <= 5_000 ? 'matched' : 'anomaly'
   row.note =
     row.status === 'matched'
       ? undefined
-      : `implied haircut ${(haircutBps / 100).toFixed(1)} % falls outside the plausible band; the reinvestment model does not describe this event`
+      : `implied haircut ${(haircutBpsPrecise / 100).toFixed(1)} % falls outside the plausible band; the reinvestment model does not describe this event`
 
   console.error(
     `#   ${row.symbol.padEnd(5)} ${row.status.padEnd(8)} gross=${row.rate} price=${row.price.value} ` +

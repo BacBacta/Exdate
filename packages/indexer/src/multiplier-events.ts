@@ -1,6 +1,6 @@
 import { ponder } from 'ponder:registry'
 import { multiplierEvents, tokens } from 'ponder:schema'
-import { findToken } from '@exdate/core'
+import { findToken, stockTokenAbi } from '@exdate/core'
 
 /**
  * `UIMultiplierUpdated` is the only Stock Token event exdate indexes.
@@ -17,6 +17,20 @@ ponder.on('StockToken:UIMultiplierUpdated', async ({ event, context }) => {
 
   const registryToken = findToken(chainId, token)
 
+  // A token the committed registry does not know - listed after the snapshot
+  // was taken. Read its decimals on chain rather than invent 18: the sibling
+  // fields below are self-evident placeholders, a number would not be.
+  let decimals: number | null = registryToken?.decimals ?? null
+  if (decimals === null) {
+    try {
+      decimals = Number(
+        await context.client.readContract({ address: token, abi: stockTokenAbi, functionName: 'decimals' }),
+      )
+    } catch {
+      decimals = null
+    }
+  }
+
   // Keep the token row present even if the poller has not run yet, so an event
   // arriving during backfill is never orphaned.
   await context.db
@@ -26,7 +40,7 @@ ponder.on('StockToken:UIMultiplierUpdated', async ({ event, context }) => {
       address: token,
       symbol: registryToken?.symbol ?? 'UNKNOWN',
       name: registryToken?.name ?? 'Unknown token',
-      decimals: registryToken?.decimals ?? 18,
+      decimals,
       isin: registryToken?.isin ?? null,
       issuer: 'Robinhood Assets (Jersey) Limited',
       status: registryToken?.status ?? 'ASSET_STATUS_UNSPECIFIED',

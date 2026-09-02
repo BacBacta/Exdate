@@ -322,11 +322,23 @@ export default async function Page() {
                 </td>
                 <td className="num">{multiplier(token.multiplier.currentDecimal)}</td>
                 <td className="num">{bps(token.events.last?.stepBps)}</td>
-                <td className="num">{utc(token.multiplier.lastChangeEffectiveAt)}</td>
+                <td className="num">
+                  {token.multiplier.scheduled ? (
+                    <span className="pill stale">scheduled {utc(token.multiplier.scheduled.effectiveAt)}</span>
+                  ) : (
+                    utc(token.multiplier.lastChangeEffectiveAt)
+                  )}
+                </td>
                 <td className="num">
                   {token.events.count}
                   {token.events.last && token.events.last.announcementCount! > 1 ? (
                     <span className="addr"> ({token.events.last.announcementCount} announcements)</span>
+                  ) : null}
+                  {token.events.last && !token.events.last.applied ? (
+                    <span className="addr"> (last not yet in effect)</span>
+                  ) : null}
+                  {token.events.last?.source === 'onchain:scan' || token.events.last?.source === 'onchain:sweep' ? (
+                    <span className="addr"> {token.events.last.source.replace('onchain:', '')}</span>
                   ) : null}
                 </td>
                 <td>
@@ -407,7 +419,13 @@ export default async function Page() {
                 <td className="num">{price(token.feed?.price ?? null)}</td>
                 <td className="num">{utc(token.feed?.updatedAt ?? null)}</td>
                 <td className="num">{age(token.feed?.ageSeconds)}</td>
-                <td className="num">{token.feed?.beyondHeartbeat ? 'yes' : 'no'}</td>
+                <td className="num">
+                  {token.feed?.beyondHeartbeat === null || token.feed?.beyondHeartbeat === undefined
+                    ? '—'
+                    : token.feed.beyondHeartbeat
+                      ? 'yes'
+                      : 'no'}
+                </td>
                 <td className="num">{token.feed?.oraclePaused === null ? '—' : token.feed?.oraclePaused ? 'yes' : 'no'}</td>
               </tr>
             ))}
@@ -416,6 +434,13 @@ export default async function Page() {
       </div>
 
       <footer>
+        <p>
+          Event rows marked <em>scan</em> were found by a full-chain sweep committed to the
+          repository rather than seen live by the indexer; <em>sweep</em> rows were found by the
+          indexer&rsquo;s own start-up catch-up. All are real logs with real transaction hashes. Token
+          names and the feed pairing come from the issuer&rsquo;s registry as snapshotted on{' '}
+          {tokens[0]?.registry.generatedAt.slice(0, 10) ?? '—'}, not read live.
+        </p>
         <p>
           Chainlink prices for these tokens are total return: the feed answer already includes the
           multiplier. Multiplying one by the other double-counts every dividend ever paid.

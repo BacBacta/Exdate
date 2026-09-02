@@ -13,7 +13,12 @@ export const tokens = onchainTable(
     address: t.hex().notNull(),
     symbol: t.text().notNull(),
     name: t.text().notNull(),
-    decimals: t.integer().notNull(),
+    /**
+     * Nullable, because a token missing from the committed registry has no
+     * known decimals until they are read on chain, and a placeholder of 18
+     * would be indistinguishable from a reading.
+     */
+    decimals: t.integer(),
     isin: t.text(),
     issuer: t.text().notNull(),
     status: t.text().notNull(),
@@ -88,7 +93,11 @@ export const tokenStates = onchainTable(
     uiMultiplier: t.bigint().notNull(),
     newUIMultiplier: t.bigint().notNull(),
     effectiveAt: t.bigint().notNull(),
-    oraclePaused: t.boolean().notNull(),
+    /**
+     * Nullable. A failed read is null, never false: "the oracle is not paused"
+     * is an observation, and a multicall entry that failed observed nothing.
+     */
+    oraclePaused: t.boolean(),
     totalSupplyUI: t.bigint(),
     sampledAt: t.bigint().notNull(),
     sampledBlock: t.bigint().notNull(),
@@ -134,7 +143,15 @@ export const feedStates = onchainTable(
   (table) => ({ pk: primaryKey({ columns: [table.chainId, table.feed] }) }),
 )
 
-/** A row is written only when `oraclePaused()` actually flips. */
+/**
+ * Pause history.
+ *
+ * `transition` rows are written when `oraclePaused()` actually flips between
+ * two polls. A `baseline` row is written when a token is first observed already
+ * paused: the pause is real but its start is unknown, and a reader must be able
+ * to tell that from a transition seen live. Nothing is written for a token first
+ * observed unpaused - that is the ordinary state, not an event.
+ */
 export const pauseEvents = onchainTable(
   'pause_events',
   (t) => ({
@@ -143,6 +160,8 @@ export const pauseEvents = onchainTable(
     at: t.bigint().notNull(),
     paused: t.boolean().notNull(),
     block: t.bigint().notNull(),
+    /** transition | baseline */
+    kind: t.text().notNull().default('transition'),
   }),
   (table) => ({ pk: primaryKey({ columns: [table.chainId, table.token, table.at] }) }),
 )
@@ -252,4 +271,25 @@ export const reconciliations = onchainTable(
     tokenIdx: index().on(table.chainId, table.token),
     statusIdx: index().on(table.status),
   }),
+)
+
+/**
+ * Where the gap sweep has reached.
+ *
+ * Ponder's event source starts at the head, and the committed scan stops at
+ * SCAN_THROUGH_BLOCK. Anything announced between the two - and anything
+ * announced while the process was down - is indexed by neither, so the poller
+ * sweeps that window itself on start-up with the same wide eth_getLogs query the
+ * backfill script uses, and records how far it got here. On the next start-up
+ * the sweep resumes from this marker, which is what closes a downtime gap.
+ */
+export const syncMarkers = onchainTable(
+  'sync_markers',
+  (t) => ({
+    chainId: t.integer().notNull(),
+    key: t.text().notNull(),
+    throughBlock: t.bigint().notNull(),
+    updatedAt: t.bigint().notNull(),
+  }),
+  (table) => ({ pk: primaryKey({ columns: [table.chainId, table.key] }) }),
 )

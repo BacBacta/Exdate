@@ -32,7 +32,8 @@ nowhere else.
   **Cadence ≈ 0.1 s/block, ≈ 857 000 blocks/day.** Block 0 has timestamp `0` — never use it for math.
 - Single Robinhood-operated sequencer, no permissionless fallback.
 - **Multicall3 is deployed at the canonical address** `0xcA11bde05977b3631167028862bE2a173976CA11`
-  (3 808 bytes). It turns the 194-token poll from 776 `eth_call`s into ~30 requests.
+  (3 808 bytes). It turns the 194-token poll — five views each, 970 calls, plus 35 feed rounds —
+  into ~30 requests.
 - **There is no archive.** `eth_call` at `latest - 10 000` already answers
   `metadata is not found`; only the last few thousand blocks of state are readable. Historical
   multiplier state must be reconstructed from events, not read back.
@@ -170,8 +171,9 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
 - A `Transfer` proves custody moved, not that a trade happened. A provable trade needs both legs
   (Stock Token + USDG) in the same `transactionHash`.
 - Mint = transfer from `address(0)`. Burn = transfer to `address(0)`.
-- ~46% of observed transfers happen outside NYSE hours, weekends included. Correctness during
-  those windows is a requirement, not a nice-to-have.
+- The kickoff brief states that ~46% of transfers happen outside NYSE hours, weekends included.
+  **exdate has not measured this** — it indexes no transfers — so the figure is the brief's, not an
+  observation. Correctness during off-hours windows is still a requirement, not a nice-to-have.
 
 ## Observed corporate actions
 
@@ -225,8 +227,9 @@ pnpm workspaces:
 | `apps/status` | Next.js App Router status page. Reads the API and nothing else. |
 | `packages/sdk` | `@exdate/sdk` — M5, not started. |
 
-Vitest lives in `packages/core`: 68 tests on raw↔UI conversion, reconciliation, staleness, NFT log
-filtering and the transport. `pnpm test`.
+Vitest lives in `packages/core` (raw↔UI conversion, reconciliation, pairing, rounds, staleness,
+NFT log filtering, the transport, the committed dataset, opt-in live checks) and `packages/api`
+(serialisation of every state the retrospective/prospective trap can produce). `pnpm test`.
 
 **Historical prices need no archive node.** `packages/core/src/rounds.ts` binary-searches an
 aggregator's own round history, which is readable from the head — about twelve reads per event, and
@@ -305,7 +308,7 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 - [x] Phase 0 verification report — `docs/phase-0-verification.md`
 - [x] **M1 indexer + status page** — 194 tokens polled, 35 feeds live, 12 multiplier events, page
-      renders real mainnet data, 68 tests green. API: `/v1/health`, `/v1/chains`,
+      renders real mainnet data, tests green. API: `/v1/health`, `/v1/chains`,
       `/v1/:chain/tokens`, `/v1/:chain/tokens/:address`, `/v1/:chain/events`, `/v1/status`,
       `/v1/calendar`.
 - [ ] M2 net yield + calendar — `/v1/calendar` serves the issuer's upcoming rows; the `/yield`

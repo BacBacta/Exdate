@@ -34,20 +34,47 @@ export interface ThrottledHttpOptions extends HttpTransportConfig {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+/**
+ * Is this error the endpoint saying "not now"?
+ *
+ * Structural first: the HTTP status, viem's error code, and JSON-RPC's own
+ * -32005 (limit exceeded), which is what reaches us when a 429 carries a
+ * well-formed JSON-RPC body - viem returns the parsed error and drops the
+ * status in that case.
+ *
+ * The text fallback deliberately reads `details` and `shortMessage` only.
+ * viem's `message` embeds the serialised request body, so a bare "429" test on
+ * it would fire on any calldata, address or block number that happened to
+ * contain those digits, and retry a genuine error a dozen times as throttling.
+ */
 const isRateLimited = (error: unknown): boolean => {
-  const candidate = error as { code?: number; status?: number; details?: string; message?: string }
-  if (candidate?.code === 429 || candidate?.status === 429) return true
-  const text = `${candidate?.details ?? ''} ${candidate?.message ?? ''}`
-  return /too many requests|rate limit|429/i.test(text)
+  const candidate = error as {
+    code?: number
+    status?: number
+    details?: string
+    shortMessage?: string
+  }
+  if (candidate?.code === 429 || candidate?.status === 429 || candidate?.code === -32005) return true
+  const text = `${candidate?.details ?? ''} ${candidate?.shortMessage ?? ''}`
+  return /too many requests|rate limit/i.test(text)
 }
 
 export function throttledHttp(url: string, options: ThrottledHttpOptions = {}): Transport {
-  const { minGapMs = 80, maxGapMs = 2_000, maxRetries = 12, onThrottle, ...httpConfig } = options
+  // Four, not a dozen: Ponder wraps every call in its own nine-attempt retry
+  // loop above this transport, so the attempts multiply. Four here is already
+  // forty logical attempts under a sustained rate limit.
+  const { minGapMs = 80, maxGapMs = 2_000, maxRetries = 4, onThrottle, ...httpConfig } = options
 
   return (config) => {
-    // retryCount 0: this transport owns retrying, and viem's own retry would
-    // fire concurrently with the queue below.
-    const inner = http(url, { ...httpConfig, retryCount: 0 })(config)
+    // retryCount 0: viem's retry would fire concurrently with the queue below;
+    // this transport does its own, and Ponder does more on top.
+    //
+    // The timeout is forced from httpConfig. viem resolves a transport's timeout
+    // as caller-supplied first, then config, and Ponder always calls a custom
+    // transport with timeout 10 000 - which would silently discard whatever
+    // ponder.config.ts asked for.
+    const timeout = httpConfig.timeout ?? (config as { timeout?: number }).timeout
+    const inner = http(url, { ...httpConfig, retryCount: 0 })({ ...config, timeout })
 
     let gapMs = minGapMs
     // A single promise chain, so exactly one request is ever in flight. The
@@ -86,7 +113,9 @@ export function throttledHttp(url: string, options: ThrottledHttpOptions = {}): 
           } catch (error) {
             lastError = error
             if (!isRateLimited(error) || attempt === maxRetries) throw error
-            gapMs = Math.min(maxGapMs, Math.max(minGapMs, gapMs * 1.6))
+            // Grow from a floor of 25 ms, not from the current gap: with
+            // minGapMs 0 the gap starts at 0 and 0 x 1.6 never leaves it.
+            gapMs = Math.min(maxGapMs, Math.max(minGapMs, Math.max(gapMs, 25) * 1.6))
             // Exponential with jitter, so a burst of rejected requests does not
             // resynchronise and collide again on the next attempt.
             const delayMs = Math.min(maxGapMs * 4, 150 * 2 ** attempt) * (0.5 + Math.random())

@@ -95,6 +95,45 @@ describe('errors that are not rate limits', () => {
     expect(calls).toBe(1)
   })
 
+  it('does not mistake a request body containing "429" for a rate limit', async () => {
+    // viem embeds the serialised request in error.message. A getLogs for a
+    // block range like 0x4290..0x4299 must not be retried as throttling.
+    let calls = 0
+    globalThis.fetch = vi.fn(async () => {
+      calls++
+      return new Response(
+        JSON.stringify({ jsonrpc: '2.0', id: 1, error: { code: -32000, message: 'execution reverted' } }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      )
+    }) as typeof fetch
+
+    const transport = connect({ maxRetries: 5 })
+    await expect(
+      transport.request({ method: 'eth_getLogs', params: [{ fromBlock: '0x4290', toBlock: '0x4299' }] }),
+    ).rejects.toBeDefined()
+    expect(calls).toBe(1)
+  })
+
+  it('recognises a JSON-RPC limit-exceeded error as a rate limit', async () => {
+    // A 429 whose body is a well-formed JSON-RPC error reaches us as code -32005
+    // with the HTTP status gone.
+    let calls = 0
+    globalThis.fetch = vi.fn(async () => {
+      calls++
+      if (calls === 1) {
+        return new Response(
+          JSON.stringify({ jsonrpc: '2.0', id: 1, error: { code: -32005, message: 'limit exceeded' } }),
+          { status: 429, headers: { 'content-type': 'application/json' } },
+        )
+      }
+      return jsonResponse('0x1')
+    }) as typeof fetch
+
+    const transport = connect()
+    await expect(transport.request({ method: 'eth_getLogs', params: [] })).resolves.toBe('0x1')
+    expect(calls).toBe(2)
+  })
+
   it('surfaces a timeout immediately', async () => {
     let calls = 0
     globalThis.fetch = vi.fn(async () => {

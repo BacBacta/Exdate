@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { lagDays, pairActionsWithChanges } from '../src/pairing.js'
+import { MATCH_WINDOW_DAYS, lagDays, pairActionsWithChanges } from '../src/pairing.js'
 
 /**
  * A wrong pair produces a haircut indistinguishable from a real one, so the join
@@ -153,6 +153,34 @@ describe('rows that cannot be paired', () => {
     expect(result.matched).toHaveLength(0)
     expect(result.unmatchedActions).toHaveLength(3)
     expect(result.unmatchedChanges).toHaveLength(1)
+  })
+
+  it('pairs a step exactly four calendar days out, at the hour every step lands', () => {
+    // A Thursday processDate over a holiday weekend: Fri closed, effect Monday
+    // at 15:10 UTC. That is four calendar days but 4 days 15 h of elapsed time,
+    // which a seconds-based window would reject.
+    expect(MATCH_WINDOW_DAYS).toBe(4)
+    const result = pairActionsWithChanges(
+      [{ id: 'a1', token: AAPL, processDate: '2026-12-31' }],
+      [{ token: AAPL, effectiveAt: at('2027-01-04T15:10:24Z') }],
+    )
+    expect(result.matched).toHaveLength(1)
+  })
+
+  it('does not pair a step five calendar days out', () => {
+    const result = pairActionsWithChanges(
+      [{ id: 'a1', token: AAPL, processDate: '2026-12-31' }],
+      [{ token: AAPL, effectiveAt: at('2027-01-05T15:10:24Z') }],
+    )
+    expect(result.matched).toHaveLength(0)
+  })
+
+  it('pairs a step on the same calendar day', () => {
+    const result = pairActionsWithChanges(
+      [{ id: 'a1', token: AAPL, processDate: '2026-08-14' }],
+      [{ token: AAPL, effectiveAt: at('2026-08-14T15:12:46Z') }],
+    )
+    expect(result.matched).toHaveLength(1)
   })
 
   it('honours a caller-supplied window', () => {

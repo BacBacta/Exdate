@@ -49,11 +49,18 @@ export const CHAINS_BY_ID: Record<number, ChainDefinition> = Object.fromEntries(
   Object.values(CHAINS).map((chain) => [chain.id, chain]),
 )
 
-/** Resolve a chain from a URL path segment: either its key or its numeric id. */
+/**
+ * Resolve a chain from a URL path segment: either its key or its numeric id.
+ *
+ * `Object.hasOwn`, not `in`: `'constructor' in CHAINS` is true for any object
+ * literal, and the `in` form let `/v1/constructor/tokens` answer 200 with an
+ * empty dataset instead of 404. The id branch accepts only a plain decimal
+ * integer, so "4663.0", "0x1237" and " 4663" are all unknown.
+ */
 export function resolveChain(segment: string): ChainDefinition | undefined {
-  if (segment in CHAINS) return CHAINS[segment as ChainKey]
-  const id = Number(segment)
-  return Number.isInteger(id) ? CHAINS_BY_ID[id] : undefined
+  if (Object.hasOwn(CHAINS, segment)) return CHAINS[segment as ChainKey]
+  if (!/^\d+$/.test(segment)) return undefined
+  return CHAINS_BY_ID[Number(segment)]
 }
 
 /**

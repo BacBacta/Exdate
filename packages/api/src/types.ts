@@ -12,7 +12,8 @@ export interface TokenRow {
   address: Address
   symbol: string
   name: string
-  decimals: number
+  /** Null for a token the registry does not know whose on-chain read failed. */
+  decimals: number | null
   isin: string | null
   issuer: string
   status: string

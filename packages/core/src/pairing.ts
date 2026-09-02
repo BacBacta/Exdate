@@ -1,4 +1,3 @@
-import { MATCH_WINDOW_DAYS } from './reconcile.js'
 
 /**
  * Pairing the two sides of a reconciliation.
@@ -41,7 +40,14 @@ export interface Pairing<A extends PairableAction, C extends PairableChange> {
   unmatchedChanges: C[]
 }
 
-const DAY_SECONDS = 86_400n
+/**
+ * Days after `processDate` within which an on-chain step is taken to be that
+ * action's. Calendar days, inclusive: a step on the fourth calendar day pairs, a
+ * step on the fifth does not. Four rather than one because the observed lag is
+ * "next business day", and a Friday or a holiday weekend puts that three or four
+ * calendar days out.
+ */
+export const MATCH_WINDOW_DAYS = 4
 
 /**
  * Pair actions with changes, one-to-one, nearest first.
@@ -56,8 +62,6 @@ export function pairActionsWithChanges<A extends PairableAction, C extends Paira
   changes: readonly C[],
   windowDays: number = MATCH_WINDOW_DAYS,
 ): Pairing<A, C> {
-  const windowSeconds = BigInt(windowDays) * DAY_SECONDS
-
   const candidates: { action: A; change: C; lagSeconds: bigint }[] = []
   for (const action of actions) {
     if (!action.token || !action.processDate) continue
@@ -66,9 +70,14 @@ export function pairActionsWithChanges<A extends PairableAction, C extends Paira
     const processedAt = BigInt(Math.floor(processedMs / 1000))
     for (const change of changes) {
       if (change.token.toLowerCase() !== action.token.toLowerCase()) continue
-      const lagSeconds = change.effectiveAt - processedAt
-      if (lagSeconds < 0n || lagSeconds > windowSeconds) continue
-      candidates.push({ action, change, lagSeconds })
+      // The window is in calendar days, the same unit lagDays reports. Measuring
+      // it in seconds from midnight would make the usable window three days and
+      // fifteen hours, since every observed step lands at ~15:10 UTC, and a
+      // genuine four-calendar-day lag over a holiday weekend would fail to pair.
+      const days = lagDays(action.processDate, change.effectiveAt)
+      if (days === null || days < 0 || days > windowDays) continue
+      // Ordering still uses seconds so that "nearest" is exact.
+      candidates.push({ action, change, lagSeconds: change.effectiveAt - processedAt })
     }
   }
 

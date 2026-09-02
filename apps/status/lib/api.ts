@@ -27,12 +27,13 @@ export interface TokenView {
   address: string
   symbol: string
   name: string
-  decimals: number
+  decimals: number | null
   isin: string | null
   issuer: string
   status: string
   logoUrl: string | null
   explorerUrl: string
+  registry: { source: string; generatedAt: string }
   state: 'indexed' | 'not_yet_polled'
   multiplier: {
     current: string | null
@@ -51,10 +52,12 @@ export interface TokenView {
     count: number
     last: {
       effectiveAt: string | null
+      applied: boolean
       announcedAt: string | null
       announcementLeadSeconds: number | null
       announcedTx: string | null
       announcementCount: number | null
+      source: string | null
       oldMultiplier: string | null
       newMultiplier: string | null
       stepBps: number | null

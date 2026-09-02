@@ -10,10 +10,11 @@ exdate indexes what actually happens: every multiplier update, every corporate a
 that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
 and the health of every Chainlink feed.
 
-> **Status: M1 shipped.** The indexer, the API and the status page run against Robinhood Chain
-> mainnet today: 194 tokens polled, 35 Chainlink feeds, 12 real multiplier events, 43 issuer
-> corporate actions. The yield endpoint, the reconciliation table, the webhooks and the SDK are
-> not built yet — they are marked below.
+> **Status: M1 and the core of M3 shipped.** The indexer, the API, the reconciliation table and
+> the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
+> feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 46 reconciliation rows. The
+> yield endpoint, the pending-dividend endpoint, the webhooks and the SDK are not built yet — they
+> are marked below.
 > Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
@@ -22,13 +23,13 @@ and the health of every Chainlink feed.
 |---|---|
 | **Pending dividend** | Between ex-date and multiplier application, a token is worth more than the oracle says. Undervalued collateral, predictable DEX/NAV premium. |
 | **Observed haircut** | Reconciling declared dividends against observed multiplier steps measures the real cost of the structure. Published nowhere else. |
-| **Feed health** | Feeds are 24/5 and freeze off-hours, but ~46% of transfers happen outside NYSE hours. Lending protocols need to know before they liquidate. |
+| **Feed health** | Feeds are 24/5 and freeze off-hours. The kickoff brief states ~46% of transfers happen outside NYSE hours — exdate has not measured that, and indexes no transfers. Lending protocols need to know before they liquidate. |
 
 None of that is hypothetical. On 2026-09-02, mid-session, the SPY feed was **18 hours** stale and
 the QQQ feed **4 hours** stale. Ten tokens have already moved their multiplier — steps ranging from
 0.64 bps to 214.86 bps — and the onchain warning before a change takes effect is **nine minutes**.
 Only 18% of Stock Tokens have a Chainlink feed at all. Reconciling the issuer's own dividend rates
-against the onchain steps gives a **~34–36 % haircut** on AAPL and SGOV, three events that don't
+against the onchain steps gives a **~34–36 % haircut** on AAPL and SGOV, four events that don't
 reconcile at all, and seven dividends marked *completed* that have not reached the chain after up
 to four weeks. Every input is sourced; see the report.
 
@@ -38,7 +39,7 @@ to four weeks. Every input is sourced; see the report.
 pnpm install
 pnpm dev          # indexer + API   http://localhost:42069
 pnpm dev:status   # status page      http://localhost:3000
-pnpm test         # 68 unit tests
+pnpm test         # unit tests for @exdate/core and @exdate/api
 pnpm typecheck
 ```
 
@@ -112,7 +113,7 @@ const y = await exdate.yield('0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC')
 
 ```
 packages/core     chains, ABIs, WAD maths, staleness, NFT log filtering, reconciliation,
-                  the throttled RPC transport, the generated registry. No I/O, 68 tests.
+                  the throttled RPC transport, the generated registry. No I/O, unit-tested.
 packages/indexer  Ponder: indexes UIMultiplierUpdated, polls the ERC-8056 views, the
                   Chainlink feeds and the issuer's corporate actions, serves the API.
 packages/api      Hono routes over a Repository interface — no SQL, deployable alone.
@@ -138,8 +139,12 @@ a dedicated provider and set `RHC_START_BLOCK=900000` to hand the whole history 
 ## Development
 
 ```bash
-cp .env.example .env      # nothing is required: every default points at the public RPC
+cp .env.example .env      # optional: every default points at the public RPC
 ```
+
+Edit the root `.env` only. `pnpm dev`, `pnpm dev:status` and `pnpm start` copy it to
+`packages/indexer/.env.local` and `apps/status/.env.local`, which are the files Ponder and Next
+actually read.
 
 No API key is needed anywhere. The registry, the prices and the corporate actions all come from the
 issuer's own unauthenticated endpoints, and the scripts under `scripts/phase0/` are dependency-free

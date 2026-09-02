@@ -35,6 +35,16 @@ describe('raw <-> UI conversion', () => {
     expect(toUnderlyingShares(5n * WAD, CRWD)).toBe(20n * WAD)
   })
 
+  it('floors, and the floor is pinned exactly', () => {
+    // 987654321123456789 * 1005101770003214918 / 1e18, truncated. A ceiling
+    // implementation would give one more wei and overstate every balance.
+    const raw = 987_654_321_123_456_789n
+    expect(toUnderlyingShares(raw, SGOV_3)).toBe(992_693_106_312_510_034n)
+    expect((raw * SGOV_3) % WAD).not.toBe(0n) // the case is genuinely inexact
+    expect(toUnderlyingShares(1n, WAD + 1n)).toBe(1n)
+    expect(toUnderlyingShares(1n, WAD - 1n)).toBe(0n)
+  })
+
   it('round-trips within one wei of floor division', () => {
     const raw = 987_654_321_123_456_789n
     const shares = toUnderlyingShares(raw, SGOV_3)

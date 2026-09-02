@@ -5,6 +5,7 @@ import {
   feedStates,
   multiplierEvents,
   pauseEvents,
+  syncMarkers,
   tokenStates,
   tokens,
 } from 'ponder:schema'
@@ -12,14 +13,17 @@ import {
   ROBINHOOD_API_BASE,
   ROBINHOOD_CHAIN,
   SCANNED_MULTIPLIER_EVENTS,
+  SCAN_THROUGH_BLOCK,
   aggregatorV3Abi,
   feedProxies,
   findToken,
   stockTokenAbi,
+  throttledHttp,
+  tokenAddresses,
   tokensForChain,
 } from '@exdate/core'
 import { runReconcilePass } from './reconcile-pass.js'
-import type { Address } from 'viem'
+import { createPublicClient, parseAbiItem, type Address } from 'viem'
 
 /**
  * The poller.
@@ -29,15 +33,44 @@ import type { Address } from 'viem'
  * chain on a block interval and writes what it reads.
  *
  * Cost per poll, with Multicall3 (verified deployed at the canonical address on
- * Robinhood Chain): ~30 requests for 194 tokens and 35 feeds. Without it, 776.
+ * Robinhood Chain): ~30 requests for 194 tokens x 5 views plus 35 feeds. Without it, 1 005.
  */
 
 /** The issuer caches /corporate-actions for an hour; polling faster is waste. */
 const CORPORATE_ACTIONS_INTERVAL_MS = 60 * 60 * 1000
-let corporateActionsFetchedAt = 0
+/** After a failed fetch, try again sooner than the full hour. */
+const CORPORATE_ACTIONS_RETRY_MS = 5 * 60 * 1000
+/**
+ * Module state, so it is NOT rolled back when Ponder retries a block. That is
+ * acceptable here only because the worst case is a delayed fetch; it must never
+ * gate a database write, which is why the seed below has no such flag.
+ */
+let corporateActionsNextAt = 0
 
-/** The scanned history only needs seeding once per process. */
-let historySeeded = false
+/**
+ * Sweep the gap only when it is wide enough to be a start-up or a downtime gap.
+ * Ponder's live sync covers the tail; re-sweeping 600 blocks every poll would
+ * double the eth_getLogs load for nothing.
+ */
+const SWEEP_MIN_GAP_BLOCKS = 10_000n
+const SWEEP_CHUNK_BLOCKS = 2_000_000n
+
+const rpcUrl = process.env.RHC_RPC_URL_ARCHIVE || process.env.RHC_RPC_URL || ROBINHOOD_CHAIN.defaultRpcUrl
+const sweepClient = createPublicClient({
+  transport: throttledHttp(rpcUrl, {
+    minGapMs: Number(process.env.RHC_RPC_MIN_GAP_MS ?? 80),
+    timeout: 45_000,
+    onFetchRequest: async (request) => {
+      if (process.env.EXDATE_DEBUG_RPC) {
+        const body = await request.clone().text()
+        console.log(`[exdate:rpc] ${body.slice(0, 120)} ... ${body.slice(-160)}`)
+      }
+    },
+  }),
+})
+const UI_MULTIPLIER_UPDATED = parseAbiItem(
+  'event UIMultiplierUpdated(uint256 oldMultiplier, uint256 newMultiplier, uint256 effectiveAtTimestamp)',
+)
 
 interface MulticallFailure {
   status: 'failure'
@@ -73,10 +106,12 @@ ponder.on('Poll:block', async ({ event, context }) => {
   const reconciled = await runReconcilePass(context, chainId, now)
   if (reconciled > 0) console.log(`[exdate] reconciliation: ${reconciled} row(s) written`)
 
-  if (!historySeeded) {
-    historySeeded = true
-    await seedScannedHistory(context, chainId)
-  }
+  // Every poll, not once per process. Twelve onConflictDoNothing inserts cost
+  // nothing, and a module-level "done" flag would survive a transaction that
+  // Ponder rolled back and retried - leaving the history dropped for the life
+  // of the process.
+  await seedScannedHistory(context, chainId)
+  await sweepGap(context, chainId, blockNumber, now)
 
   // --- ERC-8056 views -------------------------------------------------------
   const viewNames = ['uiMultiplier', 'newUIMultiplier', 'effectiveAt', 'oraclePaused', 'totalSupplyUI'] as const
@@ -127,6 +162,8 @@ ponder.on('Poll:block', async ({ event, context }) => {
 
     const previous = await context.db.find(tokenStates, { chainId, address: token.address })
 
+    // A failed oraclePaused read is stored as null, exactly like totalSupplyUI.
+    // Coercing it to false would publish "not paused" as an observation.
     await context.db
       .insert(tokenStates)
       .values({
@@ -135,7 +172,7 @@ ponder.on('Poll:block', async ({ event, context }) => {
         uiMultiplier,
         newUIMultiplier,
         effectiveAt,
-        oraclePaused: oraclePaused ?? false,
+        oraclePaused: oraclePaused ?? null,
         totalSupplyUI: totalSupplyUI ?? null,
         sampledAt: now,
         sampledBlock: blockNumber,
@@ -144,19 +181,26 @@ ponder.on('Poll:block', async ({ event, context }) => {
         uiMultiplier,
         newUIMultiplier,
         effectiveAt,
-        oraclePaused: oraclePaused ?? false,
+        oraclePaused: oraclePaused ?? null,
         totalSupplyUI: totalSupplyUI ?? null,
         sampledAt: now,
         sampledBlock: blockNumber,
       }))
 
-    // Only write a pause row when the flag actually flips, so the table stays a
-    // history of transitions rather than a log of every poll.
-    if (oraclePaused !== undefined && previous !== null && previous.oraclePaused !== oraclePaused) {
-      await context.db
-        .insert(pauseEvents)
-        .values({ chainId, token: token.address, at: now, paused: oraclePaused, block: blockNumber })
-        .onConflictDoNothing()
+    if (oraclePaused !== undefined) {
+      if (previous === null && oraclePaused) {
+        // First ever observation and the oracle is already paused: record it as
+        // a baseline whose start is unknown, not as a transition seen at `now`.
+        await context.db
+          .insert(pauseEvents)
+          .values({ chainId, token: token.address, at: now, paused: true, block: blockNumber, kind: 'baseline' })
+          .onConflictDoNothing()
+      } else if (previous !== null && previous.oraclePaused !== null && previous.oraclePaused !== oraclePaused) {
+        await context.db
+          .insert(pauseEvents)
+          .values({ chainId, token: token.address, at: now, paused: oraclePaused, block: blockNumber, kind: 'transition' })
+          .onConflictDoNothing()
+      }
     }
   }
 
@@ -190,14 +234,76 @@ ponder.on('Poll:block', async ({ event, context }) => {
   }
 
   // --- Issuer corporate actions ---------------------------------------------
-  if (Date.now() - corporateActionsFetchedAt >= CORPORATE_ACTIONS_INTERVAL_MS) {
-    // Set before the call, not after: a failed fetch must not then retry on
-    // every block. The next attempt comes an hour later, which is the endpoint's
-    // own cache window anyway.
-    corporateActionsFetchedAt = Date.now()
-    await ingestCorporateActions(context, chainId, now)
+  if (Date.now() >= corporateActionsNextAt) {
+    // Set before the call so a failure cannot retry on every block, but a
+    // failure schedules the next attempt in minutes, not the full hour.
+    corporateActionsNextAt = Date.now() + CORPORATE_ACTIONS_RETRY_MS
+    const ingested = await ingestCorporateActions(context, chainId, now)
+    if (ingested) corporateActionsNextAt = Date.now() + CORPORATE_ACTIONS_INTERVAL_MS
   }
 })
+
+/**
+ * Close the window between the committed scan and Ponder's live sync.
+ *
+ * Runs the same wide query as scripts/backfill-multiplier-events.mjs - every
+ * token address, one topic, 2 000 000 blocks per request - from the last block
+ * the sweep guaranteed to the current head, and seeds anything it finds. Uses a
+ * plain viem client on the throttled transport rather than Ponder's cached
+ * client: this is a one-off catch-up read, not indexing state.
+ */
+async function sweepGap(context: PollContext, chainId: number, head: bigint, now: bigint) {
+  const marker = await context.db.find(syncMarkers, { chainId, key: 'multiplier-events' })
+  const from = (marker?.throughBlock ?? BigInt(SCAN_THROUGH_BLOCK)) + 1n
+  if (head - from < SWEEP_MIN_GAP_BLOCKS) return
+
+  const addresses = tokenAddresses(chainId)
+  let found = 0
+  for (let start = from; start <= head; start += SWEEP_CHUNK_BLOCKS) {
+    const end = start + SWEEP_CHUNK_BLOCKS - 1n > head ? head : start + SWEEP_CHUNK_BLOCKS - 1n
+    let logs
+    try {
+      logs = await sweepClient.getLogs({ address: addresses, event: UI_MULTIPLIER_UPDATED, fromBlock: start, toBlock: end })
+    } catch (error) {
+      // Leave the marker where it was: the next poll retries the same window.
+      // Observed: the pool answered -32602 "Missing or invalid parameters" twice
+      // to a body it accepted unchanged a minute later. Set EXDATE_DEBUG_RPC=1
+      // to log the body and see for yourself.
+      console.warn(`[exdate] gap sweep ${start}-${end} failed: ${(error as Error).message.slice(0, 120)}`)
+      return
+    }
+    for (const log of logs) {
+      const { oldMultiplier, newMultiplier, effectiveAtTimestamp } = log.args
+      if (oldMultiplier === undefined || newMultiplier === undefined || effectiveAtTimestamp === undefined) continue
+      const block = await sweepClient.getBlock({ blockNumber: log.blockNumber })
+      const inserted = await context.db
+        .insert(multiplierEvents)
+        .values({
+          chainId,
+          token: log.address,
+          effectiveAt: effectiveAtTimestamp,
+          oldMultiplier,
+          newMultiplier,
+          announcedAt: block.timestamp,
+          announcedBlock: log.blockNumber,
+          announcedTx: log.transactionHash,
+          lastAnnouncedAt: block.timestamp,
+          lastAnnouncedTx: log.transactionHash,
+          announcementCount: 1,
+          kind: 'unknown',
+          source: 'onchain:sweep',
+        })
+        .onConflictDoNothing()
+      if (inserted) found++
+    }
+  }
+
+  await context.db
+    .insert(syncMarkers)
+    .values({ chainId, key: 'multiplier-events', throughBlock: head, updatedAt: now })
+    .onConflictDoUpdate(() => ({ throughBlock: head, updatedAt: now }))
+  console.log(`[exdate] gap sweep ${from}-${head}: ${found} new event(s)`)
+}
 
 /**
  * Seed the multiplier events found by the full-chain scan.

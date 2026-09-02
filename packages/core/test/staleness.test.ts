@@ -38,7 +38,7 @@ describe('feed health', () => {
     expect(health.beyondHeartbeat).toBe(false)
   })
 
-  it('reports paused over stale, and still reports the age', () => {
+  it('reports paused over live, and still reports the age', () => {
     const health = feedHealth({
       updatedAt: at('2026-09-01T18:46:04Z'),
       nowSeconds: NOW,
@@ -46,12 +46,30 @@ describe('feed health', () => {
     })
     expect(health.status).toBe('paused')
     expect(health.ageSeconds).toBeGreaterThan(0)
+    expect(health.beyondHeartbeat).toBe(false)
+  })
+
+  it('reports paused over stale, and still says the heartbeat is missed', () => {
+    // The round is a day and a bit old AND the oracle is paused. Paused wins for
+    // display because it is a deliberate window; beyondHeartbeat stays true so
+    // a caller keeping its own staleness guard is not misled.
+    const health = feedHealth({
+      updatedAt: NOW - 90_000n,
+      nowSeconds: NOW,
+      oraclePaused: true,
+    })
+    expect(health.status).toBe('paused')
+    expect(health.beyondHeartbeat).toBe(true)
   })
 
   it('is unknown, never zero, when no round exists', () => {
+    const health = feedHealth({ updatedAt: 0n, nowSeconds: NOW })
+    expect(health.status).toBe('unknown')
+    expect(health.ageSeconds).toBeUndefined()
+    // Not false: "within the heartbeat" is a claim about a round that does not
+    // exist, and the status page used to render it as "no".
+    expect(health.beyondHeartbeat).toBeUndefined()
     expect(feedHealth({ updatedAt: undefined, nowSeconds: NOW }).status).toBe('unknown')
-    expect(feedHealth({ updatedAt: 0n, nowSeconds: NOW }).status).toBe('unknown')
-    expect(feedHealth({ updatedAt: 0n, nowSeconds: NOW }).ageSeconds).toBeUndefined()
   })
 
   it('accepts a caller-supplied heartbeat', () => {
