@@ -190,19 +190,28 @@ Observed step range: **+0.64 bps (DELL) to +214.86 bps (CCL)**, plus CRWD at ×4
 **SGOV is the reference token**: three chained events (1.0 → 1.000957 → 1.002981 → 1.005101),
 which makes it the right fixture for reconciliation tests.
 
-First reconciliation against the issuer's own rates (`docs/phase-0-verification.md` §12), price =
-Chainlink round at `effectiveAt`, confidence `low`:
+Reconciliation against the issuer's own rates, price = Chainlink round at `effectiveAt`, all rows
+`confidence: low`. Live at `GET /v1/:chain/reconciliations`; rebuild offline with
+`node scripts/build-reconciliations.mjs`.
 
-| Token | Gross | Received | Haircut | Status |
-|---|---|---|---|---|
-| AAPL | $0.27 | $0.1728 | **36.0 %** | matched |
-| SGOV | $0.306812 | $0.2034 | **33.7 %** | matched |
-| ASML | $1.817086 | $0.1749 | 90.4 % | anomaly |
-| COST, CCL | — | no feed | — | anomaly (implied price far from spot) |
-| BND, SHY, UMC, SIMO, FIX, CTSH, HWM | — | `COMPLETED` by issuer, multiplier still 1.0 | — | **pending** (BND: 4 weeks) |
+| Token | Gross | Received | Haircut | Implied ÷ spot | Status |
+|---|---|---|---|---|---|
+| AAPL | $0.27 | $0.1728 | **36.0 %** | 1.47 | matched |
+| SGOV | $0.306812 | $0.2034 | **33.7 %** | 1.51 | matched |
+| ASML | $1.817086 | $0.1749 | 90.4 % | 10.7 | anomaly |
+| COST | $1.47 | no feed | — | 2.58 | anomaly |
+| CCL | $0.15 | no feed | — | 0.30 | anomaly |
+| F | $0.15 | no feed | — | 74.5 | anomaly |
+| BND, SHY, UMC, SIMO, FIX, CTSH, HWM | — | `COMPLETED` by issuer, multiplier still 1.0 | — | — | **pending** (BND: 4 weeks) |
 
 Mid-30s on two independent tokens is consistent with 30 % US non-resident withholding plus
 something unexplained. Report the observed number; never claim the decomposition.
+
+**The implied-price ratio is the discriminator that survives having no oracle.** A step that really
+was a reinvestment implies a price near spot: the two matched rows land at 1.47 and 1.51, every
+anomaly is far outside. It uses `/rhj/prices`, which covers all 194 tokens, so it works for the 159
+with no Chainlink feed. It is a plausibility check and never a reconciliation input — it is today's
+price, not the price at `effectiveAt`.
 
 ## Stack
 
@@ -218,6 +227,16 @@ pnpm workspaces:
 
 Vitest lives in `packages/core`: 68 tests on raw↔UI conversion, reconciliation, staleness, NFT log
 filtering and the transport. `pnpm test`.
+
+**Historical prices need no archive node.** `packages/core/src/rounds.ts` binary-searches an
+aggregator's own round history, which is readable from the head — about twelve reads per event, and
+each row is priced once. It reports whether it hit the current phase's floor, because "the price at
+your instant" and "the oldest price this phase has" must not read alike.
+
+**The reconcile pass runs at the START of the poll cycle.** Ponder buffers writes made inside an
+indexing function, so a `db.sql` read issued later in the same handler cannot see rows written
+earlier in it. Reading last cycle's committed state costs one poll interval of latency on a
+dividend that settled days ago.
 
 **Two-tier indexing, forced by the RPC (see "Known traps").**
 
@@ -289,17 +308,22 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
       renders real mainnet data, 68 tests green. API: `/v1/health`, `/v1/chains`,
       `/v1/:chain/tokens`, `/v1/:chain/tokens/:address`, `/v1/:chain/events`, `/v1/status`,
       `/v1/calendar`.
-- [ ] M2 net yield + calendar — `/v1/calendar` already serves the issuer's 31 upcoming rows; the
-      yield endpoint and the `confidence` surface are still to build
-- [ ] M3 reconciliation + pending dividend — the maths is in `packages/core/src/reconcile.ts` and
-      unit-tested against AAPL/SGOV/ASML/CCL/BND; the `reconciliations` table is not written yet
+- [ ] M2 net yield + calendar — `/v1/calendar` serves the issuer's upcoming rows; the `/yield`
+      endpoint shape is under design (a four-way judge panel is running)
+- [x] **M3 reconciliation** — `reconciliations` table computed live by the poller and served at
+      `/v1/:chain/reconciliations`; the observed haircut and the never-applied dividends are on the
+      status page. Remaining for M3: `/v1/:chain/tokens/:addr/pending`.
 - [ ] M4 signed webhooks
 - [ ] M5 SDK + docs
 
-### Known gaps in M1
+### Known gaps
 
-- `multiplier_events.kind` is always `unknown`: nothing joins the issuer's corporate actions to the
-  onchain events yet. That join is M3.
+- `multiplier_events.kind` is still always `unknown`. The pairing now exists in
+  `packages/core/src/pairing.ts`, so writing the issuer's action type back onto the event row is a
+  small remaining step.
 - `feed_rounds` accumulates one row per distinct Chainlink round and nothing prunes it.
 - The poller re-reads all 194 tokens every interval; only rows that changed need writing.
-- No `reconciliations` table yet, so the haircut is computable but not served.
+- No `/v1/:chain/tokens/:addr/pending` endpoint yet — the data behind it is in `reconciliations`.
+- `packages/api` and `packages/indexer` still have no tests of their own.
+- The reconciliation covers cash dividends only. A split matched to a step is written as
+  `unsupported_action_type` rather than forced through a per-share model that does not fit it.

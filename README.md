@@ -55,7 +55,14 @@ node scripts/phase0/check-corporate-actions.mjs # issuer dividends vs onchain st
 node scripts/phase0/feed-price-at.mjs <feed> <iso> # Chainlink price at an instant, no archive
 node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
 node scripts/backfill-multiplier-events.mjs    # full-chain event scan, 26 requests
+node scripts/build-reconciliations.mjs         # declared vs observed, priced at effectiveAt
 node scripts/generate-registry.mjs             # snapshots -> typed module
+```
+
+Live checks against mainnet, opt-in so the unit suite never needs the network:
+
+```bash
+EXDATE_INTEGRATION=1 pnpm --filter @exdate/core test
 ```
 
 Committed artifacts, all first-party or read from the chain:
@@ -67,6 +74,7 @@ Committed artifacts, all first-party or read from the chain:
 | `data/chainlink-feeds.snapshot.json` | 57 Chainlink feeds on Robinhood Chain |
 | `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`** |
 | `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
+| `data/reconciliations.observed.json` | every declared action against the step it produced, priced at `effectiveAt` |
 
 ## API
 
@@ -76,6 +84,7 @@ GET /v1/chains                             supported chains
 GET /v1/:chain/tokens                      every token: multiplier, scheduled update, feed state
 GET /v1/:chain/tokens/:addr                one token plus its full event history
 GET /v1/:chain/events                      every multiplier event, newest first
+GET /v1/:chain/reconciliations             declared vs observed, per action  ?token= ?status=
 GET /v1/status                             every feed: live, stale, paused, and how many have none
 GET /v1/calendar                           issuer corporate actions + pending on-chain updates
 ```
@@ -88,7 +97,6 @@ Not built yet:
 ```
 GET /v1/:chain/tokens/:addr/yield          gross, observed, implied haircut, confidence   (M2)
 GET /v1/:chain/tokens/:addr/pending        dividend owed but not yet reflected            (M3)
-GET /v1/reconciliations                    expected vs observed, per event                (M3)
 ```
 
 Webhooks (M4): `multiplier.scheduled`, `multiplier.applied`, `feed.stale`, `feed.resumed`,
