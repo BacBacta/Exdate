@@ -80,6 +80,7 @@ export interface YieldInput {
   token: YieldTokenState
   reconciliations: readonly YieldReconciliationRow[]
   events: readonly YieldEventRow[]
+  /** The committed full-chain scan; the live indexer and the gap sweep cover everything after it. */
   scan: { fromBlock: number; throughBlock: number; scannedAt: string }
   nowSeconds: bigint
   matchWindowDays: number
@@ -115,6 +116,14 @@ export function buildYieldLedger(input: YieldInput) {
 
   const ledger = rows.map((row) => {
     const event = row.effectiveAt !== null ? eventsByEffectiveAt.get(row.effectiveAt) : undefined
+    // The stored step, or the same identity recomputed from the two multipliers
+    // beside it: the ledger must not report a step as absent when both ends of
+    // it are printed on the row.
+    const stepWad =
+      row.observedStepWad ??
+      (row.oldMultiplier !== null && row.newMultiplier !== null && row.oldMultiplier > 0n
+        ? ((row.newMultiplier - row.oldMultiplier) * WAD) / row.oldMultiplier
+        : null)
     const kind = row.status === 'matched' || row.status === 'anomaly' ? kindFromCorporateActionType(row.actionType) : 'unknown'
     const pairedDividend = row.status === 'matched' && kind === 'dividend'
     const underlying =
@@ -131,7 +140,7 @@ export function buildYieldLedger(input: YieldInput) {
       key:
         row.effectiveAt !== null
           ? `${token.chainId}:${token.address.toLowerCase()}:${row.effectiveAt}`
-          : `${token.chainId}:${token.address.toLowerCase()}:${row.actionType ?? 'ACTION'}:${row.processDate ?? 'undated'}`,
+          : `${token.chainId}:${token.address.toLowerCase()}:action:${row.actionId ?? row.id}`,
       status: row.status,
       overdue,
       /** Never inferred from magnitude: DELL's dividend is +0.64 bps, CCL's +214.86, CRWD's split +30 000. */
@@ -152,8 +161,8 @@ export function buildYieldLedger(input: YieldInput) {
               announcementCount: event?.announcementCount ?? null,
               oldMultiplier: row.oldMultiplier?.toString() ?? null,
               newMultiplier: row.newMultiplier?.toString() ?? null,
-              stepWad: row.observedStepWad?.toString() ?? null,
-              stepBps: row.observedStepWad === null ? null : bpsOf(row.observedStepWad),
+              stepWad: stepWad?.toString() ?? null,
+              stepBps: stepWad === null ? null : bpsOf(stepWad),
               /**
                * Equal to stepBps, and only stated when the step is a paired
                * dividend. A holder of R raw tokens holds R*m underlying shares at
@@ -162,7 +171,7 @@ export function buildYieldLedger(input: YieldInput) {
                * feed - but a split produces the same identity with no economic
                * gain, which is why an unclassified step does not get the name.
                */
-              netYieldBps: pairedDividend && row.observedStepWad !== null ? bpsOf(row.observedStepWad) : null,
+              netYieldBps: pairedDividend && stepWad !== null ? bpsOf(stepWad) : null,
               tx: event?.announcedTx ?? null,
               block: event?.announcedBlock?.toString() ?? null,
               source: event?.source ?? 'onchain:UIMultiplierUpdated',
@@ -208,7 +217,7 @@ export function buildYieldLedger(input: YieldInput) {
 
       result: {
         grossYieldBps: row.expectedStepWad === null ? null : bpsOf(row.expectedStepWad),
-        netYieldBps: pairedDividend && row.observedStepWad !== null ? bpsOf(row.observedStepWad) : null,
+        netYieldBps: pairedDividend && stepWad !== null ? bpsOf(stepWad) : null,
         haircutBps: row.priceWad !== null && row.rate !== null ? row.impliedHaircutBps : null,
         receivedPerShare: decimal(row.receivedPerShareWad),
         /** Present with no feed at all - that is the point of it. */
@@ -242,9 +251,12 @@ export function buildYieldLedger(input: YieldInput) {
     BigInt(Math.floor(Date.parse(last.observed.effectiveAt as string) / 1000)) > token.sampledAt
 
   const coverage = {
+    /** The committed scan of every UIMultiplierUpdated log, block by block. */
     scannedFromBlock: scan.fromBlock,
     scannedThroughBlock: scan.throughBlock,
     scannedAt: scan.scannedAt,
+    /** From here the gap sweep and the live indexer take over; `closes` is what proves nothing fell between. */
+    liveFromBlock: scan.throughBlock + 1,
     multiplierAtWindowStart,
     multiplierNow,
     multiplierNowSource: token.sampledAt === null ? null : `onchain:uiMultiplier(), polled ${iso(token.sampledAt)}`,
@@ -314,7 +326,7 @@ export function buildYieldLedger(input: YieldInput) {
     {
       field: 'trailingTwelveMonthYield',
       reasonCode: 'window_shorter_than_period',
-      detail: `on-chain history starts at block ${scan.fromBlock} (2026-07-01); most of a twelve-month figure would be extrapolation`,
+      detail: `the scan starts at block ${scan.fromBlock} and the chain's public mainnet opened on 2026-07-01, so fewer than twelve months exist to measure; most of such a figure would be extrapolation`,
     },
     {
       field: 'forwardYield',
@@ -359,7 +371,7 @@ export function buildYieldLedger(input: YieldInput) {
       answerIncludesMultiplier: token.feedProxy === null ? null : true,
       warning:
         token.feedProxy === null
-          ? 'this token has no Chainlink feed; 159 of 194 do not'
+          ? 'this token has no Chainlink feed; most Stock Tokens do not (GET /v1/status carries the count)'
           : 'Chainlink publishes Token Price = Underlying Equity Market Price x Multiplier. Multiplying this answer by uiMultiplier() double-counts every step in this ledger.',
     },
   }

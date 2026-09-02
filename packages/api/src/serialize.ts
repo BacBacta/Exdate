@@ -189,6 +189,8 @@ export function serializeMultiplierEvent(row: MultiplierEventRow, nowSeconds: bi
 export function serializeCorporateAction(row: CorporateActionRow) {
   return {
     id: row.id,
+    /** The issuer's own id. Monthly payers (SGOV, SHY, BND) reuse it every month. */
+    issuerId: row.issuerId,
     chainId: row.chainId,
     token: row.token,
     symbol: row.symbol,
@@ -234,6 +236,7 @@ export function serializeReconciliation(row: ReconciliationRow) {
       row.actionId === null
         ? null
         : {
+            /** The issuer's id, which names a series for monthly payers; with processDate it names the payment. */
             actionId: row.actionId,
             type: row.actionType,
             status: row.actionStatus,

@@ -52,6 +52,7 @@ export async function runReconcilePass(
     .filter((row) => row.chainId === chainId)
     .map((row) => ({
       id: row.id,
+      issuerId: row.issuerId,
       token: row.token as Address | null,
       processDate: row.processDate,
       symbol: row.symbol,
@@ -133,7 +134,7 @@ export async function runReconcilePass(
       computedAt: now,
       token: action.token ?? null,
       symbol: action.symbol,
-      actionId: action.id,
+      actionId: action.issuerId,
       actionType: action.type,
       actionStatus: action.status,
       processDate: action.processDate ?? null,
@@ -176,6 +177,12 @@ export async function runReconcilePass(
       effectiveAt: change.effectiveAt,
       oldMultiplier: change.oldMultiplier,
       newMultiplier: change.newMultiplier,
+      // The step is a fact about the chain, not about the pairing: an unmatched
+      // row still has one, and the yield ledger compounds it as unexplained growth.
+      observedStepWad:
+        change.oldMultiplier === 0n
+          ? null
+          : ((change.newMultiplier - change.oldMultiplier) * 10n ** 18n) / change.oldMultiplier,
       status: 'unmatched',
       confidence: 'low',
       note: "no issuer corporate action explains this step - the issuer's feed only keeps about a month of history",
@@ -199,7 +206,7 @@ export async function runReconcilePass(
       computedAt: now,
       token: change.token,
       symbol: action.symbol,
-      actionId: action.id,
+      actionId: action.issuerId,
       actionType: action.type,
       actionStatus: action.status,
       processDate: action.processDate ?? null,

@@ -176,8 +176,13 @@ export const pauseEvents = onchainTable(
 export const corporateActions = onchainTable(
   'corporate_actions',
   (t) => ({
-    /** The issuer's own uid, stable across chains. */
+    /**
+     * `${issuerId}:${processDate}`. The issuer's id alone is not unique: it
+     * names a dividend series, and SGOV, SHY and BND reuse it every month.
+     */
     id: t.text().primaryKey(),
+    /** The issuer's own uid, as GET /rhj/corporate-actions states it. */
+    issuerId: t.text().notNull(),
     chainId: t.integer().notNull(),
     token: t.hex(),
     symbol: t.text().notNull(),
@@ -218,13 +223,14 @@ export const corporateActions = onchainTable(
 export const reconciliations = onchainTable(
   'reconciliations',
   (t) => ({
-    /** The issuer's action id, or `${token}:${effectiveAt}` for an unmatched step. */
+    /** The corporate_actions row id, or `${token}:${effectiveAt}` for an unmatched step. */
     id: t.text().primaryKey(),
     chainId: t.integer().notNull(),
     token: t.hex(),
     symbol: t.text().notNull(),
 
     // --- traditional side, from GET /rhj/corporate-actions -------------------
+    /** The issuer's id. Names a series for monthly payers, so not unique on its own. */
     actionId: t.text(),
     actionType: t.text(),
     actionStatus: t.text(),

@@ -108,6 +108,10 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   `node scripts/phase0/check-corporate-actions.mjs`.
 - **History is ~1 month deep** (oldest row 2026-08-05). Snapshot it continuously; the archive is
   ours to keep. The five July actions (CRWD, SGOV, MU, ORCL, DELL) need a one-off manual seed.
+- **The issuer's `id` names a dividend series, not a payment.** SGOV, SHY and BND carry the same
+  `id` on their August and September rows, with a different `processDate`, `rate` and `status` on
+  each (3 of 40 ids in the 2026-09-02 snapshot). One action is `(id, processDate)`; keying on `id`
+  alone silently dropped the pending month.
 - `processDate` ≠ ex-date ≠ pay-date. Empirically the onchain `effectiveAt` lands the **next
   business day at ~15:10 UTC**. Match on address + 0–4 day window.
 - Rate limiting is real despite the documented 60 req/s: `/prices` returns the plain-text body
@@ -290,7 +294,8 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   current product, and need a paid archive RPC.
 - 2026-09-02 — **Proposed, pending human greenlight**: the corporate-actions source is the
   issuer's own `GET /rhj/corporate-actions`, snapshotted on every poll. No market-data vendor.
-  `corporate_actions.source = 'robinhood:/rhj/corporate-actions'`, keep the issuer `id`.
+  `corporate_actions.source = 'robinhood:/rhj/corporate-actions'`, keep the issuer `id`
+  (as `issuer_id` — see the 2026-09-02 series-id entry below).
 - 2026-09-02 — No archive RPC before a transfer indexer exists. Nothing in M1–M3 needs one.
 - 2026-09-02 — **Greenlit by the human**: the four proposals above are accepted. M1 built on them.
 - 2026-09-02 — **Two-tier indexing**, forced by measurement, not preference: Ponder's sync loop
@@ -302,6 +307,17 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - 2026-09-02 — The API lives in `packages/api` as Hono routes over a `Repository` interface and is
   mounted by the indexer's `src/api/index.ts`. One implementation, served next to the data in dev,
   still deployable on its own later.
+- 2026-09-02 — `corporate_actions.id = issuerId:processDate`, `issuer_id` kept as a column;
+  `pairing.ts` keys one-to-one bookkeeping on the same pair. Cause: the issuer's `id` is a series
+  id (SGOV/SHY/BND), and the live table had lost the three pending September rows to it.
+- 2026-09-02 — `/v1/:chain/tokens/:addr/yield` is a **distribution ledger**, not a rate. Chosen by
+  a three-judge panel over four independent designs (2/3 for "the ledger", with the runner-up's
+  explicit `underlyingPrice` derivation, dividend / unexplained growth split and typed refusals
+  grafted on). `netYieldBps` exists only on a step paired with an issuer cash dividend; `totals`
+  exist only when the ledger *closes* (last step's `newMultiplier == uiMultiplier()` at the head);
+  annualised, trailing and forward figures are absent from the shape and listed under
+  `notComputed` with a reason code. Library `packages/core/src/yield.ts`, tests on SGOV's real
+  three-step history.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -311,8 +327,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
       renders real mainnet data, tests green. API: `/v1/health`, `/v1/chains`,
       `/v1/:chain/tokens`, `/v1/:chain/tokens/:address`, `/v1/:chain/events`, `/v1/status`,
       `/v1/calendar`.
-- [ ] M2 net yield + calendar — `/v1/calendar` serves the issuer's upcoming rows; the `/yield`
-      endpoint shape is under design (a four-way judge panel is running)
+- [x] **M2 net yield + calendar** — `/v1/calendar` serves the issuer's upcoming rows;
+      `/v1/:chain/tokens/:addr/yield` serves the distribution ledger (see decision log). The status
+      page does not render the ledger yet.
 - [x] **M3 reconciliation** — `reconciliations` table computed live by the poller and served at
       `/v1/:chain/reconciliations`; the observed haircut and the never-applied dividends are on the
       status page. Remaining for M3: `/v1/:chain/tokens/:addr/pending`.
@@ -327,6 +344,8 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - `feed_rounds` accumulates one row per distinct Chainlink round and nothing prunes it.
 - The poller re-reads all 194 tokens every interval; only rows that changed need writing.
 - No `/v1/:chain/tokens/:addr/pending` endpoint yet — the data behind it is in `reconciliations`.
-- `packages/api` and `packages/indexer` still have no tests of their own.
+- `packages/indexer` has no tests of its own (the poller, the sweep and the reconcile pass are
+  only exercised by running it). `packages/api` has route and serializer tests.
+- The status page does not surface `/yield`; the ledger is API-only for now.
 - The reconciliation covers cash dividends only. A split matched to a step is written as
   `unsupported_action_type` rather than forced through a per-share model that does not fit it.

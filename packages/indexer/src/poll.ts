@@ -414,8 +414,12 @@ async function ingestCorporateActions(context: PollContext, chainId: number, now
       ? `${action.processDate.year}-${String(action.processDate.month).padStart(2, '0')}-${String(action.processDate.day).padStart(2, '0')}`
       : null
 
+    // The issuer's id is a series id - SGOV's August and September dividends
+    // share it - so a row is (id, processDate). Keying on id alone kept one of
+    // the two and silently lost the pending one.
     const values = {
-      id: action.id,
+      id: `${action.id}:${processDate ?? 'undated'}`,
+      issuerId: action.id,
       chainId,
       token: (deployment?.contractAddress ?? null) as Address | null,
       symbol: action.tokenSymbol,
@@ -436,7 +440,6 @@ async function ingestCorporateActions(context: PollContext, chainId: number, now
       .values(values)
       .onConflictDoUpdate(() => ({
         status: values.status,
-        processDate: values.processDate,
         rate: values.rate,
         oldRate: values.oldRate,
         newRate: values.newRate,

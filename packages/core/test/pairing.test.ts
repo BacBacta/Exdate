@@ -206,3 +206,32 @@ describe('lagDays', () => {
     expect(lagDays('not-a-date', at('2026-08-14T15:12:46Z'))).toBeNull()
   })
 })
+
+describe('the issuer id names a series, not a payment', () => {
+  // Real rows from GET /rhj/corporate-actions on 2026-09-02: SGOV's August
+  // (COMPLETED, 0.306812) and September (IN_PROGRESS, 0.307098) dividends carry
+  // the same id. SHY and BND do the same. Keying on the id alone let August's
+  // match mark September's action as used, and the pending row vanished.
+  const SERIES = '0x000000000000000000000000000000005f7e82ad6e4c4b60ba76497863fe4a67'
+  const august = { id: SERIES, token: SGOV, processDate: '2026-08-06', rate: '0.306812' }
+  const september = { id: SERIES, token: SGOV, processDate: '2026-09-04', rate: '0.307098' }
+  const augustStep = { token: SGOV.toLowerCase(), effectiveAt: at('2026-08-07T15:10:24Z') }
+
+  it('pairs the completed month and still reports the next month as pending', () => {
+    const pairing = pairActionsWithChanges([september, august], [augustStep])
+    expect(pairing.matched).toHaveLength(1)
+    expect(pairing.matched[0]!.action.rate).toBe('0.306812')
+    expect(pairing.unmatchedActions).toEqual([september])
+    expect(pairing.unmatchedChanges).toHaveLength(0)
+  })
+
+  it('gives each month its own step once both have landed', () => {
+    const septemberStep = { token: SGOV.toLowerCase(), effectiveAt: at('2026-09-08T15:10:24Z') }
+    const pairing = pairActionsWithChanges([august, september], [septemberStep, augustStep])
+    expect(pairing.matched.map(({ action, change }) => [action.processDate, change.effectiveAt])).toEqual([
+      ['2026-08-06', augustStep.effectiveAt],
+      ['2026-09-04', septemberStep.effectiveAt],
+    ])
+    expect(pairing.unmatchedActions).toHaveLength(0)
+  })
+})

@@ -2941,5 +2941,6 @@ export const SCANNED_MULTIPLIER_EVENTS: readonly ScannedMultiplierEvent[] = [
   }
 ] as const
 
+export const SCAN_FROM_BLOCK = 900000
 export const SCAN_THROUGH_BLOCK = 52672800
 export const SCANNED_AT = "2026-09-02T15:13:53.064Z"

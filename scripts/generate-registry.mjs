@@ -96,6 +96,7 @@ export interface ScannedMultiplierEvent {
 
 export const SCANNED_MULTIPLIER_EVENTS: readonly ScannedMultiplierEvent[] = ${JSON.stringify(scan.events, null, 2)} as const
 
+export const SCAN_FROM_BLOCK = ${JSON.stringify(scan.scannedFromBlock)}
 export const SCAN_THROUGH_BLOCK = ${JSON.stringify(scan.scannedThroughBlock)}
 export const SCANNED_AT = ${JSON.stringify(scan.scannedAt)}
 `

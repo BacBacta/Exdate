@@ -15,7 +15,11 @@
  */
 
 export interface PairableAction {
-  /** The issuer's own uid. */
+  /**
+   * The issuer's own uid. It names a dividend series, not a payment: SGOV, SHY
+   * and BND carry the same id on their August and September rows, with a
+   * different processDate and rate on each. One action is (id, processDate).
+   */
   id: string
   /** Contract address on this chain, or null when the action names no deployment. */
   token: string | null
@@ -49,6 +53,9 @@ export interface Pairing<A extends PairableAction, C extends PairableChange> {
  */
 export const MATCH_WINDOW_DAYS = 4
 
+/** What makes an action unique: the issuer id alone does not (see PairableAction). */
+export const actionKey = (action: PairableAction) => `${action.id}:${action.processDate ?? ''}`
+
 /**
  * Pair actions with changes, one-to-one, nearest first.
  *
@@ -81,10 +88,10 @@ export function pairActionsWithChanges<A extends PairableAction, C extends Paira
     }
   }
 
-  // Shortest lag wins; ties break on the issuer id so the result is deterministic.
+  // Shortest lag wins; ties break on the action key so the result is deterministic.
   candidates.sort((a, b) =>
     a.lagSeconds === b.lagSeconds
-      ? a.action.id.localeCompare(b.action.id)
+      ? actionKey(a.action).localeCompare(actionKey(b.action))
       : a.lagSeconds < b.lagSeconds
         ? -1
         : 1,
@@ -96,17 +103,17 @@ export function pairActionsWithChanges<A extends PairableAction, C extends Paira
   const matched: { action: A; change: C }[] = []
 
   for (const candidate of candidates) {
-    if (usedActions.has(candidate.action.id)) continue
+    if (usedActions.has(actionKey(candidate.action))) continue
     const key = changeKey(candidate.change)
     if (usedChanges.has(key)) continue
-    usedActions.add(candidate.action.id)
+    usedActions.add(actionKey(candidate.action))
     usedChanges.add(key)
     matched.push({ action: candidate.action, change: candidate.change })
   }
 
   return {
     matched,
-    unmatchedActions: actions.filter((action) => !usedActions.has(action.id)),
+    unmatchedActions: actions.filter((action) => !usedActions.has(actionKey(action))),
     unmatchedChanges: changes.filter((change) => !usedChanges.has(changeKey(change))),
   }
 }

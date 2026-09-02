@@ -1,4 +1,14 @@
-import { CHAINS, REGISTRY_GENERATED_AT, feedHealth, resolveChain } from '@exdate/core'
+import {
+  CHAINS,
+  MATCH_WINDOW_DAYS,
+  REGISTRY_GENERATED_AT,
+  SCANNED_AT,
+  SCAN_FROM_BLOCK,
+  SCAN_THROUGH_BLOCK,
+  buildYieldLedger,
+  feedHealth,
+  resolveChain,
+} from '@exdate/core'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import {
@@ -66,6 +76,43 @@ export function createApi({ repository, now = () => BigInt(Math.floor(Date.now()
       token: serializeToken(row, { nowSeconds, explorerUrl: chain.explorerUrl }),
       events: events.map((event) => serializeMultiplierEvent(event, nowSeconds)),
     })
+  })
+
+  /**
+   * The distribution ledger for one token: every observed multiplier step and
+   * every declared action, each with its own gross, received and haircut. No
+   * rate is computed from it - see `notComputed` in the response for why.
+   */
+  app.get('/v1/:chain/tokens/:address/yield', async (c) => {
+    const chain = resolveChain(c.req.param('chain'))
+    if (!chain) return c.json(unknownChain, 404)
+    const address = c.req.param('address')
+    const row = await repository.token(chain.id, address)
+    if (!row) return c.json({ error: 'unknown token', chainId: chain.id, address }, 404)
+    const [rows, events] = await Promise.all([
+      repository.reconciliations(chain.id, address),
+      repository.multiplierEvents(chain.id, address),
+    ])
+    return c.json(
+      buildYieldLedger({
+        token: {
+          chainId: row.chainId,
+          address: row.address,
+          symbol: row.symbol,
+          decimals: row.decimals,
+          issuer: row.issuer,
+          uiMultiplier: row.uiMultiplier,
+          sampledAt: row.sampledAt,
+          feedProxy: row.feedProxy,
+          feedVerified: row.feedVerified,
+        },
+        reconciliations: rows,
+        events,
+        scan: { fromBlock: SCAN_FROM_BLOCK, throughBlock: SCAN_THROUGH_BLOCK, scannedAt: SCANNED_AT },
+        nowSeconds: now(),
+        matchWindowDays: MATCH_WINDOW_DAYS,
+      }),
+    )
   })
 
   app.get('/v1/:chain/events', async (c) => {

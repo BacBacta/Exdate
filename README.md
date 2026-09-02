@@ -10,11 +10,10 @@ exdate indexes what actually happens: every multiplier update, every corporate a
 that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
 and the health of every Chainlink feed.
 
-> **Status: M1 and the core of M3 shipped.** The indexer, the API, the reconciliation table and
+> **Status: M1, M2 and the core of M3 shipped.** The indexer, the API, the reconciliation table and
 > the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
-> feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 46 reconciliation rows. The
-> yield endpoint, the pending-dividend endpoint, the webhooks and the SDK are not built yet — they
-> are marked below.
+> feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 49 reconciliation rows. The
+> pending-dividend endpoint, the webhooks and the SDK are not built yet — they are marked below.
 > Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
@@ -86,6 +85,8 @@ GET /v1/:chain/tokens                      every token: multiplier, scheduled up
 GET /v1/:chain/tokens/:addr                one token plus its full event history
 GET /v1/:chain/events                      every multiplier event, newest first
 GET /v1/:chain/reconciliations             declared vs observed, per action  ?token= ?status=
+GET /v1/:chain/tokens/:addr/yield          the distribution ledger: per-payment gross, received,
+                                           haircut; growth split dividend / unexplained; no rate
 GET /v1/status                             every feed: live, stale, paused, and how many have none
 GET /v1/calendar                           issuer corporate actions + pending on-chain updates
 ```
@@ -93,10 +94,14 @@ GET /v1/calendar                           issuer corporate actions + pending on
 `:chain` accepts `robinhood` or `4663`. Every bigint is a decimal string; anything unobserved is
 `null`, never `0`.
 
+`/yield` is a ledger, not a rate. It carries one row per observed multiplier step and per declared
+action, calls a step *yield* only when it is paired with an issuer cash dividend, and lists every
+figure it refuses to compute (`annualizedYield`, `trailingTwelveMonthYield`, `forwardYield`) with a
+reason code. Nothing in it is per annum.
+
 Not built yet:
 
 ```
-GET /v1/:chain/tokens/:addr/yield          gross, observed, implied haircut, confidence   (M2)
 GET /v1/:chain/tokens/:addr/pending        dividend owed but not yet reflected            (M3)
 ```
 

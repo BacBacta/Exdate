@@ -65,7 +65,9 @@ export interface MultiplierEventRow {
 }
 
 export interface CorporateActionRow {
+  /** `${issuerId}:${processDate}` - the issuer's id alone names a series, not a payment. */
   id: string
+  issuerId: string
   chainId: number
   token: Address | null
   symbol: string
