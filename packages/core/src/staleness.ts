@@ -58,6 +58,49 @@ export function feedHealth(input: FeedHealthInput): FeedHealth {
 }
 
 /**
+ * What the poller should record when the pause flag it reads differs from the
+ * one it read last time.
+ *
+ * Three cases, and the first is the one that is easy to get wrong: a token that
+ * is ALREADY paused the first time exdate looks has not just been paused. Its
+ * pause started at an unknown moment before the first observation, so it is a
+ * baseline - recorded, but never sent as a transition, or every restart would
+ * announce a pause that did not happen.
+ *
+ * A read that failed is `undefined` and yields null: exdate did not observe
+ * anything, and "not observed" is not "unchanged".
+ */
+export function pauseTransition(
+  previous: boolean | null | undefined,
+  current: boolean | undefined,
+): 'baseline' | 'paused' | 'resumed' | null {
+  if (current === undefined) return null
+  if (previous === undefined || previous === null) return current ? 'baseline' : null
+  if (previous === current) return null
+  return current ? 'paused' : 'resumed'
+}
+
+/**
+ * The same question for feed health, which changes by the clock passing rather
+ * than by anything arriving - so the transition only exists against the
+ * previous poll's verdict, and the first observation of a stale feed is not a
+ * feed going stale.
+ */
+export function feedStatusTransition(
+  previous: FeedStatus | null | undefined,
+  current: FeedStatus,
+): 'stale' | 'resumed' | null {
+  if (previous === undefined || previous === null) return null
+  if (previous === current) return null
+  if (previous === 'live' && current === 'stale') return 'stale'
+  if (previous === 'stale' && current === 'live') return 'resumed'
+  // Anything involving 'unknown' or 'paused' is not a staleness transition:
+  // a feed that stops being readable has not gone stale, and a paused oracle is
+  // a corporate-action window that pause.changed already reports.
+  return null
+}
+
+/**
  * Is this price safe to act on at `nowSeconds`, given a caller's own tolerance?
  * Callers should pass their real risk bound - the 86 400 s heartbeat is a
  * publication guarantee, not a freshness guarantee.

@@ -99,6 +99,101 @@ export function haircutBpsPrecise(rateWad: bigint, receivedWad: bigint): number 
   return Number(((rateWad - receivedWad) * 1_000_000n) / rateWad) / 100
 }
 
+/**
+ * A split reconciles as a ratio, not as a per-share amount.
+ *
+ * A cash dividend is reconciled against a price; a split has no price in it at
+ * all. The issuer declares "n old shares become m new ones" and the multiplier
+ * must move by exactly m/n - an arithmetic identity with no oracle, no
+ * withholding and no room for a haircut. Which makes it the one corporate
+ * action exdate could reconcile at `high` confidence.
+ *
+ * It has never been run on real data. The only split ever observed on chain is
+ * CRWD's x4 on 2026-07-02, and its issuer row fell out of the one-month window
+ * before anything archived it, so the declared side does not exist. Nor has any
+ * split appeared in the window since: all 43 archived actions are cash
+ * dividends, so the shape the issuer uses for `oldRate`/`newRate` has never
+ * been seen either.
+ *
+ * Hence the contract: this function reconciles only when both declared rates
+ * are present and positive, and refuses otherwise. Nothing here guesses what a
+ * split payload looks like - the first real one will either satisfy this or be
+ * reported as unreconcilable, and neither outcome invents a number.
+ */
+export interface SplitReconciliation {
+  status: 'matched' | 'anomaly' | 'unsupported_action_type'
+  /** The ratio the multiplier actually moved by, WAD. Always present when the step is readable. */
+  observedRatioWad: bigint | undefined
+  /** The ratio the issuer declared, WAD, when it declared one. */
+  declaredRatioWad: bigint | undefined
+  /** Signed difference in basis points, observed against declared. */
+  differenceBps: number | undefined
+  note: string
+}
+
+export function reconcileSplit(input: {
+  /** Shares before, as the issuer states them. */
+  oldRate: string | null | undefined
+  /** Shares after. */
+  newRate: string | null | undefined
+  oldMultiplier: bigint
+  newMultiplier: bigint
+  /** How close is close enough. One basis point by default: this is arithmetic, not a market. */
+  toleranceBps?: number
+}): SplitReconciliation {
+  const { oldRate, newRate, oldMultiplier, newMultiplier, toleranceBps = 1 } = input
+
+  const observedRatioWad =
+    oldMultiplier > 0n ? (newMultiplier * WAD) / oldMultiplier : undefined
+
+  if (!oldRate || !newRate) {
+    return {
+      status: 'unsupported_action_type',
+      observedRatioWad,
+      declaredRatioWad: undefined,
+      differenceBps: undefined,
+      note:
+        'matched to a step, but the issuer row carries no share ratio to reconcile against; the observed ratio is stated instead',
+    }
+  }
+
+  const oldWad = parseDecimal(oldRate, 18)
+  const newWad = parseDecimal(newRate, 18)
+  if (oldWad <= 0n || newWad <= 0n) {
+    return {
+      status: 'anomaly',
+      observedRatioWad,
+      declaredRatioWad: undefined,
+      differenceBps: undefined,
+      note: 'the declared share ratio is not positive; there is nothing to reconcile',
+    }
+  }
+
+  const declaredRatioWad = (newWad * WAD) / oldWad
+  if (observedRatioWad === undefined) {
+    return {
+      status: 'anomaly',
+      observedRatioWad,
+      declaredRatioWad,
+      differenceBps: undefined,
+      note: 'the multiplier before the step is zero; the observed ratio is undefined',
+    }
+  }
+
+  const differenceBps =
+    Number(((observedRatioWad - declaredRatioWad) * 1_000_000n) / declaredRatioWad) / 100
+  const agrees = Math.abs(differenceBps) <= toleranceBps
+  return {
+    status: agrees ? 'matched' : 'anomaly',
+    observedRatioWad,
+    declaredRatioWad,
+    differenceBps,
+    note: agrees
+      ? 'the multiplier moved by exactly the declared share ratio'
+      : `the multiplier moved by ${(Number(observedRatioWad) / 1e18).toFixed(6)}x where the issuer declared ${(Number(declaredRatioWad) / 1e18).toFixed(6)}x`,
+  }
+}
+
 export type ReconciliationStatus = 'pending' | 'matched' | 'anomaly'
 export type Confidence = 'low' | 'medium' | 'high'
 

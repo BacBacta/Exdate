@@ -75,6 +75,7 @@ const tokens = assets
         status: asset.status,
         logoUrl: asset.logoUrl ?? null,
         feedProxy: feed?.feedProxy ?? null,
+        feedSvrProxy: feed?.feedSvrProxy ?? null,
         feedDecimals: feed?.feedDecimals ?? null,
         feedHeartbeatSeconds: feed?.heartbeatSeconds ?? null,
         // Ticker-derived, never issuer-confirmed. See scripts/phase0/map-feeds.mjs.
@@ -104,6 +105,12 @@ export interface RegistryToken {
   logoUrl: string | null
   /** Chainlink aggregator proxy, or null when the token has no feed at all. */
   feedProxy: Address | null
+  /**
+   * The same feed's SVR proxy. Same aggregator, same answer, same updatedAt -
+   * measured on all 35 - but a different phase, so a roundId from one proxy
+   * must never be passed to getRoundData on the other.
+   */
+  feedSvrProxy: Address | null
   feedDecimals: number | null
   feedHeartbeatSeconds: number | null
   /** False everywhere today: the pairing is derived from the ticker. */

@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-09-02T13:11:07.621Z",
-  "note": "Ticker-derived mapping (scripts/phase0/map-feeds.mjs), corroborated by scripts/phase0/verify-feed-map.mjs. `verified` stays false everywhere: no first-party, address-level statement links a token to a feed - the token contract exposes no address-shaped view at all, Chainlink's directory carries no token address, and the issuer publishes no feed. `corroborated` is behavioural evidence, see data/feed-map-verification.json.",
+  "note": "Ticker-derived mapping (scripts/phase0/map-feeds.mjs), corroborated by scripts/phase0/verify-feed-map.mjs. `verified` stays false everywhere: no first-party, address-level statement links a token to a feed - the token contract exposes no address-shaped view at all, Chainlink's directory carries no token address, and the issuer publishes no feed. `corroborated` is behavioural evidence, see data/feed-map-verification.json. Each feed is also published through an SVR proxy (feedSvrProxy): same aggregator, same answer, same updatedAt, but a different phase, so the encoded roundId is NOT portable between the two - see data/svr-proxy-check.json.",
   "tokensTotal": 194,
   "equityFeedsTotal": 35,
   "mapped": 35,
@@ -189,7 +189,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x4bDbb3150014c6Ab2C6D9347B0779c49015a2f3f"
     },
     {
       "chainId": 4663,
@@ -214,7 +215,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xF6d57763DFa625F4A413485261Ab2E71Ff4304CF"
     },
     {
       "chainId": 4663,
@@ -239,7 +241,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x9244830430bC7D9C9A48dd47603F24AD61f7c56e"
     },
     {
       "chainId": 4663,
@@ -264,7 +267,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x3eFBba343e2b1cF9ed4d4D5768e20B70307Aa8c9"
     },
     {
       "chainId": 4663,
@@ -289,7 +293,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xDB69948B26050818E8c9f43300F78b2582e67260"
     },
     {
       "chainId": 4663,
@@ -314,7 +319,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x951C5E9a2a065053035D4B812b1f6cA7e64c5102"
     },
     {
       "chainId": 4663,
@@ -339,7 +345,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xA7F7D79D578fb007384BaDF42c8E1D76a6a63bBD"
     },
     {
       "chainId": 4663,
@@ -364,7 +371,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x025Ba3B3569Ca7d15Da7BFC1648F13F06A072851"
     },
     {
       "chainId": 4663,
@@ -389,7 +397,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x288b837A17fED1aa00c1df832ef79D0C77336c10"
     },
     {
       "chainId": 4663,
@@ -414,7 +423,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xe9B94828424a8Efe6e773c28AB5Fd486851867c8"
     },
     {
       "chainId": 4663,
@@ -439,7 +449,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x26bca2a89D2D23787ada8F91B849608c51A26977"
     },
     {
       "chainId": 4663,
@@ -464,7 +475,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x42A4652D447A5B0bccF3B265bE8530b85A33b3A2"
     },
     {
       "chainId": 4663,
@@ -489,7 +501,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xA04EE5c4c8827F17e82f93bE9e19DeA221A749a8"
     },
     {
       "chainId": 4663,
@@ -514,7 +527,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x127B1DeDeE6269E962a59E6C1295b4002c56c403"
     },
     {
       "chainId": 4663,
@@ -539,7 +553,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x926D7D95E554D1e671EB2C0d238fe37a2C23A64E"
     },
     {
       "chainId": 4663,
@@ -564,7 +579,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x5cBC53D382E56cBb223f118CF8Eefb6c9c2759f5"
     },
     {
       "chainId": 4663,
@@ -589,7 +605,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xaD6D88eab22aa4867Efe807a5311Ed64962f740D"
     },
     {
       "chainId": 4663,
@@ -614,7 +631,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x2521a77F42098357e83bDea7fBb2A38745bf9280"
     },
     {
       "chainId": 4663,
@@ -639,7 +657,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x5b40F4E78FA58B60a4F59b8cc8cB8d2Fb0690467"
     },
     {
       "chainId": 4663,
@@ -664,7 +683,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xCa59A8F53bf4E0628CC0b1BD3a2216F2F8E04770"
     },
     {
       "chainId": 4663,
@@ -689,7 +709,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xCF169363636D73dbBf77733629CB38919d14232d"
     },
     {
       "chainId": 4663,
@@ -714,7 +735,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x2a07f8d87d369Bd8Bc36472337ae02d512a7b5e5"
     },
     {
       "chainId": 4663,
@@ -739,7 +761,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x8cd1DFC0fc61fcA55FA77b37e008A90f13364Fce"
     },
     {
       "chainId": 4663,
@@ -764,7 +787,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x41ed2c58611790af0760e31e80Bb427e4e83D603"
     },
     {
       "chainId": 4663,
@@ -789,7 +813,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xC9C477AEfF7eD1BB89B84F7907E2e11707491466"
     },
     {
       "chainId": 4663,
@@ -814,7 +839,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x955c60932E517B36be137Eee78E65343cBFC9D29"
     },
     {
       "chainId": 4663,
@@ -847,7 +873,8 @@
           }
         }
       },
-      "corroborated": true
+      "corroborated": true,
+      "feedSvrProxy": "0xa7a18Ca3F19E17FfA28F92302B817Ca8c1A94b06"
     },
     {
       "chainId": 4663,
@@ -872,7 +899,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xdA81cD9c76F1D3Ea32655dfFc7408ef22BB0Ee2a"
     },
     {
       "chainId": 4663,
@@ -897,7 +925,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xd1016D9Da414B13D55abe02221A8A145eB89aA0D"
     },
     {
       "chainId": 4663,
@@ -922,7 +951,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x42a95341ff361e81fd934F39943c5C98F6991844"
     },
     {
       "chainId": 4663,
@@ -947,7 +977,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xa68CA83408bE3f78d1c58a82081c619e9d21486d"
     },
     {
       "chainId": 4663,
@@ -972,7 +1003,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xE4479F01738B4e8C428CD8eB72D47AB9BC3c7de6"
     },
     {
       "chainId": 4663,
@@ -997,7 +1029,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0xB48D6D5729Ca032ca43729F4b605bBf9f257A84d"
     },
     {
       "chainId": 4663,
@@ -1022,7 +1055,8 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x451B1295aA84FD6d6b58af1a5002eA1b1A1913A0"
     },
     {
       "chainId": 4663,
@@ -1047,10 +1081,12 @@
           "best": null
         }
       },
-      "corroborated": false
+      "corroborated": false,
+      "feedSvrProxy": "0x6D054DECb74Cf8ef3675B0Abc100e02921176EdF"
     }
   ],
   "verifiedAt": "2026-09-02T20:32:50.485Z",
   "corroborated": 1,
-  "descriptionsNamingTicker": 35
+  "descriptionsNamingTicker": 35,
+  "svrProxies": 35
 }

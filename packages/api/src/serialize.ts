@@ -158,6 +158,14 @@ export function serializeToken(row: TokenRow, options: SerializeOptions) {
             corroborated: findToken(row.chainId, row.address)?.feedCorroborated ?? false,
             /** How the pairing was made in the first place. */
             pairedBy: 'ticker-heuristic',
+            /**
+             * The same feed's SVR proxy, which a lending market may well be the
+             * one reading. Measured on all 35 pairs: same aggregator, same
+             * answer, same updatedAt. The round id is NOT portable - each proxy
+             * has its own phase, so `roundId` above belongs to `proxy` alone.
+             */
+            svrProxy: findToken(row.chainId, row.address)?.feedSvrProxy ?? null,
+            roundIdIsProxySpecific: true,
             decimals: row.feedDecimals,
             roundId: row.feedRoundId?.toString() ?? null,
             answer: row.feedAnswer?.toString() ?? null,

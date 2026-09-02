@@ -1,0 +1,52 @@
+{
+  "measuredAt": "2026-09-02T21:54:02.261Z",
+  "note": "What indexing transfers would cost, measured rather than assumed. One eth_getLogs over a window narrowed until it fits under the endpoint's 10 000-log cap; per-day figures extrapolate at the measured chain cadence of ~857 000 blocks a day. A sample of a single window, not a day: the off-hours share is not measured here.",
+  "chainId": 4663,
+  "headBlock": 52905565,
+  "windowBlocks": 750,
+  "windowSeconds": 75,
+  "erc20Transfers": 11032,
+  "erc20TransfersPerDay": 12605899,
+  "erc721LogsDroppedByArity": 0,
+  "mints": 6,
+  "burns": 0,
+  "tokensThatMoved": 80,
+  "tokensTotal": 194,
+  "busiest": [
+    {
+      "symbol": "COST",
+      "token": "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2",
+      "transfers": 1022,
+      "perDay": 1167805
+    },
+    {
+      "symbol": "SPCX",
+      "token": "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+      "transfers": 934,
+      "perDay": 1067251
+    },
+    {
+      "symbol": "TTWO",
+      "token": "0x5e81213613b6b86eab4c6c50d718d34359459786",
+      "transfers": 791,
+      "perDay": 903849
+    },
+    {
+      "symbol": "ZM",
+      "token": "0x44c4f142009036cf477ed2d09932051843137cf1",
+      "transfers": 712,
+      "perDay": 813579
+    },
+    {
+      "symbol": "WDAY",
+      "token": "0x82da4646242e1d962e96e932269dc644c94a9caa",
+      "transfers": 579,
+      "perDay": 661604
+    }
+  ],
+  "usdgTransfers": 8481,
+  "transactionsMovingAToken": 2611,
+  "provableTrades": 1944,
+  "provableTradesPerDay": 2221344,
+  "provableShareOfTokenTransactions": 0.7445
+}

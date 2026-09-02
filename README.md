@@ -62,6 +62,8 @@ node scripts/phase0/feed-price-at.mjs <feed> <iso> # Chainlink price at an insta
 node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
 node scripts/phase0/probe-oracle-link.mjs      # is there an on-chain token <-> feed link? (no)
 node scripts/phase0/verify-feed-map.mjs        # corroborate the feed map by behaviour
+node scripts/phase0/check-svr-proxies.mjs      # primary vs SVR proxy, all 35 feeds
+node scripts/phase0/measure-transfers.mjs      # transfer volume and provable trades
 node scripts/archive-corporate-actions.mjs     # merge today's window into the archive
 node scripts/backfill-multiplier-events.mjs    # full-chain event scan, 26 requests
 node scripts/build-reconciliations.mjs         # declared vs observed, priced at effectiveAt
@@ -83,6 +85,9 @@ Committed artifacts, all first-party or read from the chain:
 | `data/chainlink-feeds.snapshot.json` | 57 Chainlink feeds on Robinhood Chain |
 | `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`**, one row corroborated |
 | `data/feed-map-verification.json` | what that pairing was actually tested against |
+| `data/svr-proxy-check.json` | the primary and SVR proxies of all 35 feeds, compared by address |
+| `data/transfer-volume.observed.json` | what indexing transfers would cost, measured |
+| `data/base-coinbase-feeds.snapshot.json` | the 13 Coinbase B20 feeds on Base — second-issuer reconnaissance |
 | `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
 | `data/reconciliations.observed.json` | every declared action against the step it produced, priced at `effectiveAt` |
 | `data/corporate-actions.archive.json` | every action the issuer has published while exdate was watching — its own endpoint keeps about a month |

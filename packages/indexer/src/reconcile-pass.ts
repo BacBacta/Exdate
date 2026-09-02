@@ -9,6 +9,7 @@ import {
   pairActionsWithChanges,
   parseDecimal,
   reconcile,
+  reconcileSplit,
   rescale,
   type RoundLookup,
 } from '@exdate/core'
@@ -71,6 +72,9 @@ export async function runReconcilePass(
       type: row.type,
       status: row.status,
       rate: row.rate,
+      // Splits carry a share ratio instead of a per-share rate.
+      oldRate: row.oldRate,
+      newRate: row.newRate,
     }))
 
   const changes = eventRows
@@ -266,14 +270,25 @@ export async function runReconcilePass(
       confidence: 'low' as const,
     }
 
-    // Only a cash dividend has a per-share rate to reconcile against. A split
-    // changes the ratio itself and needs a different model, so it is recorded
-    // rather than forced through this one.
+    // A cash dividend reconciles against a price; a split reconciles against a
+    // ratio and needs no price at all. Anything with no per-share rate goes
+    // through the ratio model, which itself refuses when the issuer declares no
+    // ratio - the state every split is in today, since no split payload has
+    // ever appeared in the issuer's window.
     if (!action.rate) {
+      const split = reconcileSplit({
+        oldRate: action.oldRate,
+        newRate: action.newRate,
+        oldMultiplier: change.oldMultiplier,
+        newMultiplier: change.newMultiplier,
+      })
       await write({
         ...base,
-        status: 'unsupported_action_type',
-        note: `matched to a step, but ${action.type} carries no per-share rate to reconcile against`,
+        // The declared ratio expressed as a step, so `expectedStepBps` means the
+        // same thing here as it does for a dividend.
+        expectedStepWad: split.declaredRatioWad === undefined ? null : split.declaredRatioWad - 10n ** 18n,
+        status: split.status,
+        note: `${action.type}: ${split.note}`,
       })
       continue
     }

@@ -18,14 +18,17 @@ import {
   aggregatorV3Abi,
   feedHealth,
   feedProxies,
+  feedStatusTransition,
   findToken,
   isPending,
+  pauseTransition,
   stepBps,
   stockTokenAbi,
   throttledHttp,
   tokenAddresses,
   tokensForChain,
 } from '@exdate/core'
+import type { FeedStatus } from '@exdate/core'
 import { runReconcilePass } from './reconcile-pass.js'
 import { deliverDueWebhooks, enqueueWebhook } from './webhooks.js'
 import { createPublicClient, parseAbiItem, type Address } from 'viem'
@@ -259,37 +262,40 @@ ponder.on('Poll:block', async ({ event, context }) => {
       })
     }
 
-    if (oraclePaused !== undefined) {
-      if (previous === null && oraclePaused) {
-        // First ever observation and the oracle is already paused: record it as
-        // a baseline whose start is unknown, not as a transition seen at `now`.
-        await context.db
-          .insert(pauseEvents)
-          .values({ chainId, token: token.address, at: now, paused: true, block: blockNumber, kind: 'baseline' })
-          .onConflictDoNothing()
-      } else if (previous !== null && previous.oraclePaused !== null && previous.oraclePaused !== oraclePaused) {
-        await context.db
-          .insert(pauseEvents)
-          .values({ chainId, token: token.address, at: now, paused: oraclePaused, block: blockNumber, kind: 'transition' })
-          .onConflictDoNothing()
-        await enqueueWebhook(context, {
-          chainId,
-          type: 'pause.changed',
-          subject: `${token.address}:${now}`,
-          token: { address: token.address, symbol: token.symbol },
-          now,
-          block: blockNumber,
-          data: {
-            paused: oraclePaused,
-            previousPaused: previous.oraclePaused,
-            at: new Date(Number(now) * 1000).toISOString(),
-            block: blockNumber.toString(),
-            effect: oraclePaused
-              ? 'the token reports its oracle paused; the Chainlink feed stops publishing while this holds'
-              : 'the token reports its oracle live again',
-          },
-        })
-      }
+    // `pauseTransition` decides. The three cases it separates - baseline, real
+    // transition, failed read - are pinned in packages/core/test/staleness.test.ts
+    // rather than in these branches.
+    const pause = pauseTransition(previous?.oraclePaused, oraclePaused)
+    if (pause === 'baseline') {
+      // Already paused the first time exdate looked: the start is unknown, so it
+      // is recorded as a baseline and never sent as a transition.
+      await context.db
+        .insert(pauseEvents)
+        .values({ chainId, token: token.address, at: now, paused: true, block: blockNumber, kind: 'baseline' })
+        .onConflictDoNothing()
+    } else if (pause !== null) {
+      const paused = pause === 'paused'
+      await context.db
+        .insert(pauseEvents)
+        .values({ chainId, token: token.address, at: now, paused, block: blockNumber, kind: 'transition' })
+        .onConflictDoNothing()
+      await enqueueWebhook(context, {
+        chainId,
+        type: 'pause.changed',
+        subject: `${token.address}:${now}`,
+        token: { address: token.address, symbol: token.symbol },
+        now,
+        block: blockNumber,
+        data: {
+          paused,
+          previousPaused: previous?.oraclePaused ?? null,
+          at: new Date(Number(now) * 1000).toISOString(),
+          block: blockNumber.toString(),
+          effect: paused
+            ? 'the token reports its oracle paused; the Chainlink feed stops publishing while this holds'
+            : 'the token reports its oracle live again',
+        },
+      })
     }
   }
 
@@ -327,12 +333,13 @@ ponder.on('Poll:block', async ({ event, context }) => {
         .values({ chainId, feed, roundId, answer, decimals, updatedAt, sampledAt: now, status: health.status })
         .onConflictDoUpdate(() => ({ roundId, answer, decimals, updatedAt, sampledAt: now, status: health.status }))
 
-      const wasLive = previousFeed?.status === 'live'
-      const wasStale = previousFeed?.status === 'stale'
-      if ((wasLive && health.status === 'stale') || (wasStale && health.status === 'live')) {
+      // Same shape as the pause decision, and tested in the same place: a first
+      // observation of a stale feed is not a feed going stale.
+      const transition = feedStatusTransition(previousFeed?.status as FeedStatus | null, health.status)
+      if (transition !== null) {
         await enqueueWebhook(context, {
           chainId,
-          type: health.status === 'stale' ? 'feed.stale' : 'feed.resumed',
+          type: transition === 'stale' ? 'feed.stale' : 'feed.resumed',
           subject: `${feed}:${now}`,
           token: feedToken ? { address: feedToken.address, symbol: feedToken.symbol } : null,
           now,

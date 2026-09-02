@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { WAD } from '../src/multiplier.js'
-import {
-  haircutBps,
-  haircutBpsPrecise,
-  parseDecimal,
-  reconcile,
-  rescale,
-  underlyingPriceWad,
-} from '../src/reconcile.js'
+import { haircutBps, haircutBpsPrecise, parseDecimal, reconcile, reconcileSplit, rescale, underlyingPriceWad } from '../src/reconcile.js'
 
 /** Chainlink answers carry 8 decimals; the maths runs in WAD. */
 const price = (chainlinkAnswer: bigint) => rescale(chainlinkAnswer, 8, 18)
@@ -287,5 +280,71 @@ describe('confidence', () => {
     expect(reconcile({ ...base, observedEventCount: 50, feedCorroborated: true }).confidence).toBe('medium')
     // Corroboration does not substitute for a sample either.
     expect(reconcile({ ...base, observedEventCount: 2, feedCorroborated: true }).confidence).toBe('low')
+  })
+})
+
+describe('splits reconcile as a ratio, with no price in them', () => {
+  // CRWD's real step: 1.0 -> 4.0 on 2026-07-02, the only split ever observed on
+  // this chain. Its issuer row fell out of the one-month window before anything
+  // archived it, so every `oldRate`/`newRate` below is CONSTRUCTED to exercise
+  // the arithmetic - no split payload has ever been seen from the issuer, and
+  // none of these numbers is a claim about what it published.
+  const CRWD = { oldMultiplier: WAD, newMultiplier: 4n * WAD }
+
+  it('matches a declared 1:4 against the observed x4', () => {
+    const result = reconcileSplit({ ...CRWD, oldRate: '1', newRate: '4' })
+    expect(result.status).toBe('matched')
+    expect(result.observedRatioWad).toBe(4n * WAD)
+    expect(result.declaredRatioWad).toBe(4n * WAD)
+    expect(result.differenceBps).toBe(0)
+  })
+
+  it('is scale-free: 5:20 is the same split as 1:4', () => {
+    expect(reconcileSplit({ ...CRWD, oldRate: '5', newRate: '20' }).status).toBe('matched')
+  })
+
+  it('calls a ratio that does not match what happened an anomaly', () => {
+    const result = reconcileSplit({ ...CRWD, oldRate: '1', newRate: '3' })
+    expect(result.status).toBe('anomaly')
+    expect(result.differenceBps).toBeCloseTo(3333.33, 1)
+    expect(result.note).toContain('4.000000x where the issuer declared 3.000000x')
+  })
+
+  it('holds a reverse split to the same rule', () => {
+    const result = reconcileSplit({
+      oldMultiplier: 10n * WAD,
+      newMultiplier: WAD,
+      oldRate: '10',
+      newRate: '1',
+    })
+    expect(result.status).toBe('matched')
+    expect(result.observedRatioWad).toBe(WAD / 10n)
+  })
+
+  it('refuses without a declared ratio, and still reports what was observed', () => {
+    // The real case today: a split matched to a step whose issuer row carries
+    // no ratio. The row says what the chain did and admits it cannot check it.
+    const result = reconcileSplit({ ...CRWD, oldRate: null, newRate: null })
+    expect(result.status).toBe('unsupported_action_type')
+    expect(result.observedRatioWad).toBe(4n * WAD)
+    expect(result.declaredRatioWad).toBeUndefined()
+    expect(result.note).toContain('no share ratio')
+  })
+
+  it('rejects a non-positive declared ratio rather than dividing by it', () => {
+    expect(reconcileSplit({ ...CRWD, oldRate: '0', newRate: '4' }).status).toBe('anomaly')
+    expect(reconcileSplit({ ...CRWD, oldRate: '1', newRate: '0' }).status).toBe('anomaly')
+  })
+
+  it('tolerates only arithmetic noise, because there is no market in a ratio', () => {
+    // One part in a million: a rounding difference passes, a real mismatch does not.
+    const nearlyFour = (4n * WAD * 1_000_001n) / 1_000_000n
+    expect(reconcileSplit({ ...CRWD, newMultiplier: nearlyFour, oldRate: '1', newRate: '4' }).status).toBe(
+      'matched',
+    )
+    const clearlyNotFour = (4n * WAD * 1_002n) / 1_000n
+    expect(
+      reconcileSplit({ ...CRWD, newMultiplier: clearlyNotFour, oldRate: '1', newRate: '4' }).status,
+    ).toBe('anomaly')
   })
 })

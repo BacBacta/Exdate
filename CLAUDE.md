@@ -144,6 +144,12 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
 - Off-hours the feed holds the last price with no heartbeat. Always read `updatedAt` and enforce a
   staleness bound. Also check the token's `oraclePaused()` — when true the feed stops publishing.
   Observed on 2026-09-02 during a live session: SPY 18 h stale, QQQ 4 h stale, USDG 21 h stale.
+- **Every feed is published through two proxies.** The directory gives `proxyAddress` and
+  `secondaryProxyAddress` (SVR, Smart Value Recapture); exdate reads the primary. Measured on all
+  35 pairs: same `aggregator()`, same `description()`, same decimals, same answer, same `updatedAt`
+  — **but a different phase**, so the encoded `roundId` is NOT portable (SGOV: phase 1 round 49 vs
+  phase 2 round 49, identical answer). Never pass a roundId from one proxy to `getRoundData` on the
+  other. `node scripts/phase0/check-svr-proxies.mjs`, `data/svr-proxy-check.json`.
 - Token → feed mapping: `data/token-feed-map.json`, every row `verified: false`, and it stays that
   way: **no first-party, address-level statement links a token to a feed.** Measured, not assumed —
   the token implementation answers with no address at all (24 selectors probed by
@@ -198,8 +204,17 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   duration, starting at 25 blocks with a ×1.5 ceiling per round — so a slow round never grows.
   Extrapolated over the 51.7 M blocks since mainnet: **≈ 300 days**. One wide query per 2 000 000
   blocks does the same scan in 26 requests, about two minutes. Hence the two-tier design below.
-- AAPL alone emits ≈ 375 000 logs/day. A dedicated archive endpoint is required before indexing
-  transfers.
+- **Transfer volume, measured across all 194 tokens on 2026-09-02**: two 750-block windows (75 s
+  each, 20 minutes apart) held 6 425 and 11 032 ERC-20 transfers — **7.3 M and 12.6 M per day**. The
+  order of magnitude is the fact; a 75-second window is not a day. AAPL alone measured ≈394 k/day,
+  which confirms the ≈375 k figure from Phase 0. The busiest token is not AAPL: ZM, COST and SPCX
+  each exceeded 1 M/day in a sample. `node scripts/phase0/measure-transfers.mjs`,
+  `data/transfer-volume.observed.json`.
+- **74 % of transactions that move a Stock Token also move USDG in the same transaction** — the
+  provable-trade share, ≈2 M/day. Most on-chain activity is trading, not custody movement.
+- A dedicated archive endpoint is required before indexing transfers: 7–13 M logs/day is 85–145
+  logs/second sustained, against an endpoint that caps a query at 10 000 logs and rejects half of
+  them.
 - A `Transfer` proves custody moved, not that a trade happened. A provable trade needs both legs
   (Stock Token + USDG) in the same `transactionHash`.
 - Mint = transfer from `address(0)`. Burn = transfer to `address(0)`.
@@ -393,6 +408,25 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   stale artifact from a rebuild. The generated archive carries only fields that change when the
   issuer changes something — copying `lastSeenAt` through would rewrite the file daily to say
   nothing.
+- 2026-09-02 — The SVR proxy is published alongside the primary (`feedSvrProxy`) rather than
+  chosen between: both answer identically, so a consumer reading either sees the same price, and the
+  one thing that differs — the phase-encoded `roundId` — is flagged as proxy-specific in the API.
+- 2026-09-02 — Splits reconcile as a **ratio**, not a per-share amount: `reconcileSplit()` compares
+  the declared `oldRate:newRate` against the observed multiplier ratio, needs no price and no
+  oracle, and tolerates one basis point. It refuses when the issuer declares no ratio, which is the
+  state of every split today: the only split ever observed (CRWD ×4) lost its issuer row, and all 43
+  archived actions are cash dividends, so **no split payload has ever been seen** and none is
+  guessed. Tested on CRWD's real step with constructed declared ratios, labelled as such.
+- 2026-09-02 — Pause and feed-status transitions moved out of the poller into
+  `pauseTransition()` / `feedStatusTransition()` in core, where they are tested. The distinction
+  that matters: a token already paused the first time exdate looks is a **baseline**, not a pause,
+  or every restart would announce a corporate action that did not happen.
+- 2026-09-02 — Second issuer reconnaissance: `docs/second-issuer-base.md`. Coinbase B20 on Base has
+  the same economics (multiplier, dividends converted to shares, total-return feed) but a different
+  read path (an on-chain oracle registry, one call for all tokens), different event names
+  (`MultiplierUpdated` + `Announcement` wrappers) and — notably — identity **by contract address
+  rather than ticker**. It needs a source module, not a config entry. Not wired: the registry
+  address, the token addresses and any corporate-action feed are all still unknown.
 - _(append decisions here as they are made)_
 
 ## Status

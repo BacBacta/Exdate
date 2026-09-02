@@ -90,6 +90,14 @@ export interface TokenView {
     corroborated: boolean
     /** How the pairing was made in the first place. */
     pairedBy: string
+    /**
+     * The same feed's SVR proxy: same aggregator, same answer, same updatedAt.
+     * Its round ids live in a different phase, so never pass `roundId` from one
+     * proxy to `getRoundData` on the other.
+     */
+    svrProxy: string | null
+    /** Always true, and the reason `svrProxy` cannot share `roundId`. */
+    roundIdIsProxySpecific: boolean
     decimals: number | null
     roundId: string | null
     answer: string | null
