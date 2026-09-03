@@ -465,6 +465,12 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   every session has three samples. The classifier is dependency-free plain ESM so the Action needs
   no install step, and unit-tested in `packages/core` because a boundary or a DST error would be
   larger than the effect.
+- 2026-09-03 — `/pending` is on the status page, and it **replaces** the narrower "declared
+  complete, never applied" table rather than sitting next to it: the endpoint serves the same rows
+  plus the two states that table dropped (`awaiting`, `overdue`) and the one figure that needs no
+  oracle, `grossPerToken = rate × uiMultiplier`. The page fetches `/pending` only for tokens that
+  can have something pending — those in an unmatched declared action, plus those with a change
+  announced on chain — so it is a handful of requests, not 194.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -508,5 +514,7 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - `tokenStates` is written every poll even when nothing moved. Deliberate: `sampledAt` is an
   observation, and skipping the write would make "checked, unchanged" read as "not checked since".
   The static registry row is no longer rewritten.
-- The status page surfaces the distribution ledgers and the never-applied dividends; the per-token
-  `/pending` view is API-only.
+- The status page's hand-declared response subsets are now checked against core at compile time
+  (`apps/status/lib/contract.assert.ts`), the same trick `@exdate/sdk` uses: both routes hand
+  `buildYieldLedger` / `buildPendingView` straight to `c.json()`, so the function's return type IS
+  the JSON. Verified to bite by retyping a field and watching `pnpm typecheck` fail.

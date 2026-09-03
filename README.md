@@ -130,7 +130,10 @@ change is about nine minutes away), `awaiting` (declared, still inside the obser
 window) and `declared_complete_not_on_chain` (the issuer's own feed says COMPLETED while the
 multiplier has not moved — seven tokens on 2026-09-02, BND for four weeks). It projects the step a
 full payment would produce at the latest round, marked `notAMeasurement`, and refuses to predict
-when the step will land or how much of it will survive.
+when the step will land or how much of it will survive. The status page renders it under
+*What is owed and has not arrived*, including `grossPerToken` — the one figure there that needs no
+oracle at all, since the declared rate is per underlying share and one raw token carries
+`uiMultiplier` of them.
 
 ## Webhooks
 

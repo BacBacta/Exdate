@@ -171,6 +171,44 @@ export interface YieldLedgerView {
   notComputed: { field: string; reasonCode: string; detail: string }[]
 }
 
+/**
+ * What the page renders from `/v1/:chain/tokens/:addr/pending` - a subset,
+ * declared here so the page cannot quietly start showing a field the API
+ * stopped sending. The full shape is typed in @exdate/sdk.
+ */
+export interface PendingView {
+  token: { address: string; symbol: string }
+  state: 'indexed' | 'not_yet_polled'
+  multiplier: { currentDecimal: string | null }
+  declared: {
+    key: string
+    /** awaiting inside the observed window, overdue past it, or completed by the issuer with no step. */
+    state: 'awaiting' | 'overdue' | 'declared_complete_not_on_chain'
+    processDate: string | null
+    daysSinceProcessDate: number | null
+    windowDays: number
+    grossPerUnderlyingShare: string | null
+    /** rate x uiMultiplier: cash owed per raw token, and it needs no price. */
+    grossPerToken: string | null
+    /** What a payment in full would produce at today's price. Never a forecast. */
+    projection: { stepBpsIfPaidInFull: number; notAMeasurement: boolean } | null
+    note: string
+  }[]
+  summary: {
+    scheduledOnChain: number
+    declaredAwaiting: number
+    declaredOverdue: number
+    declaredCompleteNotOnChain: number
+    longestOverdueDays: number | null
+    nothingPending: boolean
+  }
+  history: {
+    reconciledDividends: number
+    lastObservedHaircutBps: number | null
+  }
+  notComputed: { field: string; reasonCode: string; detail: string }[]
+}
+
 export class ApiUnreachable extends Error {}
 
 async function get<T>(path: string): Promise<T> {
@@ -190,3 +228,5 @@ export const getReconciliations = (chain = 'robinhood') =>
   get<ReconciliationsResponse>(`/v1/${chain}/reconciliations`)
 export const getYield = (address: string, chain = 'robinhood') =>
   get<YieldLedgerView>(`/v1/${chain}/tokens/${address}/yield`)
+export const getPending = (address: string, chain = 'robinhood') =>
+  get<PendingView>(`/v1/${chain}/tokens/${address}/pending`)

@@ -2,9 +2,11 @@ import {
   ApiUnreachable,
   API_URL,
   getCalendar,
+  getPending,
   getReconciliations,
   getTokens,
   getYield,
+  type PendingView,
   type ReconciliationView,
   type TokenView,
   type YieldLedgerView,
@@ -85,11 +87,6 @@ export default async function Page() {
   const reconciled = (recon?.reconciliations ?? []).filter(
     (row) => row.status === 'matched' || row.status === 'anomaly',
   )
-  // Declared COMPLETED by the issuer, yet no multiplier step has ever landed.
-  // This is the pending-dividend window, observed rather than assumed.
-  const owed = (recon?.reconciliations ?? []).filter(
-    (row) => row.status === 'pending' && row.declared?.status === 'CORPORATE_ACTION_STATUS_COMPLETED',
-  )
   /**
    * One ledger per token that has actually moved - a dozen requests today, not
    * 194, because a token whose multiplier still reads 1.0 has nothing to show.
@@ -99,6 +96,30 @@ export default async function Page() {
   const ledgers = (
     await Promise.all(moved.map((token) => getYield(token.address).catch(() => null)))
   ).filter((ledger): ledger is YieldLedgerView => ledger !== null)
+
+  /**
+   * `/pending` is per token, and only a token with an unmatched declared action
+   * or a change already announced on chain can have anything pending - so the
+   * candidates come from the two sources that know, not from all 194 tokens.
+   * A request that fails drops its row rather than taking the page down.
+   */
+  const pendingCandidates = [
+    ...new Set([
+      ...(recon?.reconciliations ?? [])
+        .filter((row) => row.status === 'pending' && row.token !== null)
+        .map((row) => row.token as string),
+      ...scheduled.map((token) => token.address),
+    ]),
+  ]
+  const pending = (
+    await Promise.all(pendingCandidates.map((address) => getPending(address).catch(() => null)))
+  ).filter((view): view is PendingView => view !== null && !view.summary.nothingPending)
+
+  /** One row per outstanding item, newest process date last, as the ledger reads. */
+  const owedRows = pending
+    .flatMap((view) => view.declared.map((row) => ({ view, row })))
+    .sort((a, b) => (a.row.processDate ?? '').localeCompare(b.row.processDate ?? ''))
+  const owedPerToken = owedRows.filter(({ row }) => row.grossPerToken !== null)
 
   const observedAt = polled
     .map((token) => token.multiplier.sampledAt)
@@ -164,7 +185,7 @@ export default async function Page() {
               {recon.counts.matched} <span className="dash">/</span> {recon.counts.anomaly}
             </div>
             <div className="label">reconciled / anomalous</div>
-            <div className="note">{owed.length} declared but never applied</div>
+            <div className="note">{owedRows.length} declared, still not on chain</div>
           </div>
         ) : null}
       </section>
@@ -274,40 +295,114 @@ export default async function Page() {
         </>
       ) : null}
 
-      {owed.length > 0 ? (
+      {owedRows.length > 0 ? (
         <>
           <h2>
-            Declared complete, never applied on chain
+            What is owed and has not arrived
             <span className="sub">
-              the issuer marks these processed; the multiplier has not moved
+              declared by the issuer, no matching multiplier step on chain — from{' '}
+              <code>/v1/:chain/tokens/:addr/pending</code>
             </span>
           </h2>
           <div className="scroll">
             <table>
               <thead>
                 <tr>
-                  <th>Process date</th>
                   <th>Token</th>
+                  <th>Process date</th>
+                  <th>State</th>
+                  <th>Days</th>
                   <th>Gross / share</th>
-                  <th>Days since</th>
+                  <th>Owed / token</th>
+                  <th>Step if paid in full</th>
+                  <th>Haircut measured here</th>
                 </tr>
               </thead>
               <tbody>
-                {owed.map((row) => (
-                  <tr key={row.id}>
-                    <td className="num">{row.declared?.processDate ?? '—'}</td>
-                    <td className="sym">{row.symbol}</td>
-                    <td className="num">{row.declared?.grossPerShare ?? '—'}</td>
-                    <td className="num">{daysSince(row.declared?.processDate ?? null)}</td>
+                {owedRows.map(({ view, row }) => (
+                  <tr key={`${view.token.address}:${row.key}`}>
+                    <td className="sym">{view.token.symbol}</td>
+                    <td className="num">{row.processDate ?? '—'}</td>
+                    <td>
+                      <span
+                        className={`pill ${
+                          row.state === 'awaiting'
+                            ? 'unknown'
+                            : row.state === 'overdue'
+                              ? 'stale'
+                              : 'paused'
+                        }`}
+                        title={row.note}
+                      >
+                        {row.state === 'declared_complete_not_on_chain'
+                          ? 'completed, no step'
+                          : row.state}
+                      </span>
+                    </td>
+                    <td className="num">
+                      {row.daysSinceProcessDate ?? '—'}
+                      {row.state === 'awaiting' ? (
+                        <span className="addr"> / {row.windowDays}</span>
+                      ) : null}
+                    </td>
+                    <td className="num">{row.grossPerUnderlyingShare ?? '—'}</td>
+                    <td className="num">
+                      {row.grossPerToken === null
+                        ? '—'
+                        : Number(row.grossPerToken).toLocaleString('en-US', {
+                            minimumFractionDigits: 4,
+                            maximumFractionDigits: 6,
+                          })}
+                    </td>
+                    <td className="num">
+                      {row.projection === null ? (
+                        <span className="dash">—</span>
+                      ) : (
+                        <span title="a projection at today's price, gross of every haircut ever measured — not a forecast of the step">
+                          {bps(row.projection.stepBpsIfPaidInFull)}*
+                        </span>
+                      )}
+                    </td>
+                    <td className="num">
+                      {view.history.lastObservedHaircutBps === null ? (
+                        <span className="dash">—</span>
+                      ) : (
+                        <>
+                          {(view.history.lastObservedHaircutBps / 100).toFixed(1)}%
+                          <span className="addr"> ({view.history.reconciledDividends})</span>
+                        </>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <p className="caption">
-            This is the pending-dividend window, observed rather than assumed. It needs both sides:
-            the issuer&rsquo;s own record that a dividend was processed, and the absence of any
-            matching multiplier step on chain.
+            Three states, kept apart because they carry different certainty.{' '}
+            <em>awaiting</em> is inside the observed next-business-day window and is not yet late;{' '}
+            <em>overdue</em> is past it; <em>completed, no step</em> is the sharpest claim of the
+            three — the issuer&rsquo;s own feed marks the action processed while the multiplier
+            still reads what it read before.{' '}
+            <strong>Owed / token</strong> is the one figure here that needs no oracle: the declared
+            rate is per underlying share, one raw token carries <code>uiMultiplier</code> of them,
+            and both numbers are known. The starred column is a projection at today&rsquo;s price
+            and gross of the withholding every reconciled distribution has taken — it says what a
+            payment in full would produce, not what will arrive. When the step will land, and how
+            much of it survives, are refused outright: the endpoint lists them under{' '}
+            <code>notComputed</code> with a reason code.
+          </p>
+          <p className="caption">
+            {owedPerToken.length} of {owedRows.length} outstanding{' '}
+            {owedRows.length === 1 ? 'action states' : 'actions state'} what is owed per token
+            {pending.length > 0 ? ` across ${pending.length} tokens` : null}. Longest wait:{' '}
+            {(() => {
+              const longest = pending
+                .map((view) => view.summary.longestOverdueDays)
+                .filter((days): days is number => days !== null)
+                .sort((a, b) => b - a)[0]
+              return longest === undefined ? 'none overdue' : `${longest} days`
+            })()}.
           </p>
         </>
       ) : null}
@@ -384,8 +479,7 @@ export default async function Page() {
             earlier steps have no declared row to match at all. Totals
             appear only when the ledger closes against the multiplier read at the head. Nothing here
             is annualised: <code>/v1/:chain/tokens/:addr/yield</code> lists every rate it refuses to
-            compute, with a reason code, and{' '}
-            <code>/v1/:chain/tokens/:addr/pending</code> reports what is owed per token.
+            compute, with a reason code.
           </p>
         </>
       ) : null}
