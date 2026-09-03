@@ -2,9 +2,9 @@
   "note": "Every corporate action the issuer has published while exdate was watching. GET /rhj/corporate-actions is a window about a month deep with no pagination and no date filter, so a row that falls out of it is unrecoverable from any first-party source. Keyed on (issuer id, processDate): the id alone names a monthly series. Refresh with node scripts/archive-corporate-actions.mjs.",
   "source": "robinhood:/rhj/corporate-actions",
   "firstArchivedAt": "2026-09-02T21:09:52.283Z",
-  "lastArchivedAt": "2026-09-02T21:09:52.283Z",
-  "windowRows": 43,
-  "archivedRows": 43,
+  "lastArchivedAt": "2026-09-03T06:44:28.191Z",
+  "windowRows": 44,
+  "archivedRows": 44,
   "beyondWindow": 0,
   "earliestProcessDate": "2026-08-05",
   "latestProcessDate": "2026-10-01",
@@ -23,7 +23,7 @@
         {
           "contractAddress": "0x47F93d52cBeC7C6D2CfC080e154002370a60dAEA",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -33,8 +33,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -52,7 +52,7 @@
         {
           "contractAddress": "0x2F62fC9fAbb470C690f141c28340eD832bB27020",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -62,8 +62,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -81,7 +81,7 @@
         {
           "contractAddress": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -91,8 +91,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -110,7 +110,7 @@
         {
           "contractAddress": "0xBE274710Bf3d9567e1B290eF6a5F9f90ca016FD8",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -120,8 +120,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -139,7 +139,7 @@
         {
           "contractAddress": "0x0E6e67Ba88e7b5d9B67636A215c76779B948dE79",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -149,8 +149,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -168,7 +168,7 @@
         {
           "contractAddress": "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -178,8 +178,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -197,7 +197,7 @@
         {
           "contractAddress": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -207,8 +207,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -226,7 +226,7 @@
         {
           "contractAddress": "0x77E655E37F4d913fB9540e0d541D824171a60e81",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -236,8 +236,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -255,7 +255,7 @@
         {
           "contractAddress": "0x93Dbb1d2Dc5D63F4abACFF30485273f538Df68Ac",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -265,8 +265,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -284,7 +284,7 @@
         {
           "contractAddress": "0x63D5a3b6939a33f1e75d8Bcd85759858239600DB",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -294,8 +294,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -313,7 +313,7 @@
         {
           "contractAddress": "0xAEa445c5F3DB1a462998ccC422A875A361ee5d99",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -323,8 +323,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -342,7 +342,7 @@
         {
           "contractAddress": "0x9651342CeA770aE9a2969Ba2A52611523146aef9",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -352,8 +352,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -371,7 +371,7 @@
         {
           "contractAddress": "0x25C288E6D899b9BC30160965aD9644c67e73bE0C",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -381,8 +381,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -400,7 +400,7 @@
         {
           "contractAddress": "0x96b933C74eCB4A0926b9210cef7b743EF46be2E9",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -410,8 +410,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -429,7 +429,7 @@
         {
           "contractAddress": "0x7066A64c24e4206CD62E83bf198c1E7EB361F51e",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -439,8 +439,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -458,7 +458,7 @@
         {
           "contractAddress": "0xEAf2512dFC1bEAc608F8794B3793CD4E02894Aa6",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -468,8 +468,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -487,7 +487,7 @@
         {
           "contractAddress": "0xf23250dac154D05Bb671CB0d0eBEf3c635c79CE2",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -497,8 +497,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -516,7 +516,7 @@
         {
           "contractAddress": "0x2F62fC9fAbb470C690f141c28340eD832bB27020",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -526,8 +526,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -545,7 +545,7 @@
         {
           "contractAddress": "0xBE274710Bf3d9567e1B290eF6a5F9f90ca016FD8",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -555,8 +555,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -574,7 +574,7 @@
         {
           "contractAddress": "0xfAf9cb261B5FCC1f404Bb10CD39C5c6C1974E612",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -584,8 +584,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -603,7 +603,7 @@
         {
           "contractAddress": "0xaE517A2903E68bd929Dfd15be875F8369D53e94a",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -613,8 +613,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -632,7 +632,7 @@
         {
           "contractAddress": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -642,8 +642,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -661,7 +661,7 @@
         {
           "contractAddress": "0x03DfbBE0AC4E7bCDaFd08eD41A400326B77D8c80",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -671,8 +671,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -690,7 +690,7 @@
         {
           "contractAddress": "0x8005d266423c7ea827372c9c864491e5786600ea",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -700,8 +700,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -719,7 +719,7 @@
         {
           "contractAddress": "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -729,8 +729,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -748,7 +748,7 @@
         {
           "contractAddress": "0xf9B46d3D1B22199D4D1025a9cEDB540A33F1a2d5",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -758,8 +758,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -777,7 +777,7 @@
         {
           "contractAddress": "0x980dcf6766FA79f5Cf0c4AAdb3ab477ff15a9619",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -787,8 +787,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -806,7 +806,7 @@
         {
           "contractAddress": "0x36046893810a7E7fCE501229d57dc3FC8c8716d0",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -816,8 +816,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -835,7 +835,7 @@
         {
           "contractAddress": "0xEB61c0Ed490A367d4E3631cCf8a74B3bfc7E775D",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -845,8 +845,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -864,7 +864,7 @@
         {
           "contractAddress": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -874,8 +874,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -893,7 +893,7 @@
         {
           "contractAddress": "0x237c16D66590F67B886d978ACD362EAeaD8B18c7",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -903,8 +903,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -922,7 +922,7 @@
         {
           "contractAddress": "0xF52597345A8Edf418bc4071b4a35112472277D3e",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -932,8 +932,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -951,7 +951,7 @@
         {
           "contractAddress": "0x48d60243c66437c6ac3c2495Be94747aEd5Dfe25",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -961,8 +961,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -980,7 +980,7 @@
         {
           "contractAddress": "0xcF364ea52787e289De6F32077834056E3E70D6A8",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -990,8 +990,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1009,7 +1009,7 @@
         {
           "contractAddress": "0xDd356AA38F40A7b7076755aC854B6FBb1F0D305B",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1019,8 +1019,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1038,7 +1038,7 @@
         {
           "contractAddress": "0x12e3c047bf9AeCAF9dDC98c05C31BFD1dd043993",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1048,8 +1048,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1067,7 +1067,7 @@
         {
           "contractAddress": "0x0f17206447090e464C277571124dD2688E48AEA9",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1077,8 +1077,37 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
+      "statusHistory": [],
+      "inWindow": true
+    },
+    {
+      "id": "0x000000000000000000000000000000008f9ceee3a7954365bdd32ff0094d9b0f",
+      "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
+      "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+      "processDate": {
+        "year": 2026,
+        "month": 9,
+        "day": 24
+      },
+      "tokenSymbol": "VRT",
+      "deployments": [
+        {
+          "contractAddress": "0xFA78C12E6488814A0262E4e802749a4a737d5fB7",
+          "chainId": 4663,
+          "networkName": "Robinhood Chain"
+        }
+      ],
+      "details": {
+        "cashDividend": {
+          "underlyingSymbol": "VRT",
+          "rate": "0.0625"
+        }
+      },
+      "firstSeenAt": "2026-09-03T06:44:28.191Z",
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 1,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1096,7 +1125,7 @@
         {
           "contractAddress": "0x329fcACEb9AD6F9580DD5F643fed0646900D043c",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1106,8 +1135,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1125,7 +1154,7 @@
         {
           "contractAddress": "0x2778C5024D5cA2CdB0f8eAD671ffc69963AdCD9C",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1135,8 +1164,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1154,7 +1183,7 @@
         {
           "contractAddress": "0x7c04E6A3368F2A1DE3874f0e80d2e0A1a9915da6",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1164,8 +1193,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1183,7 +1212,7 @@
         {
           "contractAddress": "0x561e2a49212b7cCF47f2744Ccb83e200722fADBc",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1193,8 +1222,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1212,7 +1241,7 @@
         {
           "contractAddress": "0x4189F0c66EBBB0bfeF1C31f763131361EF32f77C",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1222,8 +1251,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1241,7 +1270,7 @@
         {
           "contractAddress": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
           "chainId": 4663,
-          "networkName": ""
+          "networkName": "Robinhood Chain"
         }
       ],
       "details": {
@@ -1251,8 +1280,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-02T21:09:52.283Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-03T06:44:28.191Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     }

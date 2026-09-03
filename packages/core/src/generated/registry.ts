@@ -3926,6 +3926,21 @@ export const ARCHIVED_CORPORATE_ACTIONS: readonly ArchivedCorporateAction[] = [
     "firstSeenAt": "2026-09-02T14:21:22.355Z"
   },
   {
+    "id": "0x000000000000000000000000000000008f9ceee3a7954365bdd32ff0094d9b0f:2026-09-24",
+    "issuerId": "0x000000000000000000000000000000008f9ceee3a7954365bdd32ff0094d9b0f",
+    "chainId": 4663,
+    "token": "0xFA78C12E6488814A0262E4e802749a4a737d5fB7",
+    "symbol": "VRT",
+    "underlyingSymbol": "VRT",
+    "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
+    "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+    "processDate": "2026-09-24",
+    "rate": "0.0625",
+    "oldRate": null,
+    "newRate": null,
+    "firstSeenAt": "2026-09-03T06:44:28.191Z"
+  },
+  {
     "id": "0x000000000000000000000000000000005cca09f06be14aea89a8ea6265026644:2026-09-25",
     "issuerId": "0x000000000000000000000000000000005cca09f06be14aea89a8ea6265026644",
     "chainId": 4663,
