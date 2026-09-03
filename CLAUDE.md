@@ -731,6 +731,10 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   2026-08-24) grant a personal, revocable licence and forbid distributing "Robinhood Materials" to
   third parties or building a competing product. Whether the archived `/rhj` rows are such
   material is for counsel to answer before any of it is sold; the README says so.
+- 2026-09-03 — **The repository is public** (GitHub API: `"private": false`, checked without
+  credentials), so `NEXT_PUBLIC_EXDATE_REPO_URL=https://github.com/BacBacta/Exdate` is set on the
+  Vercel project and the Source / GitHub links render again, next to the docs the site serves
+  itself. The default branch is still `claude/lance-en5q6j`; `blob/HEAD/…` links follow it.
 - _(append decisions here as they are made)_
 
 ## Status
