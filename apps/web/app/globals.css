@@ -110,6 +110,7 @@ html[data-js] [data-reveal].in { opacity: 1; transform: none; }
 
 /* --- hero ----------------------------------------------------------------- */
 .hero { min-height: calc(100svh - var(--nav)); display: flex; align-items: center; padding: clamp(3rem, 8vh, 6rem) 0; }
+.hero > .wrap { width: 100%; }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; width: 100%; }
 h1 { font-size: clamp(2.5rem, 5.4vw, 4.6rem); line-height: 1.04; letter-spacing: -0.03em; font-weight: 500; text-wrap: balance; max-width: 14ch; }
 .lede { margin-top: 1.6rem; font-size: clamp(1.08rem, 1.4vw, 1.25rem); line-height: 1.6; color: var(--ink-2); max-width: 44ch; text-wrap: pretty; }
