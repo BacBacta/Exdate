@@ -1,21 +1,11 @@
 import type { CSSProperties } from 'react'
 import { CountUp } from './components/CountUp'
+import { Footer, Nav } from './components/Chrome'
+import { Finder } from './components/Finder'
+import { dateLong, delay, pctInt } from '../lib/format'
 import { cents, observed } from '../lib/observed'
 
-const { counts, hero, reconciled, chains, links, lastObservedAt } = observed
-
-/** Stagger for the reveal animation, as a CSS custom property. */
-const delay = (ms: number) => ({ '--d': `${ms}ms` }) as unknown as CSSProperties
-
-const dateLong = (iso: string | null | undefined) =>
-  iso
-    ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
-        new Date(iso),
-      )
-    : ''
-
-/** Whole percent for a reader; the exact basis points stay in the data. */
-const pctInt = (bps: number | null | undefined) => (bps == null ? null : Math.round(bps / 100))
+const { counts, hero, reconciled, chains, links } = observed
 
 const RING_RADIUS = 140
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
@@ -29,47 +19,10 @@ const rows = [...reconciled].sort((a, b) => {
 const matched = rows.filter((row) => row.status === 'matched')
 const heroPct = pctInt(hero.haircutBps)!
 
-/** A ring open on the share that never arrives: the product's own measurement, as the mark. */
-function Mark({ size = 20 }: { size?: number }) {
-  return (
-    <svg className="mark" width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-      <circle
-        cx="16"
-        cy="16"
-        r="11"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        strokeDasharray="44.2 24.9"
-        transform="rotate(40 16 16)"
-      />
-    </svg>
-  )
-}
-
 export default function Page() {
   return (
     <>
-      <header className="nav">
-        <div className="wrap">
-          <a className="brand" href="#top" aria-label="exdate, home">
-            <Mark />
-            <span className="wordmark">exdate</span>
-          </a>
-          <nav aria-label="Primary">
-            <a href="#how">How it works</a>
-            <a href="#proof">Proof</a>
-            <a href="#coverage">Coverage</a>
-            <a href="#developers">Developers</a>
-            {links.status ? (
-              <a className="btn small" href={links.status}>
-                Live status
-              </a>
-            ) : null}
-          </nav>
-        </div>
-      </header>
+      <Nav />
 
       <main id="main">
         {/* ---------------------------------------------------------------- */}
@@ -84,14 +37,12 @@ export default function Page() {
                 quietly becomes worth a little more. exdate measures exactly how much — and how
                 much went missing on the way.
               </p>
-              <div className="actions" data-reveal style={delay(180)}>
-                <a className="btn" href="#proof">
-                  See the evidence
-                </a>
-                <a className="btn ghost" href="#how">
-                  How it works
-                </a>
+              <div className="hero-find" data-reveal style={delay(180)}>
+                <Finder tokens={observed.tokens} />
               </div>
+              <p className="hero-more" data-reveal style={delay(240)}>
+                Or start with <a href="#proof">every dividend measured so far</a>.
+              </p>
             </div>
 
             <figure className="ring-figure" data-reveal style={delay(260)}>
@@ -115,14 +66,57 @@ export default function Page() {
                 </div>
               </div>
               <figcaption>
-                <strong>{heroPct}%</strong> of {hero.name}&rsquo;s last dividend never arrived on
-                chain.
+                <strong>{heroPct}%</strong> of{' '}
+                <a href={`/t/${hero.token.toLowerCase()}/`}>{hero.name}</a>&rsquo;s last dividend
+                never arrived on chain.
                 <span className="fig-detail">
                   Declared ${cents(hero.declared)} · Arrived ${cents(hero.received)} ·{' '}
                   {dateLong(hero.effectiveAt)}
                 </span>
               </figcaption>
             </figure>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------------- */}
+        <section className="block" id="do" aria-labelledby="do-title">
+          <div className="wrap">
+            <h2 id="do-title" data-reveal>
+              What you can do here
+            </h2>
+            <div className="do">
+              <div data-reveal style={delay(0)}>
+                <h3>Look up your token</h3>
+                <p>
+                  Any of the {counts.tokens} Robinhood Stock Tokens: what it represents in shares
+                  today, what has been declared, what arrived, and what is still owed.
+                </p>
+                <a className="more" href="#find">
+                  Find your token
+                </a>
+              </div>
+              <div data-reveal style={delay(110)}>
+                <h3>Check before you rely on a price</h3>
+                <p>
+                  Only {counts.feeds} of {counts.tokens} tokens have a price feed at all. A
+                  token&rsquo;s page tells you whether yours does, and what its last dividend
+                  cost holders.
+                </p>
+                <a className="more" href="#proof">
+                  See the evidence
+                </a>
+              </div>
+              <div data-reveal style={delay(220)}>
+                <h3>Build on the data</h3>
+                <p>
+                  A REST API, a typed SDK and signed webhooks over the same records. Every value
+                  exact; anything unobserved is null, never zero.
+                </p>
+                <a className="more" href="#developers">
+                  For developers
+                </a>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -165,7 +159,7 @@ export default function Page() {
               <h2 id="proof-title">Every dividend so far, measured.</h2>
               <p>
                 {matched.length} reconcile cleanly. {rows.length - matched.length} don&rsquo;t —
-                and we say so rather than guess.
+                and we say so rather than guess. Open a row for the token&rsquo;s full history.
               </p>
             </div>
 
@@ -173,7 +167,9 @@ export default function Page() {
               {rows.map((row, index) => (
                 <li key={`${row.token}:${row.processDate}`} data-reveal style={delay(index * 60)}>
                   <div className="who">
-                    <span className="name">{row.name}</span>
+                    <a className="name" href={`/t/${row.token.toLowerCase()}/`}>
+                      {row.name}
+                    </a>
                     <span className="sym">{row.symbol}</span>
                   </div>
                   <div className="amt">
@@ -215,32 +211,6 @@ export default function Page() {
               Every number here was read from the blockchain and dated. Nothing is estimated,
               modelled or annualised.
             </p>
-          </div>
-        </section>
-
-        {/* ---------------------------------------------------------------- */}
-        <section className="block" id="value" aria-labelledby="value-title">
-          <div className="wrap">
-            <h2 id="value-title" data-reveal>
-              What it gives you
-            </h2>
-            <div className="trio">
-              <div data-reveal style={delay(0)}>
-                <h3>What you&rsquo;re owed</h3>
-                <p>A declared dividend that hasn&rsquo;t reached the chain yet — per token, with no price needed.</p>
-              </div>
-              <div data-reveal style={delay(110)}>
-                <h3>What actually arrived</h3>
-                <p>The real value each change delivered, against what was promised.</p>
-              </div>
-              <div data-reveal style={delay(220)}>
-                <h3>Whether the price is fresh</h3>
-                <p>
-                  Price feeds pause overnight and at weekends. exdate tells you when a price is
-                  stale, before you act on it.
-                </p>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -326,28 +296,7 @@ export default function Page() {
         </section>
       </main>
 
-      {/* ------------------------------------------------------------------ */}
-      <footer>
-        <div className="wrap foot">
-          <div>
-            <span className="brand">
-              <Mark />
-              <span className="wordmark">exdate</span>
-            </span>
-            <p>The corporate-action layer for tokenized stocks.</p>
-          </div>
-          <nav aria-label="Footer">
-            {links.status ? <a href={links.status}>Live status</a> : <a href={links.data}>Data</a>}
-            <a href={links.apiDocs}>API</a>
-            <a href={links.github}>GitHub</a>
-          </nav>
-          <p className="fine">
-            Data read from Robinhood Chain: {counts.tokens} tokens, last observed{' '}
-            {dateLong(lastObservedAt)}. Stock Tokens are debt securities issued by Robinhood
-            Assets (Jersey) Limited, not equity. Nothing here is investment advice.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </>
   )
 }

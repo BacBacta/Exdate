@@ -24,6 +24,7 @@ interface ReconciliationRow {
   processDate: string | null
   rate: string | null
   status: string
+  actionStatus?: string | null
   change: { effectiveAt: string; stepBps: number; oldMultiplier: string; newMultiplier: string } | null
   price: { value: string; updatedAt: string } | null
   receivedPerShare: string | null
@@ -59,10 +60,14 @@ const reconciliations = reconciliationsJson as unknown as {
 const events = eventsJson as unknown as { scannedAt: string; events: MultiplierEvent[] }
 const registry = registryJson as unknown as {
   fetchedAt: string
-  assets: { tokenSymbol: string; tokenName: string; deployments?: { contractAddress: string; chainId: number }[] }[]
+  assets: { tokenSymbol: string; tokenName: string; isin?: string | null; deployments?: { contractAddress: string; chainId: number }[] }[]
 }
 const feeds = feedsJson as unknown as { name: string }[]
-const feedMap = feedMapJson as unknown as { generatedAt: string; pairs: unknown[]; corroborated?: number }
+const feedMap = feedMapJson as unknown as {
+  generatedAt: string
+  pairs: { token: string; feedProxy: string; verified: boolean; corroborated: boolean }[]
+  corroborated?: number
+}
 const archive = archiveJson as unknown as {
   lastArchivedAt: string
   archivedRows: number
@@ -101,13 +106,15 @@ const money = (value: string | null | undefined, places = 4) =>
 
 const day = (iso: string) => iso.slice(0, 10)
 
-/** Dollars to the cent, padded: "0.2" reads as a typo, "0.20" as a price. */
-export function cents(value: string | null | undefined): string | null {
-  const rounded = money(value, 2)
+/** Rounded and padded to `places`: "0.2" reads as a typo, "0.20" as a price. */
+export function fixed(value: string | null | undefined, places: number): string | null {
+  const rounded = money(value, places)
   if (rounded === null) return null
   const [whole, fraction = ''] = rounded.split('.')
-  return `${whole}.${fraction.padEnd(2, '0')}`
+  return `${whole}.${fraction.padEnd(places, '0')}`
 }
+/** Dollars to the cent. */
+export const cents = (value: string | null | undefined) => fixed(value, 2)
 
 /**
  * The company, by address, from the issuer's own registry - minus the suffix
@@ -190,6 +197,104 @@ const pendingExample =
 const tokens = registry.assets.filter((asset) => asset.deployments?.some((d) => d.chainId === 4663))
 const robinhoodFeeds = feeds.filter((feed) => /^Robinhood /.test(feed.name)).length
 
+/** The newest of every dataset's own timestamp: when the site last saw the chain. */
+const lastObservedAt = [registry.fetchedAt, events.scannedAt, archive.lastArchivedAt, sessionShare.lastSampleAt]
+  .filter(Boolean)
+  .sort()
+  .at(-1)!
+
+// --- one entry per token, for the finder and the token pages -----------------
+export interface TokenSummary {
+  address: string
+  symbol: string
+  name: string
+  isin: string | null
+}
+
+const tokenIndex: TokenSummary[] = tokens
+  .map((asset) => {
+    const address = asset.deployments!.find((d) => d.chainId === 4663)!.contractAddress
+    return {
+      address,
+      symbol: asset.tokenSymbol,
+      name: nameByAddress.get(address.toLowerCase()) ?? asset.tokenSymbol,
+      isin: asset.isin ?? null,
+    }
+  })
+  .sort((a, b) => a.name.localeCompare(b.name))
+
+/** Events are sorted ascending, so the last write per token is its latest step. */
+const lastStepByToken = new Map<string, MultiplierEvent>()
+for (const event of distinctEvents) lastStepByToken.set(event.token.toLowerCase(), event)
+const feedByToken = new Map(feedMap.pairs.map((pair) => [pair.token.toLowerCase(), pair]))
+
+export type DividendState = 'matched' | 'anomaly' | 'pending' | 'unmatched'
+
+/**
+ * Everything the site can say about one token, by address. Every figure comes
+ * from the committed files: the registry for identity, the event scan for the
+ * multiplier, the reconciliation dataset for each dividend, the feed map for
+ * whether a price exists. A token that never moved has multiplier 1 by
+ * construction - the scan covered the whole chain - and the page says so.
+ */
+export function tokenPage(address: string) {
+  const key = address.toLowerCase()
+  const summary = tokenIndex.find((token) => token.address.toLowerCase() === key)
+  if (!summary) return null
+
+  const lastStep = lastStepByToken.get(key) ?? null
+  const multiplier = lastStep ? BigInt(lastStep.newMultiplier) : WAD
+  const feed = feedByToken.get(key) ?? null
+  const observedDay = day(lastObservedAt)
+
+  const dividends = reconciliations.rows
+    .filter((row) => row.token.toLowerCase() === key)
+    .map((row) => {
+      const state = row.status as DividendState
+      const rateWad = row.rate ? parseDecimal(row.rate) : null
+      return {
+        key: `${row.processDate ?? row.change?.effectiveAt ?? 'undated'}:${state}`,
+        state,
+        processDate: row.processDate,
+        effectiveAt: row.change?.effectiveAt ?? null,
+        declared: fixed(row.rate, 4),
+        arrived: fixed(row.receivedPerShare, 4),
+        haircutBps: state === 'matched' ? (row.impliedHaircutBps ?? null) : null,
+        stepBps: row.change?.stepBps ?? null,
+        hasFeed: Boolean(row.feed),
+        /** Owed per token while nothing has landed: rate x what a token represents today. No price. */
+        owedPerToken:
+          state === 'pending' && rateWad !== null ? fixed(formatWad((rateWad * multiplier) / WAD, 18), 4) : null,
+        /** A process date the data has not reached yet: declared, not owed. */
+        upcoming: state === 'pending' && row.processDate !== null && row.processDate > observedDay,
+        issuerCompleted: row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED',
+      }
+    })
+    .sort((a, b) => (b.processDate ?? b.effectiveAt ?? '').localeCompare(a.processDate ?? a.effectiveAt ?? ''))
+
+  const steps = distinctEvents
+    .filter((event) => event.token.toLowerCase() === key)
+    .map((event) => ({
+      date: day(event.effectiveAt),
+      from: formatWad(BigInt(event.oldMultiplier), 6),
+      to: formatWad(BigInt(event.newMultiplier), 6),
+      stepBps: event.stepBps,
+    }))
+    .reverse()
+
+  return {
+    ...summary,
+    explorerUrl: `https://robinhoodchain.blockscout.com/address/${summary.address}`,
+    multiplier: formatWad(multiplier, 6),
+    moved: lastStep !== null,
+    lastChangedAt: lastStep ? day(lastStep.effectiveAt) : null,
+    feed: feed ? { proxy: feed.feedProxy, corroborated: feed.corroborated } : null,
+    dividends,
+    steps,
+    observedAt: observedDay,
+  }
+}
+
 export const observed = {
   chain: { id: 4663, name: 'Robinhood Chain' },
   counts: {
@@ -215,11 +320,8 @@ export const observed = {
     /** The share of the declared dividend that never arrived, 0-1, for the ring. */
     gapFraction: hero.haircutBps! / 10_000,
   },
-  /** The newest of every dataset's own timestamp: when the site last saw the chain. */
-  lastObservedAt: [registry.fetchedAt, events.scannedAt, archive.lastArchivedAt, sessionShare.lastSampleAt]
-    .filter(Boolean)
-    .sort()
-    .at(-1)!,
+  lastObservedAt,
+  tokens: tokenIndex,
   reconciled,
   steps: distinctEvents.map((e) => ({
     symbol: e.symbol,

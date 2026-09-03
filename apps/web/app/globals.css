@@ -138,6 +138,57 @@ html:not([data-js]) .ring-gap { stroke-dashoffset: calc(var(--c) * (1 - var(--ga
 .ring-figure figcaption { text-align: center; max-width: 40ch; color: var(--ink-2); font-size: 15.5px; line-height: 1.5; text-wrap: pretty; }
 .fig-detail { display: block; margin-top: 0.5rem; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
 
+/* --- finder --------------------------------------------------------------- */
+.hero-find { margin-top: 2rem; max-width: 560px; }
+.finder-label { display: block; font-size: 15px; font-weight: 500; margin-bottom: 0.6rem; }
+.finder-row { display: flex; gap: 0.5rem; }
+.finder input {
+  flex: 1; min-width: 0; height: 50px; padding: 0 1.15rem; border-radius: 999px;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
+  font: inherit; font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.4s var(--ease);
+}
+.finder input::placeholder { color: var(--muted); }
+.finder input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink) 8%, transparent); }
+.finder input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.finder .btn[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.finder-hint { margin-top: 0.6rem; font-size: 14px; color: var(--muted); }
+.finder-list { margin-top: 0.6rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.finder-list a { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.8rem 1.15rem; border-top: 1px solid var(--line); transition: background-color 0.2s; }
+.finder-list li:first-child a { border-top: 0; }
+.finder-list a:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); text-decoration: none; }
+.finder-list .name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.finder-list .sym { font-family: var(--mono); font-size: 13px; color: var(--muted); flex: none; }
+.hero-more { margin-top: 1.4rem; font-size: 15px; color: var(--muted); }
+.hero-more a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+
+/* --- what you can do ------------------------------------------------------ */
+.do { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 3.5rem); margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+.do > div { padding-top: 1.4rem; border-top: 1px solid var(--line-2); }
+.do p { color: var(--muted); font-size: 1rem; max-width: 34ch; text-wrap: pretty; }
+.do .more { display: inline-block; margin-top: 1rem; font-size: 15px; color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+
+/* --- token page ----------------------------------------------------------- */
+.token-hero { min-height: 0; padding: clamp(2.5rem, 6vh, 4.5rem) 0 clamp(2.5rem, 5vh, 4rem); }
+.crumb { font-size: 14px; color: var(--muted); margin-bottom: 2.2rem; }
+.crumb a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.token-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2rem 3rem; align-items: end; }
+.token-kind { font-size: 14px; color: var(--muted); margin-bottom: 0.8rem; }
+.token-head h1 { max-width: 20ch; font-size: clamp(2.1rem, 4.6vw, 3.8rem); }
+.token-meta { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; font-size: 13.5px; color: var(--muted); font-family: var(--mono); }
+.token-meta a { color: inherit; word-break: break-all; }
+.token-meta a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.stat { text-align: right; }
+.stat .v { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat .k { margin-top: 0.5rem; font-size: 15px; color: var(--muted); max-width: 26ch; margin-left: auto; }
+h2.small { font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin-bottom: 1.6rem; }
+.state { font-size: 15px; color: var(--muted); }
+.state.on { color: var(--ink); font-weight: 500; }
+.empty { padding: 1.4rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); }
+.note-box { margin-top: 1.4rem; color: var(--muted); font-size: 15px; max-width: 64ch; text-wrap: pretty; }
+.note-box.big { margin-top: 0; font-size: 1.05rem; color: var(--ink-2); }
+.observed-line { padding: 0 0 3rem; color: var(--muted); font-size: 14px; }
+
 /* --- sections ------------------------------------------------------------- */
 .block { padding: clamp(5rem, 11vw, 9rem) 0; border-top: 1px solid var(--line); }
 h2 { font-size: clamp(1.9rem, 3.4vw, 2.8rem); letter-spacing: -0.03em; line-height: 1.1; font-weight: 500; text-wrap: balance; max-width: 22ch; }
@@ -214,7 +265,9 @@ footer { border-top: 1px solid var(--line); padding: 3.5rem 0 4rem; }
 /* --- responsive ----------------------------------------------------------- */
 @media (max-width: 900px) {
   .hero { min-height: 0; }
-  .hero-grid, .steps, .trio, .dev-grid { grid-template-columns: 1fr; }
+  .hero-grid, .steps, .trio, .do, .dev-grid, .token-head { grid-template-columns: 1fr; }
+  .stat { text-align: left; }
+  .stat .k { margin-left: 0; }
   .ring { width: min(100%, 280px); }
   .ledger li, .coverage li { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1rem; }
   .who { grid-column: 1 / -1; }

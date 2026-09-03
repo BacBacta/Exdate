@@ -593,6 +593,19 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (3) "Does it cover every chain?" — no, and the site now says so in a *Coverage* section read
   from `data/`: Robinhood Chain, 194 tokens, 35 feeds, measured live; Base, 13 Coinbase tokens
   and 13 feeds verified on chain, nothing to measure yet because no multiplier has ever moved.
+- 2026-09-03 — **The site becomes a tool.** "What does a visitor *do* here?" had no answer: a
+  holder could not find their token, see what it is owed, what arrived, or whether it has a price
+  feed — all of which sit in `data/`. Now: a **finder** in the hero (194 names, tickers and
+  addresses baked into the page, results on every keystroke, plain links so it works by keyboard
+  and without the button) and **one static page per token** at `/t/<address>/`, generated at
+  build from the committed files: what a token represents in shares today (1 by construction for
+  a token that never moved — the scan covered the whole chain), every dividend as declared →
+  arrived → state, **owed per token** for a declared dividend that has not landed (rate × today's
+  multiplier, no price), the multiplier history, and whether a Chainlink feed exists at all. A gap
+  is shown only on `matched`; `anomaly`, `pending`, `unmatched` each get a plain-words state.
+  "What you can do here" replaces "What it gives you", and every proof row links to its token.
+  `trailingSlash: true` so `/t/<address>/` is a directory index that any static host serves
+  without URL rewriting — the thing that broke the root once.
 - _(append decisions here as they are made)_
 
 ## Status
