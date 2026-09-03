@@ -22,7 +22,7 @@ and the health of every Chainlink feed.
 |---|---|
 | **Pending dividend** | Between ex-date and multiplier application, a token is worth more than the oracle says. Undervalued collateral, predictable DEX/NAV premium. |
 | **Observed haircut** | Reconciling declared dividends against observed multiplier steps measures the real cost of the structure. Published nowhere else. |
-| **Feed health** | Feeds are 24/5 and freeze off-hours. The kickoff brief states ~46% of transfers happen outside NYSE hours — exdate has not measured that, and indexes no transfers. Lending protocols need to know before they liquidate. |
+| **Feed health** | Feeds are 24/5 and freeze off-hours, while the chain does not. exdate samples the off-hours share hourly instead of repeating the brief's ~46% — the answer is published only once every session has been sampled. Lending protocols need to know before they liquidate. |
 
 None of that is hypothetical. On 2026-09-02, mid-session, the SPY feed was **18 hours** stale and
 the QQQ feed **4 hours** stale. Ten tokens have already moved their multiplier — steps ranging from
@@ -45,11 +45,13 @@ pnpm typecheck
 The poller writes its first rows within about a minute. Until then the page says so; it never
 shows a zero it has not observed.
 
-Two GitHub Actions run in `.github/workflows`: `ci` typechecks, tests, builds the status page and
-proves the generated registry still matches the data it comes from; `archive-corporate-actions`
+Three GitHub Actions run in `.github/workflows`. `ci` typechecks, tests, builds the status page and
+proves the generated registry still matches the data it comes from. `archive-corporate-actions`
 runs daily, merges the issuer's window into `data/corporate-actions.archive.json` and commits it
-only when something changed. The second is not housekeeping — the issuer keeps about a month, so
-every day it does not run is a day of dividend history that becomes unrecoverable.
+only when something changed — not housekeeping, since the issuer keeps about a month and every day
+it does not run is a day of dividend history that becomes unrecoverable. `measure-session-share`
+runs hourly and appends one sampled window to `data/session-share.observed.json`; it takes a week to
+cover the clock, which is why it is a schedule and not a script anyone runs once.
 
 ### Verification scripts
 
@@ -87,6 +89,7 @@ Committed artifacts, all first-party or read from the chain:
 | `data/feed-map-verification.json` | what that pairing was actually tested against |
 | `data/svr-proxy-check.json` | the primary and SVR proxies of all 35 feeds, compared by address |
 | `data/transfer-volume.observed.json` | what indexing transfers would cost, measured |
+| `data/session-share.observed.json` | how much activity happens outside the US market session — sampled hourly, share refused until every session is covered |
 | `data/base-coinbase-feeds.snapshot.json` | the 13 Coinbase B20 feeds on Base — second-issuer reconnaissance |
 | `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
 | `data/reconciliations.observed.json` | every declared action against the step it produced, priced at `effectiveAt` |

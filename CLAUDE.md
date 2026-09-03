@@ -219,8 +219,39 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   (Stock Token + USDG) in the same `transactionHash`.
 - Mint = transfer from `address(0)`. Burn = transfer to `address(0)`.
 - The kickoff brief states that ~46% of transfers happen outside NYSE hours, weekends included.
-  **exdate has not measured this** — it indexes no transfers — so the figure is the brief's, not an
-  observation. Correctness during off-hours windows is still a requirement, not a nice-to-have.
+  **exdate is now measuring it** rather than repeating it — see "Off-hours share" below. Until that
+  file says `sufficient: true` the figure stays the brief's, not an observation. Correctness during
+  off-hours windows is a requirement either way, not a nice-to-have.
+
+## Off-hours share — being measured, not yet answered
+
+The one number left in the product that traced back to the brief rather than to a measurement.
+`scripts/measure-session-share.mjs` takes one sample per run — a ~40 s window of `Transfer` logs
+across all 194 tokens, its rate in transfers per second, and the ET market session it fell in — and
+appends it to `data/session-share.observed.json`. `.github/workflows/measure-session-share.yml`
+runs it hourly.
+
+- The published statistic is **a rate weighted by clock hours**, not a pooled count:
+  `mean transfers/second in a session × that session's hours per week`, normalised across the five.
+  An uneven sampling schedule therefore biases it far less. The pooled, uncorrected share is
+  published beside it so the two can be compared.
+- Sessions, in `America/New_York` so DST is not an offset anyone has to maintain: pre-market
+  04:00–09:30 (27.5 h/week), regular 09:30–16:00 (32.5), after-hours 16:00–20:00 (20), overnight
+  20:00–04:00 (40), weekend (48) — 168 h, and off-hours is 135.5 of them.
+- **The share is refused until every session has ≥3 samples**, under
+  `notComputed: insufficient_session_coverage`. Rule 2: a share computed before the regular session
+  has been sampled would be a number about the sampling schedule.
+- The classifier is `scripts/lib/market-session.mjs` — plain ESM with no dependencies, so the hourly
+  Action runs it on a bare `node` with no install step and the sampling outlives the workspace. It
+  is unit-tested in `packages/core/test/market-session.test.mjs` (18 tests: every boundary, the
+  weekend, both DST directions, the 168 slots).
+- A run whose window overlaps the last recorded sample appends nothing, so a duplicate fire is a
+  no-op rather than a double count.
+- Market holidays and half-days are **not** modelled and the file says so: a holiday counts as an
+  ordinary weekday, so its quiet regular session drags that bucket's rate down slightly.
+
+First sample 2026-09-03 07:48 UTC (overnight): 1 517 transfers in 41 s = **37 transfers/second**,
+464 of the 630 token-moving transactions also moved USDG.
 
 ## Observed corporate actions
 
@@ -427,6 +458,13 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (`MultiplierUpdated` + `Announcement` wrappers) and — notably — identity **by contract address
   rather than ticker**. It needs a source module, not a config entry. Not wired: the registry
   address, the token addresses and any corporate-action feed are all still unknown.
+- 2026-09-03 — The off-hours share is **measured hourly, not asserted**. The brief's ~46 % was the
+  last product number sourced from nobody; a single window cannot answer it, because the answer is a
+  rate that varies across the week. So: one sampled window per hour into a committed file, a share
+  weighted by each session's clock hours rather than pooled, and the share itself **refused** until
+  every session has three samples. The classifier is dependency-free plain ESM so the Action needs
+  no install step, and unit-tested in `packages/core` because a boundary or a DST error would be
+  larger than the effect.
 - _(append decisions here as they are made)_
 
 ## Status

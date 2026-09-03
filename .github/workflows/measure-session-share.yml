@@ -1,0 +1,63 @@
+# Measure the off-hours share, hour by hour.
+#
+# The kickoff brief asserts that ~46 % of transfers happen outside NYSE hours.
+# exdate indexes no transfers, so that figure has never been an observation -
+# the last number in the product traceable to nobody. It cannot be measured in
+# one shot either: the answer is a rate that varies across the week, so it takes
+# a sample in every session before it means anything.
+#
+# Hourly on purpose. A run is one short eth_getLogs window - a few seconds of
+# runner time - and the schedule is what fills the 168 hour-of-week slots. The
+# script refuses to append a window that overlaps the last one, so a delayed or
+# duplicated fire costs nothing.
+name: measure-session-share
+
+on:
+  schedule:
+    # Every hour at :07. GitHub delays scheduled runs under load, which spreads
+    # the samples inside the hour rather than pinning them to one minute.
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure-session-share
+  cancel-in-progress: false
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Throws on a bad read and exits without writing on an overlapping window,
+      # so the committed file only ever grows by real, disjoint observations.
+      - name: Take one sample
+        run: node scripts/measure-session-share.mjs
+
+      - name: Commit only if a sample was actually appended
+        run: |
+          if git diff --quiet -- data/session-share.observed.json; then
+            echo "nothing appended"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/session-share.observed.json');const s=d.samples.at(-1);const share=d.transferShare?(d.transferShare.offHours*100).toFixed(1)+'% off-hours':'share pending';process.stdout.write(d.sampleCount+' samples, '+d.easternHourOfWeekSlotsCovered+'/168 slots, '+share+' (latest: '+s.session+', '+s.transfersPerSecond+'/s)')")
+          git config user.name 'exdate-sampler'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/session-share.observed.json
+          git commit -m "Sample off-hours transfer share: $summary"
+
+          # The schedule fires hourly against a branch other jobs also push to.
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

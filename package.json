@@ -19,6 +19,7 @@
     "typecheck": "pnpm -r typecheck",
     "registry:generate": "node scripts/generate-registry.mjs",
     "archive:corporate-actions": "node scripts/archive-corporate-actions.mjs",
+    "measure:session-share": "node scripts/measure-session-share.mjs",
     "phase0:chain": "node scripts/phase0/check-chain.mjs",
     "phase0:tokens": "node scripts/phase0/check-tokens.mjs",
     "phase0:feeds": "node scripts/phase0/check-feeds.mjs",
