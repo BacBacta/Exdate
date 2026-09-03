@@ -545,6 +545,23 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   verifies the lockfile against **every** workspace `package.json`, so omitting one package fails
   the install. Verified live: `/` 200 with the real figures, `/_next/static` immutable, an unknown
   path 404.
+- 2026-09-03 — **Site v2: for a reader who is not an engineer.** v1 was documentation in a
+  nicer typeface — a nine-column table, twelve ledger rows, six dense sections, and jargon on
+  every line (bps, ERC-8056, oracle, reconciliation, confidence). v2 says one thing in plain
+  words — *a dividend on a tokenized stock never lands in your wallet; the token becomes worth a
+  little more; exdate measures how much, and how much went missing* — in five screens and ~440
+  visible words (from ~890). The hero's single visual is data: a ring whose drawn arc is the share
+  of Apple's last dividend that never arrived on chain, `--gap` fed from the reconciliation.
+  Companies are named from the registry (by address, suffix stripped), amounts shown to the cent,
+  percentages as whole numbers; a gap is shown **only** on `matched` rows — an anomaly reads
+  "doesn't add up", a feedless token "no price feed", never a number. Everything technical sits
+  behind one *Developers* block. Motion is restrained and progressive: `data-reveal` elements
+  fade and rise once on scroll, the ring draws, the number counts up — driven by an inline script
+  that sets `data-js` before first paint so there is no flash, fully present without JavaScript,
+  and switched off under `prefers-reduced-motion` (the full-page screenshots are taken in that
+  mode, which tests the path). Accessibility floor: no text under 13 px, muted text ≥ 4.5:1 in
+  both schemes, skip link, visible focus, landmarks, the ring labelled for screen readers and its
+  animated number `aria-hidden` beside the static one.
 - _(append decisions here as they are made)_
 
 ## Status

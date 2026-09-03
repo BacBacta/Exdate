@@ -58,7 +58,7 @@ const reconciliations = reconciliationsJson as unknown as {
 const events = eventsJson as unknown as { scannedAt: string; events: MultiplierEvent[] }
 const registry = registryJson as unknown as {
   fetchedAt: string
-  assets: { tokenSymbol: string; deployments?: { contractAddress: string; chainId: number }[] }[]
+  assets: { tokenSymbol: string; tokenName: string; deployments?: { contractAddress: string; chainId: number }[] }[]
 }
 const feeds = feedsJson as unknown as { name: string }[]
 const feedMap = feedMapJson as unknown as { generatedAt: string; pairs: unknown[]; corroborated?: number }
@@ -99,6 +99,27 @@ const money = (value: string | null | undefined, places = 4) =>
 
 const day = (iso: string) => iso.slice(0, 10)
 
+/** Dollars to the cent, padded: "0.2" reads as a typo, "0.20" as a price. */
+export function cents(value: string | null | undefined): string | null {
+  const rounded = money(value, 2)
+  if (rounded === null) return null
+  const [whole, fraction = ''] = rounded.split('.')
+  return `${whole}.${fraction.padEnd(2, '0')}`
+}
+
+/**
+ * The company, by address, from the issuer's own registry - minus the suffix
+ * every token carries. A reader sees "Apple", never a ticker.
+ */
+const nameByAddress = new Map(
+  registry.assets.flatMap((asset) =>
+    (asset.deployments ?? []).map((d) => [
+      d.contractAddress.toLowerCase(),
+      asset.tokenName.replace(/\s*[•·-]\s*Robinhood Token$/i, '').trim(),
+    ]),
+  ),
+)
+
 // --- what the page shows ------------------------------------------------------
 
 /** One event per (token, effectiveAt): CRWD announced the same change twice. */
@@ -112,6 +133,7 @@ const reconciled = reconciliations.rows
   .map((row) => ({
     symbol: row.symbol,
     token: row.token,
+    name: nameByAddress.get(row.token.toLowerCase()) ?? row.symbol,
     processDate: row.processDate,
     declared: money(row.rate, 6),
     stepBps: row.change?.stepBps ?? null,
@@ -187,7 +209,14 @@ export const observed = {
   hero: {
     ...hero,
     haircutPct: (hero.haircutBps! / 100).toFixed(1),
+    /** The share of the declared dividend that never arrived, 0-1, for the ring. */
+    gapFraction: hero.haircutBps! / 10_000,
   },
+  /** The newest of every dataset's own timestamp: when the site last saw the chain. */
+  lastObservedAt: [registry.fetchedAt, events.scannedAt, archive.lastArchivedAt, sessionShare.lastSampleAt]
+    .filter(Boolean)
+    .sort()
+    .at(-1)!,
   reconciled,
   steps: distinctEvents.map((e) => ({
     symbol: e.symbol,
