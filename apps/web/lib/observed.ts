@@ -25,8 +25,16 @@ interface ReconciliationRow {
   rate: string | null
   status: string
   actionStatus?: string | null
-  change: { effectiveAt: string; stepBps: number; oldMultiplier: string; newMultiplier: string } | null
-  price: { value: string; updatedAt: string } | null
+  change: {
+    effectiveAt: string
+    stepBps: number
+    oldMultiplier: string
+    newMultiplier: string
+    lagDays?: number | null
+  } | null
+  price: { value: string; updatedAt: string; stalenessSecondsAtEffectiveAt?: number | null } | null
+  expectedStepWad?: string | null
+  note?: string | null
   receivedPerShare: string | null
   impliedHaircutBps: number | null
   impliedReinvestPrice: string | null
@@ -65,7 +73,15 @@ const registry = registryJson as unknown as {
 const feeds = feedsJson as unknown as { name: string }[]
 const feedMap = feedMapJson as unknown as {
   generatedAt: string
-  pairs: { token: string; feedProxy: string; verified: boolean; corroborated: boolean }[]
+  pairs: {
+    token: string
+    feedProxy: string
+    verified: boolean
+    corroborated: boolean
+    heartbeatSeconds?: number
+    deviationThresholdPercent?: number
+    marketHours?: string
+  }[]
   corroborated?: number
 }
 const archive = archiveJson as unknown as {
@@ -226,7 +242,16 @@ const tokenIndex: TokenSummary[] = tokens
 /** Events are sorted ascending, so the last write per token is its latest step. */
 const lastStepByToken = new Map<string, MultiplierEvent>()
 for (const event of distinctEvents) lastStepByToken.set(event.token.toLowerCase(), event)
+/** The announcing transaction behind a step, by (token, instant of effect). */
+const eventByEffect = new Map(distinctEvents.map((e) => [`${e.token.toLowerCase()}:${Date.parse(e.effectiveAt)}`, e]))
 const feedByToken = new Map(feedMap.pairs.map((pair) => [pair.token.toLowerCase(), pair]))
+const multiplierOf = (key: string) => (lastStepByToken.has(key) ? BigInt(lastStepByToken.get(key)!.newMultiplier) : WAD)
+const observedDay = day(lastObservedAt)
+const EXPLORER = 'https://robinhoodchain.blockscout.com'
+/** The pairing window the reconciliation uses: the observed lag is one business day. */
+const WINDOW_DAYS = 4
+const DAY_MS = 86_400_000
+const daysBetween = (from: string, to: string) => Math.floor((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / DAY_MS)
 
 export type DividendState = 'matched' | 'anomaly' | 'pending' | 'unmatched'
 
@@ -243,9 +268,8 @@ export function tokenPage(address: string) {
   if (!summary) return null
 
   const lastStep = lastStepByToken.get(key) ?? null
-  const multiplier = lastStep ? BigInt(lastStep.newMultiplier) : WAD
+  const multiplier = multiplierOf(key)
   const feed = feedByToken.get(key) ?? null
-  const observedDay = day(lastObservedAt)
 
   const dividends = reconciliations.rows
     .filter((row) => row.token.toLowerCase() === key)
@@ -268,6 +292,24 @@ export function tokenPage(address: string) {
         /** A process date the data has not reached yet: declared, not owed. */
         upcoming: state === 'pending' && row.processDate !== null && row.processDate > observedDay,
         issuerCompleted: row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED',
+        /** How the row was measured, for a reader who opens it. Every field is from the same record. */
+        detail: {
+          priceAtEffect: row.price ? fixed(row.price.value, 2) : null,
+          priceAgeAtEffectMinutes:
+            row.price?.stalenessSecondsAtEffectiveAt != null ? Math.round(row.price.stalenessSecondsAtEffectiveAt / 60) : null,
+          /** What a full payment would have moved the multiplier by, as a percentage. */
+          expectedStepPct: row.expectedStepWad ? Number(BigInt(row.expectedStepWad)) / 1e16 : null,
+          observedStepPct: row.change ? row.change.stepBps / 100 : null,
+          impliedPrice: fixed(row.impliedReinvestPrice, 2),
+          spotToday: row.issuerSpotToday ? fixed(row.issuerSpotToday.mid, 2) : null,
+          impliedOverSpot: row.issuerSpotToday?.impliedOverSpot ?? null,
+          lagDays: row.change?.lagDays ?? null,
+          txUrl: (() => {
+            const event = row.change ? eventByEffect.get(`${key}:${Date.parse(row.change.effectiveAt)}`) : undefined
+            return event ? `${EXPLORER}/tx/${event.tx}` : null
+          })(),
+          note: row.note ?? null,
+        },
       }
     })
     .sort((a, b) => (b.processDate ?? b.effectiveAt ?? '').localeCompare(a.processDate ?? a.effectiveAt ?? ''))
@@ -279,21 +321,102 @@ export function tokenPage(address: string) {
       from: formatWad(BigInt(event.oldMultiplier), 6),
       to: formatWad(BigInt(event.newMultiplier), 6),
       stepBps: event.stepBps,
+      leadMinutes: Math.round(event.leadMinutes),
+      txUrl: `${EXPLORER}/tx/${event.tx}`,
     }))
     .reverse()
 
+  /** Growth in shares per token since launch, and what explains it. Observed, never annualised. */
+  const sinceLaunch =
+    lastStep === null
+      ? null
+      : {
+          growthPct: (Number(multiplier - WAD) / 1e16).toFixed(2),
+          reconciled: dividends.filter((d) => d.state === 'matched').length,
+          unexplained: dividends.filter((d) => d.state === 'anomaly' || d.state === 'unmatched').length,
+        }
+
   return {
     ...summary,
-    explorerUrl: `https://robinhoodchain.blockscout.com/address/${summary.address}`,
+    explorerUrl: `${EXPLORER}/address/${summary.address}`,
     multiplier: formatWad(multiplier, 6),
     moved: lastStep !== null,
     lastChangedAt: lastStep ? day(lastStep.effectiveAt) : null,
-    feed: feed ? { proxy: feed.feedProxy, corroborated: feed.corroborated } : null,
+    sinceLaunch,
+    feed: feed
+      ? {
+          proxy: feed.feedProxy,
+          proxyUrl: `${EXPLORER}/address/${feed.feedProxy}`,
+          corroborated: feed.corroborated,
+          heartbeatHours: feed.heartbeatSeconds ? Math.round(feed.heartbeatSeconds / 3600) : null,
+          deviationPercent: feed.deviationThresholdPercent ?? null,
+          marketHours: feed.marketHours === 'us_equities_24/5' ? 'US equities, 24/5' : (feed.marketHours ?? null),
+        }
+      : null,
     dividends,
     steps,
     observedAt: observedDay,
   }
 }
+
+export type CalendarGroup = 'paid_not_on_chain' | 'overdue' | 'awaiting' | 'upcoming'
+
+/**
+ * Every dividend declared by the issuer that has not produced a step on chain,
+ * across all tokens, grouped the way the pending endpoint groups them: by
+ * whether the date has arrived, whether the pairing window has passed, and
+ * whether the issuer already calls it paid.
+ */
+export const calendar = (() => {
+  const rows = reconciliations.rows
+    .filter((row) => row.status === 'pending' && row.processDate)
+    .map((row) => {
+      const key = row.token.toLowerCase()
+      const daysSince = daysBetween(row.processDate!, observedDay)
+      const group: CalendarGroup =
+        daysSince < 0
+          ? 'upcoming'
+          : daysSince <= WINDOW_DAYS
+            ? 'awaiting'
+            : row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED'
+              ? 'paid_not_on_chain'
+              : 'overdue'
+      return {
+        token: row.token,
+        symbol: row.symbol,
+        name: nameByAddress.get(key) ?? row.symbol,
+        processDate: row.processDate!,
+        declared: fixed(row.rate, 4),
+        owedPerToken: row.rate ? fixed(formatWad((parseDecimal(row.rate) * multiplierOf(key)) / WAD, 18), 4) : null,
+        daysSince,
+        group,
+      }
+    })
+  const pick = (group: CalendarGroup) =>
+    rows.filter((row) => row.group === group).sort((a, b) => a.processDate.localeCompare(b.processDate))
+  return {
+    observedDay,
+    windowDays: WINDOW_DAYS,
+    total: rows.length,
+    tokens: new Set(rows.map((row) => row.token.toLowerCase())).size,
+    paidNotOnChain: pick('paid_not_on_chain'),
+    overdue: pick('overdue'),
+    awaiting: pick('awaiting'),
+    upcoming: pick('upcoming'),
+  }
+})()
+
+/** What the dozen observed changes say about timing. A pattern with its sample size, not a forecast. */
+export const timing = (() => {
+  const leads = distinctEvents.map((e) => e.leadMinutes).sort((a, b) => a - b)
+  const lags = reconciliations.rows.map((row) => row.change?.lagDays).filter((v): v is number => typeof v === 'number')
+  return {
+    changes: distinctEvents.length,
+    medianLeadMinutes: Math.round(leads[Math.floor(leads.length / 2)] ?? 0),
+    lagOneDay: lags.filter((v) => v === 1).length,
+    lagCases: lags.length,
+  }
+})()
 
 export const observed = {
   chain: { id: 4663, name: 'Robinhood Chain' },

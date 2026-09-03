@@ -3,7 +3,7 @@ import { CountUp } from './components/CountUp'
 import { Footer, Nav } from './components/Chrome'
 import { Finder } from './components/Finder'
 import { dateLong, delay, pctInt } from '../lib/format'
-import { cents, observed } from '../lib/observed'
+import { calendar, cents, observed, timing } from '../lib/observed'
 
 const { counts, hero, reconciled, chains, links } = observed
 
@@ -139,6 +139,12 @@ export default function Page() {
                   Instead of cash, the token&rsquo;s multiplier rises. Your balance never changes;
                   what it represents does.
                 </p>
+                <p className="step-note">
+                  Across the {timing.changes} changes seen so far, the announcement came about{' '}
+                  {timing.medianLeadMinutes} minutes before the change, and the change followed the
+                  issuer&rsquo;s date by one business day in {timing.lagOneDay} of {timing.lagCases}{' '}
+                  measured cases.
+                </p>
               </li>
               <li data-reveal style={delay(220)}>
                 <span className="step-n">03</span>
@@ -200,6 +206,14 @@ export default function Page() {
                 <a href={links.data}>Every row, with its sources, in the repository</a>
               )}
               .
+            </p>
+            <p className="after" data-reveal>
+              <a href="/calendar/">
+                {calendar.total} more dividends are declared and not yet on chain
+              </a>
+              {calendar.paidNotOnChain.length > 0
+                ? `, ${calendar.paidNotOnChain.length} of them already marked paid by the issuer.`
+                : '.'}
             </p>
           </div>
         </section>

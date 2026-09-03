@@ -8,7 +8,7 @@ import { observed, tokenPage } from '../../../lib/observed'
  * One page per token, all 194 generated at build time from the committed
  * data. This is what a holder actually comes for: what their token represents
  * today, what was declared, what arrived, what is still owed, and whether a
- * price feed exists for it at all.
+ * price feed exists for it at all. Each row opens to show how it was measured.
  */
 export const dynamicParams = false
 
@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ address: 
   }
 }
 
-type Dividend = NonNullable<ReturnType<typeof tokenPage>>['dividends'][number]
+type Token = NonNullable<ReturnType<typeof tokenPage>>
+type Dividend = Token['dividends'][number]
 
 function stateOf(dividend: Dividend): { text: string; on: boolean } {
   switch (dividend.state) {
@@ -43,7 +44,105 @@ function stateOf(dividend: Dividend): { text: string; on: boolean } {
   }
 }
 
-const stepText = (bps: number) => (bps >= 10_000 ? `×${(1 + bps / 10_000).toFixed(0)}` : `+${(bps / 100).toFixed(3)}%`)
+const pct3 = (value: number | null) => (value == null ? '—' : `${value > 0 ? '+' : ''}${value.toFixed(3)}%`)
+const stepText = (bps: number) => (bps >= 10_000 ? `×${(1 + bps / 10_000).toFixed(0)}` : pct3(bps / 100))
+
+/** How the row was measured. Opened by the reader; every value is from the same record. */
+function Detail({ dividend }: { dividend: Dividend }) {
+  const d = dividend.detail
+  const measured = dividend.state === 'matched' || dividend.state === 'anomaly'
+  return (
+    <details className="row-detail">
+      <summary>{measured ? 'How this was measured' : 'Details'}</summary>
+      <dl>
+        {measured ? (
+          <>
+            <div>
+              <dt>Price when the step took effect</dt>
+              <dd>
+                {d.priceAtEffect ? `$${d.priceAtEffect}` : 'no feed'}
+                {d.priceAgeAtEffectMinutes != null ? `, ${d.priceAgeAtEffectMinutes} min old` : ''}
+              </dd>
+            </div>
+            <div>
+              <dt>Step a full payment implies</dt>
+              <dd>{pct3(d.expectedStepPct)}</dd>
+            </div>
+            <div>
+              <dt>Step observed on chain</dt>
+              <dd>{pct3(d.observedStepPct)}</dd>
+            </div>
+            <div>
+              <dt>Price the step implies</dt>
+              <dd>
+                {d.impliedPrice ? `$${d.impliedPrice}` : '—'}
+                {d.impliedOverSpot != null && d.spotToday ? ` (${d.impliedOverSpot.toFixed(2)}× today’s $${d.spotToday})` : ''}
+              </dd>
+            </div>
+            <div>
+              <dt>After the issuer’s date</dt>
+              <dd>{d.lagDays != null ? `${d.lagDays} business day${d.lagDays === 1 ? '' : 's'}` : '—'}</dd>
+            </div>
+            {d.txUrl ? (
+              <div>
+                <dt>Proof</dt>
+                <dd>
+                  <a href={d.txUrl} rel="noopener">
+                    transaction on chain
+                  </a>
+                </dd>
+              </div>
+            ) : null}
+            {dividend.state === 'anomaly' ? (
+              <div className="wide">
+                {dividend.hasFeed
+                  ? 'A dividend reinvested at the price in force should have moved the multiplier by the implied step. The observed step is too far from it to call this a measurement, so no gap is claimed.'
+                  : 'Without a price feed there is nothing to price the step against. The implied price is the only check: a reinvestment that really happened lands near today’s price.'}
+              </div>
+            ) : null}
+          </>
+        ) : dividend.state === 'pending' ? (
+          <>
+            <div>
+              <dt>Declared by the issuer for</dt>
+              <dd>{dateLong(dividend.processDate)}</dd>
+            </div>
+            <div>
+              <dt>Owed per token</dt>
+              <dd>{dividend.owedPerToken ? `$${dividend.owedPerToken}, rate × what a token represents today` : '—'}</dd>
+            </div>
+            <div className="wide">
+              {dividend.issuerCompleted
+                ? 'The issuer’s own feed marks this dividend completed, and the multiplier has not moved. Every observed step so far landed one business day after the issuer’s date.'
+                : 'No multiplier change has been announced on chain yet. Announcements come about nine minutes before a change; exdate does not predict the date.'}
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <dt>Step observed on chain</dt>
+              <dd>{pct3(d.observedStepPct)}</dd>
+            </div>
+            {d.txUrl ? (
+              <div>
+                <dt>Proof</dt>
+                <dd>
+                  <a href={d.txUrl} rel="noopener">
+                    transaction on chain
+                  </a>
+                </dd>
+              </div>
+            ) : null}
+            <div className="wide">
+              The issuer’s feed keeps about a month of history. This step’s declaration is no longer in
+              it, so its declared amount cannot be recovered from any first-party source.
+            </div>
+          </>
+        )}
+      </dl>
+    </details>
+  )
+}
 
 export default async function Page({ params }: { params: Promise<{ address: string }> }) {
   const { address } = await params
@@ -80,6 +179,16 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                     ? `shares per token, since ${dateLong(token.lastChangedAt)}`
                     : 'share per token, unchanged since launch'}
                 </div>
+                {token.sinceLaunch ? (
+                  <p className="since">
+                    +{token.sinceLaunch.growthPct}% shares since launch:{' '}
+                    {token.sinceLaunch.reconciled} dividend{token.sinceLaunch.reconciled === 1 ? '' : 's'} reconciled
+                    {token.sinceLaunch.unexplained > 0
+                      ? `, ${token.sinceLaunch.unexplained} step${token.sinceLaunch.unexplained === 1 ? '' : 's'} unexplained`
+                      : ''}
+                    .
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -122,6 +231,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                       <div className="gap">
                         <span className={`state${state.on ? ' on' : ''}`}>{state.text}</span>
                       </div>
+                      <Detail dividend={dividend} />
                     </li>
                   )
                 })}
@@ -152,7 +262,12 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                   <li key={step.date} data-reveal style={delay(index * 50)}>
                     <div className="who">
                       <span className="name">{dateLong(step.date)}</span>
-                      <span className="sym">took effect on chain</span>
+                      <span className="sym">
+                        announced {step.leadMinutes} min before ·{' '}
+                        <a href={step.txUrl} rel="noopener">
+                          transaction
+                        </a>
+                      </span>
                     </div>
                     <div className="amt">
                       <span className="k">Before</span>
@@ -177,13 +292,25 @@ export default async function Page({ params }: { params: Promise<{ address: stri
             <h2 className="small" id="feed-title" data-reveal>
               Price feed
             </h2>
-            <p className="note-box big" data-reveal>
-              {token.feed
-                ? `This token has a Chainlink price feed, paired by ticker${
-                    token.feed.corroborated ? ' and corroborated by its own dividend step' : ''
-                  }. The feed is total return: it already includes the multiplier, so never multiply it again.`
-                : 'This token has no Chainlink price feed. A lending protocol cannot price it from Chainlink, and exdate can state what is owed but cannot measure a gap.'}
-            </p>
+            <div data-reveal>
+              <p className="note-box big">
+                {token.feed
+                  ? `This token has a Chainlink price feed, paired by ticker${
+                      token.feed.corroborated ? ' and corroborated by its own dividend step' : ''
+                    }. The feed is total return: it already includes the multiplier, so never multiply it again. It holds its last price outside market hours, so always check how old a price is before relying on it.`
+                  : 'This token has no Chainlink price feed. A lending protocol cannot price it from Chainlink, and exdate can state what is owed but cannot measure a gap.'}
+              </p>
+              {token.feed ? (
+                <p className="feed-params">
+                  {token.feed.marketHours ? <span>{token.feed.marketHours}</span> : null}
+                  {token.feed.heartbeatHours ? <span>updates at least every {token.feed.heartbeatHours} h</span> : null}
+                  {token.feed.deviationPercent != null ? <span>or on a {token.feed.deviationPercent}% move</span> : null}
+                  <a href={token.feed.proxyUrl} rel="noopener">
+                    {token.feed.proxy}
+                  </a>
+                </p>
+              ) : null}
+            </div>
           </div>
         </section>
 

@@ -189,6 +189,29 @@ h2.small { font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin-bottom: 1.6rem; }
 .note-box.big { margin-top: 0; font-size: 1.05rem; color: var(--ink-2); }
 .observed-line { padding: 0 0 3rem; color: var(--muted); font-size: 14px; }
 
+/* --- expandable measurement detail, full width inside a ledger row --------- */
+.row-detail { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+.row-detail summary { cursor: pointer; list-style: none; display: inline-block; padding: 0.1rem 0; color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; font-size: 14px; }
+.row-detail summary::-webkit-details-marker { display: none; }
+.row-detail summary:focus-visible { outline-offset: 4px; }
+.row-detail dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.7rem 1.5rem; margin: 0.8rem 0 0.2rem; padding-top: 0.9rem; border-top: 1px dashed var(--line-2); }
+.row-detail dt { font-size: 12.5px; color: var(--muted); }
+.row-detail dd { margin: 0.1rem 0 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+.row-detail dd a { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+.row-detail .wide { grid-column: 1 / -1; color: var(--muted); }
+.stat .since { margin-top: 0.7rem; font-size: 14px; color: var(--muted); max-width: 30ch; margin-left: auto; text-wrap: pretty; }
+.feed-params { margin-top: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.feed-params a { color: inherit; }
+.feed-params a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.step-note { margin-top: 0.8rem; font-size: 14px; color: var(--muted); max-width: 36ch; text-wrap: pretty; }
+
+/* --- calendar ------------------------------------------------------------- */
+.cal-group { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+.cal-group h2.small { margin-bottom: 0.4rem; }
+.cal-group .lead { color: var(--muted); font-size: 15px; margin-bottom: 1.2rem; max-width: 60ch; text-wrap: pretty; }
+.when { font-size: 15px; color: var(--muted); }
+.when.late { color: var(--ink); font-weight: 500; }
+
 /* --- sections ------------------------------------------------------------- */
 .block { padding: clamp(5rem, 11vw, 9rem) 0; border-top: 1px solid var(--line); }
 h2 { font-size: clamp(1.9rem, 3.4vw, 2.8rem); letter-spacing: -0.03em; line-height: 1.1; font-weight: 500; text-wrap: balance; max-width: 22ch; }
@@ -267,7 +290,7 @@ footer { border-top: 1px solid var(--line); padding: 3.5rem 0 4rem; }
   .hero { min-height: 0; }
   .hero-grid, .steps, .trio, .do, .dev-grid, .token-head { grid-template-columns: 1fr; }
   .stat { text-align: left; }
-  .stat .k { margin-left: 0; }
+  .stat .k, .stat .since { margin-left: 0; }
   .ring { width: min(100%, 280px); }
   .ledger li, .coverage li { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1rem; }
   .who { grid-column: 1 / -1; }

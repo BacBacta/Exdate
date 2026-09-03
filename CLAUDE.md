@@ -606,6 +606,26 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   "What you can do here" replaces "What it gives you", and every proof row links to its token.
   `trailingSlash: true` so `/t/<address>/` is a directory index that any static host serves
   without URL rewriting — the thing that broke the root once.
+- 2026-09-03 — **What the code knew and the site did not, in three tiers.** An inventory of
+  `data/` against the pages found the reconciliation record mostly unshown: the price at
+  `effectiveAt` and its staleness, the expected step against the observed one, the implied price
+  and its ratio over today's spot, the lag after the issuer's date, the transaction hash, the
+  announcement lead, the feed's heartbeat and deviation, and the 37 declared dividends not yet on
+  chain. The rule for adding them without the site becoming dense again: **the default view does
+  not change**; everything new is closed, on its own page, or one sentence. (1) Every dividend row
+  on a token page opens a `<details>` — *How this was measured* on a matched or anomaly row
+  (price at effect with its age, implied step vs observed, implied price ×spot, business days after
+  the issuer's date, the transaction), *Details* on a pending or unmatched row (owed per token
+  spelled out as rate × multiplier; why an unmatched step's declared amount is unrecoverable). The
+  stat gains one line — `+0.51% shares since launch: 1 dividend reconciled, 2 steps unexplained`
+  — and the feed section its parameters (market hours, heartbeat, deviation, proxy address).
+  (2) `/calendar/`: every declared dividend not yet on chain, grouped as *issuer says paid* /
+  *due now* / *coming weeks*, each with owed per token and a relative date; the home page links it
+  with a count. (3) One sentence in *How it works* carrying the measured timing — the announcement
+  lead over the 12 changes, and the one-business-day lag in the cases where it was measured. All
+  three come from `lib/observed.ts` reading the committed files, so the site still cannot show a
+  figure that is not in git. Two things left absent on purpose, both refused in core as well: a
+  landing date for a pending dividend, and the surviving fraction before it lands.
 - _(append decisions here as they are made)_
 
 ## Status
