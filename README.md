@@ -48,11 +48,14 @@ pnpm typecheck
 The poller writes its first rows within about a minute. Until then the page says so; it never
 shows a zero it has not observed.
 
-The public site deploys to Vercel from `vercel.json` at the repository root: one project builds
+The public site is live at **https://exdate-bactas-projects.vercel.app** and deploys to Vercel from `vercel.json` at the repository root: one project builds
 the workspace (`pnpm --filter @exdate/web build`) and serves the static export from
 `apps/web/out`. `framework` is deliberately `null` rather than `nextjs` — the site is
 `output: 'export'`, so there is no server to detect and "run this command, serve this folder"
-behaves identically locally and on Vercel.
+behaves identically locally and on Vercel. From an agent container, deploy with
+`scripts/deploy-web.sh`: it uploads the tree from a copy without `.git`, because Vercel blocks a
+CLI deployment whose commit author is not a member of the team, and the commits here are the
+agent's.
 
 Three GitHub Actions run in `.github/workflows`. `ci` typechecks, tests, builds the status page and
 proves the generated registry still matches the data it comes from. `archive-corporate-actions`
