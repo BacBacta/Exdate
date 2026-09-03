@@ -13,8 +13,10 @@ and the health of every Chainlink feed.
 > **Status: M1 to M5 shipped.** The indexer, the API, the reconciliation table and
 > the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
 > feeds, 12 distinct multiplier changes, 43 issuer corporate actions, 49 reconciliation rows, and
-> 43 signed webhook deliveries verified end to end. What is left is listed under Known gaps.
-> Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
+> 43 signed webhook deliveries verified end to end. A second issuer — Coinbase B20 on Base — is
+> now verified address by address on chain but not wired
+> ([`docs/second-issuer-base.md`](docs/second-issuer-base.md)). What is left is listed under Known
+> gaps. Read [`docs/phase-0-verification.md`](docs/phase-0-verification.md) for every verified fact.
 
 ## Why it matters
 
@@ -63,10 +65,12 @@ node scripts/phase0/check-corporate-actions.mjs # issuer dividends vs onchain st
 node scripts/phase0/feed-price-at.mjs <feed> <iso> # Chainlink price at an instant, no archive
 node scripts/phase0/snapshot-registry.mjs      # refresh + diff the issuer registry
 node scripts/phase0/probe-oracle-link.mjs      # is there an on-chain token <-> feed link? (no)
+node scripts/phase0/verify-base-b20.mjs        # Coinbase B20 on Base, every address on chain
 node scripts/phase0/verify-feed-map.mjs        # corroborate the feed map by behaviour
 node scripts/phase0/check-svr-proxies.mjs      # primary vs SVR proxy, all 35 feeds
 node scripts/phase0/measure-transfers.mjs      # transfer volume and provable trades
 node scripts/archive-corporate-actions.mjs     # merge today's window into the archive
+node scripts/measure-session-share.mjs         # one off-hours sample; the Action runs it hourly
 node scripts/backfill-multiplier-events.mjs    # full-chain event scan, 26 requests
 node scripts/build-reconciliations.mjs         # declared vs observed, priced at effectiveAt
 node scripts/generate-registry.mjs             # snapshots -> typed module
@@ -91,6 +95,7 @@ Committed artifacts, all first-party or read from the chain:
 | `data/transfer-volume.observed.json` | what indexing transfers would cost, measured |
 | `data/session-share.observed.json` | how much activity happens outside the US market session — sampled hourly, share refused until every session is covered |
 | `data/base-coinbase-feeds.snapshot.json` | the 13 Coinbase B20 feeds on Base — second-issuer reconnaissance |
+| `data/base-b20-verification.json` | Coinbase's oracle registry, 13 B20 tokens and 13 feeds on Base, each read back by address |
 | `data/multiplier-events.observed.json` | every `UIMultiplierUpdated` log on chain — 13 logs, 12 distinct changes, 10 tokens |
 | `data/reconciliations.observed.json` | every declared action against the step it produced, priced at `effectiveAt` |
 | `data/corporate-actions.archive.json` | every action the issuer has published while exdate was watching — its own endpoint keeps about a month |
@@ -264,3 +269,11 @@ that is committed. What does exist: all 35 aggregators name their ticker in thei
 measured at that instant**. That row is marked `corroborated`; the other 34 are not, and the
 reconciliation confidence ladder keeps `high` reserved for a first-party statement that does not
 yet exist.
+
+One exists on the other chain, which is the useful contrast. Coinbase's oracle registry on Base
+answers a per-token read for its thirteen B20 tokens and **reverts** for WETH or for an address
+holding no code — so the registry names its token set by address, not by ticker. That is a link of
+the kind Robinhood Chain has nowhere. It still does not pair a *feed* with a token: that join is
+`AAPLc` ↔ `Coinbase AAPL`, a ticker heuristic like the other one.
+[`docs/second-issuer-base.md`](docs/second-issuer-base.md) has the whole reconnaissance, and every
+address in it was read back on chain.

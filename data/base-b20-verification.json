@@ -1,0 +1,709 @@
+{
+  "verifiedAt": "2026-09-03T08:14:11.446Z",
+  "note": "Coinbase tokenized stocks on Base, read back from the chain by address. Every address here is copied from the Base documentation page in `source` and checked against mainnet; none is guessed. This closes the two items docs/second-issuer-base.md listed as unknown: the oracle registry address and the B20 token addresses.",
+  "source": "https://docs.base.org/specifications/b20/tokenized-stocks-on-base",
+  "chainId": 8453,
+  "erc8056SelectorCrossCheck": {
+    "note": "exdate computed these from the signatures for Robinhood Chain; the Cobalt changelog states them as the values from Base's frozen ABI. Two independent sources for the same four numbers.",
+    "source": "https://docs.base.org/base-chain/specs/reference/b20/changelog/02-cobalt-b20asset-multiplier",
+    "agree": 4,
+    "of": 4,
+    "rows": [
+      {
+        "view": "uiMultiplier",
+        "exdate": "0xa60bf13d",
+        "baseFrozenAbi": "0xa60bf13d",
+        "agrees": true
+      },
+      {
+        "view": "newUIMultiplier",
+        "exdate": "0xdc767007",
+        "baseFrozenAbi": "0xdc767007",
+        "agrees": true
+      },
+      {
+        "view": "effectiveAt",
+        "exdate": "0x97a4064f",
+        "baseFrozenAbi": "0x97a4064f",
+        "agrees": true
+      },
+      {
+        "view": "totalSupplyUI",
+        "exdate": "0x9bea6429",
+        "baseFrozenAbi": "0x9bea6429",
+        "agrees": true
+      }
+    ]
+  },
+  "registry": {
+    "address": "0x3f3E8cf41cdd3b1D118c16471aB0113DfDDd5CaD",
+    "codeBytes": 1548,
+    "note": "The docs name the registry and describe what it returns but publish no ABI, so its public selectors are read out of its own dispatcher rather than guessed, then dialled with a real token address.",
+    "dispatcherSelectors": 19,
+    "surface": [
+      {
+        "selector": "0xa217fddf",
+        "signature": "DEFAULT_ADMIN_ROLE()",
+        "takesATokenAddress": false,
+        "withTokenArg": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "noArg": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "selector": "0xd4197e82",
+        "signature": null,
+        "takesATokenAddress": true,
+        "withTokenArg": "0x0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000000000000000000",
+        "noArg": null
+      },
+      {
+        "selector": "0xe63ab1e9",
+        "signature": "PAUSER_ROLE()",
+        "takesATokenAddress": false,
+        "withTokenArg": "0x65d7a28e3265b37a6474929f336521b332c1681b933f6cb9f3376673440d862a",
+        "noArg": "0x65d7a28e3265b37a6474929f336521b332c1681b933f6cb9f3376673440d862a"
+      },
+      {
+        "selector": "0x248a9ca3",
+        "signature": "getRoleAdmin(bytes32)",
+        "takesATokenAddress": true,
+        "withTokenArg": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "noArg": null
+      }
+    ],
+    "multiplierAndPauseSelector": "0xd4197e82",
+    "multiplierAndPauseSignature": null,
+    "multiplierAndPauseNote": "No candidate signature tried matched this selector, so it is left unnamed rather than guessed. What it does is measured: called with a token address it returns two words - the WAD multiplier the token itself reports, and a flag that reads false on every token today, which is the pause state Chainlink describes.",
+    "readsPerToken": [
+      {
+        "ticker": "AAPLc",
+        "token": "0xb200000000000000000000C2e324d24d7eEcd1fb",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "AMZNc",
+        "token": "0xb200000000000000000000d9192b6B456483C2E8",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "COINc",
+        "token": "0xb200000000000000000000c85a31389D71F3ecfb",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "CRCLc",
+        "token": "0xB20000000000000000000019f6E7C675b73C2e4D",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "GOOGLc",
+        "token": "0xb2000000000000000000002D0BA3164cc74f58B7",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "INTCc",
+        "token": "0xB2000000000000000000004AFF16039bA04bdFBc",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "METAc",
+        "token": "0xb2000000000000000000008bC8786B856E61707C",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "MSFTc",
+        "token": "0xB200000000000000000000Ab99cFa739E253872B",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "MSTRc",
+        "token": "0xb2000000000000000000004884b426556b92883d",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "NVDAc",
+        "token": "0xb20000000000000000000078ee7ce2fE4908108C",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "SNDKc",
+        "token": "0xb200000000000000000000397293Cb8cda9a10c5",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "SPCXc",
+        "token": "0xb2000000000000000000007b9fcbd005511aCBd5",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      },
+      {
+        "ticker": "TSLAc",
+        "token": "0xb2000000000000000000001e800a7f5189430cD0",
+        "ok": true,
+        "words": 2,
+        "multiplier": "1000000000000000000",
+        "secondWord": "0",
+        "agreesWithToken": true,
+        "error": null
+      }
+    ],
+    "controls": [
+      {
+        "label": "WETH (Base)",
+        "address": "0x4200000000000000000000000000000000000006",
+        "ok": false,
+        "data": null,
+        "error": "execution reverted"
+      },
+      {
+        "label": "no code",
+        "address": "0x0000000000000000000000000000000000000001",
+        "ok": false,
+        "data": null,
+        "error": "execution reverted"
+      }
+    ]
+  },
+  "summary": {
+    "tokens": 13,
+    "tokensAnsweringUiMultiplier": 0,
+    "tokensAnsweringEveryErc8056View": 0,
+    "multiplierAliasAgrees": 0,
+    "tokensWithNoBytecode": 0,
+    "tokenSymbolMatchesDocsTicker": 13,
+    "feeds": 13,
+    "feedsNamingTheirTicker": 13,
+    "registryAgreesWithToken": 13,
+    "controlsRefusedOrZeroed": 2
+  },
+  "tokens": [
+    {
+      "ticker": "AAPLc",
+      "address": "0xb200000000000000000000C2e324d24d7eEcd1fb",
+      "codeBytes": 1,
+      "name": "Apple Inc.",
+      "symbol": "AAPLc",
+      "decimals": 8,
+      "totalSupply": "516802990000",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "AMZNc",
+      "address": "0xb200000000000000000000d9192b6B456483C2E8",
+      "codeBytes": 1,
+      "name": "Amazon.com Inc.",
+      "symbol": "AMZNc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "COINc",
+      "address": "0xb200000000000000000000c85a31389D71F3ecfb",
+      "codeBytes": 1,
+      "name": "Coinbase Global Inc.",
+      "symbol": "COINc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "CRCLc",
+      "address": "0xB20000000000000000000019f6E7C675b73C2e4D",
+      "codeBytes": 1,
+      "name": "Circle Internet Group Inc.",
+      "symbol": "CRCLc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "GOOGLc",
+      "address": "0xb2000000000000000000002D0BA3164cc74f58B7",
+      "codeBytes": 1,
+      "name": "Alphabet Inc.",
+      "symbol": "GOOGLc",
+      "decimals": 8,
+      "totalSupply": "722269380000",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "INTCc",
+      "address": "0xB2000000000000000000004AFF16039bA04bdFBc",
+      "codeBytes": 1,
+      "name": "Intel Corporation",
+      "symbol": "INTCc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "METAc",
+      "address": "0xb2000000000000000000008bC8786B856E61707C",
+      "codeBytes": 1,
+      "name": "Meta Platforms Inc.",
+      "symbol": "METAc",
+      "decimals": 8,
+      "totalSupply": "264988510000",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "MSFTc",
+      "address": "0xB200000000000000000000Ab99cFa739E253872B",
+      "codeBytes": 1,
+      "name": "Microsoft Corporation",
+      "symbol": "MSFTc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "MSTRc",
+      "address": "0xb2000000000000000000004884b426556b92883d",
+      "codeBytes": 1,
+      "name": "Strategy Inc.",
+      "symbol": "MSTRc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "NVDAc",
+      "address": "0xb20000000000000000000078ee7ce2fE4908108C",
+      "codeBytes": 1,
+      "name": "NVIDIA Corporation",
+      "symbol": "NVDAc",
+      "decimals": 8,
+      "totalSupply": "1306108020000",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "SNDKc",
+      "address": "0xb200000000000000000000397293Cb8cda9a10c5",
+      "codeBytes": 1,
+      "name": "Sandisk Corporation",
+      "symbol": "SNDKc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "SPCXc",
+      "address": "0xb2000000000000000000007b9fcbd005511aCBd5",
+      "codeBytes": 1,
+      "name": "Space Exploration Technologies Corp.",
+      "symbol": "SPCXc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    },
+    {
+      "ticker": "TSLAc",
+      "address": "0xb2000000000000000000001e800a7f5189430cD0",
+      "codeBytes": 1,
+      "name": "Tesla Inc.",
+      "symbol": "TSLAc",
+      "decimals": 8,
+      "totalSupply": "0",
+      "multiplier": "1000000000000000000",
+      "uiMultiplier": null,
+      "newUIMultiplier": null,
+      "effectiveAt": null,
+      "totalSupplyUI": null,
+      "wadPrecision": null,
+      "reverted": [
+        "uiMultiplier",
+        "newUIMultiplier",
+        "effectiveAt",
+        "totalSupplyUI",
+        "WAD_PRECISION"
+      ],
+      "multiplierAliasAgrees": null,
+      "symbolMatchesDocsTicker": true
+    }
+  ],
+  "feeds": [
+    {
+      "ticker": "AAPL",
+      "proxy": "0x787f13dEa48Db0897CbCDD985de77809D837F988",
+      "description": "Coinbase AAPL",
+      "decimals": 8,
+      "aggregator": "0xc37b6f754e90d4cca1f533f5a08f7d532b3d0d9d",
+      "roundId": "36893488147419103355",
+      "answer": "32430140000",
+      "updatedAt": "2026-09-02T21:24:59.000Z",
+      "ageSeconds": 38934,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "AMZN",
+      "proxy": "0x06A8E4b3aBB3B7543d8396FB2B763d22820cB295",
+      "description": "Coinbase AMZN",
+      "decimals": 8,
+      "aggregator": "0x4816cb7ee43ee12c0bc9d3c597246f34d5cfdb7c",
+      "roundId": "36893488147419103393",
+      "answer": "25643760000",
+      "updatedAt": "2026-09-02T23:55:33.000Z",
+      "ageSeconds": 29900,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "COIN",
+      "proxy": "0x408e44f504A7371a345F03a73dDC96A4b48e8aa7",
+      "description": "Coinbase COIN",
+      "decimals": 8,
+      "aggregator": "0x86af8309b812bdca427a1ad83088705ad0689cfe",
+      "roundId": "36893488147419104054",
+      "answer": "17865920000",
+      "updatedAt": "2026-09-03T08:06:47.000Z",
+      "ageSeconds": 426,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "CRCL",
+      "proxy": "0x0231cF2635D1E17bB5c2462cc7504Ba1fBd61f33",
+      "description": "Coinbase CRCL",
+      "decimals": 8,
+      "aggregator": "0x936b2e82aaeda0f437e88b24d877f6195c5ff2e2",
+      "roundId": "36893488147419104517",
+      "answer": "8986085000",
+      "updatedAt": "2026-09-03T08:06:05.000Z",
+      "ageSeconds": 469,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "GOOGL",
+      "proxy": "0x5bF49E0ffA937CE2FfF033c739aD7C634c4D34F2",
+      "description": "Coinbase GOOGL",
+      "decimals": 8,
+      "aggregator": "0x6bf33b7855eb8047dde206d9f6321d7d02cfb308",
+      "roundId": "36893488147419103346",
+      "answer": "33908000000",
+      "updatedAt": "2026-09-03T03:33:25.000Z",
+      "ageSeconds": 16838,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "INTC",
+      "proxy": "0xAB657C39bac0D5886250D70849e2E3E008F2EECB",
+      "description": "Coinbase INTC",
+      "decimals": 8,
+      "aggregator": "0x8327bd1d98a2e8874d0d456cbcade231e3ab087c",
+      "roundId": "36893488147419104015",
+      "answer": "9065970000",
+      "updatedAt": "2026-09-03T08:08:19.000Z",
+      "ageSeconds": 344,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "META",
+      "proxy": "0x6526aE6797A76123638b863AeE4dD27Ba4E4b27D",
+      "description": "Coinbase META",
+      "decimals": 8,
+      "aggregator": "0xa7155928bee40052efb3094a046c5498202fd3ee",
+      "roundId": "36893488147419103503",
+      "answer": "59717200000",
+      "updatedAt": "2026-09-02T23:26:09.000Z",
+      "ageSeconds": 31674,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "MSFT",
+      "proxy": "0xeB10A6c9aa7E537aEd766C08c35Dae35B321b18c",
+      "description": "Coinbase MSFT",
+      "decimals": 8,
+      "aggregator": "0xd72b34be6c2180ad0d28dbb415aefde8a55f3ed3",
+      "roundId": "36893488147419103388",
+      "answer": "49835000000",
+      "updatedAt": "2026-09-03T07:06:19.000Z",
+      "ageSeconds": 4065,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "MSTR",
+      "proxy": "0xB3cE282CD188b35DA0E38D8Bc7d58e33173D202a",
+      "description": "Coinbase MSTR",
+      "decimals": 8,
+      "aggregator": "0xbc94b7ba3a8941fb7aee8bd10538f79f39185edb",
+      "roundId": "36893488147419104417",
+      "answer": "12554370000",
+      "updatedAt": "2026-09-03T08:08:15.000Z",
+      "ageSeconds": 349,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "NVDA",
+      "proxy": "0x04689a41629776563E6822F76f2e57D148d28513",
+      "description": "Coinbase NVDA",
+      "decimals": 8,
+      "aggregator": "0xf72b1eb5932800f3d2a5eec5f99e6cd586479675",
+      "roundId": "36893488147419103523",
+      "answer": "22525790000",
+      "updatedAt": "2026-09-02T21:28:41.000Z",
+      "ageSeconds": 38725,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "SNDK",
+      "proxy": "0x388b0dC46C0Fb05A74BeE0994fa5b02c6Fcca2eA",
+      "description": "Coinbase SNDK",
+      "decimals": 8,
+      "aggregator": "0x767b5c02af56c2621d66c8596aac32de7374b55b",
+      "roundId": "36893488147419104753",
+      "answer": "154872900000",
+      "updatedAt": "2026-09-03T08:01:31.000Z",
+      "ageSeconds": 760,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "SPCX",
+      "proxy": "0x6A634B235903C4ad6376892180d6fF8612e3Fa68",
+      "description": "Coinbase SPCX",
+      "decimals": 8,
+      "aggregator": "0xa994b7fc3123ae0ef4ee53ab5e3545f2639187a7",
+      "roundId": "36893488147419104143",
+      "answer": "14059475000",
+      "updatedAt": "2026-09-02T19:50:53.000Z",
+      "ageSeconds": 44598,
+      "descriptionNamesTicker": true
+    },
+    {
+      "ticker": "TSLA",
+      "proxy": "0xFaf869185383a24F8cb00e27BdA6b63B9905DCb4",
+      "description": "Coinbase TSLA",
+      "decimals": 8,
+      "aggregator": "0x0288234d9311c33be6c3a34b051bff8a799daa82",
+      "roundId": "36893488147419103558",
+      "answer": "36098880000",
+      "updatedAt": "2026-09-03T08:05:37.000Z",
+      "ageSeconds": 514,
+      "descriptionNamesTicker": true
+    }
+  ]
+}

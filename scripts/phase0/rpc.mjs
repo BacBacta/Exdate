@@ -6,36 +6,46 @@
 
 const RPC_URL = process.env.RHC_RPC_URL || 'https://rpc.mainnet.chain.robinhood.com'
 
-let lastCallAt = 0
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export async function rpc(method, params, { minGap = 350, tries = 8 } = {}) {
-  for (let attempt = 0; attempt < tries; attempt++) {
-    const wait = minGap - (Date.now() - lastCallAt)
-    if (wait > 0) await sleep(wait)
-    lastCallAt = Date.now()
+/**
+ * A limiter per endpoint. Robinhood Chain and Base rate-limit differently and
+ * have no reason to queue behind each other, so the pacing state belongs to the
+ * URL rather than to the module.
+ */
+export function makeRpc(url, defaults = {}) {
+  let lastCallAt = 0
+  return async function call(method, params, options = {}) {
+    const { minGap = 350, tries = 8 } = { ...defaults, ...options }
+    for (let attempt = 0; attempt < tries; attempt++) {
+      const wait = minGap - (Date.now() - lastCallAt)
+      if (wait > 0) await sleep(wait)
+      lastCallAt = Date.now()
 
-    const res = await fetch(RPC_URL, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
-    })
-    if (res.status === 429) {
-      await sleep(1500 * (attempt + 1))
-      continue
-    }
-    const body = await res.json()
-    if (body.error) {
-      if (/rate|too many/i.test(body.error.message ?? '')) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+      })
+      if (res.status === 429) {
         await sleep(1500 * (attempt + 1))
         continue
       }
-      throw new Error(`${method}: ${body.error.message}`)
+      const body = await res.json()
+      if (body.error) {
+        if (/rate|too many/i.test(body.error.message ?? '')) {
+          await sleep(1500 * (attempt + 1))
+          continue
+        }
+        throw new Error(`${method}: ${body.error.message}`)
+      }
+      return body.result
     }
-    return body.result
+    throw new Error(`${method}: still rate limited after ${tries} attempts`)
   }
-  throw new Error(`${method}: still rate limited after ${tries} attempts`)
 }
+
+export const rpc = makeRpc(RPC_URL)
 
 export const hex = (n) => '0x' + BigInt(n).toString(16)
 export const RPC_URL_IN_USE = RPC_URL

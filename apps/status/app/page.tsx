@@ -120,6 +120,10 @@ export default async function Page() {
     .flatMap((view) => view.declared.map((row) => ({ view, row })))
     .sort((a, b) => (a.row.processDate ?? '').localeCompare(b.row.processDate ?? ''))
   const owedPerToken = owedRows.filter(({ row }) => row.grossPerToken !== null)
+  const longestOverdueDays = pending
+    .map((view) => view.summary.longestOverdueDays)
+    .filter((days): days is number => days !== null)
+    .sort((a, b) => b - a)[0]
 
   const observedAt = polled
     .map((token) => token.multiplier.sampledAt)
@@ -393,16 +397,12 @@ export default async function Page() {
             <code>notComputed</code> with a reason code.
           </p>
           <p className="caption">
-            {owedPerToken.length} of {owedRows.length} outstanding{' '}
-            {owedRows.length === 1 ? 'action states' : 'actions state'} what is owed per token
-            {pending.length > 0 ? ` across ${pending.length} tokens` : null}. Longest wait:{' '}
-            {(() => {
-              const longest = pending
-                .map((view) => view.summary.longestOverdueDays)
-                .filter((days): days is number => days !== null)
-                .sort((a, b) => b - a)[0]
-              return longest === undefined ? 'none overdue' : `${longest} days`
-            })()}.
+            {owedRows.length} outstanding {owedRows.length === 1 ? 'action' : 'actions'} across{' '}
+            {pending.length} {pending.length === 1 ? 'token' : 'tokens'}, {owedPerToken.length} of
+            them stating what is owed per token.{' '}
+            {longestOverdueDays === undefined
+              ? 'None is past the window yet.'
+              : `The longest has been overdue ${longestOverdueDays} days.`}
           </p>
         </>
       ) : null}

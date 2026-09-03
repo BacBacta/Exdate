@@ -179,6 +179,10 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   for a token that never moved). A pending update exists **only** while
   `effectiveAt() > block.timestamp && newUIMultiplier() != uiMultiplier()`. Treating a non-zero
   `effectiveAt` as "pending" reports 9 phantom dividends today.
+  **This is a property of ERC-8056, not of Robinhood** — found here by measurement, then
+  confirmed in Base's own B20 changelog: "a nonzero `effectiveAt()` that's `<= block.timestamp`
+  means *already applied*, not *pending*". Same for the missing application event: "No event
+  fires at maturation."
 - **There is no application event.** `UIMultiplierUpdated` fires once, at announcement, carrying a
   future `effectiveAt`. Nothing is emitted when the change takes effect (verified: zero logs in the
   200 000 blocks after activation for SGOV and CCL). Application must be derived from the clock —
@@ -331,6 +335,38 @@ dividend that settled days ago.
 Both tiers are real logs with real transaction hashes; `source` says which scanner found the row.
 Set `RHC_RPC_URL_ARCHIVE` and `RHC_START_BLOCK=900000` to have Ponder own the whole history instead.
 
+## Base — Coinbase B20, verified 2026-09-03
+
+Read back by address on chain, not taken from the page:
+`node scripts/phase0/verify-base-b20.mjs`, `data/base-b20-verification.json`. Full write-up in
+`docs/second-issuer-base.md`.
+
+- **Oracle registry `0x3f3E8cf41cdd3b1D118c16471aB0113DfDDd5CaD`** (chain 8453, 1 548 bytes).
+  Chainlink names it and gives no address; Base gives the address and no ABI, so its 19 public
+  selectors were read out of its own dispatcher. Three are OpenZeppelin AccessControl (confirmed by
+  keccak). The fourth, **`0xd4197e82`, matched no candidate signature and stays unnamed** — but
+  called with a token address it returns two words, the WAD multiplier and a pause flag, matching
+  the token's own `multiplier()` on **13/13**. Called with WETH, or with an address holding no code,
+  it **reverts**. That control is what makes the agreement mean something: the registry knows
+  exactly those 13 addresses. It is a first-party address-level link, which Robinhood Chain has
+  nowhere.
+- **13 tokens**, `0xb2…` variant prefix, `symbol()` matching the documented ticker 13/13,
+  **8 decimals** (not 18), **every multiplier still exactly 1.0** — no Coinbase corporate action
+  has ever happened, so there is nothing on Base to reconcile yet.
+- **A token address holds 1 byte of code, not 0.** They are B20 native precompiles: no per-asset
+  contract, nothing verified on Basescan. An `extcodesize > 0` screen passes them by luck.
+- **ERC-8056 is documented but not live.** `uiMultiplier`, `newUIMultiplier`, `effectiveAt`,
+  `totalSupplyUI` and `WAD_PRECISION` **revert on all 13 tokens today**; only the Beryl
+  `multiplier()` `0x1b3ed722` answers. Base lists the Cobalt hardfork as *Planning, September 2026*
+  on both Sepolia and mainnet, which is consistent. A Base module must try both and let the revert
+  decide.
+- **4/4 ERC-8056 selectors agree** between exdate's own computed values and Base's frozen ABI —
+  two independent first-party sources for numbers exdate already dials.
+- **13/13 feeds name their ticker in `description()`**, 8 decimals, and **no SVR secondary proxy**
+  anywhere. Ages at 04:08 ET ranged from 1 minute to 12 hours: the documented off-hours freeze.
+- Still open: any Coinbase corporate-action feed, and the feed → token link, which remains a ticker
+  join (`AAPLc` ↔ `Coinbase AAPL`) and so would rate `low` on the same confidence ladder.
+
 Multi-chain from day one — Base / Coinbase B20 is a planned second issuer, so keep `chain_id` and
 `issuer` in every table and never hardcode a single chain.
 
@@ -458,6 +494,13 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (`MultiplierUpdated` + `Announcement` wrappers) and — notably — identity **by contract address
   rather than ticker**. It needs a source module, not a config entry. Not wired: the registry
   address, the token addresses and any corporate-action feed are all still unknown.
+- 2026-09-03 — **Two of those three unknowns are closed, on chain.**
+  `docs.base.org/specifications/b20/tokenized-stocks-on-base` publishes the oracle registry
+  address, the 13 token addresses and the 13 feed proxies in one first-party table, and
+  `scripts/phase0/verify-base-b20.mjs` checked every row against Base mainnet
+  (`data/base-b20-verification.json`). See `docs/second-issuer-base.md`; the headline facts are in
+  "Base — Coinbase B20" below. The corporate-action feed remains unknown, and it is the one that
+  decides whether Base produces haircuts or only a step ledger.
 - 2026-09-03 — The off-hours share is **measured hourly, not asserted**. The brief's ~46 % was the
   last product number sourced from nobody; a single window cannot answer it, because the answer is a
   rate that varies across the week. So: one sampled window per hour into a committed file, a share
@@ -500,6 +543,17 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 - The five July actions have no declared rate and never will (see the decision log); their steps
   are published as `unmatched` with the reason stated rather than filled in.
+
+- The off-hours share is being sampled, not yet answered: `data/session-share.observed.json` reads
+  `sufficient: false` until every session has three samples, which takes about a day of the hourly
+  Action. Until then the brief's ~46 % stands unverified, and nothing in the product quotes it as
+  an observation.
+
+- Base is unblocked but unwired. The registry address, the 13 token addresses and the 13 feed
+  proxies are verified on chain; no source module exists, ERC-8056 does not answer there until the
+  Cobalt hardfork, and no Coinbase corporate-action feed has been found — so Base would produce a
+  step ledger and no haircuts. Also: no Coinbase multiplier has ever moved, so there is nothing to
+  reconcile there yet.
 
 - No split has ever been reconciled end to end. `reconcileSplit()` exists and is tested, but every
   split reaches it without a declared ratio — the only one ever observed (CRWD ×4) lost its issuer
