@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import { CountUp } from './components/CountUp'
 import { cents, observed } from '../lib/observed'
 
-const { counts, hero, reconciled, links, lastObservedAt } = observed
+const { counts, hero, reconciled, chains, links, lastObservedAt } = observed
 
 /** Stagger for the reveal animation, as a CSS custom property. */
 const delay = (ms: number) => ({ '--d': `${ms}ms` }) as unknown as CSSProperties
@@ -29,21 +29,44 @@ const rows = [...reconciled].sort((a, b) => {
 const matched = rows.filter((row) => row.status === 'matched')
 const heroPct = pctInt(hero.haircutBps)!
 
+/** A ring open on the share that never arrives: the product's own measurement, as the mark. */
+function Mark({ size = 20 }: { size?: number }) {
+  return (
+    <svg className="mark" width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <circle
+        cx="16"
+        cy="16"
+        r="11"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        strokeDasharray="44.2 24.9"
+        transform="rotate(40 16 16)"
+      />
+    </svg>
+  )
+}
+
 export default function Page() {
   return (
     <>
       <header className="nav">
         <div className="wrap">
-          <a className="wordmark" href="#top" aria-label="exdate, home">
-            exdate
+          <a className="brand" href="#top" aria-label="exdate, home">
+            <Mark />
+            <span className="wordmark">exdate</span>
           </a>
           <nav aria-label="Primary">
             <a href="#how">How it works</a>
             <a href="#proof">Proof</a>
+            <a href="#coverage">Coverage</a>
             <a href="#developers">Developers</a>
-            <a className="btn small" href={links.status}>
-              Live status
-            </a>
+            {links.status ? (
+              <a className="btn small" href={links.status}>
+                Live status
+              </a>
+            ) : null}
           </nav>
         </div>
       </header>
@@ -175,7 +198,12 @@ export default function Page() {
             <p className="after" data-reveal>
               Each dividend is priced at the moment it took effect, with the oracle price in force
               then. Where a token has no price feed, no gap is claimed.{' '}
-              <a href={links.status}>Full detail on the live status page</a>.
+              {links.status ? (
+                <a href={links.status}>Full detail on the live status page</a>
+              ) : (
+                <a href={links.data}>Every row, with its sources, in the repository</a>
+              )}
+              .
             </p>
           </div>
         </section>
@@ -217,6 +245,60 @@ export default function Page() {
         </section>
 
         {/* ---------------------------------------------------------------- */}
+        <section className="block" id="coverage" aria-labelledby="coverage-title">
+          <div className="wrap">
+            <div className="block-head" data-reveal>
+              <h2 id="coverage-title">Where it looks today</h2>
+              <p>
+                Built for every chain that issues tokenized stocks. Measured wherever there is
+                something real to measure.
+              </p>
+            </div>
+            <ul className="coverage">
+              <li data-reveal>
+                <div className="who">
+                  <span className="name">{chains.robinhood.name}</span>
+                  <span className="sym">{chains.robinhood.issuer}</span>
+                </div>
+                <div className="amt">
+                  <span className="k">Tokens</span>
+                  <span className="v">{chains.robinhood.tokens}</span>
+                </div>
+                <div className="amt">
+                  <span className="k">Price feeds</span>
+                  <span className="v">{chains.robinhood.feeds}</span>
+                </div>
+                <div className="gap">
+                  <span className="tag on">measured live</span>
+                </div>
+              </li>
+              <li data-reveal style={delay(90)}>
+                <div className="who">
+                  <span className="name">{chains.base.name}</span>
+                  <span className="sym">{chains.base.issuer}</span>
+                </div>
+                <div className="amt">
+                  <span className="k">Tokens</span>
+                  <span className="v">{chains.base.tokens}</span>
+                </div>
+                <div className="amt">
+                  <span className="k">Price feeds</span>
+                  <span className="v">{chains.base.feeds}</span>
+                </div>
+                <div className="gap">
+                  <span className="tag">verified, nothing to measure yet</span>
+                </div>
+              </li>
+            </ul>
+            <p className="after" data-reveal>
+              On Base every token still reads exactly 1.0: no dividend has moved one yet. The
+              moment one does, the same measurement applies. Every record carries its chain, so
+              a third issuer is a source to read, not a redesign.
+            </p>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------------- */}
         <section className="block dev" id="developers" aria-labelledby="dev-title">
           <div className="wrap dev-grid">
             <div data-reveal>
@@ -248,11 +330,14 @@ export default function Page() {
       <footer>
         <div className="wrap foot">
           <div>
-            <span className="wordmark">exdate</span>
+            <span className="brand">
+              <Mark />
+              <span className="wordmark">exdate</span>
+            </span>
             <p>The corporate-action layer for tokenized stocks.</p>
           </div>
           <nav aria-label="Footer">
-            <a href={links.status}>Live status</a>
+            {links.status ? <a href={links.status}>Live status</a> : <a href={links.data}>Data</a>}
             <a href={links.apiDocs}>API</a>
             <a href={links.github}>GitHub</a>
           </nav>

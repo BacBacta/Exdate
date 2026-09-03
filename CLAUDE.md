@@ -581,6 +581,18 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   the production alias behind a Vercel login — set to `prod_deployment_urls_and_all_previews`
   (previews protected, production public). A fresh project (`exdate-site`) was created to isolate
   the block and deleted again once it had served its purpose.
+- 2026-09-03 — Site: three things a reader noticed. (1) The "Live status" link led to an error:
+  it defaulted to `localhost:3000`, and the status page is not hosted anywhere — it needs a
+  running indexer, which Vercel cannot run. The link now renders **only** when
+  `NEXT_PUBLIC_EXDATE_STATUS_URL` is set; otherwise the page points at the committed dataset on
+  GitHub. A dead link is worse than no link. (2) The wordmark was bare text; the mark is now a
+  ring open on 36 % of its circumference — the product's own measurement — inline in the nav and
+  footer, as `app/icon.svg` (with a dark-scheme stroke via a media query inside the SVG), and in
+  a build-time Open Graph image (`app/opengraph-image.tsx`, Satori: every multi-child `div` needs
+  `display: flex`, and SVG `<text>` is unsupported, so the number is an HTML overlay).
+  (3) "Does it cover every chain?" — no, and the site now says so in a *Coverage* section read
+  from `data/`: Robinhood Chain, 194 tokens, 35 feeds, measured live; Base, 13 Coinbase tokens
+  and 13 feeds verified on chain, nothing to measure yet because no multiplier has ever moved.
 - _(append decisions here as they are made)_
 
 ## Status

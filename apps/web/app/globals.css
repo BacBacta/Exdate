@@ -79,6 +79,8 @@ html[data-js] [data-reveal].in { opacity: 1; transform: none; }
   border-bottom: 1px solid var(--line);
 }
 .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: var(--nav); }
+.brand { display: inline-flex; align-items: center; gap: 0.55rem; color: var(--ink); }
+.mark { display: block; flex: none; }
 .wordmark { font-weight: 600; letter-spacing: -0.02em; font-size: 17px; }
 .nav nav { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 28px); font-size: 15px; color: var(--muted); }
 .nav nav a:not(.btn) { position: relative; padding: 0.35rem 0; transition: color 0.2s; }
@@ -171,6 +173,18 @@ h3 { font-size: 1.25rem; letter-spacing: -0.015em; font-weight: 500; margin-bott
 .after { margin-top: 1.6rem; color: var(--muted); font-size: 15px; max-width: 60ch; text-wrap: pretty; }
 .after a, .dev .links a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
 
+/* --- coverage ------------------------------------------------------------- */
+.coverage li {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: 1.5rem; align-items: center;
+  padding: 1.35rem 0; border-top: 1px solid var(--line);
+}
+.coverage li:last-child { border-bottom: 1px solid var(--line); }
+.tag { font-size: 15px; color: var(--muted); }
+.tag.on { color: var(--ink); font-weight: 500; }
+.tag.on::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); margin-right: 9px; vertical-align: 1px; }
+
 /* --- statement ------------------------------------------------------------ */
 .statement { text-align: center; }
 .statement-text { font-size: clamp(1.5rem, 3vw, 2.4rem); line-height: 1.25; letter-spacing: -0.025em; font-weight: 500; max-width: 26ch; margin: 0 auto; text-wrap: balance; }
@@ -202,8 +216,9 @@ footer { border-top: 1px solid var(--line); padding: 3.5rem 0 4rem; }
   .hero { min-height: 0; }
   .hero-grid, .steps, .trio, .dev-grid { grid-template-columns: 1fr; }
   .ring { width: min(100%, 280px); }
-  .ledger li { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1rem; }
+  .ledger li, .coverage li { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1rem; }
   .who { grid-column: 1 / -1; }
+  .coverage .gap { grid-column: 1 / -1; text-align: left; }
   .gap { text-align: right; }
 }
 @media (max-width: 640px) {

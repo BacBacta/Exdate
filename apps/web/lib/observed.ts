@@ -7,6 +7,7 @@
  * that read. If a number is not in those files, the page does not show it.
  */
 
+import baseJson from '../../../data/base-b20-verification.json'
 import archiveJson from '../../../data/corporate-actions.archive.json'
 import feedsJson from '../../../data/chainlink-feeds.snapshot.json'
 import eventsJson from '../../../data/multiplier-events.observed.json'
@@ -69,6 +70,7 @@ const archive = archiveJson as unknown as {
   earliestProcessDate: string
   actions: ArchivedAction[]
 }
+const base = baseJson as unknown as { verifiedAt: string; summary: { tokens: number; feeds: number } }
 const sessionShare = sessionShareJson as unknown as {
   sampleCount: number
   sufficient: boolean
@@ -186,12 +188,13 @@ const pendingExample =
     : null
 
 const tokens = registry.assets.filter((asset) => asset.deployments?.some((d) => d.chainId === 4663))
+const robinhoodFeeds = feeds.filter((feed) => /^Robinhood /.test(feed.name)).length
 
 export const observed = {
   chain: { id: 4663, name: 'Robinhood Chain' },
   counts: {
     tokens: tokens.length,
-    feeds: feeds.filter((feed) => /^Robinhood /.test(feed.name)).length,
+    feeds: robinhoodFeeds,
     mappedFeeds: feedMap.pairs.length,
     corroboratedFeeds: feedMap.corroborated ?? 0,
     distinctEvents: distinctEvents.length,
@@ -241,10 +244,21 @@ export const observed = {
     sufficient: sessionShare.sufficient,
     slotsCovered: sessionShare.easternHourOfWeekSlotsCovered,
   },
+  /**
+   * Where exdate looks, and whether there is anything to measure there yet.
+   * Every table carries a chain id; only one chain has data today. Base is
+   * verified address by address but no Coinbase multiplier has ever moved.
+   */
+  chains: {
+    robinhood: { name: 'Robinhood Chain', issuer: 'Robinhood Stock Tokens', tokens: tokens.length, feeds: robinhoodFeeds, measured: true },
+    base: { name: 'Base', issuer: 'Coinbase tokenized stocks', tokens: base.summary.tokens, feeds: base.summary.feeds, measured: false, verifiedAt: base.verifiedAt },
+  },
   links: {
     github: 'https://github.com/BacBacta/Exdate',
+    data: 'https://github.com/BacBacta/Exdate/blob/HEAD/data/reconciliations.observed.json',
     api: process.env.NEXT_PUBLIC_EXDATE_API_URL ?? 'https://api.exdate.xyz',
-    status: process.env.NEXT_PUBLIC_EXDATE_STATUS_URL ?? 'http://localhost:3000',
+    /** The live status page needs a running indexer; until one is hosted, no link is better than a dead one. */
+    status: process.env.NEXT_PUBLIC_EXDATE_STATUS_URL ?? null,
     apiDocs: 'https://github.com/BacBacta/Exdate/blob/HEAD/docs/api.md',
     sdkDocs: 'https://github.com/BacBacta/Exdate/blob/HEAD/packages/sdk/README.md',
     verification: 'https://github.com/BacBacta/Exdate/blob/HEAD/docs/phase-0-verification.md',
