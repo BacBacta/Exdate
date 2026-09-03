@@ -535,6 +535,16 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   accent colour — the number is the accent. Two bugs found by rendering: a `var(--font-sans)`
   that did not exist invalidated the whole `font-family` (serif fallback everywhere), and anomaly
   rows carry an *absent* `impliedHaircutBps` rather than `null`, which rendered `NaN %`.
+- 2026-09-03 — The public site deploys on Vercel from a root `vercel.json`: build
+  `pnpm --filter @exdate/web build`, serve `apps/web/out`, `framework: null`. Two things learned
+  by deploying rather than by reading: `cleanUrls: true` **breaks the root** on a Next static
+  export — `/index.html` redirects to `/index`, `/index` to `/`, and `/` then 404s while still
+  returning the 404 page's body with a 200-shaped payload, so the site looked deployed and was
+  not. Dropped, since Next's export already emits the layout Vercel serves correctly by default.
+  And `.vercelignore` must exclude artifacts only, never sources: `pnpm install --frozen-lockfile`
+  verifies the lockfile against **every** workspace `package.json`, so omitting one package fails
+  the install. Verified live: `/` 200 with the real figures, `/_next/static` immutable, an unknown
+  path 404.
 - _(append decisions here as they are made)_
 
 ## Status

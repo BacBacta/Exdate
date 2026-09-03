@@ -48,6 +48,12 @@ pnpm typecheck
 The poller writes its first rows within about a minute. Until then the page says so; it never
 shows a zero it has not observed.
 
+The public site deploys to Vercel from `vercel.json` at the repository root: one project builds
+the workspace (`pnpm --filter @exdate/web build`) and serves the static export from
+`apps/web/out`. `framework` is deliberately `null` rather than `nextjs` — the site is
+`output: 'export'`, so there is no server to detect and "run this command, serve this folder"
+behaves identically locally and on Vercel.
+
 Three GitHub Actions run in `.github/workflows`. `ci` typechecks, tests, builds the status page and
 proves the generated registry still matches the data it comes from. `archive-corporate-actions`
 runs daily, merges the issuer's window into `data/corporate-actions.archive.json` and commits it

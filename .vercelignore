@@ -1,0 +1,16 @@
+# What Vercel does not need to build the public site.
+#
+# The build is `pnpm --filter @exdate/web build`, so the upload must still carry
+# every workspace package.json - `pnpm install --frozen-lockfile` verifies the
+# lockfile against all of them and fails on a missing one. Only artifacts and
+# local state are excluded here, never sources.
+
+.ponder/
+packages/indexer/.ponder/
+*.log
+.next/
+out/
+coverage/
+*.tsbuildinfo
+.vercel/
+.github/
