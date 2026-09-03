@@ -9,8 +9,8 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-03T08:15:36.000Z",
-  "sampleCount": 2,
+  "lastSampleAt": "2026-09-03T08:30:20.000Z",
+  "sampleCount": 3,
   "easternHourOfWeekSlotsCovered": 2,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
@@ -19,7 +19,7 @@
     {
       "field": "transferShare / provableTradeShare",
       "reason": "insufficient_session_coverage",
-      "detail": "every session needs at least 3 samples; still short: pre_market (1), regular (0), after_hours (0), overnight (1), weekend (0)"
+      "detail": "every session needs at least 3 samples; still short: pre_market (2), regular (0), after_hours (0), overnight (1), weekend (0)"
     }
   ],
   "transferShare": null,
@@ -36,13 +36,13 @@
       "label": "pre-market 04:00-09:30 ET",
       "offHours": true,
       "hoursPerWeek": 27.5,
-      "samples": 1,
-      "transfersSampled": 1644,
-      "secondsSampled": 41,
-      "transfersPerSecondMean": 40.098,
-      "transfersPerSecondMin": 40.098,
+      "samples": 2,
+      "transfersSampled": 3065,
+      "secondsSampled": 82,
+      "transfersPerSecondMean": 37.379,
+      "transfersPerSecondMin": 34.659,
       "transfersPerSecondMax": 40.098,
-      "provableTradesPerSecondMean": 11.415
+      "provableTradesPerSecondMean": 10.524
     },
     {
       "session": "regular",
@@ -125,6 +125,20 @@
       "transactionsMovingAToken": 583,
       "provableTrades": 468,
       "provableTradesPerSecond": 11.415
+    },
+    {
+      "observedAt": "2026-09-03T08:30:20.000Z",
+      "session": "pre_market",
+      "easternHourOfWeek": 100,
+      "fromBlock": 53277269,
+      "headBlock": 53277668,
+      "windowBlocks": 400,
+      "windowSeconds": 41,
+      "transfers": 1421,
+      "transfersPerSecond": 34.659,
+      "transactionsMovingAToken": 484,
+      "provableTrades": 395,
+      "provableTradesPerSecond": 9.634
     }
   ]
 }
