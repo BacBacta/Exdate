@@ -267,6 +267,16 @@ export interface ChainsResponse {
   chains: { key: string; chainId: number; name: string; issuer: string; explorerUrl: string }[]
 }
 
+/** `/v1/me`: the caller's tier and quota. `label` is the operator's name for the key; the key is never echoed. */
+export interface MeResponse {
+  tier: 'anonymous' | 'key'
+  label: string | null
+  limitPerMinute: number
+  remaining: number
+  resetAt: string
+  keysConfigured: number
+}
+
 export interface HealthResponse {
   ok: boolean
   registryGeneratedAt: string

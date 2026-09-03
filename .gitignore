@@ -21,3 +21,6 @@ coverage/
 .vercel/
 .vercel
 .env*
+
+# copied from data/ before every site build
+apps/web/public/data/

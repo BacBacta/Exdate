@@ -1,7 +1,14 @@
 {
   "name": "@exdate/core",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Chains, ABIs, WAD maths, reconciliation and the address codecs behind exdate, the corporate-action layer for tokenized stocks. Pure: no I/O.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BacBacta/Exdate.git",
+    "directory": "packages/core"
+  },
+  "private": false,
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -13,9 +20,46 @@
     "./holdings": "./src/holdings.ts",
     "./chains": "./src/chains.ts"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./webhooks": {
+        "types": "./dist/webhooks.d.ts",
+        "default": "./dist/webhooks.js"
+      },
+      "./yield": {
+        "types": "./dist/yield.d.ts",
+        "default": "./dist/yield.js"
+      },
+      "./pending": {
+        "types": "./dist/pending.d.ts",
+        "default": "./dist/pending.js"
+      },
+      "./holdings": {
+        "types": "./dist/holdings.d.ts",
+        "default": "./dist/holdings.js"
+      },
+      "./chains": {
+        "types": "./dist/chains.d.ts",
+        "default": "./dist/chains.js"
+      }
+    }
+  },
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "viem": "^2.56.3"

@@ -96,8 +96,9 @@ export function Footer() {
             <a href="/#coverage">Coverage</a>
             <a href="/#developers">Developers</a>
             <a href={links.apiDocs}>API</a>
+            <a href={links.sdkDocs}>SDK</a>
             <a href={links.data}>Data</a>
-            <a href={links.github}>GitHub</a>
+            {links.github ? <a href={links.github}>GitHub</a> : null}
           </nav>
         </div>
         <p className="fine">

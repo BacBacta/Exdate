@@ -4,8 +4,9 @@ Every example below is a real response, captured from the indexer running agains
 mainnet on 2026-09-02. Nothing here is illustrative: if a field is `null` in an example, that is
 what the chain said.
 
-Base URL in development: `http://localhost:42069`. `:chain` accepts the key (`robinhood`) or the id
-(`4663`).
+Base URL: wherever you run the indexer — `http://localhost:42069` under `pnpm dev`, or the host you
+deploy the Docker image to (see *Hosting* in the README). There is no public instance yet. `:chain`
+accepts the key (`robinhood`) or the id (`4663`).
 
 Two rules hold everywhere:
 
@@ -18,13 +19,40 @@ Every response that carries a price says so in `answerIncludesMultiplier` / `inc
 
 ---
 
+## Keys and quotas
+
+Every route but `/v1/health` is counted. Without a key a caller shares an anonymous quota per client
+address (60 requests a minute by default); with one, the quota the operator attached to it. The key
+travels as `Authorization: Bearer <key>` or `X-Api-Key: <key>`, and three headers come back on every
+answer: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` (a Unix timestamp). Past
+the quota the answer is `429` with `Retry-After` and a JSON body:
+
+```json
+{ "error": "rate limited", "limitPerMinute": 60, "retryAfterSeconds": 41 }
+```
+
+An unknown key is `401 {"error":"unknown API key"}`, never a silent downgrade to anonymous, so a typo
+shows up as a refusal and not as a smaller quota than promised.
+
+## `GET /v1/me`
+
+What the API knows about the caller, without spending a request:
+
+```json
+{ "tier": "key", "label": "acme", "limitPerMinute": 600, "remaining": 598, "resetAt": "2026-09-03T16:41:00.000Z", "keysConfigured": 2 }
+```
+
+`label` is the name the operator gave the key; the key itself is never echoed. `tier` is `anonymous`
+without a key, and `label` is then `null`.
+
 ## `GET /v1/health`
 
 ```json
 { "ok": true, "registryGeneratedAt": "2026-09-02T15:14:00.463Z" }
 ```
 
-`registryGeneratedAt` dates the token registry snapshot, not the process.
+`registryGeneratedAt` dates the token registry snapshot, not the process. Uncounted, so a probe
+never eats into a quota.
 
 ## `GET /v1/chains`
 
@@ -111,15 +139,16 @@ hashes). `announcementCount` is above 1 where a schedule was re-announced; CRWD 
 
 ## `GET /v1/:chain/reconciliations`
 
-`?token=` narrows to one address, `?status=` to one state. `counts` is always the whole picture, so
-a filtered view cannot read as the total.
+The body is `{ chainId, counts, returned, reconciliations }`. `?token=` narrows to one address,
+`?status=` to one state; `returned` is the size of the filtered list and `counts` is always the whole
+picture, so a filtered view cannot read as the total.
 
 ```json
 {
   "id": "0x00000000000000000000000000000000…63fe4a67:2026-08-06",
   "symbol": "SGOV",
   "status": "matched",
-  "confidence": "low",
+  "confidence": "medium",
   "declared": {
     "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
     "status": "CORPORATE_ACTION_STATUS_COMPLETED",
@@ -167,7 +196,10 @@ Statuses: `matched`, `anomaly`, `pending` (declared, nothing on chain), `unmatch
 issuer row — expected before ~2026-08-05, where the issuer's feed ends) and
 `unsupported_action_type` (a split matched to a step: no per-share rate to reconcile against).
 
-`confidence` is `low` on every row today, because the feed pairing is unverified.
+`confidence` is `low` on every row but one: the token → feed pairing is inferred from a ticker, and
+no first-party statement links them. SGOV's matched row reads `medium`, because its own multiplier
+step was seen moving its feed by the step's own size (`feed.corroborated`). `high` is reserved for a
+first-party address-level link, which nothing has today.
 
 ## `GET /v1/:chain/tokens/:address/yield`
 
@@ -233,14 +265,18 @@ and the surviving fraction are refused under `notComputed`.
 
 ## `GET /v1/status`
 
-Feed health for every token that has a feed, plus `tokensWithoutFeed` — a caller must be able to see
-that most Stock Tokens have no oracle at all rather than infer it from a short list. Off-hours these
-feeds hold their last answer with no heartbeat, so `updatedAt` and `ageSeconds` are the only honest
-signals; `status` is `live | stale | paused | unknown`.
+`{ observedAt, chains: [ { chainId, name, tokens, tokensWithFeed, tokensWithoutFeed, live, stale,
+paused, unknown, feeds } ] }` — one entry per chain served. `feeds` carries the health of every token
+that has a feed (`symbol`, `token`, `feed`, `verified`, `status`, `ageSeconds`, `beyondHeartbeat`,
+`updatedAt`), and `tokensWithoutFeed` lists the rest, because a caller must be able to see that most
+Stock Tokens have no oracle at all rather than infer it from a short list. Off-hours these feeds hold
+their last answer with no heartbeat, so `updatedAt` and `ageSeconds` are the only honest signals;
+`status` is `live | stale | paused | unknown`.
 
 ## `GET /v1/calendar`
 
-Two different horizons in one response: `upcomingCorporateActions` from the issuer runs weeks ahead;
+`{ observedAt, chains: [ { chainId, upcomingCorporateActions, scheduledMultiplierUpdates } ] }`. Two
+different horizons in one response: `upcomingCorporateActions` from the issuer runs weeks ahead;
 `scheduledMultiplierUpdates` is what is genuinely pending on chain, which is about nine minutes.
 
 ## `GET /v1/webhooks`
@@ -276,4 +312,11 @@ if (result.event.type === 'dividend.reconciled') {
 ```
 
 Verify the raw bytes before parsing: key order and whitespace change the bytes, and the signature
-covers bytes. See [`packages/sdk/README.md`](../packages/sdk/README.md) for the rest.
+covers bytes. See [the SDK reference](../packages/sdk/README.md) for the rest.
+
+## Running your own
+
+`pnpm dev` runs it on a local PGlite database. If Ponder stops with *Schema "public" was previously
+used by a different Ponder app*, the local database belongs to an earlier build: delete
+`packages/indexer/.ponder/` and start again. For a hosted instance see *Hosting* in the README:
+`docker compose up -d` brings up Postgres and the indexer, and `EXDATE_API_KEYS` turns on keys.

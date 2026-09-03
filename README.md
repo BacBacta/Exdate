@@ -65,6 +65,41 @@ it does not run is a day of dividend history that becomes unrecoverable. `measur
 runs hourly and appends one sampled window to `data/session-share.observed.json`; it takes a week to
 cover the clock, which is why it is a schedule and not a script anyone runs once.
 
+### Hosting the API
+
+There is no public instance yet: the site is static and Vercel cannot run the indexer. To host
+one, `docker compose up -d` at the repository root brings up Postgres and the indexer, which polls
+the chain and serves `/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`). Put a TLS proxy in
+front and forward the client address in `X-Forwarded-For`, so anonymous quotas count per visitor.
+Everything else has a default; `.env.example` lists what can change.
+
+Keys and quotas are three variables: `EXDATE_API_KEYS` as `key:label:requestsPerMinute`, comma
+separated (empty means open at the anonymous rate); `EXDATE_ANON_RPM` for callers without a key
+(60); `EXDATE_KEY_RPM` for a key that states no quota (600). An unknown key is a `401`, never a
+silent downgrade. `GET /v1/me` tells a caller its tier and what is left, uncounted. The counting is
+in memory, per process: this API serves a few hundred rows from one process, and a shared store
+would be machinery for a problem it does not have.
+
+If `pnpm dev` stops with *Schema "public" was previously used by a different Ponder app*, the local
+PGlite database belongs to an earlier build: delete `packages/indexer/.ponder/` and start again.
+
+### Publishing the packages
+
+`@exdate/core` and `@exdate/sdk` are set up for npm: the workspace consumes their TypeScript source,
+and `publishConfig` swaps `main`, `types` and `exports` to the `dist/` that `pnpm build` emits at
+publish time, so nothing in the monorepo changes shape. `pnpm --filter @exdate/core publish` then
+`pnpm --filter @exdate/sdk publish` (the SDK depends on core; pnpm rewrites the `workspace:` range
+to the published version). Neither is published today, and the SDK README says so.
+
+### Terms that bind the data
+
+The on-chain record is public. The issuer's registry and corporate-action feed come from
+`api.robinhood.com/rhj`, which needs no key but sits under Robinhood's developer-documentation
+terms (RHDA, LLC): a personal, revocable licence that forbids distributing "Robinhood Materials" to
+third parties or building a competing product. Whether an archived JSON row is such material is a
+question for counsel before any of it is sold or licensed; this repository redistributes the feed's
+rows today, with their source named on every one.
+
 ### Verification scripts
 
 ```bash

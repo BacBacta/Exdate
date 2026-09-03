@@ -561,13 +561,14 @@ export const observed = {
     base: { name: 'Base', issuer: 'Coinbase tokenized stocks', tokens: base.summary.tokens, feeds: base.summary.feeds, measured: false, verifiedAt: base.verifiedAt },
   },
   links: {
-    github: 'https://github.com/BacBacta/Exdate',
-    data: 'https://github.com/BacBacta/Exdate/blob/HEAD/data/reconciliations.observed.json',
+    /** Set NEXT_PUBLIC_EXDATE_REPO_URL once the repository is public; a link to a private repository is a dead link. */
+    github: process.env.NEXT_PUBLIC_EXDATE_REPO_URL ?? null,
+    data: '/data/',
     api: process.env.NEXT_PUBLIC_EXDATE_API_URL ?? 'https://api.exdate.xyz',
     /** The live status page needs a running indexer; until one is hosted, no link is better than a dead one. */
     status: process.env.NEXT_PUBLIC_EXDATE_STATUS_URL ?? null,
-    apiDocs: 'https://github.com/BacBacta/Exdate/blob/HEAD/docs/api.md',
-    sdkDocs: 'https://github.com/BacBacta/Exdate/blob/HEAD/packages/sdk/README.md',
+    apiDocs: '/docs/api/',
+    sdkDocs: '/docs/sdk/',
     verification: 'https://github.com/BacBacta/Exdate/blob/HEAD/docs/phase-0-verification.md',
   },
 }

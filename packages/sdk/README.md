@@ -11,12 +11,16 @@ string**, and **anything exdate has not observed is `null`** — never `0`, neve
 pnpm add @exdate/sdk
 ```
 
+Until the package is on npm, add it from the workspace (`"@exdate/sdk": "workspace:*"`) or from a
+checkout. It depends on `@exdate/core` only; installing it never pulls in the server.
+
 ## Reading
 
 ```ts
 import { createClient } from '@exdate/sdk'
 
-const exdate = createClient({ baseUrl: 'https://api.exdate.xyz' })
+// the host your indexer runs on; there is no public instance yet
+const exdate = createClient({ baseUrl: 'http://localhost:42069', apiKey: process.env.EXDATE_API_KEY })
 
 const SGOV = '0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5'
 
@@ -39,6 +43,13 @@ route's response as-is:
 | `pending(addr)` | `/v1/:chain/tokens/:addr/pending` |
 | `status()` `calendar()` | `/v1/status` `/v1/calendar` |
 | `webhooks.catalogue()` `webhooks.events({ … })` | `/v1/webhooks`, `/v1/:chain/webhooks/events` |
+
+### Keys and quotas
+
+Without `apiKey` the anonymous quota applies (60 requests a minute per address by default). With
+one, the quota the operator attached to the key. `exdate.me()` reports the tier and what is left
+without spending a request, and a `429` arrives as an `ExdateError` whose `body` carries
+`retryAfterSeconds`.
 
 ### Errors
 

@@ -27,10 +27,12 @@ import {
   serializeToken,
   serializeWebhookEvent,
 } from './serialize.js'
+import { RateLimiter, clientIp, presentedKey, type Caller, type LimitsConfig } from './limits.js'
 import type { Repository } from './types.js'
 
 export * from './types.js'
 export * from './serialize.js'
+export * from './limits.js'
 
 export interface ApiOptions {
   repository: Repository
@@ -42,16 +44,84 @@ export interface ApiOptions {
    * operator whether silence means "nothing happened" or "nobody is listening".
    */
   webhookEndpointsConfigured?: number
+  /** API keys and quotas; absent means open at the default anonymous rate. See limits.ts. */
+  limits?: LimitsConfig
+  /** Milliseconds, injected so quota windows are deterministic under test. */
+  nowMs?: () => number
+  /**
+   * The peer address of a request when no proxy header names the client.
+   * Depends on the server adapter, so the host injects it; without it every
+   * anonymous caller behind the same silence shares one quota.
+   */
+  clientAddress?: (request: Request) => string | null
+}
+
+/** What /v1/me tells a caller about itself. Never the key. */
+export interface MeResponse {
+  tier: Caller['tier']
+  label: string | null
+  limitPerMinute: number
+  remaining: number
+  resetAt: string
+  keysConfigured: number
 }
 
 export function createApi({
   repository,
   now = () => BigInt(Math.floor(Date.now() / 1000)),
   webhookEndpointsConfigured = 0,
+  limits = { keys: [], anonymousRequestsPerMinute: 60 },
+  nowMs = () => Date.now(),
+  clientAddress = () => null,
 }: ApiOptions) {
-  const app = new Hono()
+  const app = new Hono<{ Variables: { caller: Caller } }>()
+  const limiter = new RateLimiter(limits, nowMs)
 
   app.use('/v1/*', cors())
+
+  /**
+   * Keys and quotas, on everything but the liveness route. The headers are
+   * the usual three, so a client library can back off without reading the
+   * body; a refusal is JSON like every other answer.
+   */
+  app.use('/v1/*', async (c, next) => {
+    if (c.req.path === '/v1/health') return next()
+    const key = presentedKey(c.req.raw.headers)
+    const ip = clientIp(c.req.raw.headers, clientAddress(c.req.raw))
+    const decision = c.req.path === '/v1/me' ? limiter.peek(key, ip) : limiter.take(key, ip)
+    if (!decision.ok) {
+      if (decision.status === 401) return c.json({ error: decision.error }, 401)
+      c.header('Retry-After', String(decision.retryAfterSeconds))
+      c.header('X-RateLimit-Limit', String(decision.limit))
+      c.header('X-RateLimit-Remaining', '0')
+      c.header('X-RateLimit-Reset', String(Math.ceil(decision.resetAt / 1000)))
+      return c.json(
+        { error: 'rate limited', limitPerMinute: decision.limit, retryAfterSeconds: decision.retryAfterSeconds },
+        429,
+      )
+    }
+    c.set('caller', decision.caller)
+    c.header('X-RateLimit-Limit', String(decision.limit))
+    c.header('X-RateLimit-Remaining', String(decision.remaining))
+    c.header('X-RateLimit-Reset', String(Math.ceil(decision.resetAt / 1000)))
+    await next()
+  })
+
+  app.get('/v1/me', (c) => {
+    const key = presentedKey(c.req.raw.headers)
+    const ip = clientIp(c.req.raw.headers, clientAddress(c.req.raw))
+    const decision = limiter.peek(key, ip)
+    if (!decision.ok) return c.json({ error: 'unknown API key' }, 401)
+    const body: MeResponse = {
+      tier: decision.caller.tier,
+      label: decision.caller.label,
+      limitPerMinute: decision.limit,
+      remaining: decision.remaining,
+      resetAt: new Date(decision.resetAt).toISOString(),
+      keysConfigured: limits.keys.length,
+    }
+    return c.json(body)
+  })
 
   // Ponder reserves /health and /ready for its own liveness probes.
   app.get('/v1/health', (c) => c.json({ ok: true, registryGeneratedAt: REGISTRY_GENERATED_AT }))

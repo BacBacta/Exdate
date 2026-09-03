@@ -19,6 +19,7 @@ import type {
   WebhookCatalogue,
   WebhookOutboxResponse,
   YieldLedger,
+  MeResponse,
 } from './types.js'
 
 export * from './types.js'
@@ -58,8 +59,10 @@ export type {
  */
 
 export interface ClientOptions {
-  /** e.g. `https://api.exdate.xyz`. A trailing slash is fine. */
+  /** The host the indexer runs on, e.g. `http://localhost:42069`. A trailing slash is fine. */
   baseUrl: string
+  /** Sent as `Authorization: Bearer …`. Without it the anonymous quota applies. */
+  apiKey?: string
   /** Chain key or id. Defaults to `robinhood`; every route accepts either. */
   chain?: string | number
   /** Injected for tests, proxies, or a runtime whose fetch needs options. */
@@ -97,7 +100,52 @@ export class ExdateError extends Error {
 
 type Query = Record<string, string | number | undefined>
 
-export function createClient(options: ClientOptions) {
+/**
+ * Spelled out rather than inferred: a declaration build must be able to name
+ * every type here without reaching into core's private module paths, and a
+ * consumer reading the SDK's types should see the routes, not the plumbing.
+ */
+export interface ExdateClient {
+  /** The configured chain, resolved the way every route resolves it. */
+  readonly chain: string
+  health(): Promise<HealthResponse>
+  chains(): Promise<ChainsResponse>
+  /** Every token: multiplier, any scheduled change, and feed state. */
+  tokens(): Promise<TokensResponse>
+  /** One token plus its full announcement history. Throws a 404 ExdateError if unknown. */
+  token(address: string): Promise<TokenResponse>
+  /** The same, but `null` instead of throwing when the token is unknown. */
+  tokenOrNull(address: string): Promise<TokenResponse | null>
+  /** Every multiplier announcement, newest first. */
+  events(): Promise<EventsResponse>
+  /** Declared corporate actions against the multiplier steps they produced. */
+  reconciliations(query?: { token?: string; status?: string }): Promise<ReconciliationsResponse>
+  /**
+   * The distribution ledger for one token: per-payment gross, received and
+   * haircut. Not a rate - see `notComputed` in the response for what it
+   * refuses to compute and why.
+   */
+  yield(address: string): Promise<YieldLedger>
+  /** What is owed and has not arrived: announced on chain, or declared and absent. */
+  pending(address: string): Promise<PendingView>
+  /** Feed health across every chain, plus how many tokens have no feed at all. */
+  status(): Promise<StatusResponse>
+  /** Upcoming issuer actions, and changes genuinely pending on chain. */
+  calendar(): Promise<CalendarResponse>
+  /** The caller's tier and what is left of its quota; not counted against it. */
+  me(): Promise<MeResponse>
+  webhooks: {
+    /** The event catalogue, the signing scheme and the retry schedule. */
+    catalogue(): Promise<WebhookCatalogue>
+    /** The outbox: what was noticed, and what each delivery did. */
+    events(query?: { type?: string; status?: string; limit?: number }): Promise<WebhookOutboxResponse>
+    verify: typeof verifyWebhook
+    parse: typeof parseWebhook
+    fromRequest: typeof webhookFromRequest
+  }
+}
+
+export function createClient(options: ClientOptions): ExdateClient {
   const base = options.baseUrl.replace(/\/+$/, '')
   const chain = String(options.chain ?? 'robinhood')
   const doFetch = options.fetch ?? globalThis.fetch
@@ -115,7 +163,11 @@ export function createClient(options: ClientOptions) {
   async function get<T>(path: string, query?: Query): Promise<T> {
     const target = url(path, query)
     const response = await doFetch(target, {
-      headers: { accept: 'application/json', ...options.headers },
+      headers: {
+        accept: 'application/json',
+        ...(options.apiKey ? { authorization: `Bearer ${options.apiKey}` } : {}),
+        ...options.headers,
+      },
       ...(timeoutMs > 0 ? { signal: AbortSignal.timeout(timeoutMs) } : {}),
     })
     const text = await response.text()
@@ -179,6 +231,8 @@ export function createClient(options: ClientOptions) {
     status: () => get<StatusResponse>('/v1/status'),
     /** Upcoming issuer actions, and changes genuinely pending on chain. */
     calendar: () => get<CalendarResponse>('/v1/calendar'),
+    /** The caller's tier and what is left of its quota; not counted against it. */
+    me: () => get<MeResponse>('/v1/me'),
 
     webhooks: {
       /** The event catalogue, the signing scheme and the retry schedule. */
@@ -193,7 +247,6 @@ export function createClient(options: ClientOptions) {
   }
 }
 
-export type ExdateClient = ReturnType<typeof createClient>
 
 export interface VerifyInput {
   /** One secret, or several while rotating. */

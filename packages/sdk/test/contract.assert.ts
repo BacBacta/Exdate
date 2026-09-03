@@ -1,4 +1,5 @@
 import type {
+  MeResponse as ServedMe,
   serializeCorporateAction,
   serializeMultiplierEvent,
   serializeReconciliation,
@@ -7,6 +8,7 @@ import type {
 } from '@exdate/api'
 import type {
   CorporateActionView,
+  MeResponse,
   MultiplierEventView,
   ReconciliationView,
   TokenView,
@@ -55,5 +57,11 @@ type ApiWebhookEvent = ReturnType<typeof serializeWebhookEvent>
 type SdkWebhookEvent = WebhookOutboxResponse['events'][number]
 const _webhookMatches: (row: ApiWebhookEvent) => SdkWebhookEvent = (row) => row
 never_<Extra<ApiWebhookEvent, SdkWebhookEvent>>()
+
+// /v1/me is a plain object in the route, typed there as MeResponse; both directions must hold.
+declare const servedMe: ServedMe
+declare const sdkMe: MeResponse
+export const meIsCompatible: MeResponse = servedMe
+export const meIsComplete: ServedMe = sdkMe
 
 export const contractChecked = true

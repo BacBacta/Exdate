@@ -1,0 +1,45 @@
+# One command for a hosted exdate: `docker compose up -d`.
+#
+# Postgres keeps the tables; the indexer polls the chain and serves the API on
+# 42069. Put a TLS-terminating proxy (Caddy, nginx, the host's load balancer)
+# in front, forwarding the client address in X-Forwarded-For so anonymous
+# quotas count per visitor and not per proxy. Nothing else is required: the
+# public RPC is the default, and every other setting has a default in
+# .env.example.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: exdate
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-exdate}
+      POSTGRES_DB: exdate
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U exdate -d exdate"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  indexer:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://exdate:${POSTGRES_PASSWORD:-exdate}@db:5432/exdate
+      DATABASE_SCHEMA: exdate
+      RHC_RPC_URL: ${RHC_RPC_URL:-https://rpc.mainnet.chain.robinhood.com}
+      EXDATE_POLL_INTERVAL_BLOCKS: ${EXDATE_POLL_INTERVAL_BLOCKS:-600}
+      # keys as key:label:requestsPerMinute, comma separated; empty = open at the anonymous rate
+      EXDATE_API_KEYS: ${EXDATE_API_KEYS:-}
+      EXDATE_ANON_RPM: ${EXDATE_ANON_RPM:-60}
+      EXDATE_KEY_RPM: ${EXDATE_KEY_RPM:-600}
+      # signed webhook receivers, a JSON array: [{"id":"curator","url":"https://…","secret":"…","events":["dividend.reconciled"]}]
+      EXDATE_WEBHOOK_ENDPOINTS: ${EXDATE_WEBHOOK_ENDPOINTS:-}
+    ports:
+      - "42069:42069"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

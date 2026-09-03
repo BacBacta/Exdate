@@ -22,6 +22,19 @@
       ]
     },
     {
+      "source": "/data/(.*)\\.json",
+      "headers": [
+        {
+          "key": "cache-control",
+          "value": "public, max-age=3600"
+        },
+        {
+          "key": "access-control-allow-origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/_next/static/(.*)",
       "headers": [
         {

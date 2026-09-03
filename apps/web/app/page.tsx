@@ -251,7 +251,8 @@ export default function Page() {
               <p className="links">
                 <a href={links.apiDocs}>API reference</a>
                 <a href={links.sdkDocs}>SDK</a>
-                <a href={links.github}>Source</a>
+                <a href={links.data}>Data</a>
+                {links.github ? <a href={links.github}>Source</a> : null}
               </p>
             </div>
             <pre className="code" data-reveal style={delay(120)}>

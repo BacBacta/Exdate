@@ -1,6 +1,6 @@
 import { db } from 'ponder:api'
 import schema from 'ponder:schema'
-import { createApi } from '@exdate/api'
+import { createApi, limitsFromEnv } from '@exdate/api'
 import type {
   CorporateActionRow,
   MultiplierEventRow,
@@ -158,4 +158,10 @@ const repository: Repository = {
   },
 }
 
-export default createApi({ repository, webhookEndpointsConfigured: endpoints.length })
+// Keys and quotas come from the environment and are validated at boot: a
+// malformed entry stops the process rather than admitting nobody.
+export default createApi({
+  repository,
+  webhookEndpointsConfigured: endpoints.length,
+  limits: limitsFromEnv(process.env),
+})

@@ -413,6 +413,8 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - 2026-09-01 — exdate targets Robinhood Chain (194 tokens, public data gap) rather than Base
   (4 tokens). Base remains a planned second issuer for neutrality.
 - 2026-09-02 — Name: **exdate**. Repo `exdate`, API `api.exdate.xyz`, SDK `@exdate/sdk`.
+  *(2026-09-03: `exdate.xyz` turned out to belong to someone else — see the entry of that day. The
+  name stands; the domain does not.)*
 - 2026-09-02 — Phase 0 complete. Token addresses promoted from `TODO_VERIFY` to verified against
   the issuer's own registry. See `docs/phase-0-verification.md`.
 - 2026-09-02 — **Proposed, pending human greenlight**: drop `applied_tx` / `applied_at` from
@@ -700,6 +702,35 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   shares at the August step → 22 requests, 1.7 s, 0.0122 shares gained, $1.85 declared, $1.22
   arrived, and 0 requests on the second visit; a trader's wallet with 3 184 transfers → 27
   requests, 6.8 s. Not seen, and said on the page: tokens held inside a protocol at the time.
+- 2026-09-03 — **The API reviewed as a product, and what it took to make it usable.** Running the
+  indexer against mainnet and calling every route in `docs/api.md`: all answer as documented, 50
+  reconciliations, filters and counts right, 404s in JSON, CORS open. What was wrong sat around the
+  API, not in it. (1) **The repository is private** (GitHub API: `"private": true`), so every link
+  from the public site to GitHub 404s for anyone but the owner. The site now serves the reference
+  itself: `/docs/api/` and `/docs/sdk/` render `docs/api.md` and the SDK README at build time
+  (`marked`, links rewritten to the pages), and `/data/` lists the committed datasets, copied into
+  `public/data/` before every build (`apps/web/scripts/sync-public.mjs`) and served with CORS. A
+  GitHub link renders only when `NEXT_PUBLIC_EXDATE_REPO_URL` is set. (2) **No hosted instance**
+  and the docs said `localhost`: `Dockerfile` + `docker-compose.yml` bring up Postgres and the
+  indexer with `ponder start --schema`; the docs say plainly there is no public instance yet.
+  (3) **`@exdate/sdk` is not on npm** and its README said `pnpm add` and `api.exdate.xyz`: both
+  packages are now publishable (`publishConfig` swaps `exports` to a `dist/` built by
+  `tsconfig.build.json`, verified with `pnpm pack`), and the README says they are not published.
+  (4) **`exdate.xyz` belongs to someone else** — it serves "ExDate, The honest Indian Dividend
+  Calendar" on Vercel — so the 2026-09-02 naming decision's domain is void; `metadataBase` still
+  says it and must change with the domain. (5) Doc drift fixed: SGOV's row is `medium`, not `low`;
+  `/v1/status` and `/v1/calendar` nest under `chains[]`; the reconciliations array is named.
+  (6) The local first-run trap (Ponder's *schema previously used by a different app*) is written
+  down: delete `.ponder/`. **Monetisation prerequisite built: keys and quotas** in `@exdate/api`
+  (`limits.ts`): `EXDATE_API_KEYS` as `key:label:rpm`, anonymous quota per client address from
+  `X-Forwarded-For`, the three `X-RateLimit-*` headers, `429` with `Retry-After`, an unknown key a
+  `401` and never a silent downgrade, `/v1/me` uncounted, `/v1/health` exempt. Fixed one-minute
+  windows in memory with an injectable clock; tested at the module and at the routes, and live.
+  The SDK takes `apiKey` and has `me()`; the contract assert covers `MeResponse` both ways.
+  **Terms, read rather than assumed**: Robinhood's developer-documentation terms (RHDA, LLC,
+  2026-08-24) grant a personal, revocable licence and forbid distributing "Robinhood Materials" to
+  third parties or building a competing product. Whether the archived `/rhj` rows are such
+  material is for counsel to answer before any of it is sold; the README says so.
 - _(append decisions here as they are made)_
 
 ## Status
