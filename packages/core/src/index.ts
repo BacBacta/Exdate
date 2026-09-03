@@ -1,5 +1,6 @@
 export * from './abi.js'
 export * from './chains.js'
+export * from './holdings.js'
 export * from './logs.js'
 export * from './multiplier.js'
 export * from './pairing.js'

@@ -33,7 +33,17 @@ nowhere else.
 - Single Robinhood-operated sequencer, no permissionless fallback.
 - **Multicall3 is deployed at the canonical address** `0xcA11bde05977b3631167028862bE2a173976CA11`
   (3 808 bytes). It turns the 194-token poll — five views each, 970 calls, plus 35 feed rounds —
-  into ~30 requests.
+  into ~30 requests. One `aggregate3` carrying 584 sub-calls (194 tokens × `balanceOf`,
+  `balanceOfUI`, `uiMultiplier`, plus block and timestamp) is a single `eth_call`: 124 KB of
+  calldata, 187 KB back, 140–340 ms, zero failures (measured 2026-09-03).
+- **The public RPC answers browsers.** `access-control-allow-origin: *` on both the preflight and
+  the POST (measured 2026-09-03), so a static page can read the chain with no server in between.
+  That is what `/wallet/` on the public site does.
+- **`block.number` inside the EVM is the parent chain's block, not this chain's.** Measured
+  2026-09-03: Multicall3's `getBlockNumber()` answered 25 896 564 while `eth_blockNumber` and
+  `ArbSys.arbBlockNumber()` (the Arbitrum precompile at `0x…64`, 1 byte of code) both answered
+  53 391 912. A contract-side read that wants to date itself must go through ArbSys;
+  `ROBINHOOD_CHAIN.blockNumberSource` carries the address and the computed selector.
 - **There is no archive.** `eth_call` at `latest - 10 000` already answers
   `metadata is not found`; only the last few thousand blocks of state are readable. Historical
   multiplier state must be reconstructed from events, not read back.
@@ -221,6 +231,12 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   them.
 - A `Transfer` proves custody moved, not that a trade happened. A provable trade needs both legs
   (Stock Token + USDG) in the same `transactionHash`.
+- **One wallet's history is cheap for a person and impossible for a bot** (measured 2026-09-03,
+  `eth_getLogs` with the 194 addresses and the wallet as a topic, whole chain in 5 M-block ranges):
+  67 and 350 transfers → 22 requests, 1.2–1.5 s, zero rejections; 74 000 transfers → 38 requests
+  with range halving, 27 rejections, 62 s; 88 000+ → still not done after 80 requests, and a bot
+  receiving 9 600 transfers in 30 minutes times out on any range. A browser feature must cap its
+  requests and refuse with a reason past that, never show a partial total.
 - Mint = transfer from `address(0)`. Burn = transfer to `address(0)`.
 - The kickoff brief states that ~46% of transfers happen outside NYSE hours, weekends included.
   **exdate is now measuring it** rather than repeating it — see "Off-hours share" below. Until that
@@ -307,7 +323,7 @@ pnpm workspaces:
 | `packages/indexer` | Ponder + PGlite/Postgres. Indexes `UIMultiplierUpdated`, polls the ERC-8056 views, the Chainlink feeds and the issuer's corporate actions, drains the webhook outbox, and serves the API. |
 | `packages/api` | `@exdate/api` — Hono routes over a `Repository` interface, so it never builds SQL and stays deployable on its own. |
 | `apps/status` | Next.js App Router status page. Reads the API and nothing else. |
-| `apps/web` | `@exdate/web` — the public site. Static export (`output: 'export'`); every figure is read at build time from `data/*.json` by `lib/observed.ts`, never from the API or an RPC, so it deploys as plain files and cannot show a number that is not committed. Geist Sans/Mono self-hosted via the `geist` package. |
+| `apps/web` | `@exdate/web` — the public site. Static export (`output: 'export'`); every published figure is read at build time from `data/*.json` by `lib/observed.ts`, never from the API, so it deploys as plain files and cannot show a number that is not committed. The one runtime read is `/wallet/`: the visitor's own browser asks the chain what an address holds (one Multicall3 `eth_call` through `@exdate/core/holdings`, no server, no signature) and joins it with the committed record. Geist Sans/Mono self-hosted via the `geist` package. |
 | `packages/sdk` | `@exdate/sdk` — typed client + webhook verifier over `@exdate/core` only, so a consumer never installs the server. Response shapes are hand-declared and compiled against the API's serialisers in `test/contract.assert.ts`. |
 
 Vitest lives in `packages/core` (raw↔UI conversion, reconciliation, pairing, rounds, staleness,
@@ -626,6 +642,27 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   three come from `lib/observed.ts` reading the committed files, so the site still cannot show a
   figure that is not in git. Two things left absent on purpose, both refused in core as well: a
   landing date for a pending dividend, and the surviving fraction before it lands.
+- 2026-09-03 — **`/wallet/`, step 1: what an address holds and what it is owed, read without a
+  signature.** Reading a balance is public state; a signature would only prove ownership, and the
+  page has nothing to prove. Two ways in, neither signs: paste an address, or "Use my wallet"
+  (`eth_requestAccounts`, a connection prompt, shown only when a provider is injected). The read
+  is one `eth_call` to Multicall3 built and decoded by `@exdate/core/holdings`, a module with **no
+  imports at all** — the ABI encoding is hand-written and checked byte for byte against viem in
+  the tests — because Turbopack does not follow the `.js` specifiers the rest of core uses when
+  it transpiles the package, and a wallet page must not bundle an RPC library to read a number.
+  What is shown: per token held, the balance and the shares it represents at one block (dated by
+  `ArbSys.arbBlockNumber()`, since `block.number` is the parent chain's — see "Chain"), and
+  **owed = the issuer's rate × those shares**, with no price; the sum of what is due is the
+  headline, the sum declared for the coming weeks takes its place when nothing is due yet, and a
+  wallet with nothing declared says so instead of showing `$0.00`. The joins (names, declared
+  dividends, states) are the committed data; the only live figure is the balance, which cannot be
+  committed in advance. Retries on the RPC's rejections (four, backing off), an error state with
+  "Try again" rather than zeros, unreadable tokens counted and reported, dust said to be dust.
+  Verified end to end in Chromium with the page's own calldata forwarded to the real RPC (NVDA,
+  758.247 tokens, $0.25 × 758.247 = $189.56 for 1 October). **Not read yet: history** — what past
+  steps delivered to the address needs its balance at each `effectiveAt`, which is its own
+  transfer logs plus the effective block numbers; measured feasible for a person's wallet and
+  refused for a bot's (see "Known traps"). That is step 2.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -655,6 +692,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 - The five July actions have no declared rate and never will (see the decision log); their steps
   are published as `unmatched` with the reason stated rather than filled in.
+
+- `/wallet/` reads holdings, not history. What past dividends delivered to an address needs its
+  balance at each `effectiveAt` — its own transfer logs, plus the twelve effective block numbers,
+  which can be resolved once at build time and committed. Feasible in one to two seconds for a
+  person's wallet, to be refused past ~40 requests for an automated one. Step 2, not started.
 
 - The off-hours share is being sampled, not yet answered: `data/session-share.observed.json` reads
   `sufficient: false` until every session has three samples, which takes about a day of the hourly

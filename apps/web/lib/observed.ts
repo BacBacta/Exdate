@@ -7,6 +7,7 @@
  * that read. If a number is not in those files, the page does not show it.
  */
 
+import { ROBINHOOD_CHAIN } from '@exdate/core/chains'
 import baseJson from '../../../data/base-b20-verification.json'
 import archiveJson from '../../../data/corporate-actions.archive.json'
 import feedsJson from '../../../data/chainlink-feeds.snapshot.json'
@@ -386,6 +387,7 @@ export const calendar = (() => {
         symbol: row.symbol,
         name: nameByAddress.get(key) ?? row.symbol,
         processDate: row.processDate!,
+        rate: row.rate,
         declared: fixed(row.rate, 4),
         owedPerToken: row.rate ? fixed(formatWad((parseDecimal(row.rate) * multiplierOf(key)) / WAD, 18), 4) : null,
         daysSince,
@@ -403,6 +405,36 @@ export const calendar = (() => {
     overdue: pick('overdue'),
     awaiting: pick('awaiting'),
     upcoming: pick('upcoming'),
+  }
+})()
+
+/**
+ * What the wallet page hands the browser: where to read, and the declared
+ * dividends not yet on chain per token, so a balance read live can be joined
+ * with the committed record without a server. The multiplier is not passed:
+ * the browser reads the one in force at the same block as the balance.
+ */
+export const wallet = (() => {
+  const declaredByToken: Record<string, { processDate: string; rate: string; due: boolean; group: CalendarGroup }[]> = {}
+  for (const row of [...calendar.paidNotOnChain, ...calendar.overdue, ...calendar.awaiting, ...calendar.upcoming]) {
+    if (!row.rate) continue
+    const key = row.token.toLowerCase()
+    ;(declaredByToken[key] ??= []).push({
+      processDate: row.processDate,
+      rate: row.rate,
+      due: row.group !== 'upcoming',
+      group: row.group,
+    })
+  }
+  for (const rows of Object.values(declaredByToken)) rows.sort((a, b) => a.processDate.localeCompare(b.processDate))
+  return {
+    rpcUrl: ROBINHOOD_CHAIN.defaultRpcUrl,
+    multicall3: ROBINHOOD_CHAIN.multicall3Address,
+    /** ArbSys: `block.number` on this chain is the parent chain's, see chains.ts. */
+    blockNumberSource: ROBINHOOD_CHAIN.blockNumberSource
+      ? { target: ROBINHOOD_CHAIN.blockNumberSource.target, selector: ROBINHOOD_CHAIN.blockNumberSource.selector }
+      : undefined,
+    declaredByToken,
   }
 })()
 

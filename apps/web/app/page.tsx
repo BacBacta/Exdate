@@ -41,7 +41,8 @@ export default function Page() {
                 <Finder tokens={observed.tokens} />
               </div>
               <p className="hero-more" data-reveal style={delay(240)}>
-                Or start with <a href="#proof">every dividend measured so far</a>.
+                Or <a href="/wallet/">see what your wallet holds and is owed</a>, or start with{' '}
+                <a href="#proof">every dividend measured so far</a>.
               </p>
             </div>
 
@@ -96,6 +97,16 @@ export default function Page() {
                 </a>
               </div>
               <div data-reveal style={delay(110)}>
+                <h3>Read your wallet</h3>
+                <p>
+                  Paste an address: every Stock Token it holds, the shares they represent today,
+                  and what each declared dividend would owe it. No signature, nothing sent to us.
+                </p>
+                <a className="more" href="/wallet/">
+                  Read your wallet
+                </a>
+              </div>
+              <div data-reveal style={delay(220)}>
                 <h3>Check before you rely on a price</h3>
                 <p>
                   Only {counts.feeds} of {counts.tokens} tokens have a price feed at all. A
@@ -106,7 +117,7 @@ export default function Page() {
                   See the evidence
                 </a>
               </div>
-              <div data-reveal style={delay(220)}>
+              <div data-reveal style={delay(330)}>
                 <h3>Build on the data</h3>
                 <p>
                   A REST API, a typed SDK and signed webhooks over the same records. Every value

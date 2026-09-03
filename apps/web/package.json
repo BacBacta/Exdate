@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@exdate/core": "workspace:*",
     "geist": "^1.7.2",
     "next": "^16.3.4",
     "react": "^19.2.0",

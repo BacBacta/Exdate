@@ -48,6 +48,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@exdate/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       geist:
         specifier: ^1.7.2
         version: 1.7.2(next@16.3.4(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))

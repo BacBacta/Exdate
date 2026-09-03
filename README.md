@@ -227,8 +227,11 @@ packages/api      Hono routes over a Repository interface — no SQL, deployable
 apps/status       Next.js App Router status page. Reads the API and nothing else.
 apps/web          The public site: a token finder, one static page per token (what it
                   represents, what was declared, what arrived, what is owed, and how each figure
-                  was measured) and a calendar of declared dividends not yet on chain, every
-                  number read at build time from the committed observations in data/, with its date.
+                  was measured), a calendar of declared dividends not yet on chain, and /wallet/,
+                  where a visitor's browser reads what an address holds straight from the chain
+                  (no server, no signature). Every published number is read at build time from
+                  the committed observations in data/, with its date; the balance is the one
+                  live figure, dated by its block.
 packages/sdk      @exdate/sdk — typed client + webhook verifier. Depends on core only.
 scripts           verification and backfill scripts
 data              committed snapshots of first-party registries, observed events, and the

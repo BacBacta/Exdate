@@ -34,6 +34,7 @@ export function Nav() {
           <a href="/#how">How it works</a>
           <a href="/#proof">Proof</a>
           <a href="/calendar/">Calendar</a>
+          <a href="/wallet/">Wallet</a>
           <a href="/#coverage">Coverage</a>
           <a href="/#developers">Developers</a>
           {links.status ? <a href={links.status}>Live status</a> : null}
@@ -65,6 +66,7 @@ export function Footer() {
         </div>
         <nav aria-label="Footer">
           <a href="/#find">Find your token</a>
+          <a href="/wallet/">Your wallet</a>
           <a href="/calendar/">Calendar</a>
           {links.status ? <a href={links.status}>Live status</a> : <a href={links.data}>Data</a>}
           <a href={links.apiDocs}>API</a>

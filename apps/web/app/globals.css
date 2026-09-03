@@ -163,7 +163,7 @@ html:not([data-js]) .ring-gap { stroke-dashoffset: calc(var(--c) * (1 - var(--ga
 .hero-more a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
 
 /* --- what you can do ------------------------------------------------------ */
-.do { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 3.5rem); margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+.do { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 3.5rem); margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 .do > div { padding-top: 1.4rem; border-top: 1px solid var(--line-2); }
 .do p { color: var(--muted); font-size: 1rem; max-width: 34ch; text-wrap: pretty; }
 .do .more { display: inline-block; margin-top: 1rem; font-size: 15px; color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
@@ -286,6 +286,9 @@ footer { border-top: 1px solid var(--line); padding: 3.5rem 0 4rem; }
 .fine { grid-column: 1 / -1; color: var(--muted); font-size: 14px; max-width: 72ch; margin-top: 1rem; text-wrap: pretty; }
 
 /* --- responsive ----------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .do { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 900px) {
   .hero { min-height: 0; }
   .hero-grid, .steps, .trio, .do, .dev-grid, .token-head { grid-template-columns: 1fr; }
@@ -296,8 +299,27 @@ footer { border-top: 1px solid var(--line); padding: 3.5rem 0 4rem; }
   .who { grid-column: 1 / -1; }
   .coverage .gap { grid-column: 1 / -1; text-align: left; }
   .gap { text-align: right; }
+  .wallet-head { flex-direction: column; align-items: flex-start; }
+  .wallet-total { text-align: left; }
 }
 @media (max-width: 640px) {
   .nav nav a:not(.btn) { display: none; }
   .foot { grid-template-columns: 1fr; }
 }
+
+/* ---- wallet: the one live read, in the visitor's browser ---- */
+.wallet-form { max-width: 720px; }
+.wallet-form input { font-family: var(--mono); font-size: 15px; }
+.wallet-form .finder-row { flex-wrap: wrap; }
+.wallet-form .finder-row input { flex: 1 1 320px; }
+.wallet-status { margin-top: 0.9rem; font-size: 14px; color: var(--muted); max-width: 64ch; }
+.wallet-status.err { color: var(--ink); }
+.linklike { font: inherit; background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+.wallet-result { margin-top: clamp(2rem, 4vw, 3rem); }
+.wallet-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem 2rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.wallet-count { font-size: 1.3rem; font-weight: 500; letter-spacing: -0.02em; }
+.wallet-meta { margin-top: 0.3rem; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.wallet-total { text-align: right; }
+.wallet-total .v { font-size: clamp(2rem, 4vw, 3rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.wallet-total .k { margin-top: 0.4rem; font-size: 14px; color: var(--muted); max-width: 30ch; margin-left: auto; text-wrap: pretty; }
+.ledger .who a.name:hover { text-decoration: underline; text-underline-offset: 0.2em; }
