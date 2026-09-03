@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-03T10:23:22.000Z",
-  "sampleCount": 5,
-  "easternHourOfWeekSlotsCovered": 4,
+  "lastSampleAt": "2026-09-03T11:19:11.000Z",
+  "sampleCount": 6,
+  "easternHourOfWeekSlotsCovered": 5,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -36,13 +36,13 @@
       "label": "pre-market 04:00-09:30 ET",
       "offHours": true,
       "hoursPerWeek": 27.5,
-      "samples": 4,
-      "transfersSampled": 5295,
-      "secondsSampled": 163,
-      "transfersPerSecondMean": 32.437,
+      "samples": 5,
+      "transfersSampled": 7642,
+      "secondsSampled": 203,
+      "transfersPerSecondMean": 37.684,
       "transfersPerSecondMin": 24.6,
-      "transfersPerSecondMax": 40.098,
-      "provableTradesPerSecondMean": 9.49
+      "transfersPerSecondMax": 58.675,
+      "provableTradesPerSecondMean": 9.842
     },
     {
       "session": "regular",
@@ -167,6 +167,20 @@
       "transactionsMovingAToken": 459,
       "provableTrades": 391,
       "provableTradesPerSecond": 9.537
+    },
+    {
+      "observedAt": "2026-09-03T11:19:11.000Z",
+      "session": "pre_market",
+      "easternHourOfWeek": 103,
+      "fromBlock": 53376299,
+      "headBlock": 53376698,
+      "windowBlocks": 400,
+      "windowSeconds": 40,
+      "transfers": 2347,
+      "transfersPerSecond": 58.675,
+      "transactionsMovingAToken": 556,
+      "provableTrades": 450,
+      "provableTradesPerSecond": 11.25
     }
   ]
 }
