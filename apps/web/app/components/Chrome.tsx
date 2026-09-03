@@ -21,8 +21,19 @@ export function Mark({ size = 20 }: { size?: number }) {
   )
 }
 
-/** Shared by every page; anchors are absolute so they work from a token page too. */
-export function Nav() {
+export type NavCurrent = 'tokens' | 'wallet' | 'calendar'
+
+/**
+ * Three destinations, which are the three things a visitor does here. The
+ * explanatory sections of the home page are reachable from the footer and by
+ * scrolling; they are not destinations.
+ */
+export function Nav({ current }: { current?: NavCurrent }) {
+  const item = (key: NavCurrent, href: string, label: string) => (
+    <a href={href} aria-current={current === key ? 'page' : undefined}>
+      {label}
+    </a>
+  )
   return (
     <header className="nav">
       <div className="wrap">
@@ -31,19 +42,23 @@ export function Nav() {
           <span className="wordmark">exdate</span>
         </a>
         <nav aria-label="Primary">
-          <a href="/#how">How it works</a>
-          <a href="/#proof">Proof</a>
-          <a href="/calendar/">Calendar</a>
-          <a href="/wallet/">Wallet</a>
-          <a href="/#coverage">Coverage</a>
-          <a href="/#developers">Developers</a>
-          {links.status ? <a href={links.status}>Live status</a> : null}
-          <a className="btn small" href="/#find">
-            Find your token
-          </a>
+          {item('tokens', '/#find', 'Tokens')}
+          {item('wallet', '/wallet/', 'Wallet')}
+          {item('calendar', '/calendar/', 'Calendar')}
         </nav>
       </div>
     </header>
+  )
+}
+
+/** The visual header of a ledger; each row keeps its own labels for screen readers. */
+export function LedgerHead({ cols }: { cols: readonly [string, string, string, string] }) {
+  return (
+    <div className="ledger-head" aria-hidden="true">
+      {cols.map((col, index) => (
+        <span key={index}>{col}</span>
+      ))}
+    </div>
   )
 }
 
@@ -64,14 +79,27 @@ export function Footer() {
           </span>
           <p>The corporate-action layer for tokenized stocks.</p>
         </div>
-        <nav aria-label="Footer">
-          <a href="/#find">Find your token</a>
-          <a href="/wallet/">Your wallet</a>
-          <a href="/calendar/">Calendar</a>
-          {links.status ? <a href={links.status}>Live status</a> : <a href={links.data}>Data</a>}
-          <a href={links.apiDocs}>API</a>
-          <a href={links.github}>GitHub</a>
-        </nav>
+        <div>
+          <h4>Use</h4>
+          <nav aria-label="Tools">
+            <a href="/#find">Find your token</a>
+            <a href="/wallet/">Your wallet</a>
+            <a href="/calendar/">Calendar</a>
+            {links.status ? <a href={links.status}>Live status</a> : null}
+          </nav>
+        </div>
+        <div>
+          <h4>About</h4>
+          <nav aria-label="About">
+            <a href="/#how">How it works</a>
+            <a href="/#proof">Proof</a>
+            <a href="/#coverage">Coverage</a>
+            <a href="/#developers">Developers</a>
+            <a href={links.apiDocs}>API</a>
+            <a href={links.data}>Data</a>
+            <a href={links.github}>GitHub</a>
+          </nav>
+        </div>
         <p className="fine">
           Data read from Robinhood Chain: {counts.tokens} tokens, last observed {observedDay}. Stock
           Tokens are debt securities issued by Robinhood Assets (Jersey) Limited, not equity. Nothing

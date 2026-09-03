@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <Nav />
+      <Nav current="wallet" />
       <main id="main">
         <section className="hero token-hero" aria-labelledby="wallet-title">
           <div className="wrap">

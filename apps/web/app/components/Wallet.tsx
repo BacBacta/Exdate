@@ -12,6 +12,7 @@ import {
   type HoldingsSnapshot,
 } from '@exdate/core/holdings'
 import { dateLong } from '../../lib/format'
+import { LedgerHead } from './Chrome'
 import type { CalendarGroup, TokenSummary } from '../../lib/observed'
 
 /**
@@ -259,6 +260,8 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
         </div>
 
         {count > 0 ? (
+          <>
+          <LedgerHead cols={['Token', 'Tokens', 'Shares represented', 'Declared']} />
           <ul className="ledger">
             {view.lines.map((line) => {
               const token = byAddress.get(line.holding.token.toLowerCase())
@@ -310,6 +313,7 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
               )
             })}
           </ul>
+          </>
         ) : null}
 
         {snapshot.unreadable.length > 0 ? (

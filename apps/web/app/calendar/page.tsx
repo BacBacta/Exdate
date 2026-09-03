@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Footer, Nav } from '../components/Chrome'
+import { Footer, LedgerHead, Nav } from '../components/Chrome'
 import { dateLong, delay } from '../../lib/format'
 import { calendar, type CalendarGroup } from '../../lib/observed'
 
@@ -47,7 +47,7 @@ const when = (daysSince: number) =>
 export default function Page() {
   return (
     <>
-      <Nav />
+      <Nav current="calendar" />
       <main id="main">
         <section className="hero token-hero" aria-labelledby="cal-title">
           <div className="wrap">
@@ -81,6 +81,7 @@ export default function Page() {
                   <p className="lead" data-reveal>
                     {group.lead}
                   </p>
+                  <LedgerHead cols={['Token', 'Declared per share', 'Owed per token', 'When']} />
                   <ul className="ledger">
                     {rows.map((row, index) => (
                       <li key={`${row.token}:${row.processDate}`} data-reveal style={delay(Math.min(index, 8) * 40)}>

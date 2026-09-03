@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Footer, Nav } from '../../components/Chrome'
+import { Footer, LedgerHead, Nav } from '../../components/Chrome'
 import { dateLong, delay, pctInt } from '../../../lib/format'
 import { observed, tokenPage } from '../../../lib/observed'
 
@@ -153,7 +153,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
 
   return (
     <>
-      <Nav />
+      <Nav current="tokens" />
       <main id="main">
         <section className="hero token-hero" aria-labelledby="token-title">
           <div className="wrap">
@@ -202,7 +202,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                 : 'Dividends'}
             </h2>
             {token.dividends.length > 0 ? (
-              <ul className="ledger">
+              <ul className="ledger labelled">
                 {token.dividends.map((dividend, index) => {
                   const state = stateOf(dividend)
                   const pending = dividend.state === 'pending'
@@ -257,6 +257,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
               <h2 className="small" id="steps-title" data-reveal>
                 Multiplier history
               </h2>
+              <LedgerHead cols={['Change', 'Before', 'After', 'Step']} />
               <ul className="ledger">
                 {token.steps.map((step, index) => (
                   <li key={step.date} data-reveal style={delay(index * 50)}>

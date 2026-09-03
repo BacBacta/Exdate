@@ -663,6 +663,20 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   steps delivered to the address needs its balance at each `effectiveAt`, which is its own
   transfer logs plus the effective block numbers; measured feasible for a person's wallet and
   refused for a bot's (see "Known traps"). That is step 2.
+- 2026-09-03 — **Site v3: quieter.** Three things a reader noticed: the header carried six
+  tabs that mostly named sections of the home page, every ledger row repeated its column labels,
+  and hairlines separated everything. Now the header holds the three things a visitor *does* —
+  Tokens, Wallet, Calendar — with the current one underlined, and the explanatory sections
+  (how it works, proof, coverage, developers) live in a three-column footer. Ledgers have **one
+  visual header row** (`LedgerHead`, `aria-hidden`) and each row keeps its own labels for screen
+  readers, visually hidden on desktop and shown again on narrow screens where the columns stack;
+  the token page's dividends keep their per-row labels (`ledger labelled`) because its third column
+  alternates between *arrived* and *owed*. Sections are separated by space, not lines; the one
+  principle sentence sits on a tone band (`--band`) instead of between two rules. The home page
+  lost the four-card "what you can do" block in favour of three doors that mirror the header, and
+  the timing sentence moved out of step 02 into one muted line under the steps. Buttons no longer
+  lift and shadow on hover. Home page: 617 → 451 visible words. Muted text stays ≥ 4.5:1 in both
+  schemes (`#6b6a63` on `#f6f5f1`, `#9d9c95` on `#0c0c0b`).
 - _(append decisions here as they are made)_
 
 ## Status

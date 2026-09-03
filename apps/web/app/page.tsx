@@ -1,11 +1,11 @@
 import type { CSSProperties } from 'react'
 import { CountUp } from './components/CountUp'
-import { Footer, Nav } from './components/Chrome'
+import { Footer, LedgerHead, Nav } from './components/Chrome'
 import { Finder } from './components/Finder'
 import { dateLong, delay, pctInt } from '../lib/format'
 import { calendar, cents, observed, timing } from '../lib/observed'
 
-const { counts, hero, reconciled, chains, links } = observed
+const { hero, reconciled, chains, links } = observed
 
 const RING_RADIUS = 140
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
@@ -22,7 +22,7 @@ const heroPct = pctInt(hero.haircutBps)!
 export default function Page() {
   return (
     <>
-      <Nav />
+      <Nav current="tokens" />
 
       <main id="main">
         {/* ---------------------------------------------------------------- */}
@@ -34,16 +34,12 @@ export default function Page() {
               </h1>
               <p className="lede" data-reveal style={delay(90)}>
                 When a tokenized stock pays a dividend, nothing lands in your wallet. The token
-                quietly becomes worth a little more. exdate measures exactly how much — and how
+                quietly becomes worth a little more. exdate measures exactly how much, and how
                 much went missing on the way.
               </p>
               <div className="hero-find" data-reveal style={delay(180)}>
                 <Finder tokens={observed.tokens} />
               </div>
-              <p className="hero-more" data-reveal style={delay(240)}>
-                Or <a href="/wallet/">see what your wallet holds and is owed</a>, or start with{' '}
-                <a href="#proof">every dividend measured so far</a>.
-              </p>
             </div>
 
             <figure className="ring-figure" data-reveal style={delay(260)}>
@@ -80,54 +76,23 @@ export default function Page() {
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="block" id="do" aria-labelledby="do-title">
-          <div className="wrap">
-            <h2 id="do-title" data-reveal>
-              What you can do here
-            </h2>
-            <div className="do">
-              <div data-reveal style={delay(0)}>
-                <h3>Look up your token</h3>
-                <p>
-                  Any of the {counts.tokens} Robinhood Stock Tokens: what it represents in shares
-                  today, what has been declared, what arrived, and what is still owed.
-                </p>
-                <a className="more" href="#find">
-                  Find your token
-                </a>
-              </div>
-              <div data-reveal style={delay(110)}>
-                <h3>Read your wallet</h3>
-                <p>
-                  Paste an address: every Stock Token it holds, the shares they represent today,
-                  and what each declared dividend would owe it. No signature, nothing sent to us.
-                </p>
-                <a className="more" href="/wallet/">
-                  Read your wallet
-                </a>
-              </div>
-              <div data-reveal style={delay(220)}>
-                <h3>Check before you rely on a price</h3>
-                <p>
-                  Only {counts.feeds} of {counts.tokens} tokens have a price feed at all. A
-                  token&rsquo;s page tells you whether yours does, and what its last dividend
-                  cost holders.
-                </p>
-                <a className="more" href="#proof">
-                  See the evidence
-                </a>
-              </div>
-              <div data-reveal style={delay(330)}>
-                <h3>Build on the data</h3>
-                <p>
-                  A REST API, a typed SDK and signed webhooks over the same records. Every value
-                  exact; anything unobserved is null, never zero.
-                </p>
-                <a className="more" href="#developers">
-                  For developers
-                </a>
-              </div>
-            </div>
+        <section className="block tight" aria-label="What you can do here">
+          <div className="wrap index">
+            <a href="#find" data-reveal>
+              <h3>Find your token</h3>
+              <p>What it represents today, what it was paid, what it is still owed.</p>
+            </a>
+            <a href="/wallet/" data-reveal style={delay(90)}>
+              <h3>Read your wallet</h3>
+              <p>What an address holds and is owed. No signature, nothing sent to us.</p>
+            </a>
+            <a href="/calendar/" data-reveal style={delay(180)}>
+              <h3>Calendar</h3>
+              <p>
+                {calendar.total} dividends declared and not yet on chain
+                {calendar.paidNotOnChain.length > 0 ? `, ${calendar.paidNotOnChain.length} already called paid.` : '.'}
+              </p>
+            </a>
           </div>
         </section>
 
@@ -141,31 +106,27 @@ export default function Page() {
               <li data-reveal style={delay(0)}>
                 <span className="step-n">01</span>
                 <h3>A dividend is declared</h3>
-                <p>The issuer announces what each share pays, and on which day.</p>
+                <p>The issuer states what each share pays, and on which day.</p>
               </li>
               <li data-reveal style={delay(110)}>
                 <span className="step-n">02</span>
                 <h3>The token adjusts</h3>
                 <p>
-                  Instead of cash, the token&rsquo;s multiplier rises. Your balance never changes;
-                  what it represents does.
-                </p>
-                <p className="step-note">
-                  Across the {timing.changes} changes seen so far, the announcement came about{' '}
-                  {timing.medianLeadMinutes} minutes before the change, and the change followed the
-                  issuer&rsquo;s date by one business day in {timing.lagOneDay} of {timing.lagCases}{' '}
-                  measured cases.
+                  No cash lands. The token&rsquo;s multiplier rises: your balance is unchanged,
+                  what it represents grows.
                 </p>
               </li>
               <li data-reveal style={delay(220)}>
                 <span className="step-n">03</span>
                 <h3>exdate measures the gap</h3>
-                <p>
-                  What was declared, against what really arrived — priced at the moment it
-                  happened, and dated.
-                </p>
+                <p>What was declared, against what really arrived, priced at the moment it happened.</p>
               </li>
             </ol>
+            <p className="steps-note" data-reveal>
+              Measured so far: the announcement comes about {timing.medianLeadMinutes} minutes
+              before the change, and the change lands one business day after the issuer&rsquo;s
+              date in {timing.lagOneDay} of {timing.lagCases} measured cases.
+            </p>
           </div>
         </section>
 
@@ -175,11 +136,12 @@ export default function Page() {
             <div className="block-head" data-reveal>
               <h2 id="proof-title">Every dividend so far, measured.</h2>
               <p>
-                {matched.length} reconcile cleanly. {rows.length - matched.length} don&rsquo;t —
-                and we say so rather than guess. Open a row for the token&rsquo;s full history.
+                {matched.length} reconcile cleanly. {rows.length - matched.length} don&rsquo;t, and
+                we say so rather than guess.
               </p>
             </div>
 
+            <LedgerHead cols={['Token', 'Declared', 'Arrived', 'Never arrived']} />
             <ul className="ledger">
               {rows.map((row, index) => (
                 <li key={`${row.token}:${row.processDate}`} data-reveal style={delay(index * 60)}>
@@ -209,28 +171,15 @@ export default function Page() {
             </ul>
 
             <p className="after" data-reveal>
-              Each dividend is priced at the moment it took effect, with the oracle price in force
-              then. Where a token has no price feed, no gap is claimed.{' '}
-              {links.status ? (
-                <a href={links.status}>Full detail on the live status page</a>
-              ) : (
-                <a href={links.data}>Every row, with its sources, in the repository</a>
-              )}
-              .
-            </p>
-            <p className="after" data-reveal>
-              <a href="/calendar/">
-                {calendar.total} more dividends are declared and not yet on chain
-              </a>
-              {calendar.paidNotOnChain.length > 0
-                ? `, ${calendar.paidNotOnChain.length} of them already marked paid by the issuer.`
-                : '.'}
+              Priced at the moment each step took effect. Where a token has no price feed, no gap
+              is claimed.{' '}
+              <a href="/calendar/">{calendar.total} more dividends are declared and not yet on chain</a>.
             </p>
           </div>
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="block statement" aria-label="Principle">
+        <section className="statement" aria-label="Principle">
           <div className="wrap">
             <p className="statement-text" data-reveal>
               Every number here was read from the blockchain and dated. Nothing is estimated,
@@ -244,12 +193,10 @@ export default function Page() {
           <div className="wrap">
             <div className="block-head" data-reveal>
               <h2 id="coverage-title">Where it looks today</h2>
-              <p>
-                Built for every chain that issues tokenized stocks. Measured wherever there is
-                something real to measure.
-              </p>
+              <p>Built for every chain that issues tokenized stocks. Measured wherever there is something real to measure.</p>
             </div>
-            <ul className="coverage">
+            <LedgerHead cols={['Chain', 'Tokens', 'Price feeds', '']} />
+            <ul className="ledger">
               <li data-reveal>
                 <div className="who">
                   <span className="name">{chains.robinhood.name}</span>
@@ -286,9 +233,8 @@ export default function Page() {
               </li>
             </ul>
             <p className="after" data-reveal>
-              On Base every token still reads exactly 1.0: no dividend has moved one yet. The
-              moment one does, the same measurement applies. Every record carries its chain, so
-              a third issuer is a source to read, not a redesign.
+              On Base no dividend has moved a token yet. The moment one does, the same measurement
+              applies.
             </p>
           </div>
         </section>
@@ -299,8 +245,8 @@ export default function Page() {
             <div data-reveal>
               <h2 id="dev-title">Built to integrate.</h2>
               <p>
-                A REST API, a typed TypeScript SDK and signed webhooks, over the same data you see
-                here. Every value is exact, and anything not observed is null, never zero.
+                A REST API, a typed SDK and signed webhooks over the same records. Every value is
+                exact; anything not observed is null, never zero.
               </p>
               <p className="links">
                 <a href={links.apiDocs}>API reference</a>
