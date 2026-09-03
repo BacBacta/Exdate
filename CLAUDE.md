@@ -677,6 +677,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   the timing sentence moved out of step 02 into one muted line under the steps. Buttons no longer
   lift and shadow on hover. Home page: 617 → 451 visible words. Muted text stays ≥ 4.5:1 in both
   schemes (`#6b6a63` on `#f6f5f1`, `#9d9c95` on `#0c0c0b`).
+- 2026-09-03 — **`/wallet/`, step 2: what past dividends delivered to an address, rebuilt from
+  its own transfers, still with no server.** The alternative was weighed and named: an archive
+  node answers `balanceOf` at a past block in twelve calls for any wallet, but the public node
+  keeps no archive and a paid one needs a key, hence a function that sees every address — the
+  page's promise is that the address goes nowhere but Robinhood's own node. So: the twelve
+  effective blocks are resolved **once** (`scripts/resolve-effective-blocks.mjs`, bisection over
+  block headers, which the node serves at any height; `data/effective-blocks.json`, every step
+  5 400–5 850 blocks after its announcement), and the browser reads the address's `Transfer`
+  logs in the ten tokens that ever moved, from public mainnet to the last step, through a pure
+  planner in core (`RangeScanner`: 5 M-block ranges, halved on a timeout, retried on a rejection,
+  **refused past 40 requests** rather than shown as a partial total). `balancesAt` replays
+  entries minus exits per token up to the block *before* the effective block — a transfer in
+  that block already ran under the new multiplier. Per step the wallet was exposed to: shares
+  held then, **shares gained = raw × (new − old) / 1e18** (exact, price-free), and, on a matched
+  reconciliation only, dollars declared and arrived from the committed per-share figures, so the
+  wallet's gap is the token page's gap. Anomaly, feedless and unmatched steps keep their
+  plain-words state and no dollar claim; a holding declared under a cent gets no percentage.
+  The twelve rebuilt balances are kept in the visitor's `localStorage` (a past block never
+  changes, so the cache cannot go stale; the key carries the last step's block and the step
+  count). Measured live with the page's own requests: a person's wallet holding 6.0143 SGOV
+  shares at the August step → 22 requests, 1.7 s, 0.0122 shares gained, $1.85 declared, $1.22
+  arrived, and 0 requests on the second visit; a trader's wallet with 3 184 transfers → 27
+  requests, 6.8 s. Not seen, and said on the page: tokens held inside a protocol at the time.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -707,10 +730,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - The five July actions have no declared rate and never will (see the decision log); their steps
   are published as `unmatched` with the reason stated rather than filled in.
 
-- `/wallet/` reads holdings, not history. What past dividends delivered to an address needs its
-  balance at each `effectiveAt` — its own transfer logs, plus the twelve effective block numbers,
-  which can be resolved once at build time and committed. Feasible in one to two seconds for a
-  person's wallet, to be refused past ~40 requests for an automated one. Step 2, not started.
+- `/wallet/` history is refused for automated wallets (past 40 `eth_getLogs` requests) and blind
+  to tokens held inside a protocol at the time of a step. Both are stated on the page. An archive
+  endpoint would lift the first; the second needs each protocol's own accounting.
 
 - The off-hours share is being sampled, not yet answered: `data/session-share.observed.json` reads
   `sufficient: false` until every session has three samples, which takes about a day of the hourly

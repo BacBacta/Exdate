@@ -10,6 +10,7 @@
 import { ROBINHOOD_CHAIN } from '@exdate/core/chains'
 import baseJson from '../../../data/base-b20-verification.json'
 import archiveJson from '../../../data/corporate-actions.archive.json'
+import effectiveBlocksJson from '../../../data/effective-blocks.json'
 import feedsJson from '../../../data/chainlink-feeds.snapshot.json'
 import eventsJson from '../../../data/multiplier-events.observed.json'
 import reconciliationsJson from '../../../data/reconciliations.observed.json'
@@ -93,6 +94,17 @@ const archive = archiveJson as unknown as {
   actions: ArchivedAction[]
 }
 const base = baseJson as unknown as { verifiedAt: string; summary: { tokens: number; feeds: number } }
+const effectiveBlocks = effectiveBlocksJson as unknown as {
+  resolvedAt: string
+  blocks: {
+    token: string
+    symbol: string
+    effectiveAt: string
+    effectiveBlock: number
+    oldMultiplier: string
+    newMultiplier: string
+  }[]
+}
 const sessionShare = sessionShareJson as unknown as {
   sampleCount: number
   sufficient: boolean
@@ -427,9 +439,47 @@ export const wallet = (() => {
     })
   }
   for (const rows of Object.values(declaredByToken)) rows.sort((a, b) => a.processDate.localeCompare(b.processDate))
+  /**
+   * Every multiplier step ever observed, with the block it took effect at
+   * (resolved once by scripts/resolve-effective-blocks.mjs) and the committed
+   * reconciliation for it, so the browser can turn a balance-at-that-block
+   * into shares gained, dollars declared and dollars arrived without
+   * computing anything the site does not already publish.
+   */
+  const rowByEffect = new Map(
+    reconciliations.rows.filter((row) => row.change).map((row) => [`${row.token.toLowerCase()}:${row.change!.effectiveAt}`, row]),
+  )
+  const steps = effectiveBlocks.blocks.map((block) => {
+    const key = block.token.toLowerCase()
+    const row = rowByEffect.get(`${key}:${block.effectiveAt}`)
+    const status = (row?.status ?? 'unmatched') as 'matched' | 'anomaly' | 'unmatched' | 'pending'
+    return {
+      token: key,
+      symbol: block.symbol,
+      name: nameByAddress.get(key) ?? block.symbol,
+      effectiveAt: block.effectiveAt,
+      effectiveBlock: block.effectiveBlock,
+      oldMultiplier: block.oldMultiplier,
+      newMultiplier: block.newMultiplier,
+      rate: row?.rate ?? null,
+      receivedPerShare: row?.receivedPerShare ?? null,
+      haircutBps: status === 'matched' ? (row?.impliedHaircutBps ?? null) : null,
+      status,
+      hasFeed: Boolean(row?.feed),
+      processDate: row?.processDate ?? null,
+    }
+  })
   return {
     rpcUrl: ROBINHOOD_CHAIN.defaultRpcUrl,
     multicall3: ROBINHOOD_CHAIN.multicall3Address,
+    steps,
+    /** The history scan: from public mainnet to the last step, over the tokens that ever moved. */
+    scan: {
+      fromBlock: ROBINHOOD_CHAIN.startBlock,
+      toBlock: Math.max(...steps.map((step) => step.effectiveBlock)),
+      tokens: [...new Set(steps.map((step) => step.token))],
+      resolvedAt: effectiveBlocks.resolvedAt,
+    },
     /** ArbSys: `block.number` on this chain is the parent chain's, see chains.ts. */
     blockNumberSource: ROBINHOOD_CHAIN.blockNumberSource
       ? { target: ROBINHOOD_CHAIN.blockNumberSource.target, selector: ROBINHOOD_CHAIN.blockNumberSource.selector }

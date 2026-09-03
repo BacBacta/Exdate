@@ -306,3 +306,9 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
   .nav nav { gap: 16px; font-size: 14px; }
   .wordmark { font-size: 16px; }
 }
+
+/* --- wallet history: what past steps delivered to the address ------------- */
+.wallet-history { margin-top: clamp(3rem, 6vw, 4.5rem); }
+.wallet-history .lead { color: var(--muted); font-size: 15.5px; max-width: 60ch; text-wrap: pretty; margin-bottom: 1.4rem; }
+.wallet-history .lead strong { color: var(--ink); font-weight: 500; }
+.gap .sub { display: block; font-size: 13px; color: var(--muted); font-weight: 400; margin-top: 0.15rem; }

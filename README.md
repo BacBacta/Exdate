@@ -231,7 +231,9 @@ apps/web          The public site: a token finder, one static page per token (wh
                   where a visitor's browser reads what an address holds straight from the chain
                   (no server, no signature). Every published number is read at build time from
                   the committed observations in data/, with its date; the balance is the one
-                  live figure, dated by its block.
+                  live figure, dated by its block. What past dividends delivered to the address
+                  is rebuilt in the browser from its own transfers, against the twelve effective
+                  blocks resolved once by scripts/resolve-effective-blocks.mjs.
 packages/sdk      @exdate/sdk — typed client + webhook verifier. Depends on core only.
 scripts           verification and backfill scripts
 data              committed snapshots of first-party registries, observed events, and the

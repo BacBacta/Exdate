@@ -42,13 +42,15 @@ export default function Page() {
               rpcUrl={wallet.rpcUrl}
               multicall3={wallet.multicall3}
               blockNumberSource={wallet.blockNumberSource}
+              steps={wallet.steps}
+              scan={wallet.scan}
             />
             <p className="note-box">
               <em>Shares represented</em> is the balance times the multiplier in force, read at the
               same block. <em>Owed</em> is the issuer&rsquo;s declared rate times those shares: what a
               full payment would deliver, with no price involved. What actually arrives is measured on
-              each token&rsquo;s page once the step lands. This page does not read your history yet:
-              what past dividends delivered to this address is the next step.
+              each token&rsquo;s page once the step lands. Below the holdings, what past dividends delivered to
+              this address is rebuilt from its own transfers.
             </p>
           </div>
         </section>

@@ -1,0 +1,139 @@
+{
+  "resolvedAt": "2026-09-03T12:41:49.408Z",
+  "method": "first block whose timestamp >= effectiveAt, bisection over eth_getBlockByNumber headers from the announcement block; a balance \"at the step\" is the balance after all transfers in blocks < effectiveBlock",
+  "source": "data/multiplier-events.observed.json",
+  "blocks": [
+    {
+      "token": "0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931",
+      "symbol": "CRWD",
+      "effectiveAt": "2026-07-02T13:30:00Z",
+      "announcedBlock": 1231096,
+      "effectiveBlock": 1267585,
+      "effectiveBlockTimestamp": "2026-07-02T13:30:00.000Z",
+      "previousBlockTimestamp": "2026-07-02T13:29:59.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "4000000000000000000"
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-07-08T20:14:32Z",
+      "announcedBlock": 4629631,
+      "effectiveBlock": 4635248,
+      "effectiveBlockTimestamp": "2026-07-08T20:14:32.000Z",
+      "previousBlockTimestamp": "2026-07-08T20:14:31.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000957519890990718"
+    },
+    {
+      "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
+      "symbol": "MU",
+      "effectiveAt": "2026-07-24T15:10:24Z",
+      "announcedBlock": 18239875,
+      "effectiveBlock": 18245701,
+      "effectiveBlockTimestamp": "2026-07-24T15:10:24.000Z",
+      "previousBlockTimestamp": "2026-07-24T15:10:23.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000074823219171086"
+    },
+    {
+      "token": "0xb0992820e760d836549ba69bc7598b4af75dee03",
+      "symbol": "ORCL",
+      "effectiveAt": "2026-07-27T15:10:23Z",
+      "announcedBlock": 20823272,
+      "effectiveBlock": 20829027,
+      "effectiveBlockTimestamp": "2026-07-27T15:10:23.000Z",
+      "previousBlockTimestamp": "2026-07-27T15:10:22.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1002210914971013375"
+    },
+    {
+      "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
+      "symbol": "DELL",
+      "effectiveAt": "2026-08-03T15:10:23Z",
+      "announcedBlock": 26853518,
+      "effectiveBlock": 26859241,
+      "effectiveBlockTimestamp": "2026-08-03T15:10:23.000Z",
+      "previousBlockTimestamp": "2026-08-03T15:10:22.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000063708620124549"
+    },
+    {
+      "token": "0x47f93d52cbec7c6d2cfc080e154002370a60daea",
+      "symbol": "ASML",
+      "effectiveAt": "2026-08-06T15:10:25Z",
+      "announcedBlock": 29439914,
+      "effectiveBlock": 29445528,
+      "effectiveBlockTimestamp": "2026-08-06T15:10:25.000Z",
+      "previousBlockTimestamp": "2026-08-06T15:10:24.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000101323251417769"
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-08-07T15:10:24Z",
+      "announcedBlock": 30302195,
+      "effectiveBlock": 30308049,
+      "effectiveBlockTimestamp": "2026-08-07T15:10:24.000Z",
+      "previousBlockTimestamp": "2026-08-07T15:10:23.000Z",
+      "oldMultiplier": "1000957519890990718",
+      "newMultiplier": "1002981519346766532"
+    },
+    {
+      "token": "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2",
+      "symbol": "COST",
+      "effectiveAt": "2026-08-10T15:10:24Z",
+      "announcedBlock": 32889913,
+      "effectiveBlock": 32895477,
+      "effectiveBlockTimestamp": "2026-08-10T15:10:24.000Z",
+      "previousBlockTimestamp": "2026-08-10T15:10:23.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000612040296259656"
+    },
+    {
+      "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
+      "symbol": "AAPL",
+      "effectiveAt": "2026-08-14T15:12:46Z",
+      "announcedBlock": 36345344,
+      "effectiveBlock": 36351132,
+      "effectiveBlockTimestamp": "2026-08-14T15:12:46.000Z",
+      "previousBlockTimestamp": "2026-08-14T15:12:45.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000566080061092436"
+    },
+    {
+      "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
+      "symbol": "CCL",
+      "effectiveAt": "2026-08-31T15:10:26Z",
+      "announcedBlock": 50955407,
+      "effectiveBlock": 50960761,
+      "effectiveBlockTimestamp": "2026-08-31T15:10:26.000Z",
+      "previousBlockTimestamp": "2026-08-31T15:10:25.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1021486444855206408"
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-09-01T00:00:26Z",
+      "announcedBlock": 51269236,
+      "effectiveBlock": 51274920,
+      "effectiveBlockTimestamp": "2026-09-01T00:00:26.000Z",
+      "previousBlockTimestamp": "2026-09-01T00:00:25.000Z",
+      "oldMultiplier": "1002981519346766532",
+      "newMultiplier": "1005101770003214918"
+    },
+    {
+      "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+      "symbol": "F",
+      "effectiveAt": "2026-09-02T15:10:26Z",
+      "announcedBlock": 52665452,
+      "effectiveBlock": 52671215,
+      "effectiveBlockTimestamp": "2026-09-02T15:10:26.000Z",
+      "previousBlockTimestamp": "2026-09-02T15:10:25.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000145502866134027"
+    }
+  ]
+}
