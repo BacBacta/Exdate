@@ -189,14 +189,19 @@ SGOV on 2026-09-02: growth 51.02 bps = 20.22 explained ⊕ 30.73 unexplained, ov
 
 ## `GET /v1/:chain/tokens/:address/pending`
 
-What is owed and has not arrived, with three states kept apart:
+What is owed and has not arrived, with each state kept apart:
 
 | `state` | Meaning | Certainty |
 |---|---|---|
 | `scheduled` (top level) | a log is on chain, `effectiveAt` in the future | certain, ~9 minutes out |
-| `awaiting` | declared, still inside the 4-day pairing window | normal |
+| `upcoming` | declared, process date has not arrived | nothing owed yet |
+| `awaiting` | declared, process date passed, still inside the 4-day pairing window | normal |
 | `overdue` | declared, past the window, issuer still says in progress | late |
 | `declared_complete_not_on_chain` | **the issuer says COMPLETED, the multiplier has not moved** | anomaly |
+
+`upcoming` and `awaiting` are separated because `awaiting` carries a claim — the chain should move
+within the window — that is simply false for a date that has not arrived. `summary` counts them
+apart (`declaredUpcoming`, `declaredAwaiting`).
 
 BND, four weeks after its own issuer marked the dividend complete:
 

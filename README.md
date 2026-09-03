@@ -130,9 +130,10 @@ action, calls a step *yield* only when it is paired with an issuer cash dividend
 figure it refuses to compute (`annualizedYield`, `trailingTwelveMonthYield`, `forwardYield`) with a
 reason code. Nothing in it is per annum.
 
-`/pending` keeps three states apart that are usually conflated: `scheduled` (a log is on chain, the
-change is about nine minutes away), `awaiting` (declared, still inside the observed next-business-day
-window) and `declared_complete_not_on_chain` (the issuer's own feed says COMPLETED while the
+`/pending` keeps apart states that are usually conflated: `scheduled` (a log is on chain, the
+change is about nine minutes away), `upcoming` (declared, the process date has not arrived, so
+nothing is owed yet), `awaiting` (declared, past the process date and still inside the observed
+next-business-day window) and `declared_complete_not_on_chain` (the issuer's own feed says COMPLETED while the
 multiplier has not moved — seven tokens on 2026-09-02, BND for four weeks). It projects the step a
 full payment would produce at the latest round, marked `notAMeasurement`, and refuses to predict
 when the step will land or how much of it will survive. The status page renders it under

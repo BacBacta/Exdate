@@ -119,7 +119,8 @@ export default async function Page() {
   const owedRows = pending
     .flatMap((view) => view.declared.map((row) => ({ view, row })))
     .sort((a, b) => (a.row.processDate ?? '').localeCompare(b.row.processDate ?? ''))
-  const owedPerToken = owedRows.filter(({ row }) => row.grossPerToken !== null)
+  /** Owed now, as opposed to merely on the issuer's calendar. */
+  const owedNow = owedRows.filter(({ row }) => row.state !== 'upcoming')
   const longestOverdueDays = pending
     .map((view) => view.summary.longestOverdueDays)
     .filter((days): days is number => days !== null)
@@ -189,7 +190,7 @@ export default async function Page() {
               {recon.counts.matched} <span className="dash">/</span> {recon.counts.anomaly}
             </div>
             <div className="label">reconciled / anomalous</div>
-            <div className="note">{owedRows.length} declared, still not on chain</div>
+            <div className="note">{owedNow.length} declared, still not on chain</div>
           </div>
         ) : null}
       </section>
@@ -330,11 +331,13 @@ export default async function Page() {
                     <td>
                       <span
                         className={`pill ${
-                          row.state === 'awaiting'
-                            ? 'unknown'
-                            : row.state === 'overdue'
-                              ? 'stale'
-                              : 'paused'
+                          row.state === 'upcoming'
+                            ? 'live'
+                            : row.state === 'awaiting'
+                              ? 'unknown'
+                              : row.state === 'overdue'
+                                ? 'stale'
+                                : 'paused'
                         }`}
                         title={row.note}
                       >
@@ -344,10 +347,18 @@ export default async function Page() {
                       </span>
                     </td>
                     <td className="num">
-                      {row.daysSinceProcessDate ?? '—'}
-                      {row.state === 'awaiting' ? (
-                        <span className="addr"> / {row.windowDays}</span>
-                      ) : null}
+                      {row.daysSinceProcessDate === null ? (
+                        '—'
+                      ) : row.state === 'upcoming' ? (
+                        <span className="addr">in {-row.daysSinceProcessDate}</span>
+                      ) : (
+                        <>
+                          {row.daysSinceProcessDate}
+                          {row.state === 'awaiting' ? (
+                            <span className="addr"> / {row.windowDays}</span>
+                          ) : null}
+                        </>
+                      )}
                     </td>
                     <td className="num">{row.grossPerUnderlyingShare ?? '—'}</td>
                     <td className="num">
@@ -383,10 +394,11 @@ export default async function Page() {
             </table>
           </div>
           <p className="caption">
-            Three states, kept apart because they carry different certainty.{' '}
+            Four states, kept apart because they carry different certainty.{' '}
+            <em>upcoming</em> has a process date that has not arrived, so nothing is owed yet;{' '}
             <em>awaiting</em> is inside the observed next-business-day window and is not yet late;{' '}
             <em>overdue</em> is past it; <em>completed, no step</em> is the sharpest claim of the
-            three — the issuer&rsquo;s own feed marks the action processed while the multiplier
+            four — the issuer&rsquo;s own feed marks the action processed while the multiplier
             still reads what it read before.{' '}
             <strong>Owed / token</strong> is the one figure here that needs no oracle: the declared
             rate is per underlying share, one raw token carries <code>uiMultiplier</code> of them,
@@ -397,9 +409,9 @@ export default async function Page() {
             <code>notComputed</code> with a reason code.
           </p>
           <p className="caption">
-            {owedRows.length} outstanding {owedRows.length === 1 ? 'action' : 'actions'} across{' '}
-            {pending.length} {pending.length === 1 ? 'token' : 'tokens'}, {owedPerToken.length} of
-            them stating what is owed per token.{' '}
+            {owedRows.length} {owedRows.length === 1 ? 'action' : 'actions'} across{' '}
+            {pending.length} {pending.length === 1 ? 'token' : 'tokens'}, {owedNow.length} of them
+            already due.{' '}
             {longestOverdueDays === undefined
               ? 'None is past the window yet.'
               : `The longest has been overdue ${longestOverdueDays} days.`}

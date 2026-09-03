@@ -430,7 +430,8 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `notComputed` with a reason code. Library `packages/core/src/yield.ts`, tests on SGOV's real
   three-step history.
 - 2026-09-02 — `/v1/:chain/tokens/:addr/pending` separates `scheduled` (announced on chain, ~9 min
-  out) from `awaiting` (declared, inside the 4-day window) and `declared_complete_not_on_chain`
+  out) from `awaiting` (declared, past the process date, inside the 4-day window; `upcoming` before
+  that date — added 2026-09-03) and `declared_complete_not_on_chain`
   (the issuer says COMPLETED, the multiplier has not moved). Cash owed per token is stated because
   it needs no price (`rate × uiMultiplier`); the step a full payment would produce is a
   **projection** at the latest round, flagged `notAMeasurement`; the landing date and the surviving
@@ -514,6 +515,13 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   oracle, `grossPerToken = rate × uiMultiplier`. The page fetches `/pending` only for tokens that
   can have something pending — those in an unmatched declared action, plus those with a change
   announced on chain — so it is a handful of requests, not 194.
+- 2026-09-03 — `/pending` grows a fourth declared state, `upcoming`, for a process date that has
+  not arrived. Found by rendering the endpoint: the status page showed rows reading
+  `awaiting, -21 / 4 days`, because `daysSinceProcessDate` goes negative for a future date and the
+  `pastWindow` test then fell through to `awaiting`. That is not a display bug — `awaiting` asserts
+  the chain should move within the window, which is false for a date two weeks out. The test suite
+  had encoded the same mistake (its SGOV fixture is dated two days ahead and expected `awaiting`),
+  so the fix is in `pending.ts` with the test corrected and both cases now covered.
 - _(append decisions here as they are made)_
 
 ## Status

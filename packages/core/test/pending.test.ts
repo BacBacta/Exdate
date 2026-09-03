@@ -100,14 +100,33 @@ describe('SGOV, one dividend declared and none scheduled on chain', () => {
     expect(result.summary.scheduledOnChain).toBe(0)
   })
 
-  it('lists the declared dividend as awaiting while it is still inside the window', () => {
+  it('lists a dividend whose process date is still ahead as upcoming, not awaiting', () => {
+    // `awaiting` carries a claim - the chain should move within the window - and
+    // that claim is false for a date that has not arrived. Nothing is owed yet.
     const [row] = build().declared
     expect(build().declared).toHaveLength(1)
-    expect(row!.state).toBe('awaiting')
+    expect(row!.state).toBe('upcoming')
     expect(row!.daysSinceProcessDate).toBe(-2) // processDate is two days out
+    expect(row!.note).toContain('2 day(s) away')
     expect(row!.grossPerUnderlyingShare).toBe('0.307098')
     expect(row!.processDateIsNotExDate).toBe(true)
     expect(row!.issuerStatus).toBe('CORPORATE_ACTION_STATUS_IN_PROGRESS')
+  })
+
+  it('turns it into awaiting once the process date has passed, still inside the window', () => {
+    const [row] = build({
+      reconciliations: [{ ...sgovDeclared, processDate: '2026-09-01' }, sgovMatched],
+    }).declared
+    expect(row!.state).toBe('awaiting')
+    expect(row!.daysSinceProcessDate).toBe(1)
+    expect(row!.note).toContain('inside the observed next-business-day window')
+  })
+
+  it('counts the two apart in the summary', () => {
+    expect(build().summary).toMatchObject({ declaredUpcoming: 1, declaredAwaiting: 0 })
+    expect(
+      build({ reconciliations: [{ ...sgovDeclared, processDate: '2026-09-01' }] }).summary,
+    ).toMatchObject({ declaredUpcoming: 0, declaredAwaiting: 1 })
   })
 
   it('converts the per-share rate into cash per token with no price at all', () => {
@@ -183,6 +202,7 @@ describe('BND, declared complete by the issuer and absent from the chain', () =>
     const { summary } = result()
     expect(summary).toMatchObject({
       scheduledOnChain: 0,
+      declaredUpcoming: 0,
       declaredAwaiting: 0,
       declaredOverdue: 1,
       declaredCompleteNotOnChain: 1,

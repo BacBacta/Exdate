@@ -92,7 +92,11 @@ export interface PendingInput {
   matchWindowDays: number
 }
 
-export type DeclaredState = 'awaiting' | 'overdue' | 'declared_complete_not_on_chain'
+export type DeclaredState =
+  | 'upcoming'
+  | 'awaiting'
+  | 'overdue'
+  | 'declared_complete_not_on_chain'
 
 export function buildPendingView(input: PendingInput) {
   const { token, reconciliations, events, nowSeconds, matchWindowDays } = input
@@ -170,11 +174,21 @@ export function buildPendingView(input: PendingInput) {
         ? null
         : Math.floor((Number(nowSeconds) * 1000 - processedMs) / DAY_MS)
       const pastWindow = daysSinceProcessDate !== null && daysSinceProcessDate > matchWindowDays
-      const state: DeclaredState = !pastWindow
-        ? 'awaiting'
-        : row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED'
-          ? 'declared_complete_not_on_chain'
-          : 'overdue'
+      /**
+       * A process date still in the future is not owed yet, and calling it
+       * `awaiting` would carry a claim that is false: `awaiting` means the chain
+       * should move within the window. The issuer's feed is a calendar as much
+       * as a ledger, so a token's own view lists what is coming - under a state
+       * that says so.
+       */
+      const notYetDue = daysSinceProcessDate !== null && daysSinceProcessDate < 0
+      const state: DeclaredState = notYetDue
+        ? 'upcoming'
+        : !pastWindow
+          ? 'awaiting'
+          : row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED'
+            ? 'declared_complete_not_on_chain'
+            : 'overdue'
 
       const rateWad = row.rate ? parseDecimal(row.rate, 18) : null
       /**
@@ -227,7 +241,9 @@ export function buildPendingView(input: PendingInput) {
             ? 'the issuer marks this action completed; the multiplier has not moved'
             : state === 'overdue'
               ? `no multiplier step ${daysSinceProcessDate} days after the issuer's process date; the observed lag is one business day`
-              : 'declared by the issuer, still inside the observed next-business-day window',
+              : state === 'upcoming'
+                ? `the issuer's process date is ${-(daysSinceProcessDate as number)} day(s) away; nothing is owed yet`
+                : 'declared by the issuer, still inside the observed next-business-day window',
         source: 'robinhood:/rhj/corporate-actions',
       }
     })
@@ -261,6 +277,7 @@ export function buildPendingView(input: PendingInput) {
     declared,
     summary: {
       scheduledOnChain: scheduled === null ? 0 : 1,
+      declaredUpcoming: inState('upcoming').length,
       declaredAwaiting: inState('awaiting').length,
       declaredOverdue: overdueRows.length,
       declaredCompleteNotOnChain: inState('declared_complete_not_on_chain').length,

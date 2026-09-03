@@ -78,7 +78,7 @@ ledger.notComputed.map((n) => `${n.field}: ${n.reasonCode}`)
 ```ts
 const owed = await exdate.pending(BND)
 owed.scheduled                      // a log is on chain; ~9 minutes of warning
-owed.declared[0].state              // 'awaiting' | 'overdue' | 'declared_complete_not_on_chain'
+owed.declared[0].state              // 'upcoming' | 'awaiting' | 'overdue' | 'declared_complete_not_on_chain'
 owed.declared[0].grossPerToken      // rate x uiMultiplier — needs no price
 owed.declared[0].projection         // null without a feed; `notAMeasurement: true` with one
 owed.summary.longestOverdueDays     // 28 for BND on 2026-09-02

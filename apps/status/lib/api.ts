@@ -182,8 +182,11 @@ export interface PendingView {
   multiplier: { currentDecimal: string | null }
   declared: {
     key: string
-    /** awaiting inside the observed window, overdue past it, or completed by the issuer with no step. */
-    state: 'awaiting' | 'overdue' | 'declared_complete_not_on_chain'
+    /**
+     * upcoming before the process date, awaiting inside the observed window,
+     * overdue past it, or completed by the issuer with no step on chain.
+     */
+    state: 'upcoming' | 'awaiting' | 'overdue' | 'declared_complete_not_on_chain'
     processDate: string | null
     daysSinceProcessDate: number | null
     windowDays: number
@@ -196,6 +199,7 @@ export interface PendingView {
   }[]
   summary: {
     scheduledOnChain: number
+    declaredUpcoming: number
     declaredAwaiting: number
     declaredOverdue: number
     declaredCompleteNotOnChain: number
