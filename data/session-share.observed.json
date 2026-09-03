@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-03T17:20:04.000Z",
-  "sampleCount": 12,
-  "easternHourOfWeekSlotsCovered": 11,
+  "lastSampleAt": "2026-09-03T18:27:12.000Z",
+  "sampleCount": 13,
+  "easternHourOfWeekSlotsCovered": 12,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -24,7 +24,7 @@
   ],
   "transferShare": null,
   "provableTradeShare": null,
-  "pooledOffHoursShareOfSampledTransfers": 0.4892,
+  "pooledOffHoursShareOfSampledTransfers": 0.4551,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -49,13 +49,13 @@
       "label": "regular session 09:30-16:00 ET",
       "offHours": false,
       "hoursPerWeek": 32.5,
-      "samples": 4,
-      "transfersSampled": 20682,
-      "secondsSampled": 170,
-      "transfersPerSecondMean": 120.909,
+      "samples": 5,
+      "transfersSampled": 23716,
+      "secondsSampled": 212,
+      "transfersPerSecondMean": 111.175,
       "transfersPerSecondMin": 59.683,
       "transfersPerSecondMax": 149.568,
-      "provableTradesPerSecondMean": 26.767
+      "provableTradesPerSecondMean": 25.719
     },
     {
       "session": "after_hours",
@@ -265,6 +265,20 @@
       "transactionsMovingAToken": 1524,
       "provableTrades": 1346,
       "provableTradesPerSecond": 31.302
+    },
+    {
+      "observedAt": "2026-09-03T18:27:12.000Z",
+      "session": "regular",
+      "easternHourOfWeek": 110,
+      "fromBlock": 53623609,
+      "headBlock": 53624008,
+      "windowBlocks": 400,
+      "windowSeconds": 42,
+      "transfers": 3034,
+      "transfersPerSecond": 72.238,
+      "transactionsMovingAToken": 1057,
+      "provableTrades": 904,
+      "provableTradesPerSecond": 21.524
     }
   ]
 }
