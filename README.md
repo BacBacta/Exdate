@@ -40,6 +40,7 @@ to four weeks. Every input is sourced; see the report.
 pnpm install
 pnpm dev          # indexer + API   http://localhost:42069
 pnpm dev:status   # status page      http://localhost:3000
+pnpm dev:web      # public site      http://localhost:3001
 pnpm test         # unit tests: core, api, sdk, and the indexer's webhook outbox
 pnpm typecheck
 ```
@@ -215,6 +216,8 @@ packages/indexer  Ponder: indexes UIMultiplierUpdated, polls the ERC-8056 views,
                   Chainlink feeds and the issuer's corporate actions, serves the API.
 packages/api      Hono routes over a Repository interface — no SQL, deployable alone.
 apps/status       Next.js App Router status page. Reads the API and nothing else.
+apps/web          The public site. A static export whose every number is read at build time from
+                  the committed observations in data/, with the date it was observed.
 packages/sdk      @exdate/sdk — typed client + webhook verifier. Depends on core only.
 scripts           verification and backfill scripts
 data              committed snapshots of first-party registries, observed events, and the

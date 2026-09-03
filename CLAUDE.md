@@ -307,6 +307,7 @@ pnpm workspaces:
 | `packages/indexer` | Ponder + PGlite/Postgres. Indexes `UIMultiplierUpdated`, polls the ERC-8056 views, the Chainlink feeds and the issuer's corporate actions, drains the webhook outbox, and serves the API. |
 | `packages/api` | `@exdate/api` — Hono routes over a `Repository` interface, so it never builds SQL and stays deployable on its own. |
 | `apps/status` | Next.js App Router status page. Reads the API and nothing else. |
+| `apps/web` | `@exdate/web` — the public site. Static export (`output: 'export'`); every figure is read at build time from `data/*.json` by `lib/observed.ts`, never from the API or an RPC, so it deploys as plain files and cannot show a number that is not committed. Geist Sans/Mono self-hosted via the `geist` package. |
 | `packages/sdk` | `@exdate/sdk` — typed client + webhook verifier over `@exdate/core` only, so a consumer never installs the server. Response shapes are hand-declared and compiled against the API's serialisers in `test/contract.assert.ts`. |
 
 Vitest lives in `packages/core` (raw↔UI conversion, reconciliation, pairing, rounds, staleness,
@@ -376,6 +377,7 @@ Multi-chain from day one — Base / Coinbase B20 is a planned second issuer, so 
 pnpm install
 pnpm dev          # Ponder indexer + API on http://localhost:42069
 pnpm dev:status   # status page on http://localhost:3000
+pnpm dev:web      # public site on http://localhost:3001 (static export: pnpm --filter @exdate/web build -> apps/web/out)
 pnpm test
 pnpm typecheck
 ```
@@ -522,6 +524,17 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   the chain should move within the window, which is false for a date two weeks out. The test suite
   had encoded the same mistake (its SGOV fixture is dated two days ahead and expected `awaiting`),
   so the fix is in `pending.ts` with the test corrected and both cases now covered.
+- 2026-09-03 — **Public site, `apps/web`.** One page, static export, no runtime data: every
+  figure is derived at build time from the committed observations (`lib/observed.ts` reads
+  `data/*.json` and does its WAD arithmetic in BigInt), so the site can only ever show a number
+  that is in git with a date on it — rule 2 by construction. The hero figure is not hardcoded: it
+  is the most recent *matched* reconciliation (AAPL, 36.0 %), and the pending example is SGOV
+  picked by address, its `grossPerToken` recomputed from the archive rate × the last on-chain
+  multiplier. The status page stays the live tool and is linked, not duplicated. Design: Geist
+  Sans/Mono self-hosted, warm off-white / near-black, hairlines, one large tabular figure, no
+  accent colour — the number is the accent. Two bugs found by rendering: a `var(--font-sans)`
+  that did not exist invalidated the whole `font-family` (serif fallback everywhere), and anomaly
+  rows carry an *absent* `impliedHaircutBps` rather than `null`, which rendered `NaN %`.
 - _(append decisions here as they are made)_
 
 ## Status
