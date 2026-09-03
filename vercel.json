@@ -9,6 +9,19 @@
   },
   "headers": [
     {
+      "source": "/opengraph-image",
+      "headers": [
+        {
+          "key": "content-type",
+          "value": "image/png"
+        },
+        {
+          "key": "cache-control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
       "source": "/_next/static/(.*)",
       "headers": [
         {
