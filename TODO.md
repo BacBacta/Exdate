@@ -20,29 +20,42 @@ host. Nothing else changes: delivery is recorded in `data/effective-prices.obser
 
 ## 2. Let the site deploy itself
 
-The Vercel project is **not connected to this repository**: it only updates when someone
+The Vercel project is **connected to no repository**: it only updates when someone
 deploys by hand. Seven collectors now commit data on their own schedules, so from here
 every one of those commits makes the published pages staler than the record in git —
 and "every number traces to a committed observation" stops being true once the two
 disagree.
 
-`.github/workflows/deploy-site.yml` fixes it and is already written. It needs three
-things, none of which I can create:
+### Do this: install the Vercel GitHub App (one click, no secrets)
 
-- secret `VERCEL_TOKEN` — a durable token from <https://vercel.com/account/tokens>. The
-  one used interactively expires after eight hours; an account token does not.
+Vercel's API was asked to link the project and answered exactly what is missing:
+
+> To link a GitHub repository, you need to install the GitHub integration first.
+
+Install it at <https://github.com/apps/vercel>, granting access to `BacBacta/Exdate`.
+Then say so and the link is one API call from here — after which every push deploys by
+itself, with no token to store, rotate or leak, and `deploy-site.yml` becomes dead
+weight that can be deleted.
+
+The one thing to check on the first automatic deploy: it was recorded on 2026-09-03
+that git-connected deploys do not hit the `TEAM_ACCESS_REQUIRED` block that stops CLI
+deploys here, but that has not been tested since the collectors began committing under
+bot names. If a deploy comes back `BLOCKED`, fall back to the workflow below.
+
+### Or this: give the workflow a durable token
+
+`.github/workflows/deploy-site.yml` is already written and needs three things:
+
+- secret `VERCEL_TOKEN` — a durable token from <https://vercel.com/account/tokens>.
+  Create it there and paste it straight into GitHub; it should never pass through a
+  chat or a file. The token used interactively expires after eight hours; an account
+  token does not.
 - variable `VERCEL_ORG_ID` = `team_yvcPXxh5OyD9bGT9ogPgtNEw`
 - variable `VERCEL_PROJECT_ID` = `prj_k3kFLnvN5qsU47DHRGhowCN9Ev2n`
 
-Secrets and variables live under **Settings → Secrets and variables → Actions**, on the
-*Secrets* and *Variables* tabs respectively. Until they exist the workflow runs, says
-what is missing, and exits without failing.
-
-The alternative is to connect the project to GitHub from the Vercel dashboard, which
-removes the need for the workflow entirely. It was recorded on 2026-09-03 that
-git-connected deploys do not hit the `TEAM_ACCESS_REQUIRED` block that stops CLI
-deploys here; that has not been tested since the collectors began committing under bot
-names, so try one deploy before relying on it.
+Both live under **Settings → Secrets and variables → Actions**, on the *Secrets* and
+*Variables* tabs. Until they exist the workflow runs, says what is missing, and exits
+without failing.
 
 ## 3. Host the API and the status page
 
