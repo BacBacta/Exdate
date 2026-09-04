@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-04T04:26:22.000Z",
-  "sampleCount": 23,
-  "easternHourOfWeekSlotsCovered": 22,
+  "lastSampleAt": "2026-09-04T05:21:41.000Z",
+  "sampleCount": 24,
+  "easternHourOfWeekSlotsCovered": 23,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -24,7 +24,7 @@
   ],
   "transferShare": null,
   "provableTradeShare": null,
-  "pooledOffHoursShareOfSampledTransfers": 0.6923,
+  "pooledOffHoursShareOfSampledTransfers": 0.706,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -75,13 +75,13 @@
       "label": "overnight 20:00-04:00 ET",
       "offHours": true,
       "hoursPerWeek": 40,
-      "samples": 6,
-      "transfersSampled": 25856,
-      "secondsSampled": 242,
-      "transfersPerSecondMean": 106.821,
+      "samples": 7,
+      "transfersSampled": 30146,
+      "secondsSampled": 283,
+      "transfersPerSecondMean": 106.509,
       "transfersPerSecondMin": 37,
       "transfersPerSecondMax": 165.585,
-      "provableTradesPerSecondMean": 26.584
+      "provableTradesPerSecondMean": 26.344
     },
     {
       "session": "weekend",
@@ -419,6 +419,20 @@
       "transactionsMovingAToken": 1224,
       "provableTrades": 1118,
       "provableTradesPerSecond": 28.667
+    },
+    {
+      "observedAt": "2026-09-04T05:21:41.000Z",
+      "session": "overnight",
+      "easternHourOfWeek": 121,
+      "fromBlock": 54011823,
+      "headBlock": 54012222,
+      "windowBlocks": 400,
+      "windowSeconds": 41,
+      "transfers": 4290,
+      "transfersPerSecond": 104.634,
+      "transactionsMovingAToken": 1173,
+      "provableTrades": 1021,
+      "provableTradesPerSecond": 24.902
     }
   ]
 }
