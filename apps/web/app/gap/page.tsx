@@ -13,7 +13,11 @@ export const metadata: Metadata = {
     'How far each Robinhood Stock Token trades from the Chainlink price a lending market liquidates against, and how old that price is.',
 }
 
-const bps = (value: number) => `${value > 0 ? '+' : ''}${value.toFixed(0)} bps`
+/** Rounds first: `(-0.4).toFixed(0)` is "-0", which reads as a direction that is not there. */
+const bps = (value: number) => {
+  const rounded = Math.round(value)
+  return `${rounded > 0 ? '+' : ''}${rounded === 0 ? '0' : rounded} bps`
+}
 const age = (seconds: number | null) => {
   if (seconds === null) return '—'
   if (seconds < 90) return `${seconds}s old`
