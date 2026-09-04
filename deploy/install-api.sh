@@ -21,7 +21,15 @@ set -euo pipefail
 
 REPO_HTTPS="${EXDATE_REPO_HTTPS:-https://github.com/BacBacta/Exdate.git}"
 BRANCH="${EXDATE_BRANCH:-claude/lance-en5q6j}"
-DIR="${EXDATE_DIR:-/opt/exdate}"
+# Deliberately NOT /opt/exdate. That is the watcher's working copy: it commits
+# and pushes from there, so this script must neither reset it nor build from
+# whatever state it happens to be in. Sharing it once was enough - the checkout
+# sat on an older commit, the fetch here updated no working tree, and Docker
+# built a compose file that predated the public profile: Caddy and the status
+# page never started, and the watcher service, which that older file did not gate
+# behind a profile, came up a second time beside the systemd one.
+DIR="${EXDATE_DIR:-/opt/exdate-api}"
+WATCHER_DIR="${EXDATE_WATCHER_DIR:-/opt/exdate}"
 API_HOST="${EXDATE_API_HOST:-api.exdate.me}"
 STATUS_HOST="${EXDATE_STATUS_HOST:-status.exdate.me}"
 
@@ -85,17 +93,27 @@ for port in 80 443; do
 done
 
 say "3. Repository at $DIR"
+[ "$DIR" != "$WATCHER_DIR" ] || die "EXDATE_DIR must not be the watcher's checkout ($WATCHER_DIR).
+  This script resets its checkout to the branch tip on every run, and the watcher commits from its
+  own. Leave EXDATE_DIR unset to use /opt/exdate-api."
 if [ -d "$DIR/.git" ]; then
-  # This may be the watcher's own working copy, which it commits and pushes
-  # from. Fetching and checking out is safe; resetting it is not, so it is not
-  # done here - the watcher owns that clone's state.
-  owner="$(stat -c '%U' "$DIR")"
-  note "reusing the checkout at $DIR (owner $owner)"
-  sudo -u "$owner" git -C "$DIR" fetch --quiet origin "$BRANCH" </dev/null || warn "could not fetch; building from what is on disk"
-  note "at $(git -C "$DIR" rev-parse --short HEAD)"
+  git -C "$DIR" fetch --quiet origin "$BRANCH" </dev/null
+  # Reset, not fetch-and-hope. Nothing else writes here, so this cannot lose
+  # anyone's work - and building from a tree that silently lags the branch is
+  # the failure this replaces.
+  git -C "$DIR" checkout --quiet -B "$BRANCH" "origin/$BRANCH" </dev/null
+  git -C "$DIR" reset --quiet --hard "origin/$BRANCH" </dev/null
+  note "updated to $(git -C "$DIR" rev-parse --short HEAD)"
 else
   git clone --quiet --branch "$BRANCH" "$REPO_HTTPS" "$DIR" </dev/null
-  note "cloned $BRANCH over https (read-only; the API never pushes)"
+  note "cloned $BRANCH over https at $(git -C "$DIR" rev-parse --short HEAD) (read-only; the API never pushes)"
+fi
+
+# An older compose project from the mistake above may still be running out of the
+# watcher's directory, holding the ports this one needs and a duplicate watcher.
+if [ -f "$WATCHER_DIR/docker-compose.yml" ] && docker compose --project-directory "$WATCHER_DIR" ps -q 2>/dev/null | grep -q .; then
+  warn "containers are running from $WATCHER_DIR; stopping them, they predate this layout"
+  docker compose --project-directory "$WATCHER_DIR" down </dev/null || true
 fi
 
 say "4. Settings"
@@ -123,7 +141,16 @@ note "$ENV: api $API_HOST, status $STATUS_HOST"
 say "5. Build and start"
 cd "$DIR"
 docker compose --profile public up -d --build </dev/null
-note "containers up"
+# Assert the shape rather than trusting it. "containers up" was true of the run
+# that started a duplicate watcher and no proxy at all.
+running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
+note "running: ${running:-none}"
+for want in db indexer status caddy; do
+  case " $running " in *" $want "*) ;; *) die "$want is not running. Expected db, indexer, status and caddy; got: ${running:-none}. Look at: docker compose logs $want";; esac
+done
+case " $running " in
+  *" watcher "*) die "the watcher service came up, which must not happen here: this machine runs it under systemd, and two would sample the same instants twice and race on one committed file. That means the checkout predates the watcher profile - re-run this script.";;
+esac
 
 say "6. Does it answer?"
 # Locally first: a failure here is the indexer, not TLS. Then publicly, which is

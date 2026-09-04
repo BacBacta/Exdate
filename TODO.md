@@ -137,9 +137,16 @@ curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/install
 
 It installs Docker, **refuses if either name does not resolve to this machine** — asking Let's
 Encrypt for a certificate it cannot prove is rate-limited per domain, so that check is the one worth
-having — refuses if anything already holds 80 or 443, reuses the watcher's checkout without
-resetting it, generates the Postgres password into `.env` without printing it, and proves the result
-by calling `/v1/health` locally and then over https.
+having — refuses if anything already holds 80 or 443, generates the Postgres password into `.env`
+without printing it, and proves the result by calling `/v1/health` locally and then over https.
+
+It uses **its own checkout at `/opt/exdate-api`**, not the watcher's at `/opt/exdate`, and resets it
+to the branch tip on every run. The first version shared the watcher's, fetched without updating the
+working tree, and so built a `docker-compose.yml` that predated the public profile: Caddy and the
+status page never started, and the watcher — ungated in that older file — came up a second time
+beside the systemd one. The script now refuses `EXDATE_DIR` pointing at the watcher's directory,
+stops anything still running out of it, and **asserts what came up**: `db`, `indexer`, `status` and
+`caddy` running, `watcher` not. "Containers up" was true of the run that got it wrong.
 
 Then the API is public and the quotas matter. `EXDATE_ANON_RPM` is the anonymous rate per client
 address read from `X-Forwarded-For`, which Caddy sets; `EXDATE_API_KEYS` (`key:label:rpm`, comma
