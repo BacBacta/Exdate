@@ -26,21 +26,11 @@ every one of those commits makes the published pages staler than the record in g
 and "every number traces to a committed observation" stops being true once the two
 disagree.
 
-### Do this: install the Vercel GitHub App (one click, no secrets)
+### Done: the project is linked to GitHub
 
-Vercel's API was asked to link the project and answered exactly what is missing:
-
-> To link a GitHub repository, you need to install the GitHub integration first.
-
-Install it at <https://github.com/apps/vercel>, granting access to `BacBacta/Exdate`.
-Then say so and the link is one API call from here — after which every push deploys by
-itself, with no token to store, rotate or leak, and `deploy-site.yml` becomes dead
-weight that can be deleted.
-
-The one thing to check on the first automatic deploy: it was recorded on 2026-09-03
-that git-connected deploys do not hit the `TEAM_ACCESS_REQUIRED` block that stops CLI
-deploys here, but that has not been tested since the collectors began committing under
-bot names. If a deploy comes back `BLOCKED`, fall back to the workflow below.
+The Vercel GitHub App is installed and the project is linked to `BacBacta/Exdate` with
+`claude/lance-en5q6j` as its production branch, so every push deploys by itself — no
+token to store, rotate or leak.
 
 ### Or this: give the workflow a durable token
 
