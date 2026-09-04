@@ -80,6 +80,10 @@ recovered later.
 | `measure-primary-flows` | daily | mint minus burn per token, in contiguous windows, so a delayed run loses nothing |
 | `measure-capture-cadence` | daily | how often GitHub really ran the capture job, from its own run log — the number that decides whether a step is caught |
 
+Two checks are run by hand rather than on a schedule, because their inputs move only when the
+chain does: `probe-rpc-endpoints.mjs` measures what each public endpoint can do, and
+`verify-multiplier-history.mjs` reads every step back in the chain's own state.
+
 Each commits to the default branch, which deploys the site — so the published pages and the
 committed record move together.
 
@@ -96,6 +100,25 @@ because delivering it would report a lead rather than give one; delivery is reco
 `data/effective-prices.observed.json`, which makes it the evidence that the lead was given.
 
 The indexer's signed webhook outbox is the other half of this and still needs a host - see below.
+
+### Reading the chain, and its history
+
+Robinhood's own endpoint is the default: it takes a 2,000,000-block `eth_getLogs`, answers
+browsers, and **keeps no archive** — `eth_call` a few thousand blocks back answers
+`metadata is not found`. That last fact was recorded here as a property of the chain for a month.
+It is a property of that endpoint.
+
+`node scripts/probe-rpc-endpoints.mjs` reads the public chain registries and measures every
+endpoint they list, committing the result to `data/rpc-endpoints.observed.json`: six of eight
+answer, three serve state at any height, and two reach the oldest multiplier step. Archive is
+tested as state that **differs from latest**, never as a block number, since Multicall3's
+`getBlockNumber()` answers on any node. Where two endpoints answer the same depth their answers
+are compared, and a depth with one witness is reported as one witness.
+
+Their capabilities do not overlap, so the project uses more than one. Set `RHC_RPC_URL_ARCHIVE` to
+give the indexer and `scripts/verify-multiplier-history.mjs` a node that keeps history; wide log
+scans stay on Robinhood's. These are third parties with no service commitment: sound for history,
+which can be re-read at any time, and never for a capture that cannot.
 
 ### The capture watcher
 

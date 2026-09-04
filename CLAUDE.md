@@ -44,9 +44,25 @@ nowhere else.
   `ArbSys.arbBlockNumber()` (the Arbitrum precompile at `0x…64`, 1 byte of code) both answered
   53 391 912. A contract-side read that wants to date itself must go through ArbSys;
   `ROBINHOOD_CHAIN.blockNumberSource` carries the address and the computed selector.
-- **There is no archive.** `eth_call` at `latest - 10 000` already answers
-  `metadata is not found`; only the last few thousand blocks of state are readable. Historical
-  multiplier state must be reconstructed from events, not read back.
+- **Robinhood's own endpoint keeps no archive; the chain has one.** `eth_call` at
+  `latest - 10 000` answers `metadata is not found` there, and that was recorded as a property of
+  the chain for a month because nobody had looked at another endpoint. It is a property of that
+  endpoint. The public chain registries list eight; **six answer, three serve state at any height,
+  and two reach the oldest multiplier step** — `data/rpc-endpoints.observed.json`,
+  `node scripts/probe-rpc-endpoints.mjs`. Two independent endpoints agree at 20 M and 50 M blocks
+  deep, three at 1 M, so the history is corroborated rather than taken from one witness.
+  Set `RHC_RPC_URL_ARCHIVE` to use one.
+  - Archive is tested as **state that differs from latest**, never `block.number`: Multicall3's
+    `getBlockNumber()` answers on any node, and an endpoint serving head state at every height
+    would pass a naive test. The decisive check is `reachesOldestStep`, not an arbitrary depth: a
+    node with a million blocks of history looks archival and fails on exactly the reads that need it.
+  - **Their capabilities do not overlap, so the project uses both.** Robinhood's own takes a
+    2 000 000-block `eth_getLogs` and serves no state; `pocket.network` serves 53 M of history and
+    refuses browsers; `blockmachine.io` serves 53 M and answers browsers but caps a log query at
+    1 000 blocks. Wide log scans still go to Robinhood's; state reads go to an archive one.
+  - They are **third parties with no service commitment**. Sound for history, which can be re-read
+    at any time; never for a capture that cannot be re-read, which is why the effective-price
+    watcher does not depend on one.
 - Primary quote asset is **USDG** (6 decimals), not USDC.
 - Deployed: Uniswap (v3 + v4 hooks), Morpho, Rialto (propAMM), Lighter (orderbook), Chainlink.
 - **The DEX addresses are nowhere first-party.** `docs.robinhood.com/chain/protocol-contracts`
@@ -231,8 +247,12 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   fires at maturation."
 - **There is no application event.** `UIMultiplierUpdated` fires once, at announcement, carrying a
   future `effectiveAt`. Nothing is emitted when the change takes effect (verified: zero logs in the
-  200 000 blocks after activation for SGOV and CCL). Application must be derived from the clock —
-  an indexer alone cannot produce it.
+  200 000 blocks after activation for SGOV and CCL). An indexer alone cannot produce it — but with
+  an archive endpoint the application is **observed rather than derived**: `uiMultiplier()` read at
+  `effectiveBlock - 1` and at `effectiveBlock` shows the transition, and **12 of 12 steps confirm**
+  against their announcement log. `node scripts/verify-multiplier-history.mjs`,
+  `data/multiplier-state-verification.json`. The same reads observe the retrospective trap below at
+  each announcement block, 12 of 12.
 - **The announcement lead is ~9–10 minutes**, not weeks. See `docs/phase-0-verification.md` §4.
 - **A schedule can be re-announced.** CRWD emitted the same `(newMultiplier, effectiveAt)` twice,
   11 h apart. Key `multiplier_events` on `(chain_id, token, effective_at)` and upsert.
@@ -269,9 +289,11 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   history. `scripts/measure-primary-flows.mjs`, `data/primary-flows.observed.json`, daily Action.
 - **74 % of transactions that move a Stock Token also move USDG in the same transaction** — the
   provable-trade share, ≈2 M/day. Most on-chain activity is trading, not custody movement.
-- A dedicated archive endpoint is required before indexing transfers: 7–13 M logs/day is 85–145
-  logs/second sustained, against an endpoint that caps a query at 10 000 logs and rejects half of
-  them.
+- Indexing transfers is still the one thing an archive endpoint does **not** unlock on its own:
+  7–13 M logs/day is 85–145 logs/second sustained, and the endpoints that serve history cap a log
+  query at 1 000 to 2 000 000 blocks with their own rate limits (blockmachine's keyless tier is
+  300 req/min per IP). The binding cost is storage, not the node: at roughly 250 bytes an indexed
+  row — an estimate, not a measurement — 10 M rows/day is ~2.5 GB/day, ~75 GB/month.
 - A `Transfer` proves custody moved, not that a trade happened. A provable trade needs both legs
   (Stock Token + USDG) in the same `transactionHash`.
 - **One wallet's history is cheap for a person and impossible for a bot** (measured 2026-09-03,
@@ -973,6 +995,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   0.1 s/block) — harmless, since known steps are skipped by key, and corrected. `/record/` now
   states the measured cadence and the expected catch share, and will state the watcher's heartbeat
   once one exists. Still owner-blocked: the machine and a deploy key (`TODO.md`).
+- 2026-09-04 — **"There is no archive" was true of one endpoint and recorded as true of the
+  chain.** Asked what a paid node would buy, the answer turned out to be *almost nothing that is
+  not already free*: the public chain registries list eight RPC endpoints for chain 4663 and the
+  project had only ever used Robinhood's. Six answer; three serve state at any height; two reach
+  the oldest multiplier step, 53 M blocks back. That belief had shaped real decisions — two-tier
+  indexing, a browser replaying transfer logs, the application derived from the clock — so the
+  endpoints are probed and committed like any other measurement
+  (`scripts/probe-rpc-endpoints.mjs`, `data/rpc-endpoints.observed.json`).
+  Three things the probe gets right that a naive one would not. Archive is tested as **state that
+  differs from latest**, because Multicall3's `getBlockNumber()` answers on any node and an
+  endpoint serving head state at every height would otherwise pass. The decisive field is
+  **`reachesOldestStep`**, not a depth: the first version of the site's selector took a node with
+  1 M blocks of history because it sorted on an arbitrary probe depth, and it would have failed on
+  exactly the wallets the archive path exists for. And **agreement is reported per depth** — two
+  independent endpoints at 20 M and 50 M, three at 1 M — so a lone witness is never published as
+  corroboration. What this unlocked, both measured end to end: **every multiplier step confirmed in
+  the chain's own state** (12/12, plus 12/12 of the retrospective trap at its announcement block),
+  which closes the project's oldest limitation, ERC-8056 emitting nothing when a change takes
+  effect; and **the wallet history read rather than rebuilt** — 12 requests, 1.9 s, for any address,
+  where the log replay costs up to 40 and is refused past that. The replay stays as the fallback,
+  and the page says which node answered, because one of them is not Robinhood's. What an archive
+  does **not** unlock is transfer indexing: there the binding cost is storage, roughly 75 GB a
+  month, not the node.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -1003,7 +1048,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - The five July actions have no declared rate and never will (see the decision log); their steps
   are published as `unmatched` with the reason stated rather than filled in.
 
-- `/wallet/` history is refused for automated wallets (past 40 `eth_getLogs` requests) and blind
+- `/wallet/` history no longer refuses an automated wallet: with an archive endpoint it reads
+  `balanceOf` at each effective block instead of replaying logs — measured end to end at **12
+  requests, 1.9 s, for any address**. The log replay stays as the fallback. What remains is that
+  the archive path shows the address to a **third party** rather than to Robinhood's node alone,
+  which the page states, and that the history is still blind
   to tokens held inside a protocol at the time of a step. Both are stated on the page. An archive
   endpoint would lift the first; the second needs each protocol's own accounting.
 
