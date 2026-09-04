@@ -1018,6 +1018,24 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   and the page says which node answered, because one of them is not Robinhood's. What an archive
   does **not** unlock is transfer indexing: there the binding cost is storage, roughly 75 GB a
   month, not the node.
+- 2026-09-04 — **The installer could never reach its second pass, and it took a rehearsal to see it.**
+  The watcher's install script was written but had only ever been read, not run end to end; put on a
+  real VPS it created the user and the deploy key and then stopped, and re-running it stopped in the
+  same place. Two shell traps, both found by replaying the script here against stubs rather than by
+  staring at it. **`set -o pipefail` made the auth gate always false**: GitHub answers `ssh -T` with
+  the greeting *and* exit status 1 - it grants no shell - so `ssh … | grep -q "successfully
+  authenticated"` reports failure on a match, from ssh's own status or from the SIGPIPE `grep -q`
+  sends by exiting on the first one. The answer is captured into a variable before it is searched.
+  And **under `curl … | bash` the script is bash's own stdin**, so any child that reads stdin - ssh
+  above all, and `git clone` spawns ssh - swallows the rest of the source and bash silently stops
+  where that child ran, exit 0. The whole body now lives in `main()` called as `main "$@"
+  </dev/null`: bash parses the entire file before executing a line of it (so a truncated download
+  cannot half-run either) and every child gets its own empty stdin. Rehearsed with stubbed
+  `systemctl`/`apt-get`/`ssh` and a local origin: both passes now run through all seven steps, the
+  unit's `User=`/`WorkingDirectory=`/`ExecStart=` substitutions land, and the preflight runs. The
+  public key is also printed by its own `cat` between two markers rather than expanded inside the
+  heredoc - an unreadable file must be an error on screen, not a blank line in the middle of
+  otherwise perfect instructions - and the file is checked non-empty before the gate.
 - _(append decisions here as they are made)_
 
 ## Status

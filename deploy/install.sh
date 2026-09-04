@@ -18,6 +18,17 @@
 #
 # Idempotent: re-running it is how you upgrade. It never deletes anything it did
 # not create, and it refuses rather than guessing.
+#
+# Everything below lives in main(), called at the very end with stdin detached.
+# That is not style, it is the fix for two failures this script had when it was
+# piped into bash rather than saved first. Under `curl | bash` the script IS
+# bash's stdin, so (1) any child that reads stdin - ssh above all, and git spawns
+# ssh - swallows the rest of the source and bash silently stops where that child
+# ran: pass two printed "GitHub accepts this key" and then did nothing at all,
+# no clone, no service, exit 0. And (2) a download cut in half would run its
+# first half. Wrapping the body in a function makes bash parse the whole file
+# before executing a line of it, and `</dev/null` gives every child its own
+# empty stdin.
 set -euo pipefail
 
 REPO_SSH="${EXDATE_REPO_SSH:-git@github.com:BacBacta/Exdate.git}"
@@ -29,6 +40,8 @@ NODE_MAJOR=22
 say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 note() { printf '  %s\n' "$*"; }
 die() { printf '\n\033[31mstopped:\033[0m %s\n' "$*" >&2; exit 1; }
+
+main() {
 
 # Where am I? Checked before anything else, because the two wrong answers both
 # look plausible from a phone: Termux ships apt and a shell, so the Debian check
@@ -86,6 +99,8 @@ if [ ! -f "$KEY" ]; then
   sudo -u "$USER_NAME" "$(command -v ssh-keygen)" -t ed25519 -N '' -C "exdate-watcher@$(hostname)" -f "$KEY" >/dev/null
   note "generated; the private half stays in $KEY and goes nowhere else"
 fi
+[ -s "$KEY.pub" ] || die "the deploy key's public half is missing or empty at $KEY.pub.
+  Delete $KEY and $KEY.pub, then run this again to regenerate the pair."
 # GitHub's host key, pinned now so the watcher never has to answer a prompt.
 # Some networks block outbound port 22 entirely; GitHub also serves SSH on 443,
 # so that is tried before giving up, and a failure says which rather than
@@ -111,7 +126,16 @@ chmod 600 "$SSH_DIR/known_hosts"; chown "$USER_NAME:$USER_NAME" "$SSH_DIR/known_
 
 # Does GitHub already accept this key for pushes? That is the gate between the
 # two passes, and it is asked rather than assumed.
-if sudo -u "$USER_NAME" "$(command -v ssh)" -o StrictHostKeyChecking=yes -o BatchMode=yes -p "$SSH_PORT" -T "git@$SSH_HOST" 2>&1 | grep -q "successfully authenticated"; then
+#
+# Its answer is captured before it is searched, rather than piped into grep, and
+# that is load-bearing under `set -o pipefail`. GitHub answers `ssh -T` with the
+# greeting AND exit status 1 - it grants no shell - so a pipeline ending in a
+# matching `grep -q` still reports failure, from ssh's own status or from the
+# SIGPIPE grep sends it by exiting on the first match. The gate was therefore
+# false even when the key was accepted, and the second pass could never happen:
+# it printed "add the key" forever. Measured, then fixed.
+AUTH="$(sudo -u "$USER_NAME" "$(command -v ssh)" -o StrictHostKeyChecking=yes -o BatchMode=yes -p "$SSH_PORT" -T "git@$SSH_HOST" 2>&1 || true)"
+if printf '%s' "$AUTH" | grep -q "successfully authenticated"; then
   note "GitHub accepts this key"
 else
   cat <<EOF
@@ -119,10 +143,20 @@ else
   This key is not on the repository yet. Add it, then run this script again.
 
     https://github.com/BacBacta/Exdate/settings/keys/new
-    Title:            $(hostname) watcher
+    Title:              $(hostname) watcher
     Allow write access: TICK IT - the watcher commits what it captures
 
-$(cat "$KEY.pub" | sed 's/^/    /')
+  Paste everything between the two markers, as ONE line. A phone terminal wraps
+  it across several rows; it is still one line, and GitHub rejects it broken.
+
+  ----- copy from here -----
+EOF
+  # Printed by its own command rather than expanded inside the heredoc: if the
+  # file cannot be read, that must be an error on screen, not a blank space in
+  # the middle of otherwise perfect instructions.
+  cat "$KEY.pub"
+  cat <<EOF
+  ----- to here -----
 
 EOF
   exit 0
@@ -196,3 +230,9 @@ EOF
 else
   die "preflight found something blocking; the service is installed but not started"
 fi
+
+}
+
+# Stdin detached: see the note at the top. Without it, ssh eats the rest of this
+# script when it arrives through a pipe.
+main "$@" </dev/null
