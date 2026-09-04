@@ -851,6 +851,20 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   the diff, because the standard reads it as a promise: removing a token is major, adding one
   minor, changing a detail a patch, and an unchanged rebuild keeps its timestamp so a commit means
   the data moved rather than that a job ran.
+- 2026-09-04 — **The published site was about to drift away from the record.** Seven collectors
+  now commit on their own schedules, and the Vercel project is **connected to no repository**: it
+  only updates when someone deploys by hand. Checked, not assumed — the project API reports no
+  link. So from the next hourly commit onward the pages would have shown older figures than the
+  files they claim to read, and "every number traces to a committed observation" would have
+  quietly stopped being true. `.github/workflows/deploy-site.yml` deploys on a push that touches
+  `data/`, `apps/web/`, `packages/core/` or `vercel.json`, plus a six-hourly safety net, through
+  the same `deploy-web.sh` that works around Vercel refusing a CLI deploy whose commit author is
+  not a team member — and the commits are now made by the collectors, so that block applies more
+  than before. It waits on a durable `VERCEL_TOKEN` and the two project ids, and until they exist
+  it **says what is missing and exits cleanly** rather than failing every six hours. One trap
+  caught while writing it: the `secrets` context is **not available in a step's `if`**, so the
+  guard is lifted into the job's `env` — written the documented-looking way it evaluates to
+  nothing and every step runs regardless.
 - _(append decisions here as they are made)_
 
 ## Status

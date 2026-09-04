@@ -18,7 +18,33 @@ Add repository secrets under **Settings → Secrets and variables → Actions**,
 Optionally set the repository *variable* `EXDATE_SITE_URL` so the notices link to the right
 host. Nothing else changes: delivery is recorded in `data/effective-prices.observed.json`.
 
-## 2. Host the API and the status page
+## 2. Let the site deploy itself
+
+The Vercel project is **not connected to this repository**: it only updates when someone
+deploys by hand. Seven collectors now commit data on their own schedules, so from here
+every one of those commits makes the published pages staler than the record in git —
+and "every number traces to a committed observation" stops being true once the two
+disagree.
+
+`.github/workflows/deploy-site.yml` fixes it and is already written. It needs three
+things, none of which I can create:
+
+- secret `VERCEL_TOKEN` — a durable token from <https://vercel.com/account/tokens>. The
+  one used interactively expires after eight hours; an account token does not.
+- variable `VERCEL_ORG_ID` = `team_yvcPXxh5OyD9bGT9ogPgtNEw`
+- variable `VERCEL_PROJECT_ID` = `prj_k3kFLnvN5qsU47DHRGhowCN9Ev2n`
+
+Secrets and variables live under **Settings → Secrets and variables → Actions**, on the
+*Secrets* and *Variables* tabs respectively. Until they exist the workflow runs, says
+what is missing, and exits without failing.
+
+The alternative is to connect the project to GitHub from the Vercel dashboard, which
+removes the need for the workflow entirely. It was recorded on 2026-09-03 that
+git-connected deploys do not hit the `TEAM_ACCESS_REQUIRED` block that stops CLI
+deploys here; that has not been tested since the collectors began committing under bot
+names, so try one deploy before relying on it.
+
+## 3. Host the API and the status page
 
 `docker compose up -d` at the repository root brings up Postgres and the indexer, serving
 `/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`, and *Hosting* in the README). Needs
@@ -28,13 +54,13 @@ quotas count per visitor rather than per proxy. `EXDATE_API_KEYS` turns on keys 
 Until this exists there is no public instance — the reference says so — and the signed
 webhook outbox has still never delivered anything.
 
-## 3. Choose a domain
+## 4. Choose a domain
 
 `exdate.xyz` belongs to an unrelated site. The name stands; the domain does not.
 `metadataBase` in `apps/web/app/layout.tsx` still names it and must change with the choice,
 as must `packages/sdk/README.md` and any `api.` subdomain.
 
-## 4. Publish the packages
+## 5. Publish the packages
 
 Both are prepared: `publishConfig` swaps `main`, `types` and `exports` to a `dist/` that
 `tsconfig.build.json` emits at publish time, checked with `pnpm pack`; the workspace keeps
@@ -47,7 +73,7 @@ pnpm --filter @exdate/sdk publish   # pnpm rewrites the workspace: range
 
 `packages/sdk/README.md` currently states that they are not published; update it after.
 
-## 5. Have counsel read the issuer's terms
+## 6. Have counsel read the issuer's terms
 
 Robinhood's developer-documentation terms (RHDA, LLC, 2026-08-24) grant a personal,
 revocable licence and forbid distributing "Robinhood Materials" to third parties or building
