@@ -1138,6 +1138,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   of a host. Both stay behind env vars rather than becoming literals: the site is static and rebuilt
   on a commit, so a hardcoded host would go on being advertised for as long as nobody pushed after
   the machine went away.
+- 2026-09-04 — **The Terms were read, not summarised, and they reorder the risk.** `docs/terms-review.md`.
+  Three things the earlier one-line summary did not say. First, **§2.1 puts the chain itself
+  outside the Terms**: "Robinhood Chain itself, including its protocol smart contracts […] is not
+  part of the Services". Every on-chain measurement is public state; what is a Service is the
+  Public RPC and the `/rhj` API. Second, the clause that bites is not the licence but the purpose
+  covenant, **§2.4(a): "solely for lawful testing, experimentation, evaluation, and development
+  purposes"** — it attaches to every Service including the RPC, so a production product reading
+  the chain through Robinhood's endpoint is caught by it, and reading through a node of its own or
+  a third-party endpoint is not. That turns TODO item 3 (an RPC exdate controls) from optional into
+  the terms-driven answer, starting with the capture watcher, whose reads cannot be re-done. Third,
+  the trademark licence has conditions that the site breaks today: **§5.7(j) forbids describing
+  Stock Tokens as "tokenized stocks" or "tokenized equities"**, and the site's title is *see what
+  your tokenized stock actually paid you* (counted: 15 occurrences across the public surfaces);
+  **§5.7(b)(ii) requires a "not affiliated with, endorsed by, or officially connected with
+  Robinhood Markets, Inc." disclaimer**, which is absent. Both are cheap; the first is the product's
+  sentence and is the owner's decision, so neither was changed here. Also found: the repository has
+  **no `LICENSE` file** while three packages claim MIT and the data has no licence at all; the
+  §5.2 licence is contractual and non-sublicensable, so any data licence must carve out the
+  issuer's columns; the EU *sui generis* database right is a separate question the US Terms never
+  reach; and **the arbitration opt-out closes on 2026-10-31** (§12.13, by post, the only manner).
+  Chainlink's terms render in JavaScript and could not be read from here — recorded as unread rather
+  than paraphrased. The worst case is stated as what it is: contractual and personal to exdate —
+  revocation, blocking, deletion of the archive, the indemnity — not a claim over facts.
 - _(append decisions here as they are made)_
 
 ## Status

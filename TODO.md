@@ -192,11 +192,32 @@ pnpm --filter @exdate/sdk publish   # pnpm rewrites the workspace: range
 
 `packages/sdk/README.md` currently states that they are not published; update it after.
 
-## 7. Have counsel read the issuer's terms
+## 7. Have counsel read the issuer's terms — the reading is done, the questions are written
 
-Robinhood's developer-documentation terms (RHDA, LLC, 2026-08-24) grant a personal,
-revocable licence and forbid distributing "Robinhood Materials" to third parties or building
-a competing product. The on-chain record is public and unaffected. Whether the archived
-`/rhj` rows this repository redistributes — `data/corporate-actions.archive.json`,
-`data/robinhood-assets.snapshot.json` — are such material is a question for counsel before
-any of it is sold or licensed. The README states the question and does not answer it.
+`docs/terms-review.md` reads the Robinhood Chain Terms of Service (RHDA, LLC, *Last Updated:
+August 24, 2026*) against an inventory of what exdate actually does, taken from the code. It is not
+legal advice; it is what makes counsel's hour count. The short version:
+
+- **The chain itself is expressly outside the Terms** (§2.1). Every on-chain measurement is public
+  state. What is a Service is the **Public RPC** — "not intended for production-grade" use — and the
+  **`/rhj` API**, whose output is, on the conservative reading, "Robinhood Materials".
+- **§2.4(a) binds every Service to "testing, experimentation, evaluation, and development"**, which a
+  public product is not. On the chain side that is cured by reading through a node exdate runs or a
+  third-party endpoint (item 3 above stops being optional). On the `/rhj` side there is no substitute.
+- **§5.2 is contractual and non-sublicensable**: the exposure is revocation, blocking and the
+  indemnity, personal to exdate — not a claim over facts. And exdate cannot license on the issuer's
+  fields it republishes, so any data licence must carve them out by column.
+- **§5.7(j) forbids "tokenized stocks / equities"** as a description of Stock Tokens. The site's
+  title is *see what your tokenized stock actually paid you*. Owner's call: change the words or
+  accept the risk knowingly. **§5.7(b)(ii) requires a not-affiliated disclaimer**, which is absent.
+- **No `LICENSE` file exists** while three packages claim MIT; the data has no licence at all.
+- **EU database right** (Directive 96/9/EC) is a separate question the US Terms do not address.
+- **Arbitration opt-out closes on 2026-10-31** (§12.13, sixty days from first access, by post only).
+
+Cheap and lawyer-free: the disclaimer, the `LICENSE` file, moving production reads off the Public
+RPC, and the wording decision. For counsel, in order: is `/rhj` a Service; does §2.4 permit a
+production product; the republication as it stands; the EU right; what can be licensed; the
+opt-out; Chainlink's terms, which render in JavaScript and were not readable from the workspace.
+And one option that changes the whole picture: §5.11 gives `robinhoodchain@robinhood.com` — a
+written permission turns most of this into a document.
+
