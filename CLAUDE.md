@@ -1036,6 +1036,21 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   public key is also printed by its own `cat` between two markers rather than expanded inside the
   heredoc - an unreadable file must be an error on screen, not a blank line in the middle of
   otherwise perfect instructions - and the file is checked non-empty before the gate.
+- 2026-09-04 — **The watcher is on a machine, and the day it went up paid for it.**
+  `exdate-watcher.service` runs on a Hetzner box (`ubuntu-4gb-fsn1-1`, Ubuntu, 78 MB RSS), preflight
+  8/8 — node, the checkout, push access proved with a dry run, the chain, a live AAPL quote, and the
+  clock **0.5 s** from the issuer's own, which is the one that decides whether it wakes at the right
+  second. Its first heartbeat is committed, so the record is its own evidence. Hours earlier,
+  **UPS** had shown exactly what a scheduler loses: announced 15:00:41 UTC, effective 15:10:26 — a
+  lead of 9 min 45 s — and GitHub's cron did not fire inside it. Its first quote landed at
+  **15:16:15, 350 s after the instant**, outside the two-minute tolerance and carrying
+  `isTradingHalt: true`, which is a last price and not a market. The step is published `givenUp`
+  with its reason rather than priced from a quote taken six minutes late; the issuer keeps no price
+  history, so that haircut cannot be recovered by anyone. A 30-second tick puts three samples inside
+  that window. Both capture until the repository variable `EXDATE_CAPTURE_MODE=watchdog` is set:
+  they share one file and each owns one field, steps merge by key, so the overlap costs work and
+  loses nothing — what it does cost is the alarm, since nothing checks the heartbeat until the
+  scheduled job is the watchdog.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -1074,10 +1089,13 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   to tokens held inside a protocol at the time of a step. Both are stated on the page. An archive
   endpoint would lift the first; the second needs each protocol's own accounting.
 
-- The capture of the issuer's quote at effect runs on GitHub's cron until a machine runs the
-  watcher: measured, that catches about 70 % of steps at a nine-minute budget (was 33 % at four).
-  `/record/` says so from `data/capture-cadence.observed.json`; nothing claims a capture that was
-  not made. `scripts/watch-effective-prices.mjs` is written, tested and waiting for a host.
+- The capture of the issuer's quote at effect now runs on a machine as well as on GitHub's cron.
+  What the cron alone loses was measured the same day: **UPS, 2026-09-04**, announced 15:00:41 and
+  effective 15:10:26, first sampled at **15:16:15 — 350 s late**, so the instant is unrecoverable
+  and the row says so. Until the repository variable `EXDATE_CAPTURE_MODE=watchdog` is set, both
+  capture; they share one file and merge by key, so nothing is lost, but a dead machine raises no
+  alarm. `/record/` states the measured cadence, the expected catch share and the watcher's
+  heartbeat; nothing claims a capture that was not made.
 
 - The off-hours share is being sampled, not yet answered: `data/session-share.observed.json` reads
   `sufficient: false` until every session has three samples, which takes about a day of the hourly

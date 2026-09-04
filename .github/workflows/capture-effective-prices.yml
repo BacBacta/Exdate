@@ -12,17 +12,21 @@
 # that announcement and comes back at the right second.
 #
 # Every five minutes on paper. Measured on its first morning, GitHub fired it every
-# 7 to 25 minutes: the cron is best-effort, and against a nine-minute lead that
-# caught about one step in four. The run now waits up to nine minutes for an
-# effectiveAt it has seen announced, inside the job's timeout, and the concurrency
-# group queues the next run behind a waiting one. That doubles the odds; it does
-# not make them good. data/capture-cadence.observed.json measures the real gap.
+# 7 to 25 minutes: the cron is best-effort, and against a nine-minute lead a run
+# waiting four minutes caught about one step in three - 33 %, computed as the sum of
+# min(gap, budget) over the sum of gap on the observed gaps. The budget is nine
+# minutes now, inside the job's timeout, with the concurrency group queueing the next
+# run behind a waiting one: about 70 %. Better, not good.
+# data/capture-cadence.observed.json measures the real gap, and UPS on 2026-09-04 is
+# what the rest costs - effective 15:10:26, first sampled 15:16:15, unrecoverable.
 #
-# The answer is scripts/watch-effective-prices.mjs on a machine that is simply
-# always there. Once it runs, set the repository variable EXDATE_CAPTURE_MODE to
-# `watchdog`: this job then checks the watcher's heartbeat instead of capturing,
-# captures in its place only while the heartbeat is stale, and says so through
-# the alert sinks on each transition.
+# The answer is scripts/watch-effective-prices.mjs on a machine that is simply always
+# there, and since 2026-09-04 one runs. Set the repository variable
+# EXDATE_CAPTURE_MODE to `watchdog` and this job stops capturing on its own: it checks
+# the watcher's heartbeat instead, captures in its place only while that heartbeat is
+# stale, and says so through the alert sinks on each transition. Until it is set both
+# capture - harmless, since they share one file and merge steps by key, but nothing
+# then notices if the machine dies.
 name: capture-effective-prices
 
 on:
