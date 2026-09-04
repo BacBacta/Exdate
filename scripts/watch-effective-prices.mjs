@@ -46,19 +46,22 @@ import { send, sinksFromEnv } from './lib/alert.mjs'
 
 const root = new URL('../', import.meta.url)
 const cwd = new URL('.', root).pathname
-const OUT = process.env.EXDATE_CAPTURE_OUT ?? DEFAULT_OUT
+const OUT = process.env.EXDATE_CAPTURE_OUT || DEFAULT_OUT
 /** Seconds between scans. Thirty is far inside the nine-minute lead and gentle on the RPC. */
-const TICK_MS = Number(process.env.EXDATE_WATCH_TICK_MS ?? 30_000)
+const TICK_MS = Number(process.env.EXDATE_WATCH_TICK_MS || 30_000)
 /** About a day at 0.1 s/block: a step missed during a long outage is still recorded, with its reason. Known steps are skipped by key. */
-const LOOKBACK_BLOCKS = Number(process.env.EXDATE_WATCH_LOOKBACK_BLOCKS ?? 900_000)
+const LOOKBACK_BLOCKS = Number(process.env.EXDATE_WATCH_LOOKBACK_BLOCKS || 900_000)
 /** A heartbeat commit this often even when nothing happened. The watchdog treats older than seven hours as dead. */
-const HEARTBEAT_MS = Number(process.env.EXDATE_WATCH_HEARTBEAT_MS ?? 6 * 3_600_000)
+const HEARTBEAT_MS = Number(process.env.EXDATE_WATCH_HEARTBEAT_MS || 6 * 3_600_000)
 const PUSH = process.env.EXDATE_WATCH_PUSH !== 'false'
 const AUTHOR = { name: 'exdate-watcher', email: 'noreply@users.noreply.github.com' }
 const METHOD =
   'A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.'
 /** Alert once per streak of failed ticks, not once per failure. */
 const FAILURES_BEFORE_ALERT = 20
+
+if (!(TICK_MS >= 5_000)) throw new Error(`EXDATE_WATCH_TICK_MS must be at least 5000 ms, got ${TICK_MS}`)
+if (!(HEARTBEAT_MS >= TICK_MS)) throw new Error(`EXDATE_WATCH_HEARTBEAT_MS must be at least one tick, got ${HEARTBEAT_MS}`)
 
 const log = (line) => console.error(`${iso(Date.now())} ${line}`)
 const sinks = sinksFromEnv()

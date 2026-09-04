@@ -19,13 +19,13 @@ import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 
 const root = new URL('../', import.meta.url)
-const REPO = process.env.GITHUB_REPOSITORY ?? 'BacBacta/Exdate'
-const WORKFLOW = process.env.EXDATE_CADENCE_WORKFLOW ?? 'capture-effective-prices.yml'
-const OUT = process.env.EXDATE_CADENCE_OUT ?? 'data/capture-cadence.observed.json'
+const REPO = process.env.GITHUB_REPOSITORY || 'BacBacta/Exdate'
+const WORKFLOW = process.env.EXDATE_CADENCE_WORKFLOW || 'capture-effective-prices.yml'
+const OUT = process.env.EXDATE_CADENCE_OUT || 'data/capture-cadence.observed.json'
 /** What the workflow file asks for; the measurement is how far reality is from it. */
 const NOMINAL_MINUTES = 5
 /** How long one run waits for an effectiveAt. Mirrors the default in capture-effective-prices.mjs. */
-const BUDGET_MINUTES = Number(process.env.EXDATE_CAPTURE_BUDGET_MS ?? 540_000) / 60_000
+const BUDGET_MINUTES = Number(process.env.EXDATE_CAPTURE_BUDGET_MS || 540_000) / 60_000
 const PAGES = 3
 
 async function fetchRuns() {

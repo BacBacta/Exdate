@@ -794,7 +794,7 @@ export const capture = (() => {
     watcher,
     /** Null until GitHub's run log holds enough scheduled runs to measure. */
     cadence:
-      cadence.intervalMinutes && cadence.expectedCatchShare
+      cadence.intervalMinutes && cadence.expectedCatchShare && cadence.budgetMinutes > 0
         ? {
             observedAt: cadence.observedAt,
             nominalMinutes: cadence.nominalMinutes,

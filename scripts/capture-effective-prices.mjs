@@ -36,7 +36,7 @@ import {
 import { send, sinksFromEnv } from './lib/alert.mjs'
 
 const root = new URL('../', import.meta.url)
-const OUT = process.env.EXDATE_CAPTURE_OUT ?? DEFAULT_OUT
+const OUT = process.env.EXDATE_CAPTURE_OUT || DEFAULT_OUT
 const MODE = process.env.EXDATE_CAPTURE_MODE || 'capture'
 /**
  * How long one run may stay alive waiting for an effectiveAt. Nine minutes: the
