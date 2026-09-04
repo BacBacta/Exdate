@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-04T18:24:26.000Z",
-  "sampleCount": 36,
-  "easternHourOfWeekSlotsCovered": 35,
+  "lastSampleAt": "2026-09-04T19:15:27.000Z",
+  "sampleCount": 37,
+  "easternHourOfWeekSlotsCovered": 36,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -24,7 +24,7 @@
   ],
   "transferShare": null,
   "provableTradeShare": null,
-  "pooledOffHoursShareOfSampledTransfers": 0.639,
+  "pooledOffHoursShareOfSampledTransfers": 0.6212,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -49,13 +49,13 @@
       "label": "regular session 09:30-16:00 ET",
       "offHours": false,
       "hoursPerWeek": 32.5,
-      "samples": 11,
-      "transfersSampled": 57567,
-      "secondsSampled": 449,
-      "transfersPerSecondMean": 128.265,
+      "samples": 12,
+      "transfersSampled": 62128,
+      "secondsSampled": 489,
+      "transfersPerSecondMean": 127.078,
       "transfersPerSecondMin": 59.683,
       "transfersPerSecondMax": 228.275,
-      "provableTradesPerSecondMean": 28.918
+      "provableTradesPerSecondMean": 29.404
     },
     {
       "session": "after_hours",
@@ -601,6 +601,20 @@
       "transactionsMovingAToken": 2018,
       "provableTrades": 1826,
       "provableTradesPerSecond": 44.537
+    },
+    {
+      "observedAt": "2026-09-04T19:15:27.000Z",
+      "session": "regular",
+      "easternHourOfWeek": 135,
+      "fromBlock": 54506098,
+      "headBlock": 54506497,
+      "windowBlocks": 400,
+      "windowSeconds": 40,
+      "transfers": 4561,
+      "transfersPerSecond": 114.025,
+      "transactionsMovingAToken": 1659,
+      "provableTrades": 1390,
+      "provableTradesPerSecond": 34.75
     }
   ]
 }
