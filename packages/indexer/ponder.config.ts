@@ -69,7 +69,19 @@ export default createConfig({
       // Verified in Phase 0: a 5 000 000-block eth_getLogs filtered on all 194
       // token addresses answers in under a second when it is not rejected.
       ethGetLogsBlockRange: Number(process.env.RHC_GET_LOGS_BLOCK_RANGE ?? 2_000_000),
-      pollingInterval: 2_000,
+      /**
+       * How often Ponder asks for a new head.
+       *
+       * Measured through a counting proxy on 2026-09-04, because the indexer is
+       * by far the largest RPC consumer here and eth_getBlockByNumber is ~90 % of
+       * its calls. The obvious saving is not there: raising this from 2 000 ms to
+       * 30 000 ms made the rate go UP, from 1.92 to 4.03 calls/s, because the
+       * chain produces ~10 blocks a second and a longer interval leaves more to
+       * reconcile on each poll. Left at 2 s, and the number kept here so the next
+       * person does not re-derive the wrong answer from first principles.
+       * Overridable if a provider's own accounting says otherwise.
+       */
+      pollingInterval: Number(process.env.RHC_POLLING_INTERVAL_MS ?? 2_000),
     },
   },
   contracts: {

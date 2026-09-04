@@ -48,7 +48,10 @@ nowhere else.
   `latest - 10 000` answers `metadata is not found` there, and that was recorded as a property of
   the chain for a month because nobody had looked at another endpoint. It is a property of that
   endpoint. The public chain registries list eight; **six answer, three serve state at any height,
-  and two reach the oldest multiplier step** — `data/rpc-endpoints.observed.json`,
+  and two reach the oldest multiplier step** — but **which** two is not stable: measured again on the
+  evening of 2026-09-04, `pocket.network` had lost archive since that morning and a newly listed
+  `rpc.ordofi.network` had it, with a 10 000-block log cap against blockmachine's 1 000. Re-probe
+  rather than trust the file's names. `data/rpc-endpoints.observed.json`,
   `node scripts/probe-rpc-endpoints.mjs`. Two independent endpoints agree at 20 M and 50 M blocks
   deep, three at 1 M, so the history is corroborated rather than taken from one witness.
   Set `RHC_RPC_URL_ARCHIVE` to use one.
@@ -1191,6 +1194,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   fixed on the way: the token list's own `logoURI` still pointed at the old Vercel alias. What only
   the owner can do is written where it belongs: the email to Robinhood (Appendix B), the
   arbitration notice by post before 2026-10-31 (Appendix C), and a keyed provider.
+- 2026-09-04 — **"Which RPC provider, free or paid" answered by measuring the load, and two of my
+  own claims died doing it.** A counting proxy in front of the endpoint, with Ponder running through
+  it: **the indexer alone is 166 000 to 348 000 requests a day, 5-10 M a month, and ~90 % of that is
+  `eth_getBlockByNumber` at the head.** The watcher is 5 760 a day and every GitHub collector
+  together 1 232 — three orders of magnitude smaller. That split is the answer: the watcher and the
+  collectors fit any free tier with room to spare, and the indexer does not fit most of them.
+  First claim to die: I reasoned that Ponder polling the head every 2 s was waste, since the poller
+  fires every 600 blocks and the nine-minute lead is caught by the watcher's own 30 s scan. Raising
+  `pollingInterval` to 30 s **made the rate worse** — 4.03 calls/s against 1.92 — because the chain
+  produces ten blocks a second and a longer interval leaves more to reconcile on each poll. Reverted,
+  with the measurement written into the config so the next person does not re-derive the wrong answer
+  from first principles.
+  Second: `pocket.network`, which I made the default first endpoint that same afternoon **because it
+  served state at any height and reached the oldest step**, had stopped doing both by the evening —
+  re-probed, same script. Nothing broke, since the failover falls through to Robinhood's and the
+  archive path is a separate variable, but the comment asserting that property was false within
+  hours of being written. It now says what pocket is actually kept for — the 2 000 000-block
+  `eth_getLogs` the watcher's 900 000-block scan needs, which no other third party offers
+  (blockmachine caps at 1 000, ordofi at 10 000) — and says the degradation as the reason a machine
+  that matters should point `RHC_RPC_URLS` at a keyed provider. A ninth endpoint appeared in the
+  registries the same day. The set is not stable; the probe is, so re-run it rather than trusting
+  a name.
 - _(append decisions here as they are made)_
 
 ## Status

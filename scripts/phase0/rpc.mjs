@@ -19,9 +19,17 @@
 //   RHC_RPC_URL=https://a              one endpoint, no failover (kept for compatibility)
 
 const DEFAULT_RPC_URLS = [
-  // Measured in data/rpc-endpoints.observed.json: serves state at any height,
-  // reaches the oldest multiplier step, and takes a 2,000,000-block eth_getLogs -
-  // the same span Robinhood's does. Refuses browsers, which does not matter here.
+  // Chosen for ONE property, the only one these scripts need: a 2,000,000-block
+  // eth_getLogs, the same span Robinhood's takes. The watcher scans 900,000
+  // blocks a tick, and no other third-party endpoint comes close - blockmachine
+  // caps at 1,000 and ordofi at 10,000 (data/rpc-endpoints.observed.json).
+  //
+  // It is NOT the archive endpoint. It served state at any height on the morning
+  // of 2026-09-04 and had stopped by that evening, measured, within hours of
+  // being made the default here - which is what "third parties with no service
+  // commitment" means in practice, and the reason RHC_RPC_URLS should point at a
+  // keyed provider on any machine that matters. State reads go through
+  // RHC_RPC_URL_ARCHIVE, which is a different endpoint for a different reason.
   'https://robinhood.api.pocket.network',
   // The operator's own endpoint, fallback only.
   'https://rpc.mainnet.chain.robinhood.com',
