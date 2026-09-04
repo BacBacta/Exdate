@@ -785,6 +785,17 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   fails at the floor is listed and the window is marked `incomplete`, because a missing range is
   not a zero. A run that would have to cover more than three days reads the most recent three and
   records `precededByGap` rather than implying the ledger is continuous.
+- 2026-09-04 — **The nine-minute lead is delivered to someone, without a host.** The signed webhook
+  outbox has existed since M4 and has never delivered anything, because the indexer is not hosted.
+  The lead is the most perishable thing exdate measures and the least useful sitting in a table.
+  `scripts/notify.mjs` rides the capture run that is already watching every five minutes and posts
+  to a Discord or Slack webhook, or Telegram, from repository secrets - no server, no deployment.
+  Two notices: the announcement, and the moment it takes effect, which is the one **no log
+  watcher can produce** because nothing is emitted on chain then. An announcement first seen more
+  than an hour late is **refused with its reason** rather than sent: delivering it would report a
+  lead rather than give one, which is the same distinction as a price fetched days after the
+  instant it claims to price. Delivery is recorded in the capture file, so the committed history is
+  the evidence that the lead was given. With no sink configured it does nothing and says so.
 - _(append decisions here as they are made)_
 
 ## Status

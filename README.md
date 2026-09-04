@@ -65,6 +65,20 @@ it does not run is a day of dividend history that becomes unrecoverable. `measur
 runs hourly and appends one sampled window to `data/session-share.observed.json`; it takes a week to
 cover the clock, which is why it is a schedule and not a script anyone runs once.
 
+### Alerts
+
+The most perishable thing exdate measures is the announcement lead: a multiplier change is
+published on chain about nine minutes before it takes effect. `scripts/notify.mjs` sends that
+notice, and the one at the moment it takes effect - which no chain event marks, so a log watcher
+cannot produce it. It runs inside the capture workflow every five minutes and needs no host at
+all: set `EXDATE_ALERT_WEBHOOK_URL` (a Discord or Slack incoming webhook) or
+`EXDATE_TELEGRAM_BOT_TOKEN` with `EXDATE_TELEGRAM_CHAT_ID` as repository secrets. With none set it
+does nothing and says so. An announcement seen more than an hour late is refused rather than sent,
+because delivering it would report a lead rather than give one; delivery is recorded in
+`data/effective-prices.observed.json`, which makes it the evidence that the lead was given.
+
+The indexer's signed webhook outbox is the other half of this and still needs a host - see below.
+
 ### Hosting the API
 
 There is no public instance yet: the site is static and Vercel cannot run the indexer. To host
