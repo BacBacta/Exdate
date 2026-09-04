@@ -9,7 +9,7 @@
   "builtFrom": {
     "corporateActions": "data/robinhood-corporate-actions.snapshot.json",
     "multiplierEvents": "data/multiplier-events.observed.json",
-    "prices": "Chainlink getRoundData at effectiveAt"
+    "prices": "the issuer's own quote captured at effectiveAt where one exists (all 194 tokens, seconds old), else the Chainlink round in force (35 tokens, and it can be hours stale)"
   },
   "summary": {
     "total": 49,
@@ -184,14 +184,15 @@
       "observedStepWad": "101323251417769",
       "impliedReinvestPrice": "17933.5540",
       "issuerSpotToday": {
-        "bid": "1674.5",
-        "ask": "1681",
-        "mid": "1677.7500",
-        "generatedAt": "2026-09-02T20:35:37.049140193Z",
+        "bid": "1660.18",
+        "ask": "1663.01",
+        "mid": "1661.5950",
+        "generatedAt": "2026-09-04T06:16:34.256018438Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 10.689
+        "impliedOverSpot": 10.793
       },
       "price": {
+        "source": "chainlink:getRoundData",
         "value": "1726.3000",
         "underlying": "1726.3000",
         "multiplierInForce": "1000000000000000000",
@@ -250,14 +251,15 @@
       "observedStepWad": "2022063289954840",
       "impliedReinvestPrice": "151.7321",
       "issuerSpotToday": {
-        "bid": "100.4",
-        "ask": "100.41",
-        "mid": "100.4050",
-        "generatedAt": "2026-09-02T20:35:38.106760130Z",
+        "bid": "100.45",
+        "ask": "100.46",
+        "mid": "100.4550",
+        "generatedAt": "2026-09-04T06:16:22.485841137Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 1.511
+        "impliedOverSpot": 1.51
       },
       "price": {
+        "source": "chainlink:getRoundData",
         "value": "100.5712",
         "underlying": "100.4750",
         "multiplierInForce": "1000957519890990718",
@@ -327,15 +329,15 @@
       "observedStepWad": "612040296259656",
       "impliedReinvestPrice": "2401.8026",
       "issuerSpotToday": {
-        "bid": "924.24",
-        "ask": "925.3",
-        "mid": "924.7700",
-        "generatedAt": "2026-09-02T20:35:46.299326585Z",
+        "bid": "925.51",
+        "ask": "925.94",
+        "mid": "925.7250",
+        "generatedAt": "2026-09-04T06:16:38.318022115Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 2.597
+        "impliedOverSpot": 2.595
       },
       "status": "anomaly",
-      "note": "no Chainlink feed for this token, so there is no reference price to reconcile against"
+      "note": "no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against"
     },
     {
       "actionId": "0x00000000000000000000000000000000c2425be3658540dd8e2424cbf3c5c649",
@@ -365,14 +367,15 @@
       "observedStepWad": "566080061092436",
       "impliedReinvestPrice": "476.9643",
       "issuerSpotToday": {
-        "bid": "325",
-        "ask": "325.04",
-        "mid": "325.0200",
-        "generatedAt": "2026-09-02T20:35:28.207769311Z",
+        "bid": "327.5",
+        "ask": "327.65",
+        "mid": "327.5750",
+        "generatedAt": "2026-09-04T06:16:27.939335378Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 1.467
+        "impliedOverSpot": 1.456
       },
       "price": {
+        "source": "chainlink:getRoundData",
         "value": "305.1711",
         "underlying": "305.1711",
         "multiplierInForce": "1000000000000000000",
@@ -474,15 +477,15 @@
       "observedStepWad": "21486444855206408",
       "impliedReinvestPrice": "6.9811",
       "issuerSpotToday": {
-        "bid": "23.75",
-        "ask": "23.8",
-        "mid": "23.7750",
-        "generatedAt": "2026-09-02T20:35:38.194240704Z",
+        "bid": "23.79",
+        "ask": "23.5",
+        "mid": "23.6450",
+        "generatedAt": "2026-09-04T06:16:21.876955263Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 0.294
+        "impliedOverSpot": 0.295
       },
       "status": "anomaly",
-      "note": "no Chainlink feed for this token, so there is no reference price to reconcile against"
+      "note": "no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against"
     },
     {
       "actionId": "0x00000000000000000000000000000000952cedaaab6e4593b884e68a4efbf481",
@@ -508,15 +511,15 @@
       "observedStepWad": "145502866134027",
       "impliedReinvestPrice": "1030.9075",
       "issuerSpotToday": {
-        "bid": "14.12",
-        "ask": "14.14",
-        "mid": "14.1300",
-        "generatedAt": "2026-09-02T20:35:37.814739351Z",
+        "bid": "14.37",
+        "ask": "14.4",
+        "mid": "14.3850",
+        "generatedAt": "2026-09-04T06:16:17.345784950Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 72.959
+        "impliedOverSpot": 71.665
       },
       "status": "anomaly",
-      "note": "no Chainlink feed for this token, so there is no reference price to reconcile against"
+      "note": "no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against"
     },
     {
       "actionId": "0x00000000000000000000000000000000fb93cee635bd469e8dc9849f12f889aa",

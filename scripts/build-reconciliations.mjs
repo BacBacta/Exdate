@@ -74,6 +74,39 @@ const corporateActions = (await read('data/robinhood-corporate-actions.snapshot.
 const scan = await read('data/multiplier-events.observed.json')
 const feedMap = await read('data/token-feed-map.json')
 
+/**
+ * The issuer's quote captured at the instant of each step, when there is one.
+ * Absent on a fresh checkout and on every step that predates the capture, which is
+ * why the Chainlink path below stays: this is a better price where it exists, not a
+ * replacement for the only price that could be read back after the fact.
+ */
+const captured = await read('data/effective-prices.observed.json').catch(() => ({ steps: [] }))
+const QUOTE_TOLERANCE_SECONDS = 120
+const capturedKey = (token, effectiveAt) => `${token.toLowerCase()}:${Math.floor(Date.parse(effectiveAt) / 1000)}`
+const capturedByStep = new Map((captured.steps ?? []).map((step) => [capturedKey(step.token, step.effectiveAt), step]))
+
+/**
+ * The quote nearest `effectiveAt` inside the tolerance, or null. Ties go to the
+ * earlier quote: the price before a step is the one the step was computed against.
+ * Mirrors selectQuoteAt/issuerPriceAt in packages/core/src/quotes.ts, which is
+ * where the reasoning lives and where it is unit-tested.
+ */
+function issuerQuoteAt(token, effectiveAt) {
+  const step = capturedByStep.get(capturedKey(token, effectiveAt))
+  if (!step?.quotes?.length) return null
+  let best = null
+  for (const quote of step.quotes) {
+    const signed = Math.round((Date.parse(quote.generatedAt) - Date.parse(effectiveAt)) / 1000)
+    const off = Math.abs(signed)
+    if (off > QUOTE_TOLERANCE_SECONDS) continue
+    if (!best || off < best.offBySeconds || (off === best.offBySeconds && signed < best.distanceSeconds)) {
+      best = { ...quote, distanceSeconds: signed, offBySeconds: off }
+    }
+  }
+  // A quote published while trading is halted is a last price, not a market.
+  return best && best.isTradingHalt !== true ? best : null
+}
+
 const feedForToken = new Map(feedMap.pairs.map((pair) => [pair.token.toLowerCase(), pair]))
 
 const parseDecimal = (value, decimals) => {
@@ -282,9 +315,47 @@ for (const row of rows) {
     }
   }
 
+  // --- the issuer's own quote, captured at the instant of the step -----------
+  // Preferred over a Chainlink round for two reasons that both matter: it exists
+  // for all 194 tokens rather than 35, and it is seconds old rather than a round
+  // that can be hours stale. It is already the underlying price - verified in
+  // data/issuer-quote-basis.json - so no multiplier is unwound from it.
+  const quote = issuerQuoteAt(row.token, row.change.effectiveAt)
+  if (quote) {
+    const priceWad = parseDecimal(quote.mid, 18)
+    const expectedStepWad = (rateWad * WAD) / priceWad
+    const receivedWad = (priceWad * observedStepWad) / WAD
+    const haircutBps = Number(((rateWad - receivedWad) * 10_000n) / rateWad)
+    const haircutBpsPrecise = Number(((rateWad - receivedWad) * 1_000_000n) / rateWad) / 100
+    row.price = {
+      source: 'robinhood:/rhj/prices',
+      underlying: quote.mid,
+      bid: quote.bid,
+      ask: quote.ask,
+      generatedAt: quote.generatedAt,
+      /** Signed seconds from effectiveAt; negative is before. */
+      offBySecondsAtEffectiveAt: quote.distanceSeconds,
+      isTradingHalt: quote.isTradingHalt ?? null,
+    }
+    row.expectedStepWad = expectedStepWad.toString()
+    row.receivedPerShare = (Number(receivedWad) / 1e18).toFixed(6)
+    row.impliedHaircutBps = haircutBps
+    row.status = haircutBpsPrecise >= -100 && haircutBpsPrecise <= 5_000 ? 'matched' : 'anomaly'
+    row.note =
+      row.status === 'matched'
+        ? undefined
+        : `implied haircut ${(haircutBpsPrecise / 100).toFixed(1)} % falls outside the plausible band; the reinvestment model does not describe this event`
+    console.error(
+      `#   ${row.symbol.padEnd(5)} ${row.status.padEnd(8)} gross=${row.rate} quote=${quote.mid} (${quote.distanceSeconds}s) ` +
+        `observed=${(Number(observedStepWad) / 1e14).toFixed(2)}bps haircut=${(haircutBps / 100).toFixed(1)}%`,
+    )
+    continue
+  }
+
   if (!feed) {
     row.status = 'anomaly'
-    row.note = 'no Chainlink feed for this token, so there is no reference price to reconcile against'
+    row.note =
+      'no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against'
     continue
   }
 
@@ -312,6 +383,7 @@ for (const row of rows) {
   const haircutBpsPrecise = Number(((rateWad - receivedWad) * 1_000_000n) / rateWad) / 100
 
   row.price = {
+    source: 'chainlink:getRoundData',
     /** The Chainlink answer as published: the token price, multiplier included. */
     value: (Number(tokenPriceWad) / 1e18).toFixed(4),
     /** The equity price it implies at oldMultiplier; the reconciliation input. */
@@ -349,7 +421,7 @@ await writeFile(new URL('data/reconciliations.observed.json', root), JSON.string
   builtFrom: {
     corporateActions: 'data/robinhood-corporate-actions.snapshot.json',
     multiplierEvents: 'data/multiplier-events.observed.json',
-    prices: 'Chainlink getRoundData at effectiveAt',
+    prices: "the issuer's own quote captured at effectiveAt where one exists (all 194 tokens, seconds old), else the Chainlink round in force (35 tokens, and it can be hours stale)",
   },
   summary: {
     total: rows.length,

@@ -204,8 +204,22 @@ export interface ReconcileInput {
    * The Chainlink answer in force at the moment the multiplier took effect, WAD.
    * This is the TOKEN price - total return, multiplier included. The underlying
    * price is derived inside by dividing by `oldMultiplier`; do not pre-divide.
+   *
+   * Ignored when {@link underlyingPriceWad} is given.
    */
   priceWad: bigint | undefined
+  /**
+   * The underlying equity price at that moment, WAD, from a source that already
+   * publishes it as such - the issuer's own `/rhj/prices` quote, captured at the
+   * instant of the step (see `quotes.ts`). Used as it is: no multiplier is
+   * unwound from it, because none was applied to it.
+   *
+   * This is what lets a dividend be reconciled on any of the 194 tokens rather
+   * than the 35 with a Chainlink feed, and against a price seconds old rather
+   * than a round that can be hours stale. When both are supplied this one wins,
+   * and `priceSource` on the result says which was used.
+   */
+  underlyingPriceWad?: bigint | undefined
   /**
    * True when the round found is the earliest of the aggregator's current phase,
    * so the true price at that instant may predate a rollover and be unreachable.
@@ -240,10 +254,14 @@ export interface ReconcileInput {
   plausibleHaircutBps?: readonly [number, number]
 }
 
+export type PriceSource = 'chainlink:round' | 'issuer:quote'
+
 export interface Reconciliation {
   status: ReconciliationStatus
   confidence: Confidence
-  /** The equity price the token price implies at `oldMultiplier`, WAD. */
+  /** Which of the two inputs the equity price came from; undefined when the row has no price. */
+  priceSource?: PriceSource
+  /** The equity price used, WAD: derived from the token price, or taken from the issuer quote as it is. */
   underlyingPriceWad: bigint | undefined
   expectedStepWad: bigint | undefined
   observedStepWad: bigint | undefined
@@ -265,6 +283,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
   const {
     rateWad,
     priceWad,
+    underlyingPriceWad: issuerUnderlyingWad,
     priceAtPhaseFloor = false,
     oldMultiplier,
     newMultiplier,
@@ -345,18 +364,29 @@ export function reconcile(input: ReconcileInput): Reconciliation {
   // it to spot is how CCL and COST were caught in Phase 0.
   const impliedReinvest = (rateWad * WAD) / observed
 
-  if (priceWad === undefined || priceWad <= 0n) {
+  /**
+   * The issuer's quote wins when it is there: it is the underlying price already,
+   * measured seconds from the step, on any token. A Chainlink round is the
+   * fallback, and carries the multiplier that has to be unwound.
+   */
+  const useIssuerQuote = issuerUnderlyingWad !== undefined && issuerUnderlyingWad > 0n
+  const priceSource: PriceSource = useIssuerQuote ? 'issuer:quote' : 'chainlink:round'
+
+  if (!useIssuerQuote && (priceWad === undefined || priceWad <= 0n)) {
     return {
       status: 'anomaly',
       confidence: 'low',
       ...empty,
       observedStepWad: observed,
       impliedReinvestPriceWad: impliedReinvest,
-      note: 'no reference price at effectiveAt - most Stock Tokens have no Chainlink feed',
+      note: 'no reference price at effectiveAt - no Chainlink feed for this token, and no issuer quote captured at the instant of the step',
     }
   }
 
-  if (priceAtPhaseFloor) {
+  // A phase floor only afflicts a Chainlink round: it means the round found is the
+  // oldest the current aggregator holds, so the true price may predate a rollover.
+  // An issuer quote carries its own timestamp and has no such failure mode.
+  if (!useIssuerQuote && priceAtPhaseFloor) {
     return {
       status: 'anomaly',
       confidence: 'low',
@@ -367,7 +397,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     }
   }
 
-  const underlying = underlyingPriceWad(priceWad, oldMultiplier)
+  const underlying = useIssuerQuote ? issuerUnderlyingWad! : underlyingPriceWad(priceWad!, oldMultiplier)
   const expected = expectedStepWad(rateWad, underlying)
   const received = receivedPerShareWad(underlying, observed)
   const bps = haircutBps(rateWad, received)
@@ -378,6 +408,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
   return {
     status: plausible ? 'matched' : 'anomaly',
     confidence,
+    priceSource,
     underlyingPriceWad: underlying,
     expectedStepWad: expected,
     observedStepWad: observed,

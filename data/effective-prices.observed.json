@@ -1,0 +1,49 @@
+{
+  "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
+  "method": "A run scans for UIMultiplierUpdated, which fires about nine minutes before the change, and returns to sample the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. Work beyond a run's budget is handed to the next run through this file.",
+  "lastRunAt": "2026-09-04T06:11:39.659Z",
+  "toleranceSeconds": 120,
+  "summary": {
+    "steps": 3,
+    "withQuoteAtEffect": 0,
+    "givenUp": 3
+  },
+  "steps": [
+    {
+      "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
+      "symbol": "CCL",
+      "effectiveAt": "2026-08-31T15:10:26.000Z",
+      "announcedAt": "2026-08-31T15:01:22.000Z",
+      "announcedTx": "0x391030f47dae3d1ac98f9f4384c31186fad48fae6d62d1b3fae5e1449e2fdd02",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1021486444855206408",
+      "quotes": [],
+      "givenUp": true,
+      "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-09-01T00:00:26.000Z",
+      "announcedAt": "2026-08-31T23:50:51.000Z",
+      "announcedTx": "0xf33317c324c4d1d53278dd5c0fcb6ca3afeea41ccf39441ecada548148f5f4e7",
+      "oldMultiplier": "1002981519346766532",
+      "newMultiplier": "1005101770003214918",
+      "quotes": [],
+      "givenUp": true,
+      "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
+    },
+    {
+      "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+      "symbol": "F",
+      "effectiveAt": "2026-09-02T15:10:26.000Z",
+      "announcedAt": "2026-09-02T15:00:41.000Z",
+      "announcedTx": "0x17717969d77a298b876c0c3c735b6367ee1f75e1906f67953a6a30dc35cc442e",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000145502866134027",
+      "quotes": [],
+      "givenUp": true,
+      "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
+    }
+  ]
+}

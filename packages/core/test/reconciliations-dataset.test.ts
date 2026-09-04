@@ -25,7 +25,13 @@ const dataset = JSON.parse(
     impliedHaircutBps?: number
     impliedReinvestPrice?: string | null
     observedStepWad?: string
-    price?: { value: string }
+    price?: {
+      source?: string
+      /** Chainlink only: the token price as published. */
+      value?: string
+      /** Both sources: the equity price the reconciliation actually used. */
+      underlying?: string
+    }
     issuerSpotToday?: { mid: string; impliedOverSpot: number }
     change: { oldMultiplier: string; newMultiplier: string } | null
   }[]
@@ -50,15 +56,22 @@ describe('the committed reconciliation dataset', () => {
   it('agrees with the library on every priceable row', () => {
     expect(priceable.length).toBeGreaterThan(0)
     for (const row of priceable) {
+      // Two price sources reach the same function by different doors: a Chainlink
+      // round is the token price and has its multiplier unwound inside, while the
+      // issuer's quote is already the underlying and is used as it is. A row says
+      // which it used, and the library must agree either way.
+      const fromIssuer = row.price!.source === 'robinhood:/rhj/prices'
       const result = reconcile({
         rateWad: parseDecimal(row.rate as string, 18),
         // The builder stores the price already scaled to the feed's own decimals
         // as a plain decimal string; parse it back the same way the API will.
-        priceWad: parseDecimal(row.price!.value, 18),
+        priceWad: fromIssuer ? undefined : parseDecimal(row.price!.value as string, 18),
+        underlyingPriceWad: fromIssuer ? parseDecimal(row.price!.underlying as string, 18) : undefined,
         oldMultiplier: BigInt(row.change!.oldMultiplier),
         newMultiplier: BigInt(row.change!.newMultiplier),
         observedEventCount: 1,
       })
+      expect(result.priceSource, `${row.symbol} price source`).toBe(fromIssuer ? 'issuer:quote' : 'chainlink:round')
       expect(result.status, `${row.symbol} status`).toBe(row.status)
       expect(result.impliedHaircutBps, `${row.symbol} haircut`).toBe(row.impliedHaircutBps)
       expect(result.observedStepWad!.toString(), `${row.symbol} step`).toBe(row.observedStepWad)

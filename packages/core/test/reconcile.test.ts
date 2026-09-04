@@ -348,3 +348,64 @@ describe('splits reconcile as a ratio, with no price in them', () => {
     ).toBe('anomaly')
   })
 })
+
+/**
+ * The issuer's own quote as the price, which is what lets a dividend be reconciled
+ * on any of the 194 tokens rather than the 35 with a Chainlink feed. SGOV's
+ * 2026-08-07 step is the reference: declared 0.306812, multiplier 1.000957519890990718
+ * to 1.002981519346766532, and the Chainlink round in force was 15 hours stale.
+ */
+describe('reconcile with the issuer quote', () => {
+  const SGOV = {
+    rateWad: 306_812_000_000_000_000n,
+    oldMultiplier: 1_000_957_519_890_990_718n,
+    newMultiplier: 1_002_981_519_346_766_532n,
+    observedEventCount: 3,
+    feedCorroborated: true,
+  }
+  // The Chainlink token price that produced the published 33.78 % haircut.
+  const CHAINLINK_TOKEN_PRICE = 100_571_206_810_000_000_000n
+
+  it('uses the quote as the underlying price, unwinding no multiplier from it', () => {
+    // The equity price the Chainlink path derives, handed in directly as a quote.
+    const underlying = (CHAINLINK_TOKEN_PRICE * 10n ** 18n) / SGOV.oldMultiplier
+    const viaFeed = reconcile({ ...SGOV, priceWad: CHAINLINK_TOKEN_PRICE })
+    const viaQuote = reconcile({ ...SGOV, priceWad: undefined, underlyingPriceWad: underlying })
+    expect(viaQuote.status).toBe('matched')
+    expect(viaQuote.underlyingPriceWad).toBe(underlying)
+    expect(viaQuote.impliedHaircutBps).toBe(viaFeed.impliedHaircutBps)
+    expect(viaQuote.priceSource).toBe('issuer:quote')
+    expect(viaFeed.priceSource).toBe('chainlink:round')
+  })
+
+  it('prices a token with no feed at all, which the Chainlink path cannot', () => {
+    const withoutPrice = reconcile({ ...SGOV, priceWad: undefined })
+    expect(withoutPrice.status).toBe('anomaly')
+    expect(withoutPrice.impliedHaircutBps).toBeUndefined()
+    const withQuote = reconcile({ ...SGOV, priceWad: undefined, underlyingPriceWad: 100_475_000_000_000_000_000n })
+    expect(withQuote.status).toBe('matched')
+    expect(withQuote.impliedHaircutBps).toBeGreaterThan(3000)
+    expect(withQuote.impliedHaircutBps).toBeLessThan(3600)
+  })
+
+  it('is immune to the phase floor, which is a property of a Chainlink round and not of a quote', () => {
+    const feed = reconcile({ ...SGOV, priceWad: CHAINLINK_TOKEN_PRICE, priceAtPhaseFloor: true })
+    expect(feed.status).toBe('anomaly')
+    const quote = reconcile({ ...SGOV, priceWad: undefined, underlyingPriceWad: 100_475_000_000_000_000_000n, priceAtPhaseFloor: true })
+    expect(quote.status).toBe('matched')
+  })
+
+  it('prefers the quote when both are supplied, and says so', () => {
+    const both = reconcile({ ...SGOV, priceWad: CHAINLINK_TOKEN_PRICE, underlyingPriceWad: 200_000_000_000_000_000_000n })
+    expect(both.underlyingPriceWad).toBe(200_000_000_000_000_000_000n)
+    expect(both.priceSource).toBe('issuer:quote')
+  })
+
+  it('falls back to the feed on a quote that is not a usable price', () => {
+    for (const bad of [0n, undefined]) {
+      const result = reconcile({ ...SGOV, priceWad: CHAINLINK_TOKEN_PRICE, underlyingPriceWad: bad })
+      expect(result.priceSource).toBe('chainlink:round')
+      expect(result.status).toBe('matched')
+    }
+  })
+})

@@ -1,0 +1,68 @@
+# Be there when a multiplier changes.
+#
+# The reconciliation needs the underlying price at the instant a step takes effect.
+# Chainlink can answer that after the fact, but only for 35 of 194 tokens and only
+# from a round that can be hours old. The issuer quotes all 194 and refreshes every
+# 15 s - and serves nothing but the present. That price exists for about fifteen
+# seconds and is then gone for good, like the five July corporate actions that fell
+# out of the issuer's one-month window.
+#
+# What makes catching it possible is exdate's own measurement: UIMultiplierUpdated
+# fires about nine minutes BEFORE the change, carrying effectiveAt. A run scans for
+# that announcement and comes back at the right second.
+#
+# Every five minutes on purpose. A run is a couple of RPC calls and a handful of
+# quotes; the schedule is what guarantees an announcement is seen inside its lead.
+# A run only ever waits out its own budget and hands the rest to the next one
+# through the committed file, so nothing depends on one process staying alive or on
+# GitHub firing on time.
+name: capture-effective-prices
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Runs must not overlap: they share one committed file. Queueing a late run behind
+# a waiting one is right, since the waiting one is the one holding the deadline.
+concurrency:
+  group: capture-effective-prices
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Writes nothing when there is no announcement to act on, which is most runs.
+      - name: Watch for an announcement and capture at effect
+        run: node scripts/capture-effective-prices.mjs
+
+      - name: Commit only if something was actually captured
+        run: |
+          if git diff --quiet -- data/effective-prices.observed.json; then
+            echo "nothing captured"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/effective-prices.observed.json');process.stdout.write(d.summary.steps+' steps, '+d.summary.withQuoteAtEffect+' priced at effect, '+d.summary.givenUp+' unrecoverable')")
+          git config user.name 'exdate-capture'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/effective-prices.observed.json
+          git commit -m "Capture issuer quotes at effect: $summary"
+
+          # Other scheduled jobs push to this branch too.
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

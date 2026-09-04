@@ -27,6 +27,20 @@ interface ReconciliationRow {
   rate: string | null
   status: string
   actionStatus?: string | null
+  price?: {
+    /** Which source the equity price came from. */
+    source?: string
+    /** Chainlink only: the token price as published, multiplier included. */
+    value?: string
+    /** Both sources: the equity price the reconciliation used. */
+    underlying?: string
+    /** Chainlink only: how old the round was at the instant of the step. */
+    stalenessSecondsAtEffectiveAt?: number
+    /** Issuer quote only: signed seconds from effectiveAt, negative before. */
+    offBySecondsAtEffectiveAt?: number
+    /** Chainlink only: when the round was published. */
+    updatedAt?: string
+  } | null
   change: {
     effectiveAt: string
     stepBps: number
@@ -34,7 +48,6 @@ interface ReconciliationRow {
     newMultiplier: string
     lagDays?: number | null
   } | null
-  price: { value: string; updatedAt: string; stalenessSecondsAtEffectiveAt?: number | null } | null
   expectedStepWad?: string | null
   note?: string | null
   receivedPerShare: string | null
@@ -176,7 +189,7 @@ const reconciled = reconciliations.rows
     declared: money(row.rate, 6),
     stepBps: row.change?.stepBps ?? null,
     effectiveAt: row.change?.effectiveAt ?? null,
-    priceAtEffect: row.price ? money(row.price.value, 2) : null,
+    priceAtEffect: row.price ? money(row.price.underlying ?? row.price.value, 2) : null,
     received: money(row.receivedPerShare, 4),
     haircutBps: row.impliedHaircutBps ?? null,
     impliedReinvestPrice: money(row.impliedReinvestPrice, 2),
@@ -307,9 +320,21 @@ export function tokenPage(address: string) {
         issuerCompleted: row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED',
         /** How the row was measured, for a reader who opens it. Every field is from the same record. */
         detail: {
-          priceAtEffect: row.price ? fixed(row.price.value, 2) : null,
+          priceAtEffect: row.price ? fixed(row.price.underlying ?? row.price.value, 2) : null,
+          /**
+           * How far the price was from the instant it prices. A Chainlink round
+           * reports its staleness in seconds and can be hours old; a quote captured
+           * at the step reports a signed distance and is seconds old. Both reduce
+           * to "how many minutes off", which is what a reader needs to judge it.
+           */
           priceAgeAtEffectMinutes:
-            row.price?.stalenessSecondsAtEffectiveAt != null ? Math.round(row.price.stalenessSecondsAtEffectiveAt / 60) : null,
+            row.price?.stalenessSecondsAtEffectiveAt != null
+              ? Math.round(row.price.stalenessSecondsAtEffectiveAt / 60)
+              : row.price?.offBySecondsAtEffectiveAt != null
+                ? Math.round(Math.abs(row.price.offBySecondsAtEffectiveAt) / 60)
+                : null,
+          /** Named so a reader can tell a price measured at the step from a round that predates it. */
+          priceSource: row.price?.source === 'robinhood:/rhj/prices' ? 'issuer' : row.price ? 'feed' : null,
           /** What a full payment would have moved the multiplier by, as a percentage. */
           expectedStepPct: row.expectedStepWad ? Number(BigInt(row.expectedStepWad)) / 1e16 : null,
           observedStepPct: row.change ? row.change.stepBps / 100 : null,

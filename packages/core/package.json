@@ -18,7 +18,8 @@
     "./yield": "./src/yield.ts",
     "./pending": "./src/pending.ts",
     "./holdings": "./src/holdings.ts",
-    "./chains": "./src/chains.ts"
+    "./chains": "./src/chains.ts",
+    "./quotes": "./src/quotes.ts"
   },
   "files": [
     "dist",
@@ -52,6 +53,10 @@
       "./chains": {
         "types": "./dist/chains.d.ts",
         "default": "./dist/chains.js"
+      },
+      "./quotes": {
+        "types": "./dist/quotes.d.ts",
+        "default": "./dist/quotes.js"
       }
     }
   },

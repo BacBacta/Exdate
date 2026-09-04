@@ -137,6 +137,15 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   business day at ~15:10 UTC**. Match on address + 0–4 day window.
 - Rate limiting is real despite the documented 60 req/s: `/prices` returns the plain-text body
   `local_rate_limited` with HTTP 200. Parse defensively, poll slowly.
+- **`/prices` publishes the UNDERLYING equity price, and that is measured, not assumed.**
+  `scripts/phase0/check-quote-basis.mjs` decides it against the 35 feeds: Chainlink publishes
+  `P_token = P_equity x multiplier`, so only a token whose multiplier is far from 1.0 can separate
+  the hypotheses, and only if its own price noise is smaller than that distance. **SGOV alone
+  qualifies today** (multiplier 51 bps, treasury ETF): quote x multiplier lands **1.0 bps** from the
+  feed, the bare quote **51.7 bps**. Every other mapped token has a multiplier under 23 bps and is
+  inconclusive by construction. `data/issuer-quote-basis.json`.
+- **The quote cannot be read back.** `/prices` serves the present only, so a price at a past instant
+  is gone for good - the same one-way loss as the corporate-action window.
 - Historical feed prices do **not** need an archive node: `getRoundData(roundId)` reads round
   history from current storage. `node scripts/phase0/feed-price-at.mjs <feed> <iso>`.
 
@@ -152,7 +161,9 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
 - Chainlink states the methodology as `Token Price = Underlying Equity Market Price × Multiplier`.
   That is the direct confirmation of rule 5.
 - Off-hours the feed holds the last price with no heartbeat. Always read `updatedAt` and enforce a
-  staleness bound. Also check the token's `oraclePaused()` — when true the feed stops publishing.
+  staleness bound. Measured again 2026-09-04 at 06:15 UTC (pre-market): **median feed age 59
+  minutes, 1 of 35 fresher than five minutes**, while the issuer's own quotes were live throughout.
+  A price read from a feed off-hours dates from the last session; a quote does not. Also check the token's `oraclePaused()` — when true the feed stops publishing.
   Observed on 2026-09-02 during a live session: SPY 18 h stale, QQQ 4 h stale, USDG 21 h stale.
 - **Every feed is published through two proxies.** The directory gives `proxyAddress` and
   `secondaryProxyAddress` (SVR, Smart Value Recapture); exdate reads the primary. Measured on all
@@ -735,6 +746,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   credentials), so `NEXT_PUBLIC_EXDATE_REPO_URL=https://github.com/BacBacta/Exdate` is set on the
   Vercel project and the Source / GitHub links render again, next to the docs the site serves
   itself. The default branch is still `claude/lance-en5q6j`; `blob/HEAD/…` links follow it.
+- 2026-09-04 — **The haircut is priced from the issuer's own quote, captured at the instant of the
+  step.** The differentiating asset rested on two reconciled events, and could never rest on many
+  more: it prices a dividend from the Chainlink round in force at `effectiveAt`, which exists for
+  35 of 194 tokens and can be hours old — SGOV's was 15 hours stale, and measured at 06:15 UTC the
+  median feed age was 59 minutes. Counted against what is coming: of the **37 dividends declared and
+  not yet on chain, 33 are on tokens with no feed at all**, so 89 % of the arriving flow was
+  unmeasurable by construction. `/rhj/prices` covers all 194, refreshes every 15 s — and serves only
+  the present, so the price at a past instant is unrecoverable, like the five lost July actions.
+  What makes catching it possible is exdate's own finding: `UIMultiplierUpdated` fires **about nine
+  minutes before** the change, carrying `effectiveAt`. `scripts/capture-effective-prices.mjs` scans
+  for that announcement every five minutes (`.github/workflows/capture-effective-prices.yml`) and
+  returns to sample the quote at `effectiveAt` −30 s, 0 s and +30 s; a run only waits out its own
+  budget and hands the rest to the next through `data/effective-prices.observed.json`, so nothing
+  depends on one process staying alive or on GitHub firing on time. Verified end to end against a
+  synthetic step 45 s out: three quotes, closest **11 seconds** from the instant. The three
+  historical steps in range are recorded with **zero quotes and a stated reason** rather than a
+  price fetched days late. Which price a row used is now first-party in the data (`price.source`)
+  and in the library (`Reconciliation.priceSource`): a quote goes into the new `underlyingPriceWad`
+  and is used as it is, a Chainlink answer into `priceWad` and has its multiplier unwound, and the
+  phase-floor refusal applies only to the latter because it is a property of a round. A quote
+  published while `isTradingHalt` is true is refused, not priced: that is a last price, not a
+  market. **No haircut changes today** — the capture pays off from the next dividend onward, and
+  says so rather than backfilling.
 - _(append decisions here as they are made)_
 
 ## Status
