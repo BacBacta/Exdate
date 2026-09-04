@@ -41,5 +41,29 @@ services:
       - "42069:42069"
     restart: unless-stopped
 
+  # The capture watcher: a process that is always there when a multiplier
+  # changes, which GitHub's best-effort cron is not (measured: every 7 to 25
+  # minutes against a nine-minute lead). It commits and pushes from this clone,
+  # so the clone is mounted as a working copy and the deploy key read-only.
+  # Once it runs, set the repository variable EXDATE_CAPTURE_MODE=watchdog so
+  # the GitHub job checks its heartbeat instead of capturing on its own.
+  watcher:
+    build:
+      context: .
+      dockerfile: deploy/watcher.Dockerfile
+    volumes:
+      - .:/repo
+      - ${EXDATE_WATCHER_SSH_DIR:-~/.ssh}:/root/.ssh:ro
+    environment:
+      RHC_RPC_URL: ${RHC_RPC_URL:-https://rpc.mainnet.chain.robinhood.com}
+      EXDATE_WATCH_TICK_MS: ${EXDATE_WATCH_TICK_MS:-30000}
+      EXDATE_WATCH_HEARTBEAT_MS: ${EXDATE_WATCH_HEARTBEAT_MS:-21600000}
+      EXDATE_WATCH_PUSH: ${EXDATE_WATCH_PUSH:-true}
+      EXDATE_ALERT_WEBHOOK_URL: ${EXDATE_ALERT_WEBHOOK_URL:-}
+      EXDATE_TELEGRAM_BOT_TOKEN: ${EXDATE_TELEGRAM_BOT_TOKEN:-}
+      EXDATE_TELEGRAM_CHAT_ID: ${EXDATE_TELEGRAM_CHAT_ID:-}
+      EXDATE_SITE_URL: ${EXDATE_SITE_URL:-}
+    restart: unless-stopped
+
 volumes:
   pgdata:

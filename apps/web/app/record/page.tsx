@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Footer, LedgerHead, Nav } from '../components/Chrome'
 import { dateLong, delay } from '../../lib/format'
-import { delivery } from '../../lib/observed'
+import { capture, delivery } from '../../lib/observed'
 
 /**
  * What the issuer declared, and what reached the chain. Every figure is a count with
@@ -177,6 +177,15 @@ export default function Page() {
               at all, which is the ceiling on what a feed can price. exdate now also captures the
               issuer&rsquo;s own quote at the instant a step takes effect, which covers every token
               — from the next dividend onward, since that price cannot be read back afterwards.
+            </p>
+            <p className="after" data-reveal>
+              {capture.watcher && !capture.watcher.stale
+                ? `A watcher process${capture.watcher.host ? ` on ${capture.watcher.host}` : ''} is doing that capture and last reported in on ${dateLong(capture.watcher.heartbeatAt)}.`
+                : capture.watcher
+                  ? `A watcher process was doing that capture and has been silent since ${dateLong(capture.watcher.heartbeatAt)}; GitHub's schedule is capturing in its place.`
+                  : capture.cadence
+                    ? `That capture runs today on GitHub's schedule, which is asked for every ${capture.cadence.nominalMinutes} minutes and is best-effort: measured over ${capture.cadence.runs} runs, the gap between two was ${capture.cadence.medianMinutes} minutes at the median and ${capture.cadence.maxMinutes} at the widest${capture.cadence.withinNominal === 0 ? ', and none came within five' : ''}. A run waits ${capture.cadence.budgetMinutes} minutes for a step it has seen announced, so a step landing at a random instant would be caught about ${capture.cadence.expectedCatchPercent}% of the time. A process that stays alive is written and waits for a machine.`
+                    : `That capture runs today on GitHub's schedule, which is best-effort; how often it really fires is being measured.`}
             </p>
           </div>
         </section>

@@ -5,9 +5,10 @@
 // and until now nobody was told. A webhook outbox exists in the indexer, but the
 // indexer is not hosted anywhere, so it has never delivered anything.
 //
-// This needs no host. It rides the capture run that is already watching for
-// announcements every five minutes, reads the same committed file, and posts to
-// whichever sinks are configured:
+// This needs no host. It rides whatever is watching for announcements - the
+// capture job on GitHub's schedule, or the persistent watcher on a machine, which
+// spawns it after every change - reads the same committed file, and posts to the
+// sinks in scripts/lib/alert.mjs:
 //
 //   EXDATE_ALERT_WEBHOOK_URL    a Discord or Slack incoming webhook, or any endpoint
 //                               that accepts { content, text }
@@ -21,6 +22,7 @@
 //   node scripts/notify.mjs
 import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
+import { send as sendTo, sinksFromEnv } from './lib/alert.mjs'
 
 const root = new URL('../', import.meta.url)
 const CAPTURES = process.env.EXDATE_CAPTURE_OUT ?? 'data/effective-prices.observed.json'
@@ -30,11 +32,7 @@ const EXPLORER = 'https://robinhoodchain.blockscout.com'
 /** An announcement older than this was missed, not caught; sending it now would misrepresent the lead. */
 const ANNOUNCE_MAX_AGE_SECONDS = Number(process.env.EXDATE_NOTIFY_MAX_AGE ?? 3600)
 
-const sinks = []
-if (process.env.EXDATE_ALERT_WEBHOOK_URL) sinks.push({ kind: 'webhook', url: process.env.EXDATE_ALERT_WEBHOOK_URL })
-if (process.env.EXDATE_TELEGRAM_BOT_TOKEN && process.env.EXDATE_TELEGRAM_CHAT_ID) {
-  sinks.push({ kind: 'telegram', token: process.env.EXDATE_TELEGRAM_BOT_TOKEN, chatId: process.env.EXDATE_TELEGRAM_CHAT_ID })
-}
+const sinks = sinksFromEnv()
 if (sinks.length === 0) {
   console.error('# no sink configured (EXDATE_ALERT_WEBHOOK_URL or EXDATE_TELEGRAM_BOT_TOKEN + EXDATE_TELEGRAM_CHAT_ID); nothing sent')
   process.exit(0)
@@ -58,36 +56,8 @@ const decimal = (wad) => {
 }
 const minutes = (fromIso, toIso) => Math.round((Date.parse(toIso) - Date.parse(fromIso)) / 60_000)
 
-async function post(sink, text) {
-  const request =
-    sink.kind === 'telegram'
-      ? [
-          `https://api.telegram.org/bot${sink.token}/sendMessage`,
-          { chat_id: sink.chatId, text, disable_web_page_preview: true },
-        ]
-      : [sink.url, { content: text, text }]
-  const response = await fetch(request[0], {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(request[1]),
-  })
-  if (!response.ok) throw new Error(`${sink.kind} answered ${response.status}: ${(await response.text()).slice(0, 200)}`)
-}
-
 /** Sends to every sink; one failing sink must not stop the others, and a partial send is not a send. */
-async function send(text) {
-  const failures = []
-  for (const sink of sinks) {
-    try {
-      await post(sink, text)
-    } catch (error) {
-      failures.push(`${sink.kind}: ${error.message}`)
-    }
-  }
-  if (failures.length === sinks.length) throw new Error(failures.join('; '))
-  if (failures.length) console.error(`# partial delivery: ${failures.join('; ')}`)
-  return failures.length === 0
-}
+const send = (text) => sendTo(sinks, text, { log: (line) => console.error(line) })
 
 const now = Date.now()
 let changed = false

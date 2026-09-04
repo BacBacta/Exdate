@@ -41,6 +41,8 @@ const DATASETS: [string, string][] = [
   ['token-feed-map.json', 'Token → feed pairing by ticker, with what corroborates each row'],
   ['feed-map-verification.json', 'How each feed pairing was checked against the chain'],
   ['svr-proxy-check.json', 'Primary and SVR proxies compared on all 35 feeds'],
+  ['effective-prices.observed.json', "The issuer's own quote at the instant each multiplier change took effect, and whether something was watching"],
+  ['capture-cadence.observed.json', "How often GitHub actually ran the capture job, from its own run log, against the five minutes it was asked for"],
   ['session-share.observed.json', 'Hourly samples of transfer rate by market session'],
   ['transfer-volume.observed.json', 'Transfer volume measured across all 194 tokens'],
   ['base-b20-verification.json', "Coinbase's tokens, oracle registry and feeds on Base, read back on chain"],

@@ -19,6 +19,8 @@ import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 import gapJson from '../../../data/dex-feed-gap.observed.json'
+import effectivePricesJson from '../../../data/effective-prices.observed.json'
+import cadenceJson from '../../../data/capture-cadence.observed.json'
 
 // The JSON files are cast to the handful of fields the page reads, so a field
 // the page does not use can change shape without touching this module.
@@ -753,6 +755,57 @@ export const gap = (() => {
         neither: neither.map((p) => p.symbol),
       }
     })(),
+  }
+})()
+
+/**
+ * The capture of the issuer's quote at the instant of a step, and how reliably it
+ * is being attempted. The quote cannot be read back, so whether something was
+ * there matters as much as what it caught - and until a persistent watcher runs,
+ * "something" is GitHub's best-effort schedule, whose real cadence is measured
+ * from GitHub's own run log rather than assumed from the workflow file.
+ */
+export const capture = (() => {
+  const prices = effectivePricesJson as unknown as {
+    lastRunAt: string
+    summary: { steps: number; withQuoteAtEffect: number; givenUp: number }
+    watcher?: { heartbeatAt: string; host?: string; startedAt?: string }
+  }
+  const cadence = cadenceJson as unknown as {
+    observedAt: string
+    nominalMinutes: number
+    budgetMinutes: number
+    runs: number
+    intervalMinutes: { samples: number; median: number; max: number; shareWithinNominal: number } | null
+    expectedCatchShare: { value: number } | null
+  }
+  const STALE_AFTER_MINUTES = 7 * 60
+  const watcher = prices.watcher
+    ? (() => {
+        const ageMinutes = Math.round((Date.parse(cadence.observedAt > prices.lastRunAt ? cadence.observedAt : prices.lastRunAt) - Date.parse(prices.watcher!.heartbeatAt)) / 60_000)
+        return { heartbeatAt: prices.watcher!.heartbeatAt, host: prices.watcher!.host ?? null, stale: ageMinutes > STALE_AFTER_MINUTES }
+      })()
+    : null
+  return {
+    steps: prices.summary.steps,
+    priced: prices.summary.withQuoteAtEffect,
+    givenUp: prices.summary.givenUp,
+    /** Null until a persistent watcher has committed a heartbeat. */
+    watcher,
+    /** Null until GitHub's run log holds enough scheduled runs to measure. */
+    cadence:
+      cadence.intervalMinutes && cadence.expectedCatchShare
+        ? {
+            observedAt: cadence.observedAt,
+            nominalMinutes: cadence.nominalMinutes,
+            budgetMinutes: cadence.budgetMinutes,
+            runs: cadence.runs,
+            medianMinutes: cadence.intervalMinutes.median,
+            maxMinutes: cadence.intervalMinutes.max,
+            withinNominal: cadence.intervalMinutes.shareWithinNominal,
+            expectedCatchPercent: Math.round(cadence.expectedCatchShare.value * 100),
+          }
+        : null,
   }
 })()
 

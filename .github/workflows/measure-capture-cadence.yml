@@ -1,0 +1,60 @@
+# Measure how often the capture job really runs.
+#
+# capture-effective-prices is scheduled every five minutes, and the announcement
+# lead it must catch is about nine. GitHub's cron is best-effort: on its first
+# morning the job fired every 7 to 25 minutes. Whether a step is caught depends on
+# that real gap, so the gap is measured from GitHub's own workflow-runs log and
+# committed - the site states it from this file, never from memory.
+name: measure-capture-cadence
+
+on:
+  schedule:
+    # 06:40 UTC daily. Off the hour on purpose: scheduled runs cluster there.
+    - cron: '40 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: measure-capture-cadence
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Plain node over the API; no install step.
+      - name: Read the capture job's run log
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXDATE_CAPTURE_BUDGET_MS: ${{ vars.EXDATE_CAPTURE_BUDGET_MS }}
+        run: node scripts/measure-capture-cadence.mjs
+
+      - name: Commit the measurement
+        run: |
+          if git diff --quiet -- data/capture-cadence.observed.json; then
+            echo "unchanged"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/capture-cadence.observed.json');const i=d.intervalMinutes;process.stdout.write(i?d.runs+' runs, gap median '+i.median+' min, max '+i.max+', expected catch '+Math.round(d.expectedCatchShare.value*100)+'%':d.runs+' runs, not enough for a cadence')")
+          git config user.name 'exdate-cadence'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/capture-cadence.observed.json
+          git commit -m "Measure the capture cadence: $summary"
+
+          # Other scheduled jobs push to this branch too.
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

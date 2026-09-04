@@ -64,7 +64,7 @@ an agent container with `scripts/deploy-web.sh`, which uploads the tree from a c
 the commits here are the agent's. A git-connected deployment is attributed to the installation
 instead and is not blocked, which is why the fallback deploy workflow was removed.
 
-Six GitHub Actions run in `.github/workflows`, and five of them are collectors: they exist because
+Seven GitHub Actions run in `.github/workflows`, and six of them are collectors: they exist because
 the things exdate measures are **not readable after the fact**. The issuer keeps about a month of
 corporate actions and quotes only the present; the chain keeps no archive state; a session's
 transfer rate is a rate, not a total. Every day one of these does not run is a day that cannot be
@@ -78,6 +78,7 @@ recovered later.
 | `measure-session-share` | hourly | one sampled window into `data/session-share.observed.json`; it takes a week to cover the clock, which is why it is a schedule and not a script anyone runs once |
 | `measure-dex-feed-gap` | hourly | the distance between the traded price and the Chainlink answer per token, and the pairing corroboration built on it |
 | `measure-primary-flows` | daily | mint minus burn per token, in contiguous windows, so a delayed run loses nothing |
+| `measure-capture-cadence` | daily | how often GitHub really ran the capture job, from its own run log — the number that decides whether a step is caught |
 
 Each commits to the default branch, which deploys the site — so the published pages and the
 committed record move together.
@@ -95,6 +96,25 @@ because delivering it would report a lead rather than give one; delivery is reco
 `data/effective-prices.observed.json`, which makes it the evidence that the lead was given.
 
 The indexer's signed webhook outbox is the other half of this and still needs a host - see below.
+
+### The capture watcher
+
+The capture job above is scheduled every five minutes, and GitHub's cron is best-effort: measured
+on its first morning, it fired every 7 to 25 minutes, against a nine-minute announcement lead. A
+run now waits nine minutes for a step it has seen announced, which is the most a schedule can do,
+and `data/capture-cadence.observed.json` says what that buys. The answer is a process that is
+simply always there: `scripts/watch-effective-prices.mjs`, the same logic from the same module
+(`scripts/lib/effective-prices.mjs`, tested in `packages/core`), scanning every thirty seconds,
+sampling at the instant, committing what it caught and a heartbeat every six hours.
+
+It needs a machine, a clone on a branch it may push to, and a deploy key with write access. Either
+`deploy/exdate-watcher.service` under systemd (the file says how), or the `watcher` service in
+`docker-compose.yml` next to the API. Alert sinks are the ones under *Alerts*. Then set the
+repository variable `EXDATE_CAPTURE_MODE=watchdog`: the GitHub job stops capturing on its own,
+checks the watcher's heartbeat instead, captures in its place only while that heartbeat is stale,
+and says so through the sinks on each transition. The two share one file and each owns its own
+field in it, so neither erases what the other recorded. `EXDATE_WATCH_PUSH=false` runs the watcher
+without committing, for a trial.
 
 ### Hosting the API
 

@@ -946,6 +946,33 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   almost all high-volatility names (GME, MSTR, COIN, IONQ, RGTI…) whose traded price is genuinely
   dislocated from the feed, so the test fails because its premise fails, not because the pairing is
   wrong.
+- 2026-09-04 — **The capture ran on a schedule that does not keep time, and the fix is a process,
+  not a setting.** Asked what the cron jobs cost on GitHub (nothing: the repository is public), the
+  measurement that answered it mattered more than the bill: GitHub fired the `*/5` capture job every
+  **7 to 25 minutes** (median 11.1, none within five; `data/capture-cadence.observed.json`, from
+  GitHub's own run log, refreshed daily by `measure-capture-cadence.yml`). Two of my own claims
+  died on the numbers. First, the catch window was not the nine-minute lead but the run's
+  **four-minute budget**, so a step landing at a random instant was caught about **one time in
+  three** (Σ min(gap, budget) / Σ gap = 33 %). Second, "a run that watches ten minutes makes
+  coverage continuous" is false: coverage is continuous only when the watch exceeds the *largest*
+  gap, which means a job alive 24/7 — 43 000 runner-minutes a month, free on a public repo and
+  squarely inside what GitHub's Actions terms name as prohibited (*serverless computing*), with one
+  account restriction taking every collector down at once. So: the budget is nine minutes now
+  (expected catch **70 %** on the measured gaps, inside `timeout-minutes: 12`, the concurrency group
+  queueing the next run), which is the most a schedule can do — and the answer is
+  **`scripts/watch-effective-prices.mjs`**, a persistent process for a machine, scanning every
+  30 s, sampling at the instant, committing what it caught and a heartbeat every six hours. The
+  logic moved into **`scripts/lib/effective-prices.mjs`** (plain ESM, 14 tests in
+  `packages/core/test/effective-prices.test.mjs`) so the one-shot and the watcher cannot drift; the
+  one-shot gained **`EXDATE_CAPTURE_MODE=watchdog`**, in which it checks the heartbeat, captures
+  in the watcher's place only while that heartbeat is stale (> 7 h) and alerts on each transition
+  — exercised through all four states. The two share one file and each owns one field in it
+  (`watcher`, `watchdog`); steps are merged by key before every write, and a rebase conflict is
+  resolved by taking the remote and rewriting from memory (`scripts/lib/git.mjs`). Also found: the
+  original lookback comment was off by **100×** ("~15 min" for 900 000 blocks, which is a day at
+  0.1 s/block) — harmless, since known steps are skipped by key, and corrected. `/record/` now
+  states the measured cadence and the expected catch share, and will state the watcher's heartbeat
+  once one exists. Still owner-blocked: the machine and a deploy key (`TODO.md`).
 - _(append decisions here as they are made)_
 
 ## Status
@@ -979,6 +1006,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - `/wallet/` history is refused for automated wallets (past 40 `eth_getLogs` requests) and blind
   to tokens held inside a protocol at the time of a step. Both are stated on the page. An archive
   endpoint would lift the first; the second needs each protocol's own accounting.
+
+- The capture of the issuer's quote at effect runs on GitHub's cron until a machine runs the
+  watcher: measured, that catches about 70 % of steps at a nine-minute budget (was 33 % at four).
+  `/record/` says so from `data/capture-cadence.observed.json`; nothing claims a capture that was
+  not made. `scripts/watch-effective-prices.mjs` is written, tested and waiting for a host.
 
 - The off-hours share is being sampled, not yet answered: `data/session-share.observed.json` reads
   `sufficient: false` until every session has three samples, which takes about a day of the hourly

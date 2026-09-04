@@ -1,0 +1,43 @@
+# exdate's capture watcher as a systemd service.
+#
+# The issuer's quote at the instant a multiplier change takes effect exists for
+# about fifteen seconds and cannot be read back. A process has to be there. This
+# unit keeps scripts/watch-effective-prices.mjs alive on a machine, which is what
+# GitHub's best-effort cron cannot do (measured: it fires every 7 to 25 minutes
+# against a nine-minute lead).
+#
+# Install, as root, with the repository cloned at /opt/exdate and a deploy key
+# with write access in the exdate user's ~/.ssh:
+#
+#   cp deploy/exdate-watcher.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now exdate-watcher
+#   journalctl -u exdate-watcher -f
+#
+# Alert sinks and any override go in /opt/exdate/.env (see .env.example, the
+# "alerts" and "watcher" blocks). Then set the repository variable
+# EXDATE_CAPTURE_MODE=watchdog so the GitHub job stops capturing on its own and
+# starts checking this process's heartbeat instead.
+
+[Unit]
+Description=exdate: capture the issuer's quote at the instant a multiplier change takes effect
+Documentation=https://github.com/BacBacta/Exdate
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=exdate
+WorkingDirectory=/opt/exdate
+EnvironmentFile=-/opt/exdate/.env
+ExecStart=/usr/bin/node scripts/watch-effective-prices.mjs
+Restart=always
+RestartSec=10
+# The watcher writes one small JSON file and runs git; nothing else needs the disk.
+ProtectSystem=strict
+ReadWritePaths=/opt/exdate
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -18,7 +18,26 @@ Add repository secrets under **Settings → Secrets and variables → Actions**,
 Optionally set the repository *variable* `EXDATE_SITE_URL` so the notices link to the right
 host. Nothing else changes: delivery is recorded in `data/effective-prices.observed.json`.
 
-## 2. Host the API and the status page
+## 2. Run the capture watcher on a machine
+
+The issuer's quote at the instant a step takes effect is the price a haircut is computed from for
+the 159 tokens without a Chainlink feed, and it cannot be read back. Today it is captured by a
+GitHub cron that fires every 7 to 25 minutes in practice (`data/capture-cadence.observed.json`);
+at the nine-minute budget that catches about 70 % of steps. `scripts/watch-effective-prices.mjs`
+is the same capture as a process that stays alive, written and tested; it needs:
+
+- a small VPS (a 4 €/month box is plenty; the same one can host the API below), with node 22
+  and git, the repository cloned at `/opt/exdate` on `claude/lance-en5q6j`;
+- a **deploy key with write access** on the repository, created in GitHub and placed in the
+  machine's `~/.ssh` — never through a chat or a file that travels;
+- `deploy/exdate-watcher.service` installed as the file says, or `docker compose up -d watcher`;
+- the alert sinks from item 1 in `/opt/exdate/.env`, so it can speak;
+- then the repository *variable* `EXDATE_CAPTURE_MODE=watchdog`, so the GitHub job stands down
+  and checks the watcher's heartbeat instead.
+
+`EXDATE_WATCH_PUSH=false` runs it without committing, for a first look.
+
+## 3. Host the API and the status page
 
 `docker compose up -d` at the repository root brings up Postgres and the indexer, serving
 `/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`, and *Hosting* in the README). Needs
@@ -28,13 +47,13 @@ quotas count per visitor rather than per proxy. `EXDATE_API_KEYS` turns on keys 
 Until this exists there is no public instance — the reference says so — and the signed
 webhook outbox has still never delivered anything.
 
-## 3. Choose a domain
+## 4. Choose a domain
 
 `exdate.xyz` belongs to an unrelated site. The name stands; the domain does not.
 `metadataBase` in `apps/web/app/layout.tsx` still names it and must change with the choice,
 as must `packages/sdk/README.md` and any `api.` subdomain.
 
-## 4. Publish the packages
+## 5. Publish the packages
 
 Both are prepared: `publishConfig` swaps `main`, `types` and `exports` to a `dist/` that
 `tsconfig.build.json` emits at publish time, checked with `pnpm pack`; the workspace keeps
@@ -47,7 +66,7 @@ pnpm --filter @exdate/sdk publish   # pnpm rewrites the workspace: range
 
 `packages/sdk/README.md` currently states that they are not published; update it after.
 
-## 5. Have counsel read the issuer's terms
+## 6. Have counsel read the issuer's terms
 
 Robinhood's developer-documentation terms (RHDA, LLC, 2026-08-24) grant a personal,
 revocable licence and forbid distributing "Robinhood Materials" to third parties or building
