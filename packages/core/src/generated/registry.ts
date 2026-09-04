@@ -4016,6 +4016,21 @@ export const ARCHIVED_CORPORATE_ACTIONS: readonly ArchivedCorporateAction[] = [
     "firstSeenAt": "2026-09-02T14:21:22.355Z"
   },
   {
+    "id": "0x000000000000000000000000000000001bbb45628de84cb2917abd26680c7ab9:2026-09-30",
+    "issuerId": "0x000000000000000000000000000000001bbb45628de84cb2917abd26680c7ab9",
+    "chainId": 4663,
+    "token": "0x156E175DD063a8cE274C50654eF40e0032b3fbcF",
+    "symbol": "AVGO",
+    "underlyingSymbol": "AVGO",
+    "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
+    "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+    "processDate": "2026-09-30",
+    "rate": "0.65",
+    "oldRate": null,
+    "newRate": null,
+    "firstSeenAt": "2026-09-04T06:43:45.574Z"
+  },
+  {
     "id": "0x00000000000000000000000000000000915f477416294f5099a5e0e09f327ce5:2026-10-01",
     "issuerId": "0x00000000000000000000000000000000915f477416294f5099a5e0e09f327ce5",
     "chainId": 4663,
