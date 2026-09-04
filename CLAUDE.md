@@ -1256,6 +1256,18 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   things this vindicates: the paging fix committed hours earlier, without which the probe would have
   reported a flat failure instead of a cap; and building the probe at all rather than reading a
   pricing page — the 10-block limit is on a documentation page nobody would have thought to open.
+- 2026-09-04 — **A three-minute trial in a container replaced the real machine's heartbeat in the
+  committed record, and a `git add -A` published it.** The watcher writes `watcher: { host, tick,
+  lookback, heartbeatAt }` into the shared state file whether or not it can push, so a test run with
+  `EXDATE_WATCH_PUSH=false` — meant to prove the paging fix against a capped endpoint — left
+  `host: "vm"`, `tickSeconds: 20`, `lookbackBlocks: 120000` where `ubuntu-4gb-fsn1-1` had been.
+  Nothing measured was lost: only that block changed and the four steps with their quotes were
+  untouched. But the record then said a machine that does not exist was watching, which `/record/`
+  renders by name, and the fix is not "be careful with `git add`". The heartbeat is **a claim that a
+  watcher is running on this host**, and the watchdog reads its absence as a dead machine. A run
+  that cannot push is not making that claim, so it no longer writes the block at all — captures it
+  makes are still merged, because those are real observations. Verified by running the trial again
+  and diffing: the block is byte-identical afterwards.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -110,16 +110,24 @@ async function persist() {
     previous,
     captures,
     method: METHOD,
-    patch: {
-      watcher: {
-        heartbeatAt: iso(Date.now()),
-        startedAt,
-        host: hostname(),
-        scans,
-        tickSeconds: TICK_MS / 1000,
-        lookbackBlocks: LOOKBACK_BLOCKS,
-      },
-    },
+    // The heartbeat is a claim that a watcher is running on this host, and the
+    // watchdog on GitHub treats its absence as a dead machine. A trial run - one
+    // that cannot push - is not that, so it does not make the claim. Written the
+    // other way round once, a three-minute test in a container replaced the real
+    // machine's heartbeat in the committed record with its own hostname, tick
+    // and lookback, and only a diff caught it.
+    patch: PUSH
+      ? {
+          watcher: {
+            heartbeatAt: iso(Date.now()),
+            startedAt,
+            host: hostname(),
+            scans,
+            tickSeconds: TICK_MS / 1000,
+            lookbackBlocks: LOOKBACK_BLOCKS,
+          },
+        }
+      : {},
   })
 }
 
