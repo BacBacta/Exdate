@@ -101,7 +101,7 @@ Worth paying for only when you decide to index transfers, and the number to chec
 node: 7–13 M transfers a day is roughly 75 GB of database a month. Both QuickNode and Chainstack
 list this chain; a keyless tier on the endpoint in use allows 300 requests a minute per IP.
 
-## 4. Host the API and the status page — built and rehearsed; needs one DNS record
+## 4. Host the API and the status page — done, live
 
 Everything between "the containers run" and "someone can call it" now exists and was exercised here
 with a real Docker daemon, not read:
@@ -148,10 +148,19 @@ beside the systemd one. The script now refuses `EXDATE_DIR` pointing at the watc
 stops anything still running out of it, and **asserts what came up**: `db`, `indexer`, `status` and
 `caddy` running, `watcher` not. "Containers up" was true of the run that got it wrong.
 
-Then the API is public and the quotas matter. `EXDATE_ANON_RPM` is the anonymous rate per client
-address read from `X-Forwarded-For`, which Caddy sets; `EXDATE_API_KEYS` (`key:label:rpm`, comma
-separated) turns on keys. Until this runs there is no public instance — the reference says so — and
-the signed webhook outbox has still never delivered anything.
+**Live since 2026-09-04**: `https://api.exdate.me` and `https://status.exdate.me`, on the same
+Hetzner machine as the watcher, which is untouched and still under systemd. Verified from outside:
+`/v1/health` 200 over HTTP/2, CORS open, the three `X-RateLimit-*` headers present, plain HTTP 308s
+to HTTPS, the status page 200. The certificate was validated by the machine's own `curl` — a check
+from this workspace only sees its egress proxy's certificate, so that is stated rather than claimed.
+
+The quotas now matter. `EXDATE_ANON_RPM` is the anonymous rate per client address read from
+`X-Forwarded-For`, which Caddy sets; `EXDATE_API_KEYS` (`key:label:rpm`, comma separated) turns on
+keys. It is one small machine with no availability commitment, and the README, the reference and the
+SDK README all say so rather than implying a service.
+
+Still not delivered by anything: the signed webhook outbox. It needs a receiver in
+`EXDATE_WEBHOOK_ENDPOINTS`, which is a consumer, not a deployment.
 
 ## 5. Choose a domain — done: exdate.me
 

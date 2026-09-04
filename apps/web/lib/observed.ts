@@ -931,8 +931,15 @@ export const observed = {
     /** Set NEXT_PUBLIC_EXDATE_REPO_URL once the repository is public; a link to a private repository is a dead link. */
     github: process.env.NEXT_PUBLIC_EXDATE_REPO_URL ?? null,
     data: '/data/',
-    /** The live status page needs a running indexer; until one is hosted, no link is better than a dead one. */
+    /** The live status page needs a running indexer; with none hosted, no link is better than a dead one. */
     status: process.env.NEXT_PUBLIC_EXDATE_STATUS_URL ?? null,
+    /**
+     * The live API, same rule. Deliberately not a literal even though
+     * api.exdate.me answers today: the site is static and rebuilt on a commit,
+     * so a hardcoded host would keep being advertised for as long as nobody
+     * pushed after the machine went away.
+     */
+    api: process.env.NEXT_PUBLIC_EXDATE_API_URL ?? null,
     apiDocs: '/docs/api/',
     sdkDocs: '/docs/sdk/',
     verification: 'https://github.com/BacBacta/Exdate/blob/HEAD/docs/phase-0-verification.md',

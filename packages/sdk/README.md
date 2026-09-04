@@ -19,8 +19,8 @@ checkout. It depends on `@exdate/core` only; installing it never pulls in the se
 ```ts
 import { createClient } from '@exdate/sdk'
 
-// the host your indexer runs on; there is no public instance yet
-const exdate = createClient({ baseUrl: 'http://localhost:42069', apiKey: process.env.EXDATE_API_KEY })
+// the public instance, or the host your own indexer runs on
+const exdate = createClient({ baseUrl: 'https://api.exdate.me', apiKey: process.env.EXDATE_API_KEY })
 
 const SGOV = '0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5'
 

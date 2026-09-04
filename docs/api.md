@@ -4,8 +4,9 @@ Every example below is a real response, captured from the indexer running agains
 mainnet on 2026-09-02. Nothing here is illustrative: if a field is `null` in an example, that is
 what the chain said.
 
-Base URL: wherever you run the indexer — `http://localhost:42069` under `pnpm dev`, or the host you
-deploy the Docker image to (see *Hosting* in the README). There is no public instance yet. `:chain`
+Base URL: **`https://api.exdate.me`**, or wherever you run the indexer yourself —
+`http://localhost:42069` under `pnpm dev`, or the box `deploy/install-api.sh` sets up (see *Hosting*
+in the README). The public instance is one small machine with no availability commitment. `:chain`
 accepts the key (`robinhood`) or the id (`4663`).
 
 Two rules hold everywhere:

@@ -252,6 +252,7 @@ export default function Page() {
               </p>
               <p className="links">
                 <a href={links.apiDocs}>API reference</a>
+                {links.api ? <a href={`${links.api}/v1/health`}>Live API</a> : null}
                 <a href={links.sdkDocs}>SDK</a>
                 <a href="/tokenlist.json">Token list</a>
                 <a href={links.data}>Data</a>

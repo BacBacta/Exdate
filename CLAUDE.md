@@ -1114,6 +1114,30 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   subdomain at Vercel, so explicit A records were needed to win on specificity; its CAA records
   already list `letsencrypt.org`, which is what makes Caddy's certificate possible and was checked
   rather than assumed.
+- 2026-09-04 — **The API and the status page are live at `api.exdate.me` and `status.exdate.me`,
+  and the first attempt failed silently, which is the part worth writing down.** The installer
+  reused the watcher's checkout at `/opt/exdate` and only fetched, on the reasoning that the watcher
+  owns that clone and must not be reset. No working tree was updated, so Docker built a
+  `docker-compose.yml` that predated the public profile: **Caddy and the status page never started
+  at all, and the watcher — ungated in that older file — came up a second time beside the systemd
+  one**, on a host where two of them sample the same instants and race on one committed file. Every
+  line printed as success. The API now takes its own checkout at `/opt/exdate-api` and resets it to
+  the branch tip, which can lose nothing because nothing else writes there; `EXDATE_DIR` pointing at
+  the watcher's directory is refused by name; anything still running out of it is brought down. And
+  the check that turns this class of failure into a message: the script reads back the running
+  services and dies unless `db`, `indexer`, `status` and `caddy` are all up — and dies if `watcher`
+  is. "Containers up" was true of the run that got it wrong, which is exactly why a script must
+  assert the shape it expected rather than the fact that a command returned zero.
+  Verified from outside afterwards: `/v1/health` 200 over HTTP/2, CORS open, the three
+  `X-RateLimit-*` headers, plain HTTP 308 to HTTPS, the status page 200. The Let's Encrypt
+  certificate was validated by the machine's own `curl`, not from here — this workspace's egress
+  proxy substitutes its own certificate, so checking TLS from here would prove nothing, and the
+  distinction is stated rather than glossed. The zone's CAA records were read first and do list
+  `letsencrypt.org`; without that Caddy could never have been issued anything.
+  The site now renders its *Live status* and *Live API* links, hidden since the beginning for want
+  of a host. Both stay behind env vars rather than becoming literals: the site is static and rebuilt
+  on a commit, so a hardcoded host would go on being advertised for as long as nobody pushed after
+  the machine went away.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -148,11 +148,18 @@ without committing, for a trial.
 
 ### Hosting the API
 
-There is no public instance yet: the site is static and Vercel cannot run the indexer. To host
-one, `docker compose up -d` at the repository root brings up Postgres and the indexer, which polls
-the chain and serves `/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`). Put a TLS proxy in
-front and forward the client address in `X-Forwarded-For`, so anonymous quotas count per visitor.
-Everything else has a default; `.env.example` lists what can change.
+A public instance runs at **`https://api.exdate.me`**, with the status page at
+**`https://status.exdate.me`**. It is one small machine, not a service with an availability
+commitment — say so before anyone builds on it.
+
+`deploy/install-api.sh` puts the same thing on a fresh Debian or Ubuntu box: Postgres, the indexer
+serving `/v1` on 42069, the status page rendered server-side, and Caddy terminating TLS for both
+names (`Dockerfile`, `deploy/status.Dockerfile`, `deploy/Caddyfile`, `docker-compose.yml` under
+`--profile public`). It refuses before Caddy can ask Let's Encrypt for a name that does not resolve
+to the machine, because repeated ACME failures are rate-limited per domain, and it reads back which
+containers came up rather than assuming. Caddy forwards the client address in `X-Forwarded-For`, so
+anonymous quotas count per visitor and not per proxy. Everything else has a default; `.env.example`
+lists what can change.
 
 Keys and quotas are three variables: `EXDATE_API_KEYS` as `key:label:requestsPerMinute`, comma
 separated (empty means open at the anonymous rate); `EXDATE_ANON_RPM` for callers without a key
@@ -320,8 +327,7 @@ up to one interval (~60 s by default) against a ~9-minute announcement lead.
 ```ts
 import { createClient } from '@exdate/sdk'
 
-// There is no public instance yet; this is your own, from docker-compose.yml.
-const exdate = createClient({ baseUrl: 'http://localhost:42069' })
+const exdate = createClient({ baseUrl: 'https://api.exdate.me' })
 const ledger = await exdate.yield('0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5')
 
 ledger.totals?.dividendGrowthBps    // 20.22 — explained by a paired issuer dividend
