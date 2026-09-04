@@ -1,0 +1,61 @@
+# How far the traded price sits from the oracle, hour by hour.
+#
+# A lending market liquidates against the Chainlink feed. The feed is 24/5 and freezes
+# outside market hours; the chain does not stop. The distance between the two is the
+# risk a curator carries, and it is widest exactly when the feed is stalest. Nobody
+# publishes it.
+#
+# Hourly, because the claim worth making is not "the gap is N bps" but "the gap runs
+# wider off-hours than in session", and that needs a sample in every session before it
+# means anything - the same discipline as the off-hours transfer share. Each run reads
+# every pool and every feed in one instant, so it measures a gap rather than the delay
+# between two reads.
+name: measure-dex-feed-gap
+
+on:
+  schedule:
+    # :23 to sit clear of the other schedules, which share this branch.
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure-dex-feed-gap
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Appends nothing when a run fires twice inside a minute: two reads seconds apart
+      # are one observation, not two.
+      - name: Read every pool and every feed at one instant
+        run: node scripts/measure-dex-feed-gap.mjs
+
+      - name: Commit only if a sample was appended
+        run: |
+          if git diff --quiet -- data/dex-feed-gap.observed.json; then
+            echo "nothing appended"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/dex-feed-gap.observed.json');const s=d.summary;process.stdout.write(d.session+', median '+s.medianAbsDeviationBps+' bps, widest '+s.maxAbsDeviationBps+' bps across '+s.withFeed+' tokens, median feed age '+Math.round(s.medianFeedAgeSeconds/60)+' min')")
+          git config user.name 'exdate-gap'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/dex-feed-gap.observed.json
+          git commit -m "Measure the DEX-to-feed gap: $summary"
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

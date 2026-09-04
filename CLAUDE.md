@@ -49,6 +49,16 @@ nowhere else.
   multiplier state must be reconstructed from events, not read back.
 - Primary quote asset is **USDG** (6 decimals), not USDC.
 - Deployed: Uniswap (v3 + v4 hooks), Morpho, Rialto (propAMM), Lighter (orderbook), Chainlink.
+- **The DEX addresses are nowhere first-party.** `docs.robinhood.com/chain/protocol-contracts`
+  lists the rollup, the bridge and the precompiles and **no venue at all**. So the venue was found
+  by behaviour: Transfer counterparties holding code that answer `token0()`, `token1()` and
+  `slot0()`. Uniswap v3 factory **`0x1f7d7550b1b028f7571e69a784071f0205fd2efa`** (24 535 bytes) then
+  confirmed it by returning exactly those pools from its own `getPool` - which makes pool → factory
+  a **first-party on-chain link**, unlike token → feed. Fee tiers 100/500/3000/10000; quote asset
+  USDG. A second contract at `0x1ac9db4a2608ba45d6127b1737949b51bb54b7f3` (4 917 bytes) answers pool
+  selectors on its own pools but not `getPool`; it is recorded as an unidentified second venue
+  rather than named. `scripts/phase0/discover-pools.mjs`, `data/dex-pools.json`: **277 pools across
+  192 tokens, 105 with liquidity, 65 tokens quotable**.
 
 ## Stock Tokens — verified 2026-09-02
 
@@ -796,6 +806,23 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   lead rather than give one, which is the same distinction as a price fetched days after the
   instant it claims to price. Delivery is recorded in the capture file, so the committed history is
   the evidence that the lead was given. With no sink configured it does nothing and says so.
+- 2026-09-04 — **The gap between the traded price and the oracle, hourly.** The signal a lending
+  curator actually needs and nobody publishes: a market liquidates against the Chainlink feed, the
+  feed is 24/5 and freezes off-hours, and the chain does not stop. First measurement, taken
+  overnight: across the 26 quotable tokens that have a feed, **median |gap| 20 bps, widest 186 bps
+  (GME)**, median feed age 150 minutes, and SPY's feed 16 hours old while its pool traded 48 bps
+  above it. Both sides quote the **raw token** - Chainlink publishes `P_equity x multiplier` and the
+  pool trades that same token - so nothing is unwound from either, which is rule 5 in the one place
+  it would be easiest to double-count. Every pool and every feed is read in **one instant**, one
+  Multicall3 batch each, or the number would measure the delay between two reads. The deepest pool
+  per token wins, not the cheapest fee tier: a thin pool prints a price no size can trade at, and a
+  pool with zero liquidity is skipped rather than ranked last because its `sqrtPriceX96` is whatever
+  the last trade left behind. The arithmetic is exact bigint maths in `packages/core/src/pools.ts`
+  (the 18-vs-6 decimal difference against USDG is where a naive reading is off by 1e12, and there is
+  an exact test for it). The snapshot answers "how far apart now"; the **history**, labelled by
+  market session with the same classifier as the off-hours share, is what will answer the claim
+  worth making - that the gap runs wider when the feed is frozen. One sample is a reading, not a
+  rate, and the file says so.
 - _(append decisions here as they are made)_
 
 ## Status

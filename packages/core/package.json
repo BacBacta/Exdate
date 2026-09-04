@@ -19,7 +19,8 @@
     "./pending": "./src/pending.ts",
     "./holdings": "./src/holdings.ts",
     "./chains": "./src/chains.ts",
-    "./quotes": "./src/quotes.ts"
+    "./quotes": "./src/quotes.ts",
+    "./pools": "./src/pools.ts"
   },
   "files": [
     "dist",
@@ -57,6 +58,10 @@
       "./quotes": {
         "types": "./dist/quotes.d.ts",
         "default": "./dist/quotes.js"
+      },
+      "./pools": {
+        "types": "./dist/pools.d.ts",
+        "default": "./dist/pools.js"
       }
     }
   },
