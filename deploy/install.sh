@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+# Put the exdate capture watcher on a fresh Debian or Ubuntu machine.
+#
+# The watcher has to be present at an instant that happens once and cannot be
+# read back: the issuer's quote when a multiplier change takes effect. GitHub's
+# cron fires every 7 to 25 minutes against a nine-minute lead, so it catches
+# about seven steps in ten. A process that is simply always there catches them
+# all. This script is the shortest path to that process.
+#
+# Run it as root, twice:
+#
+#   curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/install.sh | bash
+#
+# The first pass makes a deploy key and stops, printing the public half for you
+# to paste into GitHub. The private half is generated on this machine and never
+# leaves it, which is the whole reason the key is not handed to you from
+# anywhere else. The second pass clones, installs the service and starts it.
+#
+# Idempotent: re-running it is how you upgrade. It never deletes anything it did
+# not create, and it refuses rather than guessing.
+set -euo pipefail
+
+REPO_SSH="${EXDATE_REPO_SSH:-git@github.com:BacBacta/Exdate.git}"
+BRANCH="${EXDATE_BRANCH:-claude/lance-en5q6j}"
+DIR="${EXDATE_DIR:-/opt/exdate}"
+USER_NAME="${EXDATE_USER:-exdate}"
+NODE_MAJOR=22
+
+say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
+note() { printf '  %s\n' "$*"; }
+die() { printf '\n\033[31mstopped:\033[0m %s\n' "$*" >&2; exit 1; }
+
+[ "$(id -u)" -eq 0 ] || die "run as root (sudo bash), it creates a user and a systemd unit"
+command -v apt-get >/dev/null || die "this expects Debian or Ubuntu; on anything else follow deploy/exdate-watcher.service by hand"
+
+say "1. Packages"
+# Checked one by one: a box can have git and curl and no ssh-keygen, and
+# grouping them meant openssh-client was never installed on exactly that box.
+missing=()
+command -v git         >/dev/null || missing+=(git)
+command -v curl        >/dev/null || missing+=(curl)
+command -v ssh-keygen  >/dev/null || missing+=(openssh-client)
+command -v ssh-keyscan >/dev/null || missing+=(openssh-client)
+if [ ${#missing[@]} -gt 0 ]; then
+  note "installing ${missing[*]}"
+  apt-get update -qq
+  apt-get install -y -qq ca-certificates "${missing[@]}"
+fi
+if ! command -v node >/dev/null || [ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)" -lt 20 ]; then
+  note "installing node ${NODE_MAJOR}"
+  curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash - >/dev/null
+  apt-get install -y -qq nodejs
+fi
+GIT="$(command -v git)"
+note "node $(node --version), git $($GIT --version | awk '{print $3}')"
+
+say "2. Service account"
+if ! id -u "$USER_NAME" >/dev/null 2>&1; then
+  useradd --system --create-home --home-dir "/home/$USER_NAME" --shell /usr/sbin/nologin "$USER_NAME"
+  note "created $USER_NAME"
+else
+  note "$USER_NAME already exists"
+fi
+SSH_DIR="/home/$USER_NAME/.ssh"
+install -d -m 700 -o "$USER_NAME" -g "$USER_NAME" "$SSH_DIR"
+
+say "3. Deploy key"
+KEY="$SSH_DIR/id_ed25519"
+if [ ! -f "$KEY" ]; then
+  sudo -u "$USER_NAME" "$(command -v ssh-keygen)" -t ed25519 -N '' -C "exdate-watcher@$(hostname)" -f "$KEY" >/dev/null
+  note "generated; the private half stays in $KEY and goes nowhere else"
+fi
+# GitHub's host key, pinned now so the watcher never has to answer a prompt.
+# Some networks block outbound port 22 entirely; GitHub also serves SSH on 443,
+# so that is tried before giving up, and a failure says which rather than
+# dying with no message.
+HOST_KEYS=""
+SSH_HOST="github.com"; SSH_PORT=22
+HOST_KEYS="$(ssh-keyscan -t ed25519 -T 10 github.com 2>/dev/null || true)"
+if [ -z "$HOST_KEYS" ]; then
+  note "port 22 to github.com is closed here; trying ssh.github.com:443"
+  HOST_KEYS="$(ssh-keyscan -t ed25519 -T 10 -p 443 ssh.github.com 2>/dev/null || true)"
+  if [ -n "$HOST_KEYS" ]; then
+    SSH_HOST="ssh.github.com"; SSH_PORT=443
+    REPO_SSH="${REPO_SSH/git@github.com:/ssh://git@ssh.github.com:443/}"
+    printf 'Host github.com\n  HostName ssh.github.com\n  Port 443\n  User git\n' \
+      | sudo -u "$USER_NAME" tee "$SSH_DIR/config" >/dev/null
+    chmod 600 "$SSH_DIR/config"; chown "$USER_NAME:$USER_NAME" "$SSH_DIR/config"
+    note "using ssh.github.com:443 for git"
+  fi
+fi
+[ -n "$HOST_KEYS" ] || die "cannot reach GitHub over SSH on port 22 or 443. The watcher pushes what it captures, so it needs one of them open outbound."
+printf '%s\n' "$HOST_KEYS" | sudo -u "$USER_NAME" tee "$SSH_DIR/known_hosts" >/dev/null
+chmod 600 "$SSH_DIR/known_hosts"; chown "$USER_NAME:$USER_NAME" "$SSH_DIR/known_hosts"
+
+# Does GitHub already accept this key for pushes? That is the gate between the
+# two passes, and it is asked rather than assumed.
+if sudo -u "$USER_NAME" "$(command -v ssh)" -o StrictHostKeyChecking=yes -o BatchMode=yes -p "$SSH_PORT" -T "git@$SSH_HOST" 2>&1 | grep -q "successfully authenticated"; then
+  note "GitHub accepts this key"
+else
+  cat <<EOF
+
+  This key is not on the repository yet. Add it, then run this script again.
+
+    https://github.com/BacBacta/Exdate/settings/keys/new
+    Title:            $(hostname) watcher
+    Allow write access: TICK IT - the watcher commits what it captures
+
+$(cat "$KEY.pub" | sed 's/^/    /')
+
+EOF
+  exit 0
+fi
+
+say "4. Repository at $DIR"
+if [ -d "$DIR/.git" ]; then
+  sudo -u "$USER_NAME" "$GIT" -C "$DIR" fetch --quiet origin "$BRANCH"
+  sudo -u "$USER_NAME" "$GIT" -C "$DIR" checkout --quiet "$BRANCH"
+  sudo -u "$USER_NAME" "$GIT" -C "$DIR" reset --quiet --hard "origin/$BRANCH"
+  note "updated to $(sudo -u "$USER_NAME" "$GIT" -C "$DIR" rev-parse --short HEAD)"
+else
+  [ -e "$DIR" ] && [ -n "$(ls -A "$DIR" 2>/dev/null)" ] && die "$DIR exists and is not an exdate checkout; move it or set EXDATE_DIR"
+  install -d -o "$USER_NAME" -g "$USER_NAME" "$DIR"
+  sudo -u "$USER_NAME" "$GIT" clone --quiet --branch "$BRANCH" "$REPO_SSH" "$DIR"
+  note "cloned $BRANCH"
+fi
+sudo -u "$USER_NAME" "$GIT" -C "$DIR" config user.name 'exdate-watcher'
+sudo -u "$USER_NAME" "$GIT" -C "$DIR" config user.email 'noreply@users.noreply.github.com'
+
+say "5. Settings"
+if [ ! -f "$DIR/.env" ]; then
+  cat > "$DIR/.env" <<'EOF'
+# Where the announcement and the applied notice go. With none set the watcher
+# still captures and simply tells nobody. See .env.example for the full list.
+# EXDATE_ALERT_WEBHOOK_URL=
+# EXDATE_TELEGRAM_BOT_TOKEN=
+# EXDATE_TELEGRAM_CHAT_ID=
+EOF
+  chown "$USER_NAME:$USER_NAME" "$DIR/.env"; chmod 600 "$DIR/.env"
+  note "wrote $DIR/.env with the alert sinks commented out"
+else
+  note "$DIR/.env kept as it is"
+fi
+
+say "6. Service"
+install -m 644 "$DIR/deploy/exdate-watcher.service" /etc/systemd/system/exdate-watcher.service
+systemctl daemon-reload
+note "installed exdate-watcher.service"
+
+say "7. Preflight"
+if sudo -u "$USER_NAME" --preserve-env=HOME env HOME="/home/$USER_NAME" node "$DIR/scripts/check-watcher.mjs"; then
+  systemctl enable --now exdate-watcher
+  sleep 3
+  systemctl is-active --quiet exdate-watcher && note "running" || die "service failed to start: journalctl -u exdate-watcher"
+  cat <<EOF
+
+  Done. It is watching.
+
+    journalctl -u exdate-watcher -f      what it is doing
+    systemctl restart exdate-watcher     after editing $DIR/.env
+
+  One thing left, on GitHub rather than here: set the repository variable
+  EXDATE_CAPTURE_MODE to "watchdog", so the scheduled job stops capturing on its
+  own and starts checking this machine's heartbeat instead.
+
+    https://github.com/BacBacta/Exdate/settings/variables/actions/new
+
+EOF
+else
+  die "preflight found something blocking; the service is installed but not started"
+fi

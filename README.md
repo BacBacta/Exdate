@@ -130,9 +130,16 @@ simply always there: `scripts/watch-effective-prices.mjs`, the same logic from t
 (`scripts/lib/effective-prices.mjs`, tested in `packages/core`), scanning every thirty seconds,
 sampling at the instant, committing what it caught and a heartbeat every six hours.
 
-It needs a machine, a clone on a branch it may push to, and a deploy key with write access. Either
-`deploy/exdate-watcher.service` under systemd (the file says how), or the `watcher` service in
-`docker-compose.yml` next to the API. Alert sinks are the ones under *Alerts*. Then set the
+It needs a machine, a clone on a branch it may push to, and a deploy key with write access.
+`deploy/install.sh`, run as root on a fresh Debian or Ubuntu box, does all of it: it runs twice,
+the first pass generating a deploy key and printing the public half to add to the repository, the
+second cloning, installing `deploy/exdate-watcher.service` and starting it. The private key is
+generated on the machine and never travels. There is also a `watcher` service in
+`docker-compose.yml`, next to the API.
+
+`node scripts/check-watcher.mjs` says whether a machine can do the job before it matters: node, the
+checkout, push access proved with a dry run, the chain, a real issuer quote, and the clock measured
+against the issuer's own, since the watcher wakes on that clock and drift means missed windows. Alert sinks are the ones under *Alerts*. Then set the
 repository variable `EXDATE_CAPTURE_MODE=watchdog`: the GitHub job stops capturing on its own,
 checks the watcher's heartbeat instead, captures in its place only while that heartbeat is stale,
 and says so through the sinks on each transition. The two share one file and each owns its own

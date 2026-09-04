@@ -22,20 +22,38 @@ host. Nothing else changes: delivery is recorded in `data/effective-prices.obser
 
 The issuer's quote at the instant a step takes effect is the price a haircut is computed from for
 the 159 tokens without a Chainlink feed, and it cannot be read back. Today it is captured by a
-GitHub cron that fires every 7 to 25 minutes in practice (`data/capture-cadence.observed.json`);
-at the nine-minute budget that catches about 70 % of steps. `scripts/watch-effective-prices.mjs`
-is the same capture as a process that stays alive, written and tested; it needs:
+GitHub cron that fires every 7 to 25 minutes in practice
+(`data/capture-cadence.observed.json`); at the nine-minute budget that catches about 70 % of steps.
+A process that is always there catches all of them.
 
-- a small VPS (a 4 €/month box is plenty; the same one can host the API below), with node 22
-  and git, the repository cloned at `/opt/exdate` on `claude/lance-en5q6j`;
-- a **deploy key with write access** on the repository, created in GitHub and placed in the
-  machine's `~/.ssh` — never through a chat or a file that travels;
-- `deploy/exdate-watcher.service` installed as the file says, or `docker compose up -d watcher`;
-- the alert sinks from item 1 in `/opt/exdate/.env`, so it can speak;
-- then the repository *variable* `EXDATE_CAPTURE_MODE=watchdog`, so the GitHub job stands down
-  and checks the watcher's heartbeat instead.
+Take any small VPS, Debian or Ubuntu, 1 GB is plenty (the watcher measures 78 MB). Then, as root:
 
-`EXDATE_WATCH_PUSH=false` runs it without committing, for a first look.
+```bash
+curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/install.sh | bash
+```
+
+It runs **twice on purpose**. The first pass installs what is missing, creates a service account and
+generates a deploy key, then stops and prints the public half. Add that to
+<https://github.com/BacBacta/Exdate/settings/keys/new> with **write access ticked** — the watcher
+commits what it captures. The private half is generated on the machine and never leaves it, which
+is why no key is handed to you from anywhere else. Run the same command again and it clones,
+installs the service, runs the preflight and starts.
+
+Then two things by hand:
+
+- put an alert sink in `/opt/exdate/.env` (item 1 above) and `systemctl restart exdate-watcher`;
+- set the repository *variable* `EXDATE_CAPTURE_MODE` to `watchdog` at
+  <https://github.com/BacBacta/Exdate/settings/variables/actions/new>, so the scheduled job stops
+  capturing on its own and starts checking the machine's heartbeat instead, alerting when it goes
+  quiet.
+
+`node scripts/check-watcher.mjs` answers "could this machine do the job" on demand: node, the
+checkout, push access proved with a dry run, the chain, a real issuer quote, and the clock against
+the issuer's own — the watcher wakes on that clock, so minutes of drift means missing windows.
+Add `--send-test-alert` to prove delivery. `EXDATE_WATCH_PUSH=false` runs it without committing.
+
+The installer was exercised here up to the point where it needs outbound SSH, which this container
+blocks; the clone, service install and start have not been run end to end on a real box.
 
 ## 3. Optional: an archive endpoint you control
 
