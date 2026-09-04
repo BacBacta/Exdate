@@ -20,7 +20,8 @@
     "./holdings": "./src/holdings.ts",
     "./chains": "./src/chains.ts",
     "./quotes": "./src/quotes.ts",
-    "./pools": "./src/pools.ts"
+    "./pools": "./src/pools.ts",
+    "./tokenlist": "./src/tokenlist.ts"
   },
   "files": [
     "dist",
@@ -62,6 +63,10 @@
       "./pools": {
         "types": "./dist/pools.d.ts",
         "default": "./dist/pools.js"
+      },
+      "./tokenlist": {
+        "types": "./dist/tokenlist.d.ts",
+        "default": "./dist/tokenlist.js"
       }
     }
   },

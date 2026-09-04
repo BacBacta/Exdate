@@ -14,3 +14,12 @@ for (const name of readdirSync(source)) {
   n++
 }
 console.log(`public/data: ${n} files`)
+
+/**
+ * The token list also gets a clean path at the site root. A token list is imported by
+ * URL into a wallet or an aggregator, and that URL is quoted, bookmarked and cached by
+ * consumers - so it should read like an address and not like an implementation detail
+ * under /data.
+ */
+copyFileSync(new URL('exdate.tokenlist.json', source), new URL('../public/tokenlist.json', import.meta.url))
+console.log('public/tokenlist.json: 1 file')

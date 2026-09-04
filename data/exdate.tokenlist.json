@@ -1,0 +1,3510 @@
+{
+  "name": "exdate Robinhood Stock Tokens",
+  "timestamp": "2026-09-04T07:47:16.296Z",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "keywords": [
+    "tokenized stocks",
+    "robinhood",
+    "dividends",
+    "corporate actions"
+  ],
+  "logoURI": "https://exdate-bactas-projects.vercel.app/icon.svg",
+  "tokens": [
+    {
+      "chainId": 4663,
+      "address": "0x521Cf887E6531c6F667b5BC4D896E5d9bfE8EB2E",
+      "name": "Applied Optoelectronics",
+      "symbol": "AAOI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x521cf887e6531c6f667b5bc4d896e5d9bfe8eb2e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US03823U1025",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x521cf887e6531c6f667b5bc4d896e5d9bfe8eb2e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "name": "Apple",
+      "symbol": "AAPL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xaf3d76f1834a1d425780943c99ea8a608f8a93f9.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.000566080061092436",
+        "isin": "US0378331005",
+        "priceFeed": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xaf3d76f1834a1d425780943c99ea8a608f8a93f9/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x3139D77Ace0cbAA5bDfD38bD1F1911a794AF0B0e",
+      "name": "Abcellera Biologics",
+      "symbol": "ABCL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x3139d77ace0cbaa5bdfd38bd1f1911a794af0b0e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "CA00288U1066",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x3139d77ace0cbaa5bdfd38bd1f1911a794af0b0e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x232B8ed6377BE97813853B0Ac104c4Cda8378d1B",
+      "name": "Adobe",
+      "symbol": "ADBE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x232b8ed6377be97813853b0ac104c4cda8378d1b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US00724F1012",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x232b8ed6377be97813853b0ac104c4cda8378d1b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x5F604fBA1162193A4388A5DFa56F556f3E133cC2",
+      "name": "Aehr",
+      "symbol": "AEHR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x5f604fba1162193a4388a5dfa56f556f3e133cc2.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US00760J1088",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x5f604fba1162193a4388a5dfa56f556f3e133cc2/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xfAf9cb261B5FCC1f404Bb10CD39C5c6C1974E612",
+      "name": "Advanced Energy",
+      "symbol": "AEIS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xfaf9cb261b5fcc1f404bb10cd39c5c6c1974e612.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0079731008",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.1",
+        "dividendProcessDate": "2026-09-04",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xfaf9cb261b5fcc1f404bb10cd39c5c6c1974e612/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x748c32c3ca24eDf31ea597Db1F3d330a7a6DA3Dc",
+      "name": "Astera Labs, Inc.",
+      "symbol": "ALAB",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x748c32c3ca24edf31ea597db1f3d330a7a6da3dc.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US04626A1034",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x748c32c3ca24edf31ea597db1f3d330a7a6da3dc/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x36046893810a7E7fCE501229d57dc3FC8c8716d0",
+      "name": "Applied Materials",
+      "symbol": "AMAT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x36046893810a7e7fce501229d57dc3fc8c8716d0.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0382221051",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.53",
+        "dividendProcessDate": "2026-09-10",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x36046893810a7e7fce501229d57dc3fc8c8716d0/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x99D9D8663545151603863C5AcbD6FC3218899009",
+      "name": "Ambarella",
+      "symbol": "AMBA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x99d9d8663545151603863c5acbd6fc3218899009.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "KYG037AX1015",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x99d9d8663545151603863c5acbd6fc3218899009/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x05a3d1Cd21d0C88145E82600E62e7E496e0F222B",
+      "name": "AMC Entertainment",
+      "symbol": "AMC",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x05a3d1cd21d0c88145e82600e62e7e496e0f222b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US00165C3025",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x05a3d1cd21d0c88145e82600e62e7e496e0f222b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
+      "name": "AMD",
+      "symbol": "AMD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x86923f96303d656e4aa86d9d42d1e57ad2023fdc.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0079031078",
+        "priceFeed": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x86923f96303d656e4aa86d9d42d1e57ad2023fdc/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xDd356AA38F40A7b7076755aC854B6FBb1F0D305B",
+      "name": "Amkor Technology",
+      "symbol": "AMKR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xdd356aa38f40a7b7076755ac854b6fbb1f0d305b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0316521006",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.08352",
+        "dividendProcessDate": "2026-09-22",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xdd356aa38f40a7b7076755ac854b6fbb1f0d305b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+      "name": "Amazon",
+      "symbol": "AMZN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x12f190a9f9d7d37a250758b26824b97ce941bf54.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0231351067",
+        "priceFeed": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x12f190a9f9d7d37a250758b26824b97ce941bf54/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x28bABD556b60E53663B8615036479a29c2CDd1Bf",
+      "name": "Arista",
+      "symbol": "ANET",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x28babd556b60e53663b8615036479a29c2cdd1bf.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0404132054",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x28babd556b60e53663b8615036479a29c2cdd1bf/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xb8DBf92F9741c9ac1c32115E78581f23509916FD",
+      "name": "Applied Digital",
+      "symbol": "APLD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb8dbf92f9741c9ac1c32115e78581f23509916fd.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0381692070",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb8dbf92f9741c9ac1c32115e78581f23509916fd/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xA249BAF1063Af884807C1E1400AEf7784836917E",
+      "name": "AppLovin",
+      "symbol": "APP",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xa249baf1063af884807c1e1400aef7784836917e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US03831W1080",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xa249baf1063af884807c1e1400aef7784836917e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x47F93d52cBeC7C6D2CfC080e154002370a60dAEA",
+      "name": "ASML Holding NV",
+      "symbol": "ASML",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x47f93d52cbec7c6d2cfc080e154002370a60daea.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.000101323251417769",
+        "isin": "USN070592100",
+        "priceFeed": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x47f93d52cbec7c6d2cfc080e154002370a60daea/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x1AF6446f07eb1d97c546AFC8c9544cBDF3AD5137",
+      "name": "AST SpaceMobile",
+      "symbol": "ASTS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x1af6446f07eb1d97c546afc8c9544cbdf3ad5137.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US00217D1000",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x1af6446f07eb1d97c546afc8c9544cbdf3ad5137/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x373C06c4f7BDe527D7Dae4BA169E42b55E393CeD",
+      "name": "Aurora Innovation",
+      "symbol": "AUR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x373c06c4f7bde527d7dae4ba169e42b55e393ced.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0517741072",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x373c06c4f7bde527d7dae4ba169e42b55e393ced/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF6290b5e7C26502e2dA514C31509849718EA76A5",
+      "name": "AeroVironment",
+      "symbol": "AVAV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf6290b5e7c26502e2da514c31509849718ea76a5.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0080731088",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf6290b5e7c26502e2da514c31509849718ea76a5/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x156E175DD063a8cE274C50654eF40e0032b3fbcF",
+      "name": "Broadcom",
+      "symbol": "AVGO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x156e175dd063a8ce274c50654ef40e0032b3fbcf.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US11135F1012",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x156e175dd063a8ce274c50654ef40e0032b3fbcf/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xC27dBD474aF5181c5A8777903690D8D262D12648",
+      "name": "Axon",
+      "symbol": "AXON",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc27dbd474af5181c5a8777903690d8d262d12648.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US05464C1018",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc27dbd474af5181c5a8777903690d8d262d12648/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x141eEa040c2250eEc0314e336975e81f85f6585e",
+      "name": "AXT",
+      "symbol": "AXTI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x141eea040c2250eec0314e336975e81f85f6585e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US00246W1036",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x141eea040c2250eec0314e336975e81f85f6585e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4D21483a44Bf67a86b77E3dA301411880797D452",
+      "name": "Boeing",
+      "symbol": "BA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x4d21483a44bf67a86b77e3da301411880797d452.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0970231058",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x4d21483a44bf67a86b77e3da301411880797d452/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4",
+      "name": "Alibaba",
+      "symbol": "BABA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xad25ac6c84d497db898fa1e8387bf6af3532a1c4.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US01609W1027",
+        "priceFeed": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xad25ac6c84d497db898fa1e8387bf6af3532a1c4/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x48E39E56aCdbA37b09020C0b734A613C9a2f100A",
+      "name": "Blackberry",
+      "symbol": "BB",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x48e39e56acdba37b09020c0b734a613c9a2f100a.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "CA09228F1036",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x48e39e56acdba37b09020c0b734a613c9a2f100a/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x822CC93fFD030293E9842c30BBD678F530701867",
+      "name": "Bloom Energy",
+      "symbol": "BE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x822cc93ffd030293e9842c30bbd678f530701867.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0937121079",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x822cc93ffd030293e9842c30bbd678f530701867/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x2F62fC9fAbb470C690f141c28340eD832bB27020",
+      "name": "Vanguard Total Bond Market ETF",
+      "symbol": "BND",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x2f62fc9fabb470c690f141c28340ed832bb27020.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US9219378356",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.25155",
+        "dividendProcessDate": "2026-08-05",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x2f62fc9fabb470c690f141c28340ed832bb27020/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xceF9027c7d6985b85f0BA431125073529A947A68",
+      "name": "Webull",
+      "symbol": "BULL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xcef9027c7d6985b85f0ba431125073529a947a68.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "KYG9572D1034",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xcef9027c7d6985b85f0ba431125073529a947a68/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x5c90450Bbb4273D7b2f17CF6917AEB237A569679",
+      "name": "Cerebras Systems",
+      "symbol": "CBRS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x5c90450bbb4273d7b2f17cf6917aeb237a569679.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US15675D1037",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x5c90450bbb4273d7b2f17cf6917aeb237a569679/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x9651342CeA770aE9a2969Ba2A52611523146aef9",
+      "name": "Carnival Corporation",
+      "symbol": "CCL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x9651342cea770ae9a2969ba2a52611523146aef9.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.021486444855206408",
+        "isin": "BMG2004J1036",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x9651342cea770ae9a2969ba2a52611523146aef9/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xaE517A2903E68bd929Dfd15be875F8369D53e94a",
+      "name": "Constellation Energy",
+      "symbol": "CEG",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xae517a2903e68bd929dfd15be875f8369d53e94a.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US21037T1097",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.4265",
+        "dividendProcessDate": "2026-09-04",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xae517a2903e68bd929dfd15be875f8369d53e94a/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x8cF07C5A878945185d327aAa6e33FAa95F95e7bF",
+      "name": "Celsius",
+      "symbol": "CELH",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x8cf07c5a878945185d327aaa6e33faa95f95e7bf.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US15118V2079",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x8cf07c5a878945185d327aaa6e33faa95f95e7bf/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x44f6D488021f8233B9416294d1FE9b1fEe28382d",
+      "name": "Ciena",
+      "symbol": "CIEN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x44f6d488021f8233b9416294d1fe9b1fee28382d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US1717793095",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x44f6d488021f8233b9416294d1fe9b1fee28382d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x62200915e7DEab1eC7f79fb246daDbB80eACdDd0",
+      "name": "Clover Health Investments",
+      "symbol": "CLOV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x62200915e7deab1ec7f79fb246dadbb80eacddd0.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US18914F1030",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x62200915e7deab1ec7f79fb246dadbb80eacddd0/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xBf449977089c718C004a66C554B26B94ef3Ad4De",
+      "name": "Celestica",
+      "symbol": "CLS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xbf449977089c718c004a66c554b26b94ef3ad4de.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "CA15101Q2071",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xbf449977089c718c004a66c554b26b94ef3ad4de/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xcBB95BBF36099d34dA091dc6Fa6F49EfA257Cee3",
+      "name": "CleanSpark",
+      "symbol": "CLSK",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xcbb95bbf36099d34da091dc6fa6f49efa257cee3.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US18452B2097",
+        "priceFeed": "0x810c12D3a554Bc47fd39597Fe3b3AAC4941F50eF",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xcbb95bbf36099d34da091dc6fa6f49efa257cee3/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x92F9F459F1a9a5AD266b182BE7Bffd1C6c666894",
+      "name": "Coherent",
+      "symbol": "COHR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x92f9f459f1a9a5ad266b182be7bffd1c6c666894.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US19247G1076",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x92f9f459f1a9a5ad266b182be7bffd1c6c666894/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b",
+      "name": "Coinbase",
+      "symbol": "COIN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x6330d8c3178a418788df01a47479c0ce7ccf450b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US19260Q1076",
+        "priceFeed": "0xA3a468A452940B7D6b69991207B508c609a98Ef2",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x6330d8c3178a418788df01a47479c0ce7ccf450b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2",
+      "name": "Costco",
+      "symbol": "COST",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x4ea005168d7f09a7a0ba9d1def21a479950e44c2.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.000612040296259656",
+        "isin": "US22160K1051",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x4ea005168d7f09a7a0ba9d1def21a479950e44c2/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
+      "name": "Circle Internet Group",
+      "symbol": "CRCL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US1725731079",
+        "priceFeed": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4D67253bc223e6b0e104F1084c1fb2b669dDC41b",
+      "name": "Credo Technology Group",
+      "symbol": "CRDO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x4d67253bc223e6b0e104f1084c1fb2b669ddc41b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "KYG254571055",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x4d67253bc223e6b0e104f1084c1fb2b669ddc41b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xd95B44124e475743a7589e68F3D74008A5536D44",
+      "name": "Salesforce",
+      "symbol": "CRM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xd95b44124e475743a7589e68f3d74008a5536d44.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US79466L3024",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xd95b44124e475743a7589e68f3d74008a5536d44/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xea72Ecca2d0f6bFA1394DBBCff85b52CD4233931",
+      "name": "CrowdStrike Holdings",
+      "symbol": "CRWD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931.png",
+      "extensions": {
+        "underlyingSharesPerToken": "4",
+        "isin": "US22788C1053",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
+      "name": "CoreWeave",
+      "symbol": "CRWV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US21873S1087",
+        "priceFeed": "0xe1b3aABCAFAd1c94708dc1367dcfF8Aa4407487C",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF543967EEBB6f1917992eF0E68De63ab07a5a0dA",
+      "name": "Cisco Systems",
+      "symbol": "CSCO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf543967eebb6f1917992ef0e68de63ab07a5a0da.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US17275R1023",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf543967eebb6f1917992ef0e68de63ab07a5a0da/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x63D5a3b6939a33f1e75d8Bcd85759858239600DB",
+      "name": "Cognizant",
+      "symbol": "CTSH",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x63d5a3b6939a33f1e75d8bcd85759858239600db.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US1924461023",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.33",
+        "dividendProcessDate": "2026-08-25",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x63d5a3b6939a33f1e75d8bcd85759858239600db/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xa4f319104089FE321dc8093C6E707d4fE190A988",
+      "name": "Carvana",
+      "symbol": "CVNA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xa4f319104089fe321dc8093c6e707d4fe190a988.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US1468691027",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xa4f319104089fe321dc8093c6e707d4fe190a988/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x27c99fBde9D0d2AA4f4Bfb4943f237843DdF6958",
+      "name": "Datadog",
+      "symbol": "DDOG",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x27c99fbde9d0d2aa4f4bfb4943f237843ddf6958.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US23804L1035",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x27c99fbde9d0d2aa4f4bfb4943f237843ddf6958/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x941AE714EC6D8130c7B75d67160Ca08f1e7d11Dd",
+      "name": "Dell",
+      "symbol": "DELL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.000063708620124549",
+        "isin": "US24703L2025",
+        "priceFeed": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x1D11f0496982706C5e14A514D4E79F2e6BdE4516",
+      "name": "Trump Media & Technology Group",
+      "symbol": "DJT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x1d11f0496982706c5e14a514d4e79f2e6bde4516.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US25400Q1058",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x1d11f0496982706c5e14a514d4e79f2e6bde4516/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xc02f12B9fe9E707079EC0d546f3050d3F6C1F8bD",
+      "name": "DigitalOcean",
+      "symbol": "DOCN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc02f12b9fe9e707079ec0d546f3050d3f6c1f8bd.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US25402D1028",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc02f12b9fe9e707079ec0d546f3050d3f6c1f8bd/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x39EC44Bee4F6A116c6F9B8De566848a985C53C60",
+      "name": "e.l.f. Beauty",
+      "symbol": "ELF",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x39ec44bee4f6a116c6f9b8de566848a985c53c60.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US26856L1035",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x39ec44bee4f6a116c6f9b8de566848a985c53c60/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x1c690498150252222C275A5CEd69d3A6b1f52D5E",
+      "name": "iShares MSCI Taiwan Capped ETF",
+      "symbol": "EWT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x1c690498150252222c275a5ced69d3a6b1f52d5e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46434G7723",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x1c690498150252222c275a5ced69d3a6b1f52d5e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x7f0aBeF0C07280F82c6a08ead09dEd6BAE2C13Fc",
+      "name": "iShares MSCI South Korea fund",
+      "symbol": "EWY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x7f0abef0c07280f82c6a08ead09ded6bae2c13fc.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4642867729",
+        "priceFeed": "0xEFdf54610B62A7753Ec30bDc380847c12D32e1D1",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x7f0abef0c07280f82c6a08ead09ded6bae2c13fc/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x25C288E6D899b9BC30160965aD9644c67e73bE0C",
+      "name": "Ford Motor",
+      "symbol": "F",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x25c288e6d899b9bc30160965ad9644c67e73be0c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.000145502866134027",
+        "isin": "US3453708600",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x25c288e6d899b9bc30160965ad9644c67e73be0c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xa48F22A46C0F1C46CA7D111CB6c137c271987180",
+      "name": "Fair Isaac",
+      "symbol": "FICO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xa48f22a46c0f1c46ca7d111cb6c137c271987180.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US3032501047",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xa48f22a46c0f1c46ca7d111cb6c137c271987180/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x41F4267525a8AFf329540eF24fD83d9044758B33",
+      "name": "Figma",
+      "symbol": "FIG",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x41f4267525a8aff329540ef24fd83d9044758b33.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US3168411052",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x41f4267525a8aff329540ef24fd83d9044758b33/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x9ECe29A4A2397C0a35fb5fA8EE2b9509130a98cc",
+      "name": "Fiserv",
+      "symbol": "FISV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x9ece29a4a2397c0a35fb5fa8ee2b9509130a98cc.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US3377381088",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x9ece29a4a2397c0a35fb5fa8ee2b9509130a98cc/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x93Dbb1d2Dc5D63F4abACFF30485273f538Df68Ac",
+      "name": "Comfort Systems",
+      "symbol": "FIX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x93dbb1d2dc5d63f4abacff30485273f538df68ac.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US1999081045",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.9",
+        "dividendProcessDate": "2026-08-24",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x93dbb1d2dc5d63f4abacff30485273f538df68ac/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x282e87451E10fA6679BC7D76C69BE44cD3fC777C",
+      "name": "Fluence Energy",
+      "symbol": "FLNC",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x282e87451e10fa6679bc7d76c69be44cd3fc777c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US34379V1035",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x282e87451e10fa6679bc7d76c69be44cd3fc777c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x03BC731Ffb162cdd7B98D3C6542bFC291126075d",
+      "name": "Firefly Aerospace Inc.",
+      "symbol": "FLY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x03bc731ffb162cdd7b98d3c6542bfc291126075d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US31816X1063",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x03bc731ffb162cdd7b98d3c6542bfc291126075d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x3FB8976980d486084b2eb4a404BD12e72823958f",
+      "name": "Fortinet",
+      "symbol": "FTNT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x3fb8976980d486084b2eb4a404bd12e72823958f.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US34959E1091",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x3fb8976980d486084b2eb4a404bd12e72823958f/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xeB30663bDFf0622Ef4e4E5cBb4E975F19f33f51D",
+      "name": "Futu Holdings",
+      "symbol": "FUTU",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xeb30663bdff0622ef4e4e5cbb4e975f19f33f51d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US36118L1061",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xeb30663bdff0622ef4e4e5cbb4e975f19f33f51d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x63b814DDBd6BF339f25Fed8c36158a008D5B373e",
+      "name": "General Electric",
+      "symbol": "GE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x63b814ddbd6bf339f25fed8c36158a008d5b373e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US3696043013",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x63b814ddbd6bf339f25fed8c36158a008d5b373e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x94B8AAE43A1cCc08Aa64B7D1F29b4D920aF4a0C9",
+      "name": "GE Vernova",
+      "symbol": "GEV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x94b8aae43a1ccc08aa64b7d1f29b4d920af4a0c9.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US36828A1016",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x94b8aae43a1ccc08aa64b7d1f29b4d920af4a0c9/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xC9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e",
+      "name": "SPDR Gold Trust",
+      "symbol": "GLD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc9a981fee1f9dec688bb123ccdecc63d0debfc4e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US78463V1070",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc9a981fee1f9dec688bb123ccdecc63d0debfc4e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x7c04E6A3368F2A1DE3874f0e80d2e0A1a9915da6",
+      "name": "Corning",
+      "symbol": "GLW",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x7c04e6a3368f2a1de3874f0e80d2e0a1a9915da6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US2193501051",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.28",
+        "dividendProcessDate": "2026-09-29",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x7c04e6a3368f2a1de3874f0e80d2e0a1a9915da6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x2D427692E928fa156ec22acfaBaFA0447C5805B7",
+      "name": "Galaxy Digital Inc.",
+      "symbol": "GLXY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x2d427692e928fa156ec22acfabafa0447c5805b7.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US36317J2096",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x2d427692e928fa156ec22acfabafa0447c5805b7/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x1b0E319c6A659F002271B69dB8A7df2F911c153E",
+      "name": "GameStop",
+      "symbol": "GME",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x1b0e319c6a659f002271b69db8a7df2f911c153e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US36467W1099",
+        "priceFeed": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x1b0e319c6a659f002271b69db8a7df2f911c153e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "name": "Alphabet Class A",
+      "symbol": "GOOGL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US02079K3059",
+        "priceFeed": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.22",
+        "dividendProcessDate": "2026-09-14",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xEB61c0Ed490A367d4E3631cCf8a74B3bfc7E775D",
+      "name": "Huntington Ingalls",
+      "symbol": "HII",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xeb61c0ed490a367d4e3631ccf8a74b3bfc7e775d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4464131063",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.38",
+        "dividendProcessDate": "2026-09-11",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xeb61c0ed490a367d4e3631ccf8a74b3bfc7e775d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xCceE82fE024c36fA15E1005edE3E9e4787e23D09",
+      "name": "Hims & Hers Health",
+      "symbol": "HIMS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xccee82fe024c36fa15e1005ede3e9e4787e23d09.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4330001060",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xccee82fe024c36fa15e1005ede3e9e4787e23d09/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x59dd09d4900C2E4B5F75b7c0d4E6796fcc234Cb1",
+      "name": "HP Enterprise",
+      "symbol": "HPE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x59dd09d4900c2e4b5f75b7c0d4e6796fcc234cb1.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US42824C1099",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x59dd09d4900c2e4b5f75b7c0d4e6796fcc234cb1/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xAEa445c5F3DB1a462998ccC422A875A361ee5d99",
+      "name": "Howmet Aerospace",
+      "symbol": "HWM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xaea445c5f3db1a462998ccc422a875a361ee5d99.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4432011082",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.14",
+        "dividendProcessDate": "2026-08-25",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xaea445c5f3db1a462998ccc422a875a361ee5d99/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x980dcf6766FA79f5Cf0c4AAdb3ab477ff15a9619",
+      "name": "IBM",
+      "symbol": "IBM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x980dcf6766fa79f5cf0c4aadb3ab477ff15a9619.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4592001014",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.69",
+        "dividendProcessDate": "2026-09-10",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x980dcf6766fa79f5cf0c4aadb3ab477ff15a9619/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x7c148F74ac7445D1F28366b7FcDC6792a9Fcd0Cf",
+      "name": "ImmunityBio,",
+      "symbol": "IBRX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x7c148f74ac7445d1f28366b7fcdc6792a9fcd0cf.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US45256X1037",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x7c148f74ac7445d1f28366b7fcdc6792a9fcd0cf/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xACEF2e09adb47aD6aBeBAD9fF06689E60615C2B6",
+      "name": "iShares MSCI India ETF",
+      "symbol": "INDA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xacef2e09adb47ad6abebad9ff06689e60615c2b6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46429B5984",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xacef2e09adb47ad6abebad9ff06689e60615c2b6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xB853bC83a753342a4f8320ea680b4B1E84118D21",
+      "name": "Infleqtion",
+      "symbol": "INFQ",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb853bc83a753342a4f8320ea680b4b1e84118d21.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US45676K1034",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb853bc83a753342a4f8320ea680b4b1e84118d21/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xf1953DAB6FaD537488d5A022361FfAa8B4c95eC6",
+      "name": "Innodata",
+      "symbol": "INOD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf1953dab6fad537488d5a022361ffaa8b4c95ec6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4576422053",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf1953dab6fad537488d5a022361ffaa8b4c95ec6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
+      "name": "Intel",
+      "symbol": "INTC",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc72b96e0e48ecd4dc75e1e45396e26300bc39681.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4581401001",
+        "priceFeed": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc72b96e0e48ecd4dc75e1e45396e26300bc39681/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x56d23beE5f41A7120170b0c603Dae30128e460e9",
+      "name": "Intuit",
+      "symbol": "INTU",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x56d23bee5f41a7120170b0c603dae30128e460e9.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4612021034",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x56d23bee5f41a7120170b0c603dae30128e460e9/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x558378E000D634A36593E338eBacdd6207640EfE",
+      "name": "IonQ",
+      "symbol": "IONQ",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x558378e000d634a36593e338ebacdd6207640efe.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46222L1089",
+        "priceFeed": "0x22EfeC4919baf55F360E0EDee4AbEB26DE4971eb",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x558378e000d634a36593e338ebacdd6207640efe/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF0AB0c93bE6F41369d302e55db1A96b3c430212D",
+      "name": "IREN Limited",
+      "symbol": "IREN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf0ab0c93be6f41369d302e55db1a96b3c430212d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "AU0000185993",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf0ab0c93be6f41369d302e55db1a96b3c430212d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xEAf2512dFC1bEAc608F8794B3793CD4E02894Aa6",
+      "name": "Jabil Inc.",
+      "symbol": "JBL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xeaf2512dfc1beac608f8794b3793cd4e02894aa6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4663131039",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.08",
+        "dividendProcessDate": "2026-09-02",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xeaf2512dfc1beac608f8794b3793cd4e02894aa6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x03DfbBE0AC4E7bCDaFd08eD41A400326B77D8c80",
+      "name": "Johnson & Johnson",
+      "symbol": "JNJ",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x03dfbbe0ac4e7bcdafd08ed41a400326b77d8c80.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4781601046",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.34",
+        "dividendProcessDate": "2026-09-08",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x03dfbbe0ac4e7bcdafd08ed41a400326b77d8c80/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xb334C5cE741B80B5B671F47F5C269Cb193fe8E24",
+      "name": "Joby Aviation",
+      "symbol": "JOBY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb334c5ce741b80b5b671f47f5c269cb193fe8e24.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "KYG651631007",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb334c5ce741b80b5b671f47f5c269cb193fe8e24/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x96b933C74eCB4A0926b9210cef7b743EF46be2E9",
+      "name": "KLA",
+      "symbol": "KLAC",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x96b933c74ecb4a0926b9210cef7b743ef46be2e9.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4824801009",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.23",
+        "dividendProcessDate": "2026-09-01",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x96b933c74ecb4a0926b9210cef7b743ef46be2e9/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x12e3c047bf9AeCAF9dDC98c05C31BFD1dd043993",
+      "name": "Kohls Corporation",
+      "symbol": "KSS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x12e3c047bf9aecaf9ddc98c05c31bfd1dd043993.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5002551043",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.125",
+        "dividendProcessDate": "2026-09-23",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x12e3c047bf9aecaf9ddc98c05c31bfd1dd043993/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x7FD06a4d81cCfA3F351394E144d5191874C31313",
+      "name": "Kratos Defense & Security Solutions",
+      "symbol": "KTOS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x7fd06a4d81ccfa3f351394e144d5191874c31313.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US50077B2079",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x7fd06a4d81ccfa3f351394e144d5191874c31313/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x48d60243c66437c6ac3c2495Be94747aEd5Dfe25",
+      "name": "L3Harris",
+      "symbol": "LHX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x48d60243c66437c6ac3c2495be94747aed5dfe25.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5024311095",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.25",
+        "dividendProcessDate": "2026-09-18",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x48d60243c66437c6ac3c2495be94747aed5dfe25/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x8eF20885F94e3D9bc7eB3080279188Bd5ED7c08C",
+      "name": "Lumentum",
+      "symbol": "LITE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x8ef20885f94e3d9bc7eb3080279188bd5ed7c08c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US55024U1097",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x8ef20885f94e3d9bc7eb3080279188bd5ed7c08c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x8005d266423c7ea827372c9c864491e5786600ea",
+      "name": "Eli Lilly",
+      "symbol": "LLY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x8005d266423c7ea827372c9c864491e5786600ea.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5324571083",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.73",
+        "dividendProcessDate": "2026-09-10",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x8005d266423c7ea827372c9c864491e5786600ea/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x329fcACEb9AD6F9580DD5F643fed0646900D043c",
+      "name": "Lockheed",
+      "symbol": "LMT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x329fcaceb9ad6f9580dd5f643fed0646900d043c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5398301094",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "3.45",
+        "dividendProcessDate": "2026-09-25",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x329fcaceb9ad6f9580dd5f643fed0646900d043c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x57b0030166DB0C31690d1A5aA167e2e26e2C29a4",
+      "name": "Lam Research Corp",
+      "symbol": "LRCX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x57b0030166db0c31690d1a5aa167e2e26e2c29a4.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5128073062",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x57b0030166db0c31690d1a5aa167e2e26e2c29a4/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4e62068525Ab11FE768e29dfD00ef909B9803016",
+      "name": "Lululemon",
+      "symbol": "LULU",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x4e62068525ab11fe768e29dfd00ef909b9803016.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5500211090",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x4e62068525ab11fe768e29dfd00ef909b9803016/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xa5D4968421bA94814Be3B136b15cf422101aC1a3",
+      "name": "Intuitive Machines",
+      "symbol": "LUNR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xa5d4968421ba94814be3b136b15cf422101ac1a3.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46125A1007",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xa5d4968421ba94814be3b136b15cf422101ac1a3/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xDdf2266b79abf0B48898959B0ed6E6adf512be74",
+      "name": "MongoDB",
+      "symbol": "MDB",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xddf2266b79abf0b48898959b0ed6e6adf512be74.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US60937P1066",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xddf2266b79abf0b48898959b0ed6e6adf512be74/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+      "name": "Meta Platforms",
+      "symbol": "META",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc0d6457c16cc70d6790dd43521c899c87ce02f35.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US30303M1027",
+        "priceFeed": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc0d6457c16cc70d6790dd43521c899c87ce02f35/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xc6Cbad1016b38B797610c25E1dc7D95988B1f362",
+      "name": "Modine",
+      "symbol": "MOD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc6cbad1016b38b797610c25e1dc7d95988b1f362.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US6078281002",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc6cbad1016b38b797610c25e1dc7d95988b1f362/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x52D50D0280AD1054b43f052bD70a49a212A1b128",
+      "name": "Monolithic Power Systems",
+      "symbol": "MPWR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x52d50d0280ad1054b43f052bd70a49a212a1b128.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US6098391054",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x52d50d0280ad1054b43f052bd70a49a212a1b128/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x43B07D15cE533bEc5476d70C22a78a1B2B662155",
+      "name": "Moderna",
+      "symbol": "MRNA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x43b07d15ce533bec5476d70c22a78a1b2b662155.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US60770K1079",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x43b07d15ce533bec5476d70c22a78a1b2b662155/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x62fd0668e10D8B72339BE2DCF7643001688ff13B",
+      "name": "Marvell Technology",
+      "symbol": "MRVL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x62fd0668e10d8b72339be2dcf7643001688ff13b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5738741041",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x62fd0668e10d8b72339be2dcf7643001688ff13b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+      "name": "Microsoft",
+      "symbol": "MSFT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xe93237c50d904957cf27e7b1133b510c669c2e74.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5949181045",
+        "priceFeed": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.91",
+        "dividendProcessDate": "2026-09-10",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xe93237c50d904957cf27e7b1133b510c669c2e74/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xec262a75e413fAfD0dF80480274532C79D42da09",
+      "name": "Strategy Inc.",
+      "symbol": "MSTR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xec262a75e413fafd0df80480274532c79d42da09.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US5949724083",
+        "priceFeed": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xec262a75e413fafd0df80480274532c79d42da09/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xC93f4d80e268AB922e871bd169156C3CC41894e6",
+      "name": "MACOM",
+      "symbol": "MTSI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc93f4d80e268ab922e871bd169156c3cc41894e6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US55405Y1001",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc93f4d80e268ab922e871bd169156c3cc41894e6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+      "name": "Micron Technology",
+      "symbol": "MU",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xff080c8ce2e5feadaca0da81314ae59d232d4afd.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.000074823219171086",
+        "isin": "US5951121038",
+        "priceFeed": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xff080c8ce2e5feadaca0da81314ae59d232d4afd/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x48961813349333209994750ffA89b3c5C22eC969",
+      "name": "MaxLinear",
+      "symbol": "MXL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x48961813349333209994750ffa89b3c5c22ec969.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US57776J1007",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x48961813349333209994750ffa89b3c5c22ec969/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xf7181b63Fdb858558A74ba96BC42732684cd7965",
+      "name": "Navan",
+      "symbol": "NAVN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf7181b63fdb858558a74ba96bc42732684cd7965.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US6391931010",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf7181b63fdb858558a74ba96bc42732684cd7965/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x9D9c6684F596F66a64C030B93A886D51Fd4D7931",
+      "name": "Nebius Group",
+      "symbol": "NBIS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x9d9c6684f596f66a64c030b93a886d51fd4d7931.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "NL0009805522",
+        "priceFeed": "0xE1D87B116Ba0fe898998f1D140339D1fA1E09705",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x9d9c6684f596f66a64c030b93a886d51fd4d7931/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x116F00968269B7bfbaD4109cE591d6E74c0601d4",
+      "name": "Cloudflare, Inc. Class A common stock",
+      "symbol": "NET",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x116f00968269b7bfbad4109ce591d6e74c0601d4.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US18915M1071",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x116f00968269b7bfbad4109ce591d6e74c0601d4/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xE0444EF8BF4eD74f74FD73686e2ddF4C1c5591E8",
+      "name": "Netflix",
+      "symbol": "NFLX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xe0444ef8bf4ed74f74fd73686e2ddf4c1c5591e8.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US64110L1061",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xe0444ef8bf4ed74f74fd73686e2ddf4c1c5591e8/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xBEF75684C43c4ea7BD18Dd532a2244674Ee8b926",
+      "name": "Nano Nuclear Energy",
+      "symbol": "NNE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xbef75684c43c4ea7bd18dd532a2244674ee8b926.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US63010H1086",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xbef75684c43c4ea7bd18dd532a2244674ee8b926/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x0C3260aF4B8f13a69c4c2dFb84fD667890CDFa14",
+      "name": "ServiceNow",
+      "symbol": "NOW",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x0c3260af4b8f13a69c4c2dfb84fd667890cdfa14.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US81762P1021",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x0c3260af4b8f13a69c4c2dfb84fd667890cdfa14/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x408c14038a04f7bD235329E26d2bf569ee20e250",
+      "name": "Nu",
+      "symbol": "NU",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x408c14038a04f7bd235329e26d2bf569ee20e250.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "KYG6683N1034",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x408c14038a04f7bd235329e26d2bf569ee20e250/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "name": "NVIDIA",
+      "symbol": "NVDA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US67066G1040",
+        "priceFeed": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.25",
+        "dividendProcessDate": "2026-10-01",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xbE6702d7b70315376dC48a3293f24f0982F86386",
+      "name": "Navitas Semiconductor",
+      "symbol": "NVTS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xbe6702d7b70315376dc48a3293f24f0982f86386.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US63942X1063",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xbe6702d7b70315376dc48a3293f24f0982f86386/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x8B2f88497f15A18E9D4FFa1a8fFB8538399aE774",
+      "name": "Oklo",
+      "symbol": "OKLO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x8b2f88497f15a18e9d4ffa1a8ffb8538399ae774.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US02156V1098",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x8b2f88497f15a18e9d4ffa1a8ffb8538399ae774/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xbBD09F72b025360FeE5C928053Dca6248d35be54",
+      "name": "ON Semiconductor",
+      "symbol": "ON",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xbbd09f72b025360fee5c928053dca6248d35be54.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US6821891057",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xbbd09f72b025360fee5c928053dca6248d35be54/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x8ff63eAeEe3fE54Ba450c4F5538064Ec5A893Aef",
+      "name": "Onto Innovation",
+      "symbol": "ONTO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x8ff63eaeee3fe54ba450c4f5538064ec5a893aef.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US6833441057",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x8ff63eaeee3fe54ba450c4f5538064ec5a893aef/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xb0992820E760d836549ba69BC7598b4af75dEE03",
+      "name": "Oracle",
+      "symbol": "ORCL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb0992820e760d836549ba69bc7598b4af75dee03.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.002210914971013375",
+        "isin": "US68389X1054",
+        "priceFeed": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb0992820e760d836549ba69bc7598b4af75dee03/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x40E7a279850e443f582059ae5dC1c3b6563E6395",
+      "name": "Ouster",
+      "symbol": "OUST",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x40e7a279850e443f582059ae5dc1c3b6563e6395.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US68989M2026",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x40e7a279850e443f582059ae5dc1c3b6563e6395/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x1Cdad396DB64BDa184d5182A97Dd9B3C62100b7D",
+      "name": "Everpure",
+      "symbol": "P",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x1cdad396db64bda184d5182a97dd9b3c62100b7d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US74624M1027",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x1cdad396db64bda184d5182a97dd9b3c62100b7d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xB039597eD45CBa7B6E2fb9E8BE51802969CEe5Be",
+      "name": "Palo Alto Networks",
+      "symbol": "PANW",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb039597ed45cba7b6e2fb9e8be51802969cee5be.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US6974351057",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb039597ed45cba7b6e2fb9e8be51802969cee5be/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xfb2664f07B6Aadd29ea7a59D8859b1AeB8645cDa",
+      "name": "UiPath",
+      "symbol": "PATH",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xfb2664f07b6aadd29ea7a59d8859b1aeb8645cda.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US90364P1057",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xfb2664f07b6aadd29ea7a59d8859b1aeb8645cda/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x9b23573b156B52565012F5cE02CDF60AFBaa70Be",
+      "name": "Penguin Solutions",
+      "symbol": "PENG",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x9b23573b156b52565012f5ce02cdf60afbaa70be.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US7069151055",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x9b23573b156b52565012f5ce02cdf60afbaa70be/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x7066A64c24e4206CD62E83bf198c1E7EB361F51e",
+      "name": "Pfizer",
+      "symbol": "PFE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x7066a64c24e4206cd62e83bf198c1e7eb361f51e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US7170811035",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.43",
+        "dividendProcessDate": "2026-09-01",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x7066a64c24e4206cd62e83bf198c1e7eb361f51e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xAA4d64474c172010aB57719cb9951E6142a100d3",
+      "name": "Planet Labs",
+      "symbol": "PL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xaa4d64474c172010ab57719cb9951e6142a100d3.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US72703X1063",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xaa4d64474c172010ab57719cb9951e6142a100d3/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+      "name": "Palantir Technologies",
+      "symbol": "PLTR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US69608A1088",
+        "priceFeed": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xcf6B2D875361be807EAfa57458c80f28521F9333",
+      "name": "POET Technologies",
+      "symbol": "POET",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xcf6b2d875361be807eafa57458c80f28521f9333.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "CA73044W3021",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xcf6b2d875361be807eafa57458c80f28521f9333/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x237c16D66590F67B886d978ACD362EAeaD8B18c7",
+      "name": "Powell Industries",
+      "symbol": "POWL",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x237c16d66590f67b886d978acd362eaead8b18c7.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US7391281067",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.09",
+        "dividendProcessDate": "2026-09-16",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x237c16d66590f67b886d978acd362eaead8b18c7/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4189F0c66EBBB0bfeF1C31f763131361EF32f77C",
+      "name": "Permian Resources",
+      "symbol": "PR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x4189f0c66ebbb0bfef1c31f763131361ef32f77c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US71424F1057",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.16",
+        "dividendProcessDate": "2026-09-30",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x4189f0c66ebbb0bfef1c31f763131361ef32f77c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x9Ab02Ead789b6903c3c44d0ED32F9c707CDF12FD",
+      "name": "Quanta",
+      "symbol": "PWR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x9ab02ead789b6903c3c44d0ed32f9c707cdf12fd.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US74762E1029",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x9ab02ead789b6903c3c44d0ed32f9c707cdf12fd/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xC583c60aeF9Dc401Da72cEC1B404743a93cea1Cc",
+      "name": "D-Wave Quantum Inc. Common Stock",
+      "symbol": "QBTS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc583c60aef9dc401da72cec1b404743a93cea1cc.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US26740W1099",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc583c60aef9dc401da72cec1b404743a93cea1cc/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x0f17206447090e464C277571124dD2688E48AEA9",
+      "name": "Qualcomm",
+      "symbol": "QCOM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x0f17206447090e464c277571124dd2688e48aea9.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US7475251036",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.92",
+        "dividendProcessDate": "2026-09-24",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x0f17206447090e464c277571124dd2688e48aea9/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+      "name": "Invesco QQQ",
+      "symbol": "QQQ",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xd5f3879160bc7c32ebb4dc785f8a4f505888de68.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46090E1038",
+        "priceFeed": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xd5f3879160bc7c32ebb4dc785f8a4f505888de68/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x59818904ab4cE163b3cE4FfB64f2D6Ca02c434B4",
+      "name": "Quantum Computing",
+      "symbol": "QUBT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x59818904ab4ce163b3ce4ffb64f2d6ca02c434b4.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US74766W1080",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x59818904ab4ce163b3ce4ffb64f2d6ca02c434b4/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF0C4BF4C582cb3836e98394b1d4e7B7281101bE8",
+      "name": "Roblox",
+      "symbol": "RBLX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf0c4bf4c582cb3836e98394b1d4e7b7281101be8.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US7710491033",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf0c4bf4c582cb3836e98394b1d4e7b7281101be8/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xFDE6b5d9BB419B10C23268c74e369AbFF39C0460",
+      "name": "Red Cat",
+      "symbol": "RCAT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xfde6b5d9bb419b10c23268c74e369abff39c0460.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US75644T1007",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xfde6b5d9bb419b10c23268c74e369abff39c0460/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x05b37Fb53A299a1b874A619e1c4C404D52C36F4C",
+      "name": "Reddit",
+      "symbol": "RDDT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x05b37fb53a299a1b874a619e1c4c404d52c36f4c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US75734B1008",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x05b37fb53a299a1b874a619e1c4c404d52c36f4c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x92Ef19E82bD8fF36661DE838D5eaE7e5CEF0EfFE",
+      "name": "Redwire",
+      "symbol": "RDW",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x92ef19e82bd8ff36661de838d5eae7e5cef0effe.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US75776W1036",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x92ef19e82bd8ff36661de838d5eae7e5cef0effe/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x284358abc07F9359f19f4b5b4aC91901Be2597Ba",
+      "name": "Rigetti Computing",
+      "symbol": "RGTI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x284358abc07f9359f19f4b5b4ac91901be2597ba.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US76655K1034",
+        "priceFeed": "0x2A045cF1C49c61c166C036d2f06FA2D2d984f765",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x284358abc07f9359f19f4b5b4ac91901be2597ba/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xB1BF26c1D20ff267A4f93550d1E0d06ac40a114B",
+      "name": "Rivian Automotive",
+      "symbol": "RIVN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb1bf26c1d20ff267a4f93550d1e0d06ac40a114b.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US76954A1034",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb1bf26c1d20ff267a4f93550d1e0d06ac40a114b/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x3b14C39E89D60D627b42a1A4CA45b5bb45Fc12e2",
+      "name": "Rocket Lab Corporation",
+      "symbol": "RKLB",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x3b14c39e89d60d627b42a1a4ca45b5bb45fc12e2.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US7731211089",
+        "priceFeed": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x3b14c39e89d60d627b42a1a4ca45b5bb45fc12e2/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x756Bc80af765C82da966a788858d65aDF14f3793",
+      "name": "Sunrun",
+      "symbol": "RUN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x756bc80af765c82da966a788858d65adf14f3793.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US86771W1053",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x756bc80af765c82da966a788858d65adf14f3793/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x95052ddcd5DC25641657424A8Cf04834997E1730",
+      "name": "EchoStar",
+      "symbol": "SATS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x95052ddcd5dc25641657424a8cf04834997e1730.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US2787681061",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x95052ddcd5dc25641657424a8cf04834997e1730/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xd63ABB2C13d7a8421a8017a712802053568e3C1D",
+      "name": "Schwab US Dividend Equity ETF",
+      "symbol": "SCHD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xd63abb2c13d7a8421a8017a712802053568e3c1d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US8085247976",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xd63abb2c13d7a8421a8017a712802053568e3c1d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "name": "iShares 0-3 Month Treasury Bond",
+      "symbol": "SGOV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x92fd66527192e3e61d4ddd13322aa222de86f9b5.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1.005101770003214918",
+        "isin": "US46436E7186",
+        "priceFeed": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+        "priceFeedCorroboratedBy": "multiplier-step",
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.308665",
+        "dividendProcessDate": "2026-09-04",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x92fd66527192e3e61d4ddd13322aa222de86f9b5/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF53F66751B1Eff985311b693531E3290F600c410",
+      "name": "Shopify",
+      "symbol": "SHOP",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf53f66751b1eff985311b693531e3290f600c410.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "CA82509L1076",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf53f66751b1eff985311b693531e3290f600c410/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xBE274710Bf3d9567e1B290eF6a5F9f90ca016FD8",
+      "name": "iShares 1-3 Year Treasury Bond ETF",
+      "symbol": "SHY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xbe274710bf3d9567e1b290ef6a5f9f90ca016fd8.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4642874576",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.250772",
+        "dividendProcessDate": "2026-08-06",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xbe274710bf3d9567e1b290ef6a5f9f90ca016fd8/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x77E655E37F4d913fB9540e0d541D824171a60e81",
+      "name": "Silicon Motion",
+      "symbol": "SIMO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x77e655e37f4d913fb9540e0d541d824171a60e81.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US82706C1080",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.4975",
+        "dividendProcessDate": "2026-08-20",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x77e655e37f4d913fb9540e0d541d824171a60e81/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x84CAb63bc87912E71ad199ff14A0bA45de68FeF8",
+      "name": "SK hynix Inc. American Depositary Shares",
+      "symbol": "SKHY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x84cab63bc87912e71ad199ff14a0ba45de68fef8.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US78392B2060",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x84cab63bc87912e71ad199ff14a0ba45de68fef8/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x285b231728c7E4333799183DF1094d775246a535",
+      "name": "SELLAS Life Sciences",
+      "symbol": "SLS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x285b231728c7e4333799183df1094d775246a535.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US81642T2096",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x285b231728c7e4333799183df1094d775246a535/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+      "name": "iShares Silver Trust",
+      "symbol": "SLV",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46428Q1094",
+        "priceFeed": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xc01aA1fECeC0605b13bc84874ff7256C0f5F562a",
+      "name": "Super Micro Computer",
+      "symbol": "SMCI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xc01aa1fecec0605b13bc84874ff7256c0f5f562a.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US86800U3023",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xc01aa1fecec0605b13bc84874ff7256c0f5f562a/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x072f979c2CAc8e1391B0162a87Fee094bF8744a0",
+      "name": "VanEck Semiconductor ETF",
+      "symbol": "SMH",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x072f979c2cac8e1391b0162a87fee094bf8744a0.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US92189F6768",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x072f979c2cac8e1391b0162a87fee094bf8744a0/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x1Eebee7F74517e0279dFb09d25B0407bEEc3FDd6",
+      "name": "NuScale Power",
+      "symbol": "SMR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x1eebee7f74517e0279dfb09d25b0407beec3fdd6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US67079K1007",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x1eebee7f74517e0279dfb09d25b0407beec3fdd6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF6589F11Bc40b669e584073F428B05562F568733",
+      "name": "Snap",
+      "symbol": "SNAP",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf6589f11bc40b669e584073f428b05562f568733.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US83304A1060",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf6589f11bc40b669e584073f428b05562f568733/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
+      "name": "Sandisk Corporation",
+      "symbol": "SNDK",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb90a19ff0af67f7779aff50a882a9cff42446400.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US80004C2008",
+        "priceFeed": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb90a19ff0af67f7779aff50a882a9cff42446400/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xBa0CAB75495255d0cB58E22B648bFED4ECD1F47E",
+      "name": "Snowflake",
+      "symbol": "SNOW",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xba0cab75495255d0cb58e22b648bfed4ecd1f47e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US8334451098",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xba0cab75495255d0cb58e22b648bfed4ecd1f47e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x98E75885157C80992A8D41b696D8c9C6Fb30A926",
+      "name": "SoFi Technologies",
+      "symbol": "SOFI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x98e75885157c80992a8d41b696d8c9c6fb30a926.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US83406F1021",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x98e75885157c80992a8d41b696d8c9c6fb30a926/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x6E3Dfd9f7e1649BaA14D25cac18C94d62dB10A54",
+      "name": "SoundHound AI",
+      "symbol": "SOUN",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x6e3dfd9f7e1649baa14d25cac18c94d62db10a54.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US8361001071",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x6e3dfd9f7e1649baa14d25cac18c94d62db10a54/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x75742c18BC1f1C5c5f448f4C9D9C6F66dafAAa38",
+      "name": "iShares Semiconductor ETF",
+      "symbol": "SOXX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x75742c18bc1f1c5c5f448f4c9d9c6f66dafaaa38.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US4642875235",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x75742c18bc1f1c5c5f448f4c9d9c6f66dafaaa38/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "name": "Space Exploration Technologies Corp. Class A Common Stock",
+      "symbol": "SPCX",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US84615Q1031",
+        "priceFeed": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xAd622320e520de39e72d41EF07438C3Fd3354875",
+      "name": "Invesco S&P 500 Momentum ETF",
+      "symbol": "SPMO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xad622320e520de39e72d41ef07438c3fd3354875.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US46138E3392",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xad622320e520de39e72d41ef07438c3fd3354875/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "name": "SPDR S&P 500 ETF Trust",
+      "symbol": "SPY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x117cc2133c37b721f49de2a7a74833232b3b4c0c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US78462F1030",
+        "priceFeed": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x117cc2133c37b721f49de2a7a74833232b3b4c0c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xb1969f6604CA1AE7a2cD3F1827876e914594CA2D",
+      "name": "T1 Energy",
+      "symbol": "TE",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb1969f6604ca1ae7a2cd3f1827876e914594ca2d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US35834F1049",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb1969f6604ca1ae7a2cd3f1827876e914594ca2d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x5B97476b922F3305131B8f0B9D333172E87f4aaE",
+      "name": "Atlassian Corporation",
+      "symbol": "TEAM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x5b97476b922f3305131b8f0b9d333172e87f4aae.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US0494681010",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x5b97476b922f3305131b8f0b9d333172e87f4aae/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xB1CC0EC7Db69Cf43539119814df40071b9d61793",
+      "name": "Tempus AI",
+      "symbol": "TEM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xb1cc0ec7db69cf43539119814df40071b9d61793.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US88023B1035",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xb1cc0ec7db69cf43539119814df40071b9d61793/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x2778C5024D5cA2CdB0f8eAD671ffc69963AdCD9C",
+      "name": "Teradyne",
+      "symbol": "TER",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x2778c5024d5ca2cdb0f8ead671ffc69963adcd9c.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US8807701029",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.13",
+        "dividendProcessDate": "2026-09-25",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x2778c5024d5ca2cdb0f8ead671ffc69963adcd9c/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x89776d4Cd68193597A2fC132cfaC1fDe36CCeA8a",
+      "name": "Tower Semiconductor",
+      "symbol": "TSEM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x89776d4cd68193597a2fc132cfac1fde36ccea8a.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "IL0010823792",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x89776d4cd68193597a2fc132cfac1fde36ccea8a/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "name": "Tesla",
+      "symbol": "TSLA",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x322f0929c4625ed5bad873c95208d54e1c003b2d.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US88160R1014",
+        "priceFeed": "0x4A1166a659A55625345e9515b32adECea5547C38",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x322f0929c4625ed5bad873c95208d54e1c003b2d/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x58FfE4a942d3885bAa22D7520691F611EF09e7AA",
+      "name": "Taiwan Semiconductor Manufacturing",
+      "symbol": "TSM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x58ffe4a942d3885baa22d7520691f611ef09e7aa.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US8740391003",
+        "priceFeed": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x58ffe4a942d3885baa22d7520691f611ef09e7aa/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x0b5fb4031cae9163db10B169Ee72685F0EdC8545",
+      "name": "Trade Desk",
+      "symbol": "TTD",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x0b5fb4031cae9163db10b169ee72685f0edc8545.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US88339J1051",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x0b5fb4031cae9163db10b169ee72685f0edc8545/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x5e81213613b6B86EaB4c6c50d718d34359459786",
+      "name": "Take-Two Interactive Software",
+      "symbol": "TTWO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x5e81213613b6b86eab4c6c50d718d34359459786.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US8740541094",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x5e81213613b6b86eab4c6c50d718d34359459786/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x0E6e67Ba88e7b5d9B67636A215c76779B948dE79",
+      "name": "United Microelectronics",
+      "symbol": "UMC",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x0e6e67ba88e7b5d9b67636a215c76779b948de79.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US9108734057",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.306662",
+        "dividendProcessDate": "2026-08-06",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x0e6e67ba88e7b5d9b67636a215c76779b948de79/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xcF364ea52787e289De6F32077834056E3E70D6A8",
+      "name": "UnitedHealth",
+      "symbol": "UNH",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xcf364ea52787e289de6f32077834056e3e70d6a8.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US91324P1021",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "2.32",
+        "dividendProcessDate": "2026-09-22",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xcf364ea52787e289de6f32077834056e3e70d6a8/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xf23250dac154D05Bb671CB0d0eBEf3c635c79CE2",
+      "name": "UPS",
+      "symbol": "UPS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf23250dac154d05bb671cb0d0ebef3c635c79ce2.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US9113121068",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.64",
+        "dividendProcessDate": "2026-09-03",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf23250dac154d05bb671cb0d0ebef3c635c79ce2/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xd917B029C761D264c6A312BBbcDA868658eF86a6",
+      "name": "USA Rare Earth",
+      "symbol": "USAR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xd917b029c761d264c6a312bbbcda868658ef86a6.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US91733P1075",
+        "priceFeed": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xd917b029c761d264c6a312bbbcda868658ef86a6/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
+      "name": "United States Oil Fund",
+      "symbol": "USO",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US91232N2071",
+        "priceFeed": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x6006ed4B2F94110851ff7509D97D034f0EeD9226",
+      "name": "Vicor",
+      "symbol": "VICR",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x6006ed4b2f94110851ff7509d97d034f0eed9226.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US9258151029",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x6006ed4b2f94110851ff7509d97d034f0eed9226/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xFA78C12E6488814A0262E4e802749a4a737d5fB7",
+      "name": "Vertiv",
+      "symbol": "VRT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xfa78c12e6488814a0262e4e802749a4a737d5fb7.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US92537N1081",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xfa78c12e6488814a0262e4e802749a4a737d5fb7/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x26dCbfb34FC83CAbD6990f449674efDc6097fF85",
+      "name": "ViaSat",
+      "symbol": "VSAT",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x26dcbfb34fc83cabd6990f449674efdc6097ff85.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US92552V1008",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x26dcbfb34fc83cabd6990f449674efdc6097ff85/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x561e2a49212b7cCF47f2744Ccb83e200722fADBc",
+      "name": "Vistra",
+      "symbol": "VST",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x561e2a49212b7ccf47f2744ccb83e200722fadbc.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US92840M1027",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.23",
+        "dividendProcessDate": "2026-09-30",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x561e2a49212b7ccf47f2744ccb83e200722fadbc/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x0594134DF3f171a354D9C85eBD65b7A6148F6D09",
+      "name": "Vanguard Morningstar Total Stock Market ETF",
+      "symbol": "VTI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x0594134df3f171a354d9c85ebd65b7a6148f6d09.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US9229087690",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x0594134df3f171a354d9c85ebd65b7a6148f6d09/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x82DA4646242e1D962e96e932269Dc644c94a9CaA",
+      "name": "Workday",
+      "symbol": "WDAY",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x82da4646242e1d962e96e932269dc644c94a9caa.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US98138H1014",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x82da4646242e1d962e96e932269dc644c94a9caa/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xF52597345A8Edf418bc4071b4a35112472277D3e",
+      "name": "Western Digital",
+      "symbol": "WDC",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf52597345a8edf418bc4071b4a35112472277d3e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US9581021055",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.15",
+        "dividendProcessDate": "2026-09-17",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf52597345a8edf418bc4071b4a35112472277d3e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x348Be1A8663f15edDe5CDf8A96BB69078f7aB6Fd",
+      "name": "TeraWulf",
+      "symbol": "WULF",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x348be1a8663f15edde5cdf8a96bb69078f7ab6fd.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US88080T1043",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x348be1a8663f15edde5cdf8a96bb69078f7ab6fd/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x9e7ABD3C9139D14E4c86DcE0e455AAB7A0C2FB3E",
+      "name": "WhiteFiber, Inc.",
+      "symbol": "WYFI",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x9e7abd3c9139d14e4c86dce0e455aab7a0c2fb3e.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "KYG961151035",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x9e7abd3c9139d14e4c86dce0e455aab7a0c2fb3e/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x15Cd20759CE7F3285c29A319dE2D1A2e098c6f43",
+      "name": "State Street Technology Select Sector SPDR ETF",
+      "symbol": "XLK",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x15cd20759ce7f3285c29a319de2d1a2e098c6f43.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US81369Y8030",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x15cd20759ce7f3285c29a319de2d1a2e098c6f43/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xA8eB3BCcbf2017eE7CBfb652eB51CF2E1B153289",
+      "name": "Xanadu Quantum",
+      "symbol": "XNDU",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xa8eb3bccbf2017ee7cbfb652eb51cf2e1b153289.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "CA98390R1029",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xa8eb3bccbf2017ee7cbfb652eb51cf2e1b153289/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0xf9B46d3D1B22199D4D1025a9cEDB540A33F1a2d5",
+      "name": "ExxonMobil Holdings Corporation",
+      "symbol": "XOM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf9b46d3d1b22199d4d1025a9cedb540a33f1a2d5.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US30233Q1085",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "1.03",
+        "dividendProcessDate": "2026-09-10",
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0xf9b46d3d1b22199d4d1025a9cedb540a33f1a2d5/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x44c4F142009036cF477eD2d09932051843137CF1",
+      "name": "Zoom",
+      "symbol": "ZM",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x44c4f142009036cf477ed2d09932051843137cf1.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US98980L1017",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x44c4f142009036cf477ed2d09932051843137cf1/"
+      }
+    },
+    {
+      "chainId": 4663,
+      "address": "0x7dc013eB55e436f30d7ED1AFE4E36d6e45e3c3f7",
+      "name": "Zscaler",
+      "symbol": "ZS",
+      "decimals": 18,
+      "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0x7dc013eb55e436f30d7ed1afe4e36d6e45e3c3f7.png",
+      "extensions": {
+        "underlyingSharesPerToken": "1",
+        "isin": "US98980G1022",
+        "priceFeed": null,
+        "priceFeedCorroboratedBy": null,
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
+        "exdateUrl": "https://exdate-bactas-projects.vercel.app/t/0x7dc013eb55e436f30d7ed1afe4e36d6e45e3c3f7/"
+      }
+    }
+  ]
+}

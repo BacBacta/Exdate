@@ -41,15 +41,21 @@ jobs:
       - name: Regenerate the typed registry
         run: node scripts/generate-registry.mjs
 
+      # The list carries what each token represents in shares and what it is owed, both of
+      # which move with the archive, so it is rebuilt here rather than on its own schedule.
+      # It refuses to write an invalid list: a consumer would silently ignore one.
+      - name: Rebuild the token list
+        run: node --experimental-strip-types --no-warnings scripts/build-token-list.mjs
+
       - name: Commit only if something actually changed
         run: |
-          if git diff --quiet -- data/corporate-actions.archive.json packages/core/src/generated/registry.ts; then
+          if git diff --quiet -- data/corporate-actions.archive.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json; then
             echo "nothing changed"
             exit 0
           fi
           summary=$(node -e "const a=require('./data/corporate-actions.archive.json');process.stdout.write(a.archivedRows+' rows, '+a.beyondWindow+' beyond the window')")
           git config user.name 'exdate-archive'
           git config user.email 'noreply@users.noreply.github.com'
-          git add data/corporate-actions.archive.json packages/core/src/generated/registry.ts
+          git add data/corporate-actions.archive.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json
           git commit -m "Archive corporate actions: $summary"
           git push

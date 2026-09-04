@@ -836,6 +836,21 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   market session with the same classifier as the off-hours share, is what will answer the claim
   worth making - that the gap runs wider when the feed is frozen. One sample is a reading, not a
   rate, and the file says so.
+- 2026-09-04 — **A token list, which is distribution rather than another page.** A wallet or an
+  aggregator learns a token exists by importing a list from a URL, so this is the cheapest way for
+  exdate to end up inside someone else's product instead of waiting for visitors. Served at
+  `/tokenlist.json` with CORS, 194 tokens. The value is in the **extensions**, which nobody else
+  can fill: what one token represents in shares today, whether a dividend is declared and not yet
+  delivered, what it owes per token (rate × multiplier, no price, so it holds for all 194), the
+  Chainlink proxy a lending market would price against — `null` for the 159 that have none — and
+  **which evidence corroborates that pairing**, by name. The schema's constraints were read from
+  the published file, not remembered: a list name is capped at 30 characters and `^[\w ]+$`, which
+  **forbids a hyphen**, and an invalid list is silently ignored by every consumer, which looks
+  exactly like nobody wanting it. So `validateTokenList` is in core with tests and the builder
+  **refuses to write** rather than publish something no one will load. The version is computed from
+  the diff, because the standard reads it as a promise: removing a token is major, adding one
+  minor, changing a detail a patch, and an unchanged rebuild keeps its timestamp so a commit means
+  the data moved rather than that a job ran.
 - _(append decisions here as they are made)_
 
 ## Status

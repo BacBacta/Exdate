@@ -246,11 +246,14 @@ export default function Page() {
               <h2 id="dev-title">Built to integrate.</h2>
               <p>
                 A REST API, a typed SDK and signed webhooks over the same records. Every value is
-                exact; anything not observed is null, never zero.
+                exact; anything not observed is null, never zero. The token list imports the whole
+                registry into a wallet in one URL, carrying what each token represents in shares
+                and what it is owed.
               </p>
               <p className="links">
                 <a href={links.apiDocs}>API reference</a>
                 <a href={links.sdkDocs}>SDK</a>
+                <a href="/tokenlist.json">Token list</a>
                 <a href={links.data}>Data</a>
                 {links.github ? <a href={links.github}>Source</a> : null}
               </p>
