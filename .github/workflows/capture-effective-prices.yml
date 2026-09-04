@@ -58,7 +58,12 @@ jobs:
       # In watchdog mode it also needs the sinks, to say when the watcher goes quiet.
       - name: Watch for an announcement and capture at effect
         env:
-          EXDATE_CAPTURE_MODE: ${{ vars.EXDATE_CAPTURE_MODE }}
+          # Defaults to watchdog since 2026-09-04, when a machine started running
+          # scripts/watch-effective-prices.mjs: with a watcher alive, a second
+          # capturer is duplicated work and no alarm. The repository variable
+          # still wins, so setting EXDATE_CAPTURE_MODE=capture turns this job
+          # back into the capturer if that machine is ever retired.
+          EXDATE_CAPTURE_MODE: ${{ vars.EXDATE_CAPTURE_MODE || 'watchdog' }}
           EXDATE_CAPTURE_BUDGET_MS: ${{ vars.EXDATE_CAPTURE_BUDGET_MS }}
           EXDATE_ALERT_WEBHOOK_URL: ${{ secrets.EXDATE_ALERT_WEBHOOK_URL }}
           EXDATE_TELEGRAM_BOT_TOKEN: ${{ secrets.EXDATE_TELEGRAM_BOT_TOKEN }}
@@ -97,3 +102,33 @@ jobs:
             git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
           done
           exit 1
+
+      # The alarm of last resort, and the only one that needs no setup.
+      #
+      # A watcher that dies is worse than no watcher: the record keeps saying a
+      # process is there while nothing is sampling, and the instants it misses
+      # cannot be read back. The watchdog above notices and sends a notice - to
+      # nobody, when no sink is configured, which is the state this repository is
+      # in until someone adds one. A failed scheduled run, on the other hand,
+      # emails the repository owner with no configuration whatsoever.
+      #
+      # It runs AFTER the commit on purpose: failing earlier would throw away the
+      # capture this run made in the watcher's place, which is the opposite of
+      # the point. `always()` so a failure upstream does not hide a silent
+      # watcher.
+      - name: Fail if the watcher is silent and nobody was told
+        if: ${{ always() }}
+        run: |
+          node -e '
+            const s = require("./data/effective-prices.observed.json")
+            const w = s.watchdog
+            if (!w || !w.stale) process.exit(0)
+            console.error("The capture watcher has been silent since " + (w.heartbeatAt || "never") + ".")
+            if (w.alertedAt) {
+              console.error("A notice was delivered at " + w.alertedAt + "; this run does not fail.")
+              process.exit(0)
+            }
+            console.error("No alert sink is configured, so this run fails on purpose: a failed scheduled run is the one notice that needs no setup.")
+            console.error("Set EXDATE_ALERT_WEBHOOK_URL, or the Telegram pair, as repository secrets to get a real notice instead.")
+            process.exit(1)
+          '

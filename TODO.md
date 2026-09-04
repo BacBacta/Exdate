@@ -3,20 +3,32 @@
 Everything here is blocked on a decision, an account or a payment, not on code. The code
 side of each is already in the repository and named below. Delete an entry when it is done.
 
-## 1. Arm the alerts
+## 1. Arm the alerts — one paste, and the machine dying is already covered
 
-`.github/workflows/capture-effective-prices.yml` runs every five minutes and calls
-`scripts/notify.mjs`, which today does nothing because no sink is configured. exdate knows
-about a multiplier change about nine minutes before it happens, and nobody is being told.
+Two different notices, and only one of them still needs you.
 
-Add repository secrets under **Settings → Secrets and variables → Actions**, either:
+**A dead watcher now raises an alarm with no configuration at all.** The scheduled job runs in
+watchdog mode by default and, if it finds the heartbeat stale and no sink took the notice, it
+**fails on purpose** — after committing whatever it captured in the watcher's place, so nothing is
+lost. GitHub emails the repository owner when a scheduled workflow fails, which is a channel that
+needs no setup. Exercised through all four states: no watchdog block, watcher alive, watcher silent
+with nobody told (fails), watcher silent with a notice delivered (does not fail).
+
+**The nine-minute lead still reaches nobody.** exdate learns of a multiplier change about nine
+minutes before it takes effect, and that is the perishable one. Add repository secrets under
+**Settings → Secrets and variables → Actions**, either:
 
 - `EXDATE_ALERT_WEBHOOK_URL` — a Discord or Slack incoming webhook, or any endpoint that
   accepts `{ content, text }`; or
 - `EXDATE_TELEGRAM_BOT_TOKEN` **and** `EXDATE_TELEGRAM_CHAT_ID`.
 
+Put the same value in `/opt/exdate/.env` on the watcher machine and `systemctl restart
+exdate-watcher`, or the machine that is actually watching stays mute. An alert that lives only on
+that machine also cannot announce that machine's death, which is why both places matter.
+`node scripts/check-watcher.mjs --send-test-alert` proves delivery rather than assuming it.
+
 Optionally set the repository *variable* `EXDATE_SITE_URL` so the notices link to the right
-host. Nothing else changes: delivery is recorded in `data/effective-prices.observed.json`.
+host. Delivery is recorded in `data/effective-prices.observed.json`.
 
 ## 2. Run the capture watcher on a machine — running; two settings left
 
@@ -34,15 +46,14 @@ after the instant**, far outside the two-minute tolerance, and the first sample 
 `givenUp`, with its reason, and its haircut cannot be computed from a quote: the issuer publishes
 no price history, so the instant is gone. A 30-second tick would have had three samples inside it.
 
-Two things left, both on GitHub rather than on the machine:
+**`EXDATE_CAPTURE_MODE` no longer needs setting.** The workflow defaults to `watchdog` since
+2026-09-04, because a watcher exists and the default should describe reality rather than the state
+the repository was in before it did. The repository variable still wins if it is ever set, so
+`EXDATE_CAPTURE_MODE=capture` turns the scheduled job back into the capturer if this machine is
+retired.
 
-- set the repository *variable* `EXDATE_CAPTURE_MODE` to `watchdog` at
-  <https://github.com/BacBacta/Exdate/settings/variables/actions/new>, so the scheduled job stops
-  capturing on its own and starts checking this machine's heartbeat instead, alerting when it goes
-  quiet. Until that is set, both are capturing; they share one file and merge by key, so nothing is
-  lost either way — it is simply twice the work and no alarm if the machine dies;
-- put an alert sink in `/opt/exdate/.env` (item 1 above) and `systemctl restart exdate-watcher`, so
-  the nine-minute lead reaches someone instead of only the file.
+One thing left: put an alert sink in `/opt/exdate/.env` (item 1 above) and `systemctl restart
+exdate-watcher`, so the nine-minute lead reaches someone instead of only the file.
 
 ### Rebuilding it, or adding a second machine
 

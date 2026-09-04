@@ -1096,6 +1096,24 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `['traded-price']` — corroborated but on one event, so the evidence is reported without lifting
   the confidence. The SDK's contract assert was checked to bite by removing the field and watching
   `tsc` fail with `Type '"feedCorroboratedBy"' does not satisfy the constraint 'never'`.
+- 2026-09-04 — **Two owner-blocked items removed by making the defaults tell the truth.** The
+  scheduled capture job needed a repository variable set to `watchdog` before it would stop
+  capturing beside the machine that now does it. That variable existed only because the workflow's
+  default described the world before the watcher, so the default is `watchdog` now and the variable
+  still overrides it — `EXDATE_CAPTURE_MODE=capture` turns the job back into the capturer if the
+  machine is ever retired. And the alert sink: with none configured a dead watcher was noticed by
+  the watchdog and reported **to nobody**, which is the worst state of all, since the record keeps
+  saying a process is there while nothing samples and the missed instants cannot be read back. A
+  failed scheduled run emails the repository owner with no configuration whatsoever, so the job now
+  fails on purpose when the heartbeat is stale and no notice was delivered — **after** the commit,
+  because failing earlier would discard the capture the run made in the watcher's place. Exercised
+  through all four states. A real sink is still better and still needs the owner: it carries the
+  nine-minute lead, which is the perishable notice, and a failed cron run cannot.
+  Also done here rather than asked for: `api.exdate.me` and `status.exdate.me` now resolve to the
+  watcher machine. The zone is on Vercel DNS and carried a wildcard `*` ALIAS pointing every
+  subdomain at Vercel, so explicit A records were needed to win on specificity; its CAA records
+  already list `letsencrypt.org`, which is what makes Caddy's certificate possible and was checked
+  rather than assumed.
 - _(append decisions here as they are made)_
 
 ## Status
