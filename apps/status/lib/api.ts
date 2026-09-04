@@ -10,8 +10,15 @@ export interface FeedView {
   proxy: string
   /** False everywhere: no first-party statement links a token to a feed. */
   verified: boolean
-  /** The token's own multiplier step was seen moving this feed by its own size. */
+  /** The pairing is backed by behaviour rather than by its ticker alone. */
   corroborated: boolean
+  /**
+   * Which behaviour. 'multiplier-step' is causal - this token's own step was
+   * seen moving this feed by the step's own size. 'traded-price' identifies the
+   * underlying - the token's traded price sits closest to this feed, repeatedly.
+   * Weaker, and never to be presented as the other.
+   */
+  corroboratedBy: readonly ('multiplier-step' | 'traded-price')[]
   decimals: number | null
   roundId: string | null
   answer: string | null

@@ -81,6 +81,13 @@ const tokens = assets
         // Ticker-derived, never issuer-confirmed. See scripts/phase0/map-feeds.mjs.
         feedVerified: feed?.verified ?? false,
         feedCorroborated: feed?.corroborated ?? false,
+        /**
+         * Which evidence carries the pairing, never merged into the boolean above:
+         * a step that moved this feed is causal, a traded price that sits closest to
+         * it is identification, and a page that says "corroborated" without saying
+         * which is claiming the stronger one for free.
+         */
+        feedCorroboratedBy: feed?.corroboratedBy ?? [],
       }
     }),
   )
@@ -93,6 +100,9 @@ const banner = `// GENERATED FILE - do not edit.
 
 const out = `${banner}
 import type { Address } from 'viem'
+
+/** How a token -> feed pairing came to be believed. See feedCorroboratedBy. */
+export type FeedCorroboration = 'multiplier-step' | 'traded-price'
 
 export interface RegistryToken {
   chainId: number
@@ -116,11 +126,25 @@ export interface RegistryToken {
   /** False everywhere today: the pairing is derived from the ticker. */
   feedVerified: boolean
   /**
-   * The token's own multiplier step was observed moving this feed by the step's
-   * own size, and no other mapped feed moved closer to it. Behavioural
-   * evidence, not a first-party statement - see data/feed-map-verification.json.
+   * The pairing is backed by behaviour rather than by a ticker join alone.
+   * Behavioural evidence, never a first-party statement - see
+   * data/feed-map-verification.json. Read feedCorroboratedBy to learn which
+   * evidence, because the two are not equally strong.
    */
   feedCorroborated: boolean
+  /**
+   * Which evidence carries the pairing:
+   *
+   *   'multiplier-step' - this token's own step was seen moving this feed by the
+   *      step's own size, above the feed's round-to-round noise, with no other
+   *      mapped feed closer. Causal, and the strongest thing available here.
+   *   'traded-price' - the token's traded price repeatedly sits far closer to
+   *      this feed's answer than to any other mapped feed. Identification, and
+   *      weaker: two unrelated assets can trade at one price.
+   *
+   * Empty when the pairing is still a bare ticker match.
+   */
+  feedCorroboratedBy: readonly FeedCorroboration[]
 }
 
 export const REGISTRY_TOKENS: readonly RegistryToken[] = ${JSON.stringify(tokens, null, 2)} as const

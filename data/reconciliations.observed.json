@@ -67,7 +67,11 @@
       "feed": {
         "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
         "verified": false,
-        "corroborated": true
+        "corroborated": true,
+        "corroboratedBy": [
+          "multiplier-step",
+          "traded-price"
+        ]
       },
       "status": "unmatched",
       "note": "on-chain step with no issuer row - the issuer's feed only goes back about a month"
@@ -95,7 +99,10 @@
       "feed": {
         "proxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "status": "unmatched",
       "note": "on-chain step with no issuer row - the issuer's feed only goes back about a month"
@@ -123,7 +130,8 @@
       "feed": {
         "proxy": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
         "verified": false,
-        "corroborated": false
+        "corroborated": false,
+        "corroboratedBy": []
       },
       "status": "unmatched",
       "note": "on-chain step with no issuer row - the issuer's feed only goes back about a month"
@@ -151,7 +159,10 @@
       "feed": {
         "proxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "status": "unmatched",
       "note": "on-chain step with no issuer row - the issuer's feed only goes back about a month"
@@ -179,17 +190,20 @@
       "feed": {
         "proxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "observedStepWad": "101323251417769",
       "impliedReinvestPrice": "17933.5540",
       "issuerSpotToday": {
-        "bid": "1660.18",
-        "ask": "1663.01",
-        "mid": "1661.5950",
-        "generatedAt": "2026-09-04T06:16:34.256018438Z",
+        "bid": "1676.96",
+        "ask": "1677.86",
+        "mid": "1677.4100",
+        "generatedAt": "2026-09-04T08:47:09.823851925Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 10.793
+        "impliedOverSpot": 10.691
       },
       "price": {
         "source": "chainlink:getRoundData",
@@ -246,15 +260,19 @@
       "feed": {
         "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
         "verified": false,
-        "corroborated": true
+        "corroborated": true,
+        "corroboratedBy": [
+          "multiplier-step",
+          "traded-price"
+        ]
       },
       "observedStepWad": "2022063289954840",
       "impliedReinvestPrice": "151.7321",
       "issuerSpotToday": {
-        "bid": "100.45",
-        "ask": "100.46",
-        "mid": "100.4550",
-        "generatedAt": "2026-09-04T06:16:22.485841137Z",
+        "bid": "100.46",
+        "ask": "100.47",
+        "mid": "100.4650",
+        "generatedAt": "2026-09-04T08:47:12.118170971Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.51
       },
@@ -329,12 +347,12 @@
       "observedStepWad": "612040296259656",
       "impliedReinvestPrice": "2401.8026",
       "issuerSpotToday": {
-        "bid": "925.51",
-        "ask": "925.94",
-        "mid": "925.7250",
-        "generatedAt": "2026-09-04T06:16:38.318022115Z",
+        "bid": "925.69",
+        "ask": "927",
+        "mid": "926.3450",
+        "generatedAt": "2026-09-04T08:47:16.399768170Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 2.595
+        "impliedOverSpot": 2.593
       },
       "status": "anomaly",
       "note": "no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against"
@@ -362,17 +380,20 @@
       "feed": {
         "proxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "observedStepWad": "566080061092436",
       "impliedReinvestPrice": "476.9643",
       "issuerSpotToday": {
-        "bid": "327.5",
-        "ask": "327.65",
-        "mid": "327.5750",
-        "generatedAt": "2026-09-04T06:16:27.939335378Z",
+        "bid": "327.29",
+        "ask": "327.36",
+        "mid": "327.3250",
+        "generatedAt": "2026-09-04T08:47:04.190915513Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 1.456
+        "impliedOverSpot": 1.457
       },
       "price": {
         "source": "chainlink:getRoundData",
@@ -477,12 +498,12 @@
       "observedStepWad": "21486444855206408",
       "impliedReinvestPrice": "6.9811",
       "issuerSpotToday": {
-        "bid": "23.79",
-        "ask": "23.5",
-        "mid": "23.6450",
-        "generatedAt": "2026-09-04T06:16:21.876955263Z",
+        "bid": "23.48",
+        "ask": "23.69",
+        "mid": "23.5850",
+        "generatedAt": "2026-09-04T08:47:08.541040729Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 0.295
+        "impliedOverSpot": 0.296
       },
       "status": "anomaly",
       "note": "no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against"
@@ -511,12 +532,12 @@
       "observedStepWad": "145502866134027",
       "impliedReinvestPrice": "1030.9075",
       "issuerSpotToday": {
-        "bid": "14.37",
-        "ask": "14.4",
-        "mid": "14.3850",
-        "generatedAt": "2026-09-04T06:16:17.345784950Z",
+        "bid": "14.32",
+        "ask": "14.41",
+        "mid": "14.3650",
+        "generatedAt": "2026-09-04T08:47:13.724413391Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
-        "impliedOverSpot": 71.665
+        "impliedOverSpot": 71.765
       },
       "status": "anomaly",
       "note": "no Chainlink feed for this token and no issuer quote captured at the instant of the step, so there is no reference price to reconcile against"
@@ -576,7 +597,11 @@
       "feed": {
         "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
         "verified": false,
-        "corroborated": true
+        "corroborated": true,
+        "corroboratedBy": [
+          "multiplier-step",
+          "traded-price"
+        ]
       },
       "status": "unmatched",
       "note": "on-chain step with no issuer row - the issuer's feed only goes back about a month"
@@ -692,7 +717,11 @@
       "feed": {
         "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
         "verified": false,
-        "corroborated": true
+        "corroborated": true,
+        "corroboratedBy": [
+          "multiplier-step",
+          "traded-price"
+        ]
       },
       "status": "pending",
       "note": "declared by the issuer, no multiplier step observed on chain"
@@ -744,7 +773,10 @@
       "feed": {
         "proxy": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "status": "pending",
       "note": "declared by the issuer, no multiplier step observed on chain"
@@ -828,7 +860,10 @@
       "feed": {
         "proxy": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "status": "pending",
       "note": "declared by the issuer, no multiplier step observed on chain"
@@ -1040,7 +1075,10 @@
       "feed": {
         "proxy": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
         "verified": false,
-        "corroborated": false
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "status": "pending",
       "note": "declared by the issuer, no multiplier step observed on chain"

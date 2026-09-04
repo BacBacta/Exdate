@@ -196,10 +196,21 @@ Statuses: `matched`, `anomaly`, `pending` (declared, nothing on chain), `unmatch
 issuer row — expected before ~2026-08-05, where the issuer's feed ends) and
 `unsupported_action_type` (a split matched to a step: no per-share rate to reconcile against).
 
-`confidence` is `low` on every row but one: the token → feed pairing is inferred from a ticker, and
-no first-party statement links them. SGOV's matched row reads `medium`, because its own multiplier
-step was seen moving its feed by the step's own size (`feed.corroborated`). `high` is reserved for a
-first-party address-level link, which nothing has today.
+`confidence` starts at `low`: the token → feed pairing is inferred from a ticker, and no first-party
+statement links them. It reaches `medium` from three observed events once the pairing is
+corroborated by behaviour, and `feed.corroboratedBy` says by which behaviour — never merge the two,
+because they are not the same claim:
+
+- `multiplier-step` — this token's own step was seen moving this feed by the step's own size, above
+  the feed's round-to-round noise, with no other mapped feed closer. Causal, and true of **SGOV
+  alone**.
+- `traded-price` — the token's on-chain traded price repeatedly sits far closer to this feed's
+  answer than to any other mapped feed. Identification, and weaker: two unrelated assets can trade
+  at one price. True of **23 of 35 pairings** today.
+
+`high` is reserved for a first-party address-level link, which nothing has today. A row refused for
+a reason of its own — no price at `effectiveAt`, a non-positive rate — reads `low` and still reports
+`feed.corroboratedBy`, because that is a fact about the pairing and not about the event.
 
 ## `GET /v1/:chain/tokens/:address/yield`
 

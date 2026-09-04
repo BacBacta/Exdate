@@ -46,6 +46,15 @@ jobs:
       - name: Corroborate the feed map from the readings so far
         run: node scripts/corroborate-feed-map.mjs
 
+      # The corroboration is an input to the confidence a haircut is published
+      # with, and the indexer and the API read it from the generated registry
+      # rather than from the map. Regenerating here is what keeps the two from
+      # disagreeing - CI checks that they match, and the first time a pairing
+      # crossed its threshold it turned the build red until this ran by hand.
+      # No dependencies: it is plain node over committed JSON.
+      - name: Regenerate the registry the map feeds
+        run: node scripts/generate-registry.mjs
+
       - name: Commit only if a sample was appended
         run: |
           if git diff --quiet -- data/dex-feed-gap.observed.json data/token-feed-map.json; then
@@ -55,7 +64,7 @@ jobs:
           summary=$(node -e "const d=require('./data/dex-feed-gap.observed.json');const m=require('./data/token-feed-map.json');const s=d.summary;process.stdout.write(d.session+', median '+s.medianAbsDeviationBps+' bps, widest '+s.maxAbsDeviationBps+' bps across '+s.withFeed+' tokens, '+m.corroborated+'/'+m.pairs.length+' pairings corroborated')")
           git config user.name 'exdate-gap'
           git config user.email 'noreply@users.noreply.github.com'
-          git add data/dex-feed-gap.observed.json data/token-feed-map.json
+          git add data/dex-feed-gap.observed.json data/token-feed-map.json packages/core/src/generated/registry.ts
           git commit -m "Measure the DEX-to-feed gap: $summary"
 
           for attempt in 1 2 3 4; do

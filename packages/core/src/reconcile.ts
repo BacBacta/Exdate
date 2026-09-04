@@ -1,3 +1,4 @@
+import type { FeedCorroboration } from './generated/registry.js'
 import { WAD } from './multiplier.js'
 
 /**
@@ -235,13 +236,23 @@ export interface ReconcileInput {
   /** False when the token -> feed pairing is still a ticker heuristic. */
   feedVerified?: boolean
   /**
-   * The feed pairing is corroborated by behaviour: this token's own multiplier
-   * step was seen moving this feed by the step's own size, louder than the
-   * feed's round-to-round noise, and no other mapped feed moved closer. Weaker
-   * than {@link feedVerified}, which would mean a first-party address-level
-   * statement - there is none for any pair today.
+   * The feed pairing is corroborated by behaviour rather than by its ticker
+   * alone. Weaker than {@link feedVerified}, which would mean a first-party
+   * address-level statement - there is none for any pair today. Which behaviour
+   * carried it is {@link feedCorroboratedBy}, and the two are not equally
+   * strong, so a row that reports one must never be presented as the other.
    */
   feedCorroborated?: boolean
+  /**
+   * Which evidence corroborates the pairing. Both raise confidence to `medium`,
+   * because both are evidence about the thing confidence is about - is this the
+   * right feed for this token - and neither is a first-party statement. They are
+   * carried separately rather than merged because they answer that question in
+   * different ways: a step that moved this feed is causal and tests the exact
+   * mechanism a haircut depends on; a traded price that sits closest to this
+   * feed identifies the underlying, which two unrelated assets could share.
+   */
+  feedCorroboratedBy?: readonly FeedCorroboration[]
   /**
    * Bounds outside which a result is reported as an anomaly rather than a
    * measurement, in basis points. The default admits everything from "holders
@@ -259,6 +270,14 @@ export type PriceSource = 'chainlink:round' | 'issuer:quote'
 export interface Reconciliation {
   status: ReconciliationStatus
   confidence: Confidence
+  /**
+   * Which corroboration the token -> feed pairing carries, so a consumer never
+   * has to take `confidence` on trust. Empty when the pairing is a bare ticker
+   * match. It is a fact about the pairing, not about this row: a row forced to
+   * `low` for a reason of its own - no price, a non-positive rate - still
+   * reports the evidence its pairing has.
+   */
+  feedCorroboratedBy: readonly FeedCorroboration[]
   /** Which of the two inputs the equity price came from; undefined when the row has no price. */
   priceSource?: PriceSource
   /** The equity price used, WAD: derived from the token price, or taken from the issuer quote as it is. */
@@ -290,6 +309,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     observedEventCount,
     feedVerified = false,
     feedCorroborated = false,
+    feedCorroboratedBy = [],
     plausibleHaircutBps = DEFAULT_PLAUSIBLE_HAIRCUT_BPS,
   } = input
 
@@ -304,6 +324,13 @@ export function reconcile(input: ReconcileInput): Reconciliation {
    *
    * Nothing reaches `high` today: no first-party statement links any token to
    * any feed. See data/feed-map-verification.json for what was actually tested.
+   *
+   * Both kinds of corroboration land on the same rung, and the row says which
+   * one it stands on rather than letting the weaker borrow the stronger's
+   * standing. A fourth rung was considered and rejected: `medium` already means
+   * "believed on behaviour, not stated by anyone", which is true of both, and
+   * splitting it would put the distinction in a word instead of in the field
+   * that names the evidence.
    */
   const confidence: Confidence =
     observedEventCount < 3 || !(feedVerified || feedCorroborated)
@@ -325,6 +352,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     return {
       status: 'pending',
       confidence,
+      feedCorroboratedBy,
       ...empty,
       note: 'declared by the issuer, no multiplier step observed on chain yet',
     }
@@ -338,6 +366,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     return {
       status: 'anomaly',
       confidence: 'low',
+      feedCorroboratedBy,
       ...empty,
       observedStepWad: oldMultiplier === 0n ? undefined : observedStepWad(oldMultiplier, newMultiplier),
       note: 'the declared rate is not positive; there is no dividend to reconcile',
@@ -353,6 +382,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     return {
       status: 'anomaly',
       confidence: 'low',
+      feedCorroboratedBy,
       ...empty,
       observedStepWad: observed,
       note: 'the multiplier did not increase; the reinvestment model does not describe this event',
@@ -376,6 +406,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     return {
       status: 'anomaly',
       confidence: 'low',
+      feedCorroboratedBy,
       ...empty,
       observedStepWad: observed,
       impliedReinvestPriceWad: impliedReinvest,
@@ -390,6 +421,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
     return {
       status: 'anomaly',
       confidence: 'low',
+      feedCorroboratedBy,
       ...empty,
       observedStepWad: observed,
       impliedReinvestPriceWad: impliedReinvest,
@@ -408,6 +440,7 @@ export function reconcile(input: ReconcileInput): Reconciliation {
   return {
     status: plausible ? 'matched' : 'anomaly',
     confidence,
+    feedCorroboratedBy,
     priceSource,
     underlyingPriceWad: underlying,
     expectedStepWad: expected,

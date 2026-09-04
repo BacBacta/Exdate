@@ -150,12 +150,21 @@ export function serializeToken(row: TokenRow, options: SerializeOptions) {
              */
             verified: row.feedVerified,
             /**
-             * Behavioural evidence instead: this token's own multiplier step was
-             * seen moving this feed by the step's own size, above the feed's
-             * round-to-round noise, with no other mapped feed closer. True for
-             * SGOV only - see data/feed-map-verification.json.
+             * Behavioural evidence instead. `corroboratedBy` says which, and a
+             * consumer that presents one as the other is overstating what was
+             * measured:
+             *
+             *   'multiplier-step' - this token's own step was seen moving this
+             *      feed by the step's own size, above the feed's round-to-round
+             *      noise, with no other mapped feed closer. Causal.
+             *   'traded-price' - the token's traded price repeatedly sits far
+             *      closer to this feed than to any other. Identification, and
+             *      weaker: two unrelated assets can trade at one price.
+             *
+             * See data/feed-map-verification.json and data/token-feed-map.json.
              */
             corroborated: findToken(row.chainId, row.address)?.feedCorroborated ?? false,
+            corroboratedBy: findToken(row.chainId, row.address)?.feedCorroboratedBy ?? [],
             /** How the pairing was made in the first place. */
             pairedBy: 'ticker-heuristic',
             /**

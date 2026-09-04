@@ -193,15 +193,30 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   `Robinhood AAPL / USD`, `RHAMD / USD`, `Robinhood SGOV-USD`), and the issuer's registry carries
   **194 distinct tickers for 194 assets**, so a ticker resolves to exactly one address. Each half is
   first-party; only the join is inference.
-- **One pair is corroborated by behaviour: SGOV.** Its 2026-07-08 step moved its feed by
-  +9.5778 bps against an expected +9.5752, on a feed whose round-to-round noise is 0.0094 bps — and
-  across all 35 mapped feeds at that instant, the assigned one is uniquely closest (next: 40.59 bps
-  away). The other five equity tokens with steps are inconclusive by construction: a 0.5 % deviation
-  threshold puts ~50 bps between consecutive rounds, so a dividend-sized step is invisible.
-  SGOV's 2026-09-01 step disagrees (−3.03 vs +21.14 bps) and is reported as such: the equity leg is
-  unobservable from here, and a total-return feed is designed to stay flat through a step.
+- **23 of 35 pairings are corroborated by behaviour, in two different ways** — and the two are
+  never merged, because they are not the same claim. `corroboratedBy` names which, everywhere the
+  fact travels: the map, the generated registry, `reconcile()`, the API, the SDK and both sites.
+  - **Causal — `multiplier-step`, SGOV alone.** Its 2026-07-08 step moved its feed by +9.5778 bps
+    against an expected +9.5752, on a feed whose round-to-round noise is 0.0094 bps — and across
+    all 35 mapped feeds at that instant, the assigned one is uniquely closest (next: 40.59 bps
+    away). The other five equity tokens with steps are inconclusive by construction: a 0.5 %
+    deviation threshold puts ~50 bps between consecutive rounds, so a dividend-sized step is
+    invisible. SGOV's 2026-09-01 step disagrees (−3.03 vs +21.14 bps) and is reported as such: the
+    equity leg is unobservable from here, and a total-return feed is designed to stay flat through
+    a step.
+  - **Identification — `traded-price`, 23 pairings** (SGOV among them, so it carries both).
+    The token's on-chain traded price sits far closer to this feed's answer than to any other
+    mapped feed, on a majority of at least three readings. Weaker on purpose: two unrelated assets
+    can trade at one price. The 12 that fail are the informative half — CLSK, COIN, CRCL, CRWV,
+    EWY, GME, IONQ, MSTR, NBIS, ORCL, RGTI, RKLB — almost all high-volatility names whose traded
+    price is genuinely dislocated from the feed (GME's gap has been read at 664 bps on a pool
+    holding $809 046). The test fails there because the premise fails, not because the pairing is
+    wrong.
 - Confidence ladder, in `reconcile.ts`: ticker match only → `low` always; `feedCorroborated` →
   `medium` from three events; a first-party address link → `high` from ten, which nothing reaches.
+  **Both kinds of corroboration land on `medium`** — `medium` already means "believed on
+  behaviour, not stated by anyone", which is true of both — and the row publishes
+  `feedCorroboratedBy` so the weaker never borrows the stronger's standing.
 
 ## Known traps
 
@@ -910,6 +925,27 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   durable-token path stays available in this entry if the link is ever removed: `VERCEL_ORG_ID`
   `team_yvcPXxh5OyD9bGT9ogPgtNEw`, `VERCEL_PROJECT_ID` `prj_k3kFLnvN5qsU47DHRGhowCN9Ev2n`, and
   `scripts/deploy-web.sh`, which uploads from a copy with no `.git` so there is no author to check.
+- 2026-09-04 — **The traded-price test crossed its threshold, and turned a boolean into a lie.**
+  The hourly gap collector reached three samples and 22 pairings became corroborated at once —
+  1 of 35 to 23 of 35 in a single commit. Two things broke that a boolean cannot express. CI went
+  red, correctly: `feedCorroborated` reaches the confidence ladder through the **generated
+  registry**, not the map, and only `archive-corporate-actions` regenerated it, so the gap workflow
+  now runs `generate-registry.mjs` too (plain node over committed JSON, no install) and commits it
+  with the sample. And every surface that read the boolean alone went on saying *corroborated by
+  its own dividend step* about 22 tokens whose step had never been seen moving anything — the token
+  page, the status page's tooltip, the API's field documentation, the SDK's type. That is a claim
+  about evidence that does not exist, which is rule 2 applied to a sentence rather than a number.
+  So the kind travels with the fact now, end to end: `corroboratedBy` in the map, the registry,
+  `reconcile()`'s input **and its output**, the API, the SDK and both sites, with a test that
+  asserts a price-corroborated row never reports `multiplier-step`.
+  **Both kinds still land on `medium`,** and a fourth rung was considered and rejected: `medium`
+  already means "believed on behaviour, not stated by anyone", which is true of both, and splitting
+  it would put the distinction in a word instead of in the field that names the evidence. What
+  separates them is written down instead — causal versus identification, and that two unrelated
+  assets can trade at one price. The 12 pairings that fail the price test are the informative half:
+  almost all high-volatility names (GME, MSTR, COIN, IONQ, RGTI…) whose traded price is genuinely
+  dislocated from the feed, so the test fails because its premise fails, not because the pairing is
+  wrong.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -959,9 +995,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   split reaches it without a declared ratio — the only one ever observed (CRWD ×4) lost its issuer
   row, and all 43 archived actions are cash dividends — so it refuses and the row stays
   `unsupported_action_type` with the observed ratio stated.
-- The token → feed pairing is corroborated for 1 of 35 tokens and named-only for the other 34. No
-  first-party link exists to close the gap; a second SGOV-like token (low-volatility underlying,
-  large step) would corroborate another row. See `docs/phase-0-verification.md` §14.
+- The token → feed pairing is **causally** corroborated for 1 of 35 tokens (SGOV, by its own step);
+  22 more are corroborated only by their traded price, which identifies the underlying and does not
+  test the mechanism a haircut depends on, and 12 are still a bare ticker match. No first-party link
+  exists to close the gap; a second SGOV-like token (low-volatility underlying, large step) would
+  causally corroborate another row. See `docs/phase-0-verification.md` §14.
 - The poller and the gap sweep have no tests of their own: they need a chain and a Ponder process,
   so they are exercised by running the indexer. The webhook outbox is unit-tested
   (`packages/indexer/test/webhooks.test.ts`) and was also verified live against a local receiver.

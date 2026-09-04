@@ -314,6 +314,7 @@ export async function runReconcilePass(
       }
     }
 
+    const registryToken = findToken(chainId, change.token as Address)
     const outcome = reconcile({
       rateWad,
       priceWad,
@@ -323,9 +324,11 @@ export async function runReconcilePass(
       observedEventCount: eventCountFor(String(change.token)),
       feedVerified: token?.feedVerified ?? false,
       // From the committed registry rather than the tokens table: corroboration
-      // is a property of the map, established offline by
-      // scripts/phase0/verify-feed-map.mjs, not something the poller observes.
-      feedCorroborated: findToken(chainId, change.token as Address)?.feedCorroborated ?? false,
+      // is a property of the map, established outside the poller - by the
+      // multiplier-step test in scripts/phase0/verify-feed-map.mjs and by the
+      // hourly traded-price test in scripts/corroborate-feed-map.mjs.
+      feedCorroborated: registryToken?.feedCorroborated ?? false,
+      feedCorroboratedBy: registryToken?.feedCorroboratedBy ?? [],
     })
 
     await write({

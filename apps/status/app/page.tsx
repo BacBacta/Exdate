@@ -16,6 +16,24 @@ import { age, bps, daysSince, multiplier, price, shortAddress, utc } from './for
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
+/**
+ * The badge says only that the pairing rests on behaviour; the title has to say
+ * on which, because the two are not the same claim. A step that moved this feed
+ * is causal evidence about this token; a traded price closest to this feed
+ * identifies the underlying, which two assets could in principle share.
+ */
+function pairingTitle(by: readonly string[]): string {
+  const reasons = [
+    by.includes('multiplier-step')
+      ? "this token's own multiplier step was seen moving this feed by the step's own size, and no other mapped feed moved closer"
+      : null,
+    by.includes('traded-price')
+      ? 'the price this token trades at on chain sits closer to this feed than to any other mapped feed, across repeated readings'
+      : null,
+  ].filter(Boolean)
+  return reasons.length ? reasons.join('; and ') : 'paired by ticker; no first-party statement links this token to this feed'
+}
+
 function FeedCell({ token }: { token: TokenView }) {
   if (!token.feed) {
     return (
@@ -28,11 +46,7 @@ function FeedCell({ token }: { token: TokenView }) {
     <>
       <span className={`pill ${token.feed.status}`}>{token.feed.status}</span>
       {token.feed.verified ? null : (
-        <span className="addr" title={
-          token.feed.corroborated
-            ? "the token's own multiplier step was seen moving this feed by the step's own size, and no other mapped feed moved closer"
-            : 'paired by ticker; no first-party statement links this token to this feed'
-        }>
+        <span className="addr" title={pairingTitle(token.feed.corroboratedBy)}>
           {' '}
           {token.feed.corroborated ? 'corroborated' : 'derived'}
         </span>

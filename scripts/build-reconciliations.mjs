@@ -281,7 +281,14 @@ console.error(`# ${rows.length} rows: ${rows.filter((r) => r.change).length} wit
 for (const row of rows) {
   const feed = feedForToken.get(row.token.toLowerCase())
   row.feed = feed
-    ? { proxy: feed.feedProxy, verified: feed.verified, corroborated: feed.corroborated ?? false }
+    ? {
+        proxy: feed.feedProxy,
+        verified: feed.verified,
+        corroborated: feed.corroborated ?? false,
+        // Which evidence, so this file cannot be read as claiming the causal
+        // test on a pairing that only passed the traded-price one.
+        corroboratedBy: feed.corroboratedBy ?? [],
+      }
     : null
 
   if (!row.change) {

@@ -56,7 +56,7 @@ interface ReconciliationRow {
   impliedHaircutBps: number | null
   impliedReinvestPrice: string | null
   issuerSpotToday: { mid: string; impliedOverSpot: number } | null
-  feed: { proxy: string; corroborated: boolean } | null
+  feed: { proxy: string; corroborated: boolean; corroboratedBy: readonly string[] } | null
 }
 interface MultiplierEvent {
   symbol: string
@@ -95,11 +95,13 @@ const feedMap = feedMapJson as unknown as {
     feedProxy: string
     verified: boolean
     corroborated: boolean
+    corroboratedBy?: ('multiplier-step' | 'traded-price')[]
     heartbeatSeconds?: number
     deviationThresholdPercent?: number
     marketHours?: string
   }[]
   corroborated?: number
+  corroboratedByStep?: number
 }
 const archive = archiveJson as unknown as {
   lastArchivedAt: string
@@ -431,6 +433,13 @@ export function tokenPage(address: string) {
           proxy: feed.feedProxy,
           proxyUrl: `${EXPLORER}/address/${feed.feedProxy}`,
           corroborated: feed.corroborated,
+          /**
+           * Which evidence, never merged into the boolean: a step that moved
+           * this feed is causal, a traded price closest to it identifies the
+           * underlying, and the page must not claim the first when it has the
+           * second.
+           */
+          corroboratedBy: feed.corroboratedBy ?? [],
           heartbeatHours: feed.heartbeatSeconds ? Math.round(feed.heartbeatSeconds / 3600) : null,
           deviationPercent: feed.deviationThresholdPercent ?? null,
           marketHours: feed.marketHours === 'us_equities_24/5' ? 'US equities, 24/5' : (feed.marketHours ?? null),
@@ -735,6 +744,7 @@ export const observed = {
     feeds: robinhoodFeeds,
     mappedFeeds: feedMap.pairs.length,
     corroboratedFeeds: feedMap.corroborated ?? 0,
+    stepCorroboratedFeeds: feedMap.corroboratedByStep ?? 0,
     distinctEvents: distinctEvents.length,
     tokensMoved: new Set(distinctEvents.map((e) => e.token)).size,
     archivedActions: archive.archivedRows,

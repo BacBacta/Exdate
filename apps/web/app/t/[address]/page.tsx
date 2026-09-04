@@ -29,6 +29,23 @@ export async function generateMetadata({ params }: { params: Promise<{ address: 
 type Token = NonNullable<ReturnType<typeof tokenPage>>
 type Dividend = Token['dividends'][number]
 
+/**
+ * Says what actually backs the pairing, in a reader's words. The two kinds are
+ * not interchangeable: a step that moved this feed is causal evidence about
+ * this token's own dividends, while a traded price that sits closest to it
+ * identifies the underlying and could in principle be shared by two assets.
+ * Claiming the first when only the second holds would be a number about
+ * nothing, which is the one thing this site must not print.
+ */
+function pairingEvidence(by: readonly string[]): string {
+  const step = by.includes('multiplier-step')
+  const price = by.includes('traded-price')
+  if (step && price) return ' and confirmed twice over: by its own dividend step and by the price it trades at'
+  if (step) return ' and confirmed by its own dividend step'
+  if (price) return ' and confirmed by the price it trades at on chain'
+  return ''
+}
+
 function stateOf(dividend: Dividend): { text: string; on: boolean } {
   switch (dividend.state) {
     case 'matched':
@@ -296,9 +313,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
             <div data-reveal>
               <p className="note-box big">
                 {token.feed
-                  ? `This token has a Chainlink price feed, paired by ticker${
-                      token.feed.corroborated ? ' and corroborated by its own dividend step' : ''
-                    }. The feed is total return: it already includes the multiplier, so never multiply it again. It holds its last price outside market hours, so always check how old a price is before relying on it.`
+                  ? `This token has a Chainlink price feed, paired by ticker${pairingEvidence(token.feed.corroboratedBy)}. The feed is total return: it already includes the multiplier, so never multiply it again. It holds its last price outside market hours, so always check how old a price is before relying on it.`
                   : 'This token has no Chainlink price feed. A lending protocol cannot price it from Chainlink, and exdate can state what is owed but cannot measure a gap.'}
               </p>
               {token.feed ? (

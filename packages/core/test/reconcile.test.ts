@@ -281,6 +281,54 @@ describe('confidence', () => {
     // Corroboration does not substitute for a sample either.
     expect(reconcile({ ...base, observedEventCount: 2, feedCorroborated: true }).confidence).toBe('low')
   })
+
+  /**
+   * The two kinds of corroboration reach the same rung and are NOT the same
+   * claim, so the row has to say which one it stands on. This is the test that
+   * would have caught the day the traded-price test crossed its threshold: 22
+   * pairings became corroborated at once, and every page that read the boolean
+   * alone went on saying "corroborated by its own dividend step" about tokens
+   * whose step had never been observed moving anything.
+   */
+  it('reports which evidence corroborates the pairing, never merging the two', () => {
+    const priced = reconcile({
+      ...base,
+      observedEventCount: 3,
+      feedCorroborated: true,
+      feedCorroboratedBy: ['traded-price'],
+    })
+    expect(priced.confidence).toBe('medium')
+    expect(priced.feedCorroboratedBy).toEqual(['traded-price'])
+    expect(priced.feedCorroboratedBy).not.toContain('multiplier-step')
+
+    // SGOV is the one pairing that carries both.
+    const both = reconcile({
+      ...base,
+      observedEventCount: 3,
+      feedCorroborated: true,
+      feedCorroboratedBy: ['multiplier-step', 'traded-price'],
+    })
+    expect(both.feedCorroboratedBy).toEqual(['multiplier-step', 'traded-price'])
+
+    // A bare ticker match claims nothing.
+    expect(reconcile({ ...base, observedEventCount: 3 }).feedCorroboratedBy).toEqual([])
+  })
+
+  /**
+   * A row refused for a reason of its own still reports what its pairing rests
+   * on: that is a fact about the pairing, not about this event.
+   */
+  it('keeps the pairing evidence on a row that could not be priced', () => {
+    const unpriceable = reconcile({
+      ...base,
+      priceWad: undefined,
+      observedEventCount: 3,
+      feedCorroborated: true,
+      feedCorroboratedBy: ['traded-price'],
+    })
+    expect(unpriceable.confidence).toBe('low')
+    expect(unpriceable.feedCorroboratedBy).toEqual(['traded-price'])
+  })
 })
 
 describe('splits reconcile as a ratio, with no price in them', () => {

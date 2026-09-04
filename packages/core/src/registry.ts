@@ -10,7 +10,12 @@ export {
   SCAN_THROUGH_BLOCK,
   SCANNED_AT,
 } from './generated/registry.js'
-export type { ArchivedCorporateAction, RegistryToken, ScannedMultiplierEvent } from './generated/registry.js'
+export type {
+  ArchivedCorporateAction,
+  FeedCorroboration,
+  RegistryToken,
+  ScannedMultiplierEvent,
+} from './generated/registry.js'
 
 const byAddress = new Map<string, RegistryToken>(
   REGISTRY_TOKENS.map((token) => [`${token.chainId}:${token.address.toLowerCase()}`, token]),
