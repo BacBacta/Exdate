@@ -149,6 +149,7 @@ picture, so a filtered view cannot read as the total.
   "symbol": "SGOV",
   "status": "matched",
   "confidence": "medium",
+  "feedCorroboratedBy": ["multiplier-step", "traded-price"],
   "declared": {
     "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
     "status": "CORPORATE_ACTION_STATUS_COMPLETED",
@@ -198,8 +199,8 @@ issuer row — expected before ~2026-08-05, where the issuer's feed ends) and
 
 `confidence` starts at `low`: the token → feed pairing is inferred from a ticker, and no first-party
 statement links them. It reaches `medium` from three observed events once the pairing is
-corroborated by behaviour, and `feed.corroboratedBy` says by which behaviour — never merge the two,
-because they are not the same claim:
+corroborated by behaviour, and the row's own `feedCorroboratedBy` says by which behaviour — never
+merge the two, because they are not the same claim:
 
 - `multiplier-step` — this token's own step was seen moving this feed by the step's own size, above
   the feed's round-to-round noise, with no other mapped feed closer. Causal, and true of **SGOV
@@ -210,7 +211,9 @@ because they are not the same claim:
 
 `high` is reserved for a first-party address-level link, which nothing has today. A row refused for
 a reason of its own — no price at `effectiveAt`, a non-positive rate — reads `low` and still reports
-`feed.corroboratedBy`, because that is a fact about the pairing and not about the event.
+`feedCorroboratedBy`, because that is a fact about the pairing and not about the event. An empty
+array means the pairing rests on a ticker match alone; the same list is served per token under
+`feed.corroboratedBy` on `GET /v1/:chain/tokens/:address`.
 
 ## `GET /v1/:chain/tokens/:address/yield`
 

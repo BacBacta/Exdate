@@ -90,15 +90,50 @@ Worth paying for only when you decide to index transfers, and the number to chec
 node: 7–13 M transfers a day is roughly 75 GB of database a month. Both QuickNode and Chainstack
 list this chain; a keyless tier on the endpoint in use allows 300 requests a minute per IP.
 
-## 4. Host the API and the status page
+## 4. Host the API and the status page — built and rehearsed; needs one DNS record
 
-`docker compose up -d` at the repository root brings up Postgres and the indexer, serving
-`/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`, and *Hosting* in the README). Needs
-a server and a TLS proxy that forwards the client address in `X-Forwarded-For`, so anonymous
-quotas count per visitor rather than per proxy. `EXDATE_API_KEYS` turns on keys and quotas.
+Everything between "the containers run" and "someone can call it" now exists and was exercised here
+with a real Docker daemon, not read:
 
-Until this exists there is no public instance — the reference says so — and the signed
-webhook outbox has still never delivered anything.
+- `deploy/Caddyfile` terminates TLS for `api.exdate.me` and `status.exdate.me` and proxies to the
+  compose network. Validated against `caddy:2-alpine`: *Valid configuration*.
+- `deploy/status.Dockerfile` builds the status page as a Next standalone server that reads
+  `http://indexer:42069` over the compose network, so the API's address never reaches a browser.
+- Two compose profiles: `public` adds Caddy and the status page; `watcher` gates the watcher, which
+  used to start with everything else and must not, since this machine runs it under systemd.
+- The indexer's port moved to `127.0.0.1:42069`. It was published on every interface.
+
+**Rehearsed end to end here**: both images build, Postgres + the indexer come up, `/v1/health`
+answers, `/v1/chains` and `/v1/robinhood/tokens` serve 194 polled tokens with the three
+`X-RateLimit-*` headers and CORS, an unknown path is a JSON 404, the reconcile pass produces **51
+reconciliations** (2 matched, 5 anomaly, 38 pending, 6 unmatched) and the status page renders them
+against the live API. Two real defects were found by doing it rather than by reading: both
+Dockerfiles were missing `tsconfig.base.json` from their build context, and the reconciliation row
+was dropping `feedCorroboratedBy` at the database (see the decision log for 2026-09-04).
+
+**What is left is one DNS record and one command.** Point both names at the machine:
+
+```
+api.exdate.me     A    2.28.43.138
+status.exdate.me  A    2.28.43.138
+```
+
+then, as root on that machine:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/install-api.sh | bash
+```
+
+It installs Docker, **refuses if either name does not resolve to this machine** — asking Let's
+Encrypt for a certificate it cannot prove is rate-limited per domain, so that check is the one worth
+having — refuses if anything already holds 80 or 443, reuses the watcher's checkout without
+resetting it, generates the Postgres password into `.env` without printing it, and proves the result
+by calling `/v1/health` locally and then over https.
+
+Then the API is public and the quotas matter. `EXDATE_ANON_RPM` is the anonymous rate per client
+address read from `X-Forwarded-For`, which Caddy sets; `EXDATE_API_KEYS` (`key:label:rpm`, comma
+separated) turns on keys. Until this runs there is no public instance — the reference says so — and
+the signed webhook outbox has still never delivered anything.
 
 ## 5. Choose a domain — done: exdate.me
 

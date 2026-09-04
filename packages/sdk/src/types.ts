@@ -154,6 +154,15 @@ export interface ReconciliationView {
   symbol: string
   status: ReconciliationStatus | string
   confidence: string
+  /**
+   * Which behaviour carries `confidence`. Both kinds reach `medium` and they are
+   * not the same claim, so read this rather than the word alone:
+   * `multiplier-step` is causal - this token's own multiplier step was seen
+   * moving this feed by the step's own size - while `traded-price` only
+   * identifies the underlying, since two unrelated assets can trade at one
+   * price. Empty means the token to feed pairing rests on a ticker match alone.
+   */
+  feedCorroboratedBy: readonly ('multiplier-step' | 'traded-price')[]
   note: string | null
   declared: {
     actionId: string | null

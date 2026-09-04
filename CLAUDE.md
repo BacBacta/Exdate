@@ -966,7 +966,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   already means "believed on behaviour, not stated by anyone", which is true of both, and splitting
   it would put the distinction in a word instead of in the field that names the evidence. What
   separates them is written down instead — causal versus identification, and that two unrelated
-  assets can trade at one price. The 12 pairings that fail the price test are the informative half:
+  assets can trade at one price. *(Corrected later the same day: "end to end" was half true — the
+  reconciliation row dropped the kind at the database. See the hosting entry below.)* The 12
+  pairings that fail the price test are the informative half:
   almost all high-volatility names (GME, MSTR, COIN, IONQ, RGTI…) whose traded price is genuinely
   dislocated from the feed, so the test fails because its premise fails, not because the pairing is
   wrong.
@@ -1067,6 +1069,33 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `NEXT_PUBLIC_EXDATE_SITE_URL` as the override. `api.exdate.me` and `status.exdate.me` are reserved
   and deliberately named nowhere in the product until something answers on them: publishing an
   endpoint that does not exist is the same failure as publishing a number nobody measured.
+- 2026-09-04 — **The API and the status page are hosted, and building them found the one place the
+  corroboration kind was not travelling.** `deploy/Caddyfile`, `deploy/status.Dockerfile`, two
+  compose profiles (`public` for Caddy and the status page, `watcher` to stop the watcher service
+  starting beside the systemd one on the same host) and `deploy/install-api.sh`. Rehearsed here
+  against a real Docker daemon rather than read: both images build, `/v1/health` answers, 194 tokens
+  poll, the three `X-RateLimit-*` headers and CORS are present, an unknown path is a JSON 404, the
+  reconcile pass produces 51 rows and the status page renders them live. The installer's decisive
+  check is that both names already resolve to the machine, because a failed ACME challenge is
+  rate-limited per domain; it also refuses if 80 or 443 are taken, and never resets the watcher's
+  checkout, which the watcher owns.
+  Two real defects fell out of doing it. Both Dockerfiles omitted `tsconfig.base.json`, which every
+  workspace tsconfig extends, so the status build failed on `extends … doesn't resolve correctly`.
+  And the more important one: the entry above claims the corroboration kind travels "end to end …
+  `reconcile()`'s input **and its output**, the API, the SDK and both sites". It did not. The poller
+  passed it into `reconcile()`, `reconcile()` returned it — and the `reconciliations` table had **no
+  column for it**, so it was dropped on write and the API's reconciliation row published
+  `confidence: medium` with nothing saying which behaviour earned it.
+  `/v1/:chain/reconciliations` is the differentiating dataset, so that is precisely where the
+  conflation mattered, and `docs/api.md` pointed a reader at `feed.corroboratedBy`, which only the
+  token route serves. Fixed at the break: a `feedCorroboratedBy` column (comma-joined over a closed
+  two-value set, with the boolean **derived** in the serialiser rather than stored beside it — two
+  columns that can disagree about one fact is how a row claims corroboration it cannot name), the
+  write, the serialiser, the API row type, the SDK type and the reference. Verified live through the
+  hosted API: SGOV `medium` with `['multiplier-step','traded-price']`, AAPL `low` with
+  `['traded-price']` — corroborated but on one event, so the evidence is reported without lifting
+  the confidence. The SDK's contract assert was checked to bite by removing the field and watching
+  `tsc` fail with `Type '"feedCorroboratedBy"' does not satisfy the constraint 'never'`.
 - _(append decisions here as they are made)_
 
 ## Status

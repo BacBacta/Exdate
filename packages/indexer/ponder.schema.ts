@@ -275,8 +275,26 @@ export const reconciliations = onchainTable(
     impliedReinvestPriceWad: t.bigint(),
     /** pending | matched | anomaly | unmatched */
     status: t.text().notNull(),
-    /** low | medium | high. Low today for every row: see note on feedVerified. */
+    /**
+     * low | medium | high. `high` needs a first-party address-level link between
+     * token and feed, which does not exist anywhere, so nothing reaches it.
+     * `medium` means the pairing is believed on behaviour - see the column below,
+     * which says WHICH behaviour, because two different claims land here.
+     */
     confidence: t.text().notNull(),
+    /**
+     * Which behaviour corroborates the token to feed pairing this row's price
+     * came from: `multiplier-step` (causal - this token's own step was seen
+     * moving this feed by the step's own size) and/or `traded-price` (weaker -
+     * the token's traded price sits closest to this feed, repeatedly). Empty
+     * when the pairing is a bare ticker match.
+     *
+     * Stored comma-joined over a closed two-value set, and the boolean is
+     * derived from it in the serialiser rather than stored beside it: two
+     * columns that can disagree about one fact is how a row ends up claiming
+     * corroboration it cannot name.
+     */
+    feedCorroboratedBy: t.text(),
     note: t.text(),
     computedAt: t.bigint().notNull(),
   }),

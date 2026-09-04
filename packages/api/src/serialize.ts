@@ -263,6 +263,16 @@ export function serializeReconciliation(row: ReconciliationRow) {
     /** pending | matched | anomaly | unmatched | unsupported_action_type */
     status: row.status,
     confidence: row.confidence,
+    /**
+     * Which behaviour carries `confidence`, never merged into one word.
+     * 'multiplier-step' is causal: this token's own step was seen moving this
+     * feed by the step's own size, above the feed's noise, with no other mapped
+     * feed closer. 'traded-price' only identifies the underlying: the token
+     * trades nearest this feed's answer, repeatedly - two unrelated assets can
+     * trade at one price, so it is the weaker of the two. Empty means the
+     * pairing rests on a ticker match alone, which is why `confidence` is `low`.
+     */
+    feedCorroboratedBy: row.feedCorroboratedBy ? (row.feedCorroboratedBy.split(',') as ('multiplier-step' | 'traded-price')[]) : [],
     note: row.note,
 
     declared:

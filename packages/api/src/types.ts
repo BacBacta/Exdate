@@ -108,6 +108,12 @@ export interface ReconciliationRow {
   impliedReinvestPriceWad: bigint | null
   status: string
   confidence: string
+  /**
+   * Comma-joined 'multiplier-step' and/or 'traded-price', or null. The evidence
+   * behind `confidence`: both kinds reach `medium`, and they are not the same
+   * claim, so the row names which rather than leaving a reader to assume.
+   */
+  feedCorroboratedBy: string | null
   note: string | null
   computedAt: bigint
 }

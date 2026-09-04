@@ -340,6 +340,11 @@ export async function runReconcilePass(
       impliedReinvestPriceWad: outcome.impliedReinvestPriceWad ?? null,
       status: outcome.status,
       confidence: outcome.confidence,
+      // The evidence behind `confidence`, kept with the row. Without it a
+      // consumer reads `medium` and cannot tell a causal corroboration from an
+      // identification by traded price - which is the exact conflation the two
+      // kinds were separated to prevent.
+      feedCorroboratedBy: outcome.feedCorroboratedBy.length ? outcome.feedCorroboratedBy.join(',') : null,
       note: outcome.note ?? null,
     })
 
