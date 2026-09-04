@@ -147,3 +147,96 @@ export function compareToFeed(input: {
     beyondHeartbeat: age > input.heartbeatSeconds,
   }
 }
+
+// ---------------------------------------------------------------------------
+// Corroborating a token -> feed pairing with the price it trades at.
+//
+// No first-party statement links any Stock Token to any Chainlink feed. The map is
+// built from a ticker match, which is why `confidence` is `low` almost everywhere and
+// why every haircut carries that caveat. One pairing, SGOV, is corroborated by its own
+// multiplier step moving its feed by the step's own size - causal evidence, and the
+// strongest available.
+//
+// A traded price gives a second, different kind of evidence: identification. If a
+// token's pool price sits far closer to one feed than to any other, that feed is the
+// one quoting this asset. It is weaker than the step test, because two unrelated assets
+// can trade at the same price - MSTR at $142.68 and USO at $141.99 defeat each other
+// exactly this way - so the test is a ratio and not a distance, and it refuses when the
+// margin is thin.
+//
+// A ratio rather than an absolute gap on purpose: feeds freeze outside market hours, so
+// the absolute distance is large for legitimate reasons, while the ranking survives.
+// ---------------------------------------------------------------------------
+
+/** How many times further the nearest other feed must be before a match identifies anything. */
+export const MINIMUM_SEPARATION = 3
+
+/** Below this, `ownBps` is treated as this value: an exact match must not divide by zero. */
+const SEPARATION_FLOOR_BPS = 0.01
+
+export type PriceCorroborationRefusal = 'no_other_feeds' | 'not_closest' | 'insufficient_separation'
+
+export interface PriceCorroboration {
+  /** Distance from the traded price to the feed this token is mapped to. */
+  ownBps: number
+  /** Distance to the nearest feed it is not mapped to, or null when there is nothing to compare against. */
+  nearestOtherBps: number | null
+  /** How many times further that other feed is. Higher is stronger identification. */
+  separation: number | null
+  corroborates: boolean
+  refusal: PriceCorroborationRefusal | null
+}
+
+/**
+ * Does this traded price identify the feed the token is mapped to, among all the others?
+ */
+export function corroborateFeedByPrice(input: {
+  tradedPriceWad: bigint
+  assignedFeedPriceWad: bigint
+  /** Every other mapped feed's price, read at the same instant. */
+  otherFeedPricesWad: readonly bigint[]
+  minimumSeparation?: number
+}): PriceCorroboration | null {
+  const own = deviationBps(input.tradedPriceWad, input.assignedFeedPriceWad)
+  if (own === null) return null
+  const ownBps = Math.abs(own)
+  const others = input.otherFeedPricesWad
+    .map((price) => deviationBps(input.tradedPriceWad, price))
+    .filter((value): value is number => value !== null)
+    .map(Math.abs)
+  if (others.length === 0) {
+    return { ownBps, nearestOtherBps: null, separation: null, corroborates: false, refusal: 'no_other_feeds' }
+  }
+  const nearestOtherBps = Math.min(...others)
+  const separation = nearestOtherBps / Math.max(ownBps, SEPARATION_FLOOR_BPS)
+  if (nearestOtherBps < ownBps) {
+    return { ownBps, nearestOtherBps, separation, corroborates: false, refusal: 'not_closest' }
+  }
+  const minimum = input.minimumSeparation ?? MINIMUM_SEPARATION
+  if (separation < minimum) {
+    return { ownBps, nearestOtherBps, separation, corroborates: false, refusal: 'insufficient_separation' }
+  }
+  return { ownBps, nearestOtherBps, separation, corroborates: true, refusal: null }
+}
+
+/** Samples before a run of agreements means anything, and the share of them that must agree. */
+export const CORROBORATION_MINIMUM_SAMPLES = 3
+export const CORROBORATION_MAJORITY = 2 / 3
+
+export interface CorroborationTally {
+  samples: number
+  corroborating: number
+}
+
+/**
+ * Whether accumulated readings amount to corroboration.
+ *
+ * One reading can be luck: two assets briefly crossing prices would pass it. So a
+ * pairing is corroborated only once several readings agree, and a lone disagreement
+ * does not undo a run of agreements either - the bar is a majority over a minimum
+ * number of samples, and both are stated here rather than buried in a caller.
+ */
+export function feedCorroboratedByPrice({ samples, corroborating }: CorroborationTally): boolean {
+  if (samples < CORROBORATION_MINIMUM_SAMPLES) return false
+  return corroborating / samples >= CORROBORATION_MAJORITY
+}

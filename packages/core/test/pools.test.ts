@@ -5,7 +5,9 @@ import {
   POOL_SELECTOR,
   POOL_SIGNATURE,
   compareToFeed,
+  corroborateFeedByPrice,
   deviationBps,
+  feedCorroboratedByPrice,
   poolPriceWad,
   selectVenuePrice,
   type PoolQuote,
@@ -156,5 +158,98 @@ describe('compareToFeed', () => {
 
   it('is null when the feed has no usable answer', () => {
     expect(compareToFeed({ ...base, poolPriceWad: 328n * WAD, feedAnswer: 0n, feedUpdatedAt: 1_788_000_000n })).toBeNull()
+  })
+})
+
+describe('corroborateFeedByPrice', () => {
+  const WAD18 = 10n ** 18n
+  const usd = (value: number) => BigInt(Math.round(value * 1e6)) * 10n ** 12n
+
+  it('corroborates when the assigned feed is far closer than any other', () => {
+    // TSM as measured: 76.6 bps from its own feed, 1037 from the nearest other.
+    const result = corroborateFeedByPrice({
+      tradedPriceWad: usd(414.134),
+      assignedFeedPriceWad: usd(417.33),
+      otherFeedPricesWad: [usd(461.5935), usd(19.455), usd(1571.765)],
+    })!
+    expect(result.corroborates).toBe(true)
+    expect(result.ownBps).toBeCloseTo(76.6, 0)
+    expect(result.separation).toBeGreaterThan(3)
+    expect(result.refusal).toBeNull()
+  })
+
+  it('refuses when another feed is closer, which is how two assets at one price defeat each other', () => {
+    // MSTR at $142.677 sits nearer USO's feed at $141.995 than its own at $141.77.
+    const result = corroborateFeedByPrice({
+      tradedPriceWad: usd(142.677),
+      assignedFeedPriceWad: usd(141.77),
+      otherFeedPricesWad: [usd(141.995)],
+    })!
+    expect(result.corroborates).toBe(false)
+    expect(result.refusal).toBe('not_closest')
+    expect(result.nearestOtherBps).toBeLessThan(result.ownBps)
+  })
+
+  it('refuses a thin margin: closest is not the same as identified', () => {
+    const result = corroborateFeedByPrice({
+      tradedPriceWad: usd(100),
+      assignedFeedPriceWad: usd(100.2),
+      otherFeedPricesWad: [usd(100.3)],
+    })!
+    expect(result.corroborates).toBe(false)
+    expect(result.refusal).toBe('insufficient_separation')
+    expect(result.separation).toBeLessThan(3)
+  })
+
+  it('is a ratio, not a distance, so a frozen feed still identifies its token', () => {
+    // 300 bps from its own feed - stale but unmistakably the right one.
+    const result = corroborateFeedByPrice({
+      tradedPriceWad: usd(103),
+      assignedFeedPriceWad: usd(100),
+      otherFeedPricesWad: [usd(400)],
+    })!
+    expect(result.ownBps).toBeCloseTo(300, 0)
+    expect(result.corroborates).toBe(true)
+  })
+
+  it('says so when there is nothing to compare against, rather than passing by default', () => {
+    const result = corroborateFeedByPrice({
+      tradedPriceWad: usd(100),
+      assignedFeedPriceWad: usd(100),
+      otherFeedPricesWad: [],
+    })!
+    expect(result.corroborates).toBe(false)
+    expect(result.refusal).toBe('no_other_feeds')
+  })
+
+  it('handles an exact match without dividing by zero', () => {
+    const result = corroborateFeedByPrice({
+      tradedPriceWad: 100n * WAD18,
+      assignedFeedPriceWad: 100n * WAD18,
+      otherFeedPricesWad: [200n * WAD18],
+    })!
+    expect(result.ownBps).toBe(0)
+    expect(Number.isFinite(result.separation!)).toBe(true)
+    expect(result.corroborates).toBe(true)
+  })
+
+  it('is null when the assigned feed has no usable price', () => {
+    expect(
+      corroborateFeedByPrice({ tradedPriceWad: 100n * WAD18, assignedFeedPriceWad: 0n, otherFeedPricesWad: [200n * WAD18] }),
+    ).toBeNull()
+  })
+})
+
+describe('feedCorroboratedByPrice', () => {
+  it('needs several readings: one agreement can be two assets briefly crossing', () => {
+    expect(feedCorroboratedByPrice({ samples: 1, corroborating: 1 })).toBe(false)
+    expect(feedCorroboratedByPrice({ samples: 2, corroborating: 2 })).toBe(false)
+    expect(feedCorroboratedByPrice({ samples: 3, corroborating: 3 })).toBe(true)
+  })
+
+  it('survives a lone disagreement but not a pattern of them', () => {
+    expect(feedCorroboratedByPrice({ samples: 9, corroborating: 6 })).toBe(true)
+    expect(feedCorroboratedByPrice({ samples: 9, corroborating: 5 })).toBe(false)
+    expect(feedCorroboratedByPrice({ samples: 100, corroborating: 0 })).toBe(false)
   })
 })

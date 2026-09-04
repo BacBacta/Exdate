@@ -1,7 +1,7 @@
 {
   "note": "Distance between the price a Stock Token trades at on chain and the Chainlink answer a lending market liquidates against. Both quote the raw token, so nothing is unwound from either. Positive means the traded price is above the oracle.",
   "method": "The deepest USDG pool per token, read in the same instant as every feed, through one Multicall3 batch each. A pool with no liquidity is skipped rather than ranked last: its price is whatever the last trade left behind. Each run appends its summary to the history, labelled with the market session, so the difference between an open market and a frozen feed becomes measurable rather than asserted.",
-  "observedAt": "2026-09-04T07:27:39.000Z",
+  "observedAt": "2026-09-04T07:43:19.000Z",
   "session": "overnight",
   "heartbeatSeconds": 86400,
   "summary": {
@@ -9,14 +9,302 @@
     "withFeed": 26,
     "withoutFeed": 39,
     "medianAbsDeviationBps": 19.93,
-    "maxAbsDeviationBps": 185.27,
-    "medianFeedAgeSeconds": 9026,
+    "maxAbsDeviationBps": 169.89,
+    "medianFeedAgeSeconds": 9966,
     "feedsBeyondHeartbeat": 0
   },
   "bySession": {
     "overnight": {
-      "samples": 1,
+      "samples": 2,
       "medianAbsDeviationBps": 19.93
+    }
+  },
+  "corroboration": {
+    "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9": {
+      "symbol": "AAPL",
+      "feed": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        22
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 22
+    },
+    "0x86923f96303d656e4aa86d9d42d1e57ad2023fdc": {
+      "symbol": "AMD",
+      "feed": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        607.6
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 607.6
+    },
+    "0x12f190a9f9d7d37a250758b26824b97ce941bf54": {
+      "symbol": "AMZN",
+      "feed": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        58.8
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 58.8
+    },
+    "0x47f93d52cbec7c6d2cfc080e154002370a60daea": {
+      "symbol": "ASML",
+      "feed": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+      "samples": 1,
+      "corroborating": 0,
+      "separations": [
+        3
+      ],
+      "lastRefusal": "insufficient_separation",
+      "medianSeparation": 3
+    },
+    "0xad25ac6c84d497db898fa1e8387bf6af3532a1c4": {
+      "symbol": "BABA",
+      "feed": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        15.6
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 15.6
+    },
+    "0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5": {
+      "symbol": "CRCL",
+      "feed": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        18.1
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 18.1
+    },
+    "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd": {
+      "symbol": "DELL",
+      "feed": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        13
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 13
+    },
+    "0x1b0e319c6a659f002271b69db8a7df2f911c153e": {
+      "symbol": "GME",
+      "feed": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        6.7
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 6.7
+    },
+    "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3": {
+      "symbol": "GOOGL",
+      "feed": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        12.8
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 12.8
+    },
+    "0xc72b96e0e48ecd4dc75e1e45396e26300bc39681": {
+      "symbol": "INTC",
+      "feed": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        55.4
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 55.4
+    },
+    "0xc0d6457c16cc70d6790dd43521c899c87ce02f35": {
+      "symbol": "META",
+      "feed": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        60.7
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 60.7
+    },
+    "0xe93237c50d904957cf27e7b1133b510c669c2e74": {
+      "symbol": "MSFT",
+      "feed": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        8.8
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 8.8
+    },
+    "0xec262a75e413fafd0df80480274532c79d42da09": {
+      "symbol": "MSTR",
+      "feed": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
+      "samples": 1,
+      "corroborating": 0,
+      "separations": [
+        0.1
+      ],
+      "lastRefusal": "not_closest",
+      "medianSeparation": 0.1
+    },
+    "0xff080c8ce2e5feadaca0da81314ae59d232d4afd": {
+      "symbol": "MU",
+      "feed": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        514
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 514
+    },
+    "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec": {
+      "symbol": "NVDA",
+      "feed": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        1114.1
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 1114.1
+    },
+    "0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a": {
+      "symbol": "PLTR",
+      "feed": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
+      "samples": 1,
+      "corroborating": 0,
+      "separations": [
+        0.8
+      ],
+      "lastRefusal": "not_closest",
+      "medianSeparation": 0.8
+    },
+    "0xd5f3879160bc7c32ebb4dc785f8a4f505888de68": {
+      "symbol": "QQQ",
+      "feed": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        1285.7
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 1285.7
+    },
+    "0x92fd66527192e3e61d4ddd13322aa222de86f9b5": {
+      "symbol": "SGOV",
+      "feed": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        34.2
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 34.2
+    },
+    "0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f": {
+      "symbol": "SLV",
+      "feed": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        45.2
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 45.2
+    },
+    "0xb90a19ff0af67f7779aff50a882a9cff42446400": {
+      "symbol": "SNDK",
+      "feed": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        49.7
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 49.7
+    },
+    "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea": {
+      "symbol": "SPCX",
+      "feed": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        52.8
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 52.8
+    },
+    "0x117cc2133c37b721f49de2a7a74833232b3b4c0c": {
+      "symbol": "SPY",
+      "feed": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        18.4
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 18.4
+    },
+    "0x322f0929c4625ed5bad873c95208d54e1c003b2d": {
+      "symbol": "TSLA",
+      "feed": "0x4A1166a659A55625345e9515b32adECea5547C38",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        38.2
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 38.2
+    },
+    "0x58ffe4a942d3885baa22d7520691f611ef09e7aa": {
+      "symbol": "TSM",
+      "feed": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        13.6
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 13.6
+    },
+    "0xd917b029c761d264c6a312bbbcda868658ef86a6": {
+      "symbol": "USAR",
+      "feed": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
+      "samples": 1,
+      "corroborating": 1,
+      "separations": [
+        27.8
+      ],
+      "lastRefusal": null,
+      "medianSeparation": 27.8
+    },
+    "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344": {
+      "symbol": "USO",
+      "feed": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
+      "samples": 1,
+      "corroborating": 0,
+      "separations": [
+        0.5
+      ],
+      "lastRefusal": "not_closest",
+      "medianSeparation": 0.5
     }
   },
   "history": [
@@ -30,6 +318,17 @@
       "maxAbsDeviationBps": 185.27,
       "medianFeedAgeSeconds": 9026,
       "feedsBeyondHeartbeat": 0
+    },
+    {
+      "observedAt": "2026-09-04T07:43:19.000Z",
+      "session": "overnight",
+      "tokensQuotable": 65,
+      "withFeed": 26,
+      "withoutFeed": 39,
+      "medianAbsDeviationBps": 19.93,
+      "maxAbsDeviationBps": 169.89,
+      "medianFeedAgeSeconds": 9966,
+      "feedsBeyondHeartbeat": 0
     }
   ],
   "tokens": [
@@ -39,14 +338,17 @@
       "token": "0x1b0e319c6a659f002271b69db8a7df2f911c153e",
       "pool": "0xe9713f453adb9245b19559790c96f470a18f2fdf",
       "feeTier": 10000,
-      "liquidity": "5420415624210476838",
-      "tradedPrice": "19.8154",
+      "liquidity": "5440540509686246355",
+      "tradedPrice": "19.7855",
       "feed": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
       "feedPrice": "19.4550",
-      "feedAgeSeconds": 4484,
+      "feedAgeSeconds": 5424,
       "beyondHeartbeat": false,
-      "deviationBps": 185.27,
-      "hasFeed": true
+      "deviationBps": 169.89,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 6.7,
+      "corroborationRefusal": null
     },
     {
       "symbol": "ASML",
@@ -55,13 +357,16 @@
       "pool": "0xce79c1b7b5f9ae1aab3b1796e7fcd2f5f24cf265",
       "feeTier": 3000,
       "liquidity": "29036567906625034",
-      "tradedPrice": "1649.2428",
+      "tradedPrice": "1649.5353",
       "feed": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
       "feedPrice": "1674.0146",
-      "feedAgeSeconds": 1110,
+      "feedAgeSeconds": 2050,
       "beyondHeartbeat": false,
-      "deviationBps": -147.97,
-      "hasFeed": true
+      "deviationBps": -146.23,
+      "hasFeed": true,
+      "identifiesItsFeed": false,
+      "separationFromNearestOtherFeed": 3,
+      "corroborationRefusal": "insufficient_separation"
     },
     {
       "symbol": "TSM",
@@ -70,13 +375,16 @@
       "pool": "0x07e8ea83d4c1340774c8965125e26e12bf943bf1",
       "feeTier": 10000,
       "liquidity": "214884811356894980",
-      "tradedPrice": "414.1340",
+      "tradedPrice": "414.1386",
       "feed": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
       "feedPrice": "417.3300",
-      "feedAgeSeconds": 10723,
+      "feedAgeSeconds": 11663,
       "beyondHeartbeat": false,
-      "deviationBps": -76.58,
-      "hasFeed": true
+      "deviationBps": -76.47,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 13.6,
+      "corroborationRefusal": null
     },
     {
       "symbol": "BABA",
@@ -84,44 +392,17 @@
       "token": "0xad25ac6c84d497db898fa1e8387bf6af3532a1c4",
       "pool": "0xa57ab582b310dd6f9e934ea1eeea152741545e6a",
       "feeTier": 3000,
-      "liquidity": "388838411638484855",
-      "tradedPrice": "113.0888",
+      "liquidity": "390770691728809080",
+      "tradedPrice": "113.0722",
       "feed": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
       "feedPrice": "112.3000",
-      "feedAgeSeconds": 1341,
+      "feedAgeSeconds": 2281,
       "beyondHeartbeat": false,
-      "deviationBps": 70.24,
-      "hasFeed": true
-    },
-    {
-      "symbol": "MSTR",
-      "name": "Strategy Inc.",
-      "token": "0xec262a75e413fafd0df80480274532c79d42da09",
-      "pool": "0x17578c0e0d15da44f31677263114f71ae76653ea",
-      "feeTier": 10000,
-      "liquidity": "107172339577378533",
-      "tradedPrice": "142.6770",
-      "feed": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
-      "feedPrice": "141.7700",
-      "feedAgeSeconds": 3529,
-      "beyondHeartbeat": false,
-      "deviationBps": 63.97,
-      "hasFeed": true
-    },
-    {
-      "symbol": "SNDK",
-      "name": "Sandisk Corporation",
-      "token": "0xb90a19ff0af67f7779aff50a882a9cff42446400",
-      "pool": "0xa1e1c9519cd5ae47e9a935645e1a7b935b944559",
-      "feeTier": 10000,
-      "liquidity": "41963382278130081",
-      "tradedPrice": "1578.9352",
-      "feed": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
-      "feedPrice": "1571.7650",
-      "feedAgeSeconds": 3147,
-      "beyondHeartbeat": false,
-      "deviationBps": 45.61,
-      "hasFeed": true
+      "deviationBps": 68.76,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 15.6,
+      "corroborationRefusal": null
     },
     {
       "symbol": "SPY",
@@ -129,14 +410,17 @@
       "token": "0x117cc2133c37b721f49de2a7a74833232b3b4c0c",
       "pool": "0xa7bb1ac63bbab0c44316e6c8c455213441689167",
       "feeTier": 500,
-      "liquidity": "254910197534555643",
-      "tradedPrice": "774.5802",
+      "liquidity": "259554568856290324",
+      "tradedPrice": "774.3757",
       "feed": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
       "feedPrice": "771.1850",
-      "feedAgeSeconds": 58527,
+      "feedAgeSeconds": 59467,
       "beyondHeartbeat": false,
-      "deviationBps": 44.02,
-      "hasFeed": true
+      "deviationBps": 41.37,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 18.4,
+      "corroborationRefusal": null
     },
     {
       "symbol": "GOOGL",
@@ -144,14 +428,17 @@
       "token": "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
       "pool": "0x34d0dc122cf9a8eb296fc5e0d3a233625d7d19b7",
       "feeTier": 500,
-      "liquidity": "810948044750467965",
-      "tradedPrice": "343.5297",
+      "liquidity": "833112043913245232",
+      "tradedPrice": "343.4498",
       "feed": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
       "feedPrice": "342.1150",
-      "feedAgeSeconds": 62762,
+      "feedAgeSeconds": 63702,
       "beyondHeartbeat": false,
-      "deviationBps": 41.35,
-      "hasFeed": true
+      "deviationBps": 39.01,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 12.8,
+      "corroborationRefusal": null
     },
     {
       "symbol": "USAR",
@@ -160,13 +447,16 @@
       "pool": "0x04391780f519b7d3ba59c9590459d76e23d225c4",
       "feeTier": 3000,
       "liquidity": "421101165621683574",
-      "tradedPrice": "17.8297",
+      "tradedPrice": "17.8285",
       "feed": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
       "feedPrice": "17.7750",
-      "feedAgeSeconds": 4228,
+      "feedAgeSeconds": 5168,
       "beyondHeartbeat": false,
-      "deviationBps": 30.78,
-      "hasFeed": true
+      "deviationBps": 30.11,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 27.8,
+      "corroborationRefusal": null
     },
     {
       "symbol": "USO",
@@ -175,13 +465,16 @@
       "pool": "0x02175608f1b5e6b5ed221ccfdc7be197d111d915",
       "feeTier": 3000,
       "liquidity": "736689459480661387",
-      "tradedPrice": "141.5889",
+      "tradedPrice": "141.5703",
       "feed": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
       "feedPrice": "141.9950",
-      "feedAgeSeconds": 44944,
+      "feedAgeSeconds": 45884,
       "beyondHeartbeat": false,
-      "deviationBps": -28.59,
-      "hasFeed": true
+      "deviationBps": -29.9,
+      "hasFeed": true,
+      "identifiesItsFeed": false,
+      "separationFromNearestOtherFeed": 0.5,
+      "corroborationRefusal": "not_closest"
     },
     {
       "symbol": "META",
@@ -190,13 +483,16 @@
       "pool": "0x107a7cb40d8665360ba10e59471af06150a50922",
       "feeTier": 3000,
       "liquidity": "88395780863344956",
-      "tradedPrice": "613.7019",
+      "tradedPrice": "613.6750",
       "feed": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
       "feedPrice": "612.1900",
-      "feedAgeSeconds": 7590,
+      "feedAgeSeconds": 8530,
       "beyondHeartbeat": false,
-      "deviationBps": 24.69,
-      "hasFeed": true
+      "deviationBps": 24.25,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 60.7,
+      "corroborationRefusal": null
     },
     {
       "symbol": "TSLA",
@@ -205,28 +501,16 @@
       "pool": "0xf4acdaeeb7022862a763c9b1b885e11191c889e3",
       "feeTier": 3000,
       "liquidity": "464045942536675020",
-      "tradedPrice": "370.6057",
+      "tradedPrice": "370.5711",
       "feed": "0x4A1166a659A55625345e9515b32adECea5547C38",
       "feedPrice": "369.7650",
-      "feedAgeSeconds": 11513,
+      "feedAgeSeconds": 12453,
       "beyondHeartbeat": false,
-      "deviationBps": 22.73,
-      "hasFeed": true
-    },
-    {
-      "symbol": "AAPL",
-      "name": "Apple",
-      "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
-      "pool": "0xaae0d815ee56e4092a5e5c2911e676fea50b2d6d",
-      "feeTier": 500,
-      "liquidity": "872901278687645145",
-      "tradedPrice": "327.7220",
-      "feed": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
-      "feedPrice": "327.0700",
-      "feedAgeSeconds": 2564,
-      "beyondHeartbeat": false,
-      "deviationBps": 19.93,
-      "hasFeed": true
+      "deviationBps": 21.79,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 38.2,
+      "corroborationRefusal": null
     },
     {
       "symbol": "AMZN",
@@ -234,44 +518,17 @@
       "token": "0x12f190a9f9d7d37a250758b26824b97ce941bf54",
       "pool": "0x8ac92da74ab5f3b1d024dc1943ad7e15dc4179ef",
       "feeTier": 3000,
-      "liquidity": "616586059906578626",
-      "tradedPrice": "259.5228",
+      "liquidity": "560492583527329722",
+      "tradedPrice": "259.5906",
       "feed": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
       "feedPrice": "259.0300",
-      "feedAgeSeconds": 57256,
+      "feedAgeSeconds": 58196,
       "beyondHeartbeat": false,
-      "deviationBps": 19.02,
-      "hasFeed": true
-    },
-    {
-      "symbol": "DELL",
-      "name": "Dell",
-      "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
-      "pool": "0xc30c89cb7815a1488b7998d15eec73961707fc5a",
-      "feeTier": 10000,
-      "liquidity": "295355019688142916",
-      "tradedPrice": "519.6985",
-      "feed": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
-      "feedPrice": "518.7530",
-      "feedAgeSeconds": 10553,
-      "beyondHeartbeat": false,
-      "deviationBps": 18.22,
-      "hasFeed": true
-    },
-    {
-      "symbol": "MU",
-      "name": "Micron Technology",
-      "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
-      "pool": "0xd057b1bc54917855bbee58ead58647f47cab35e5",
-      "feeTier": 3000,
-      "liquidity": "623898016276936851",
-      "tradedPrice": "968.0790",
-      "feed": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
-      "feedPrice": "969.6725",
-      "feedAgeSeconds": 416,
-      "beyondHeartbeat": false,
-      "deviationBps": -16.43,
-      "hasFeed": true
+      "deviationBps": 21.64,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 58.8,
+      "corroborationRefusal": null
     },
     {
       "symbol": "PLTR",
@@ -280,58 +537,16 @@
       "pool": "0x851680416a4f4e1c463d45171d61acddbc8554c0",
       "feeTier": 3000,
       "liquidity": "326050150187089463",
-      "tradedPrice": "181.9824",
+      "tradedPrice": "181.8807",
       "feed": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
       "feedPrice": "182.2484",
-      "feedAgeSeconds": 41513,
+      "feedAgeSeconds": 42453,
       "beyondHeartbeat": false,
-      "deviationBps": -14.59,
-      "hasFeed": true
-    },
-    {
-      "symbol": "INTC",
-      "name": "Intel",
-      "token": "0xc72b96e0e48ecd4dc75e1e45396e26300bc39681",
-      "pool": "0x2e5a92f5013a64661a49312111be2e8abd33f56a",
-      "feeTier": 3000,
-      "liquidity": "43995615860951618",
-      "tradedPrice": "92.6935",
-      "feed": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
-      "feedPrice": "92.5800",
-      "feedAgeSeconds": 5812,
-      "beyondHeartbeat": false,
-      "deviationBps": 12.25,
-      "hasFeed": true
-    },
-    {
-      "symbol": "AMD",
-      "name": "AMD",
-      "token": "0x86923f96303d656e4aa86d9d42d1e57ad2023fdc",
-      "pool": "0x48d284a2a4d3dc1b3da08231fe44317e7e7aa51f",
-      "feeTier": 3000,
-      "liquidity": "93759127980485756",
-      "tradedPrice": "461.5935",
-      "feed": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
-      "feedPrice": "462.0700",
-      "feedAgeSeconds": 694,
-      "beyondHeartbeat": false,
-      "deviationBps": -10.31,
-      "hasFeed": true
-    },
-    {
-      "symbol": "SLV",
-      "name": "iShares Silver Trust",
-      "token": "0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f",
-      "pool": "0x8cb787e6c315d464775289bad00fdd67d53ecb3d",
-      "feeTier": 3000,
-      "liquidity": "484806797928454357",
-      "tradedPrice": "60.2747",
-      "feed": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
-      "feedPrice": "60.2200",
-      "feedAgeSeconds": 21632,
-      "beyondHeartbeat": false,
-      "deviationBps": 9.07,
-      "hasFeed": true
+      "deviationBps": -20.17,
+      "hasFeed": true,
+      "identifiesItsFeed": false,
+      "separationFromNearestOtherFeed": 0.8,
+      "corroborationRefusal": "not_closest"
     },
     {
       "symbol": "MSFT",
@@ -340,13 +555,178 @@
       "pool": "0xeb60bcd1d920ad6e102690ccfc6fb488899e1510",
       "feeTier": 3000,
       "liquidity": "216917500611032456",
-      "tradedPrice": "509.1014",
+      "tradedPrice": "509.6843",
       "feed": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
       "feedPrice": "508.6700",
-      "feedAgeSeconds": 24292,
+      "feedAgeSeconds": 25232,
       "beyondHeartbeat": false,
-      "deviationBps": 8.48,
-      "hasFeed": true
+      "deviationBps": 19.93,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 8.8,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
+      "pool": "0xaae0d815ee56e4092a5e5c2911e676fea50b2d6d",
+      "feeTier": 500,
+      "liquidity": "1006855313401689733",
+      "tradedPrice": "327.6962",
+      "feed": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+      "feedPrice": "327.0700",
+      "feedAgeSeconds": 3504,
+      "beyondHeartbeat": false,
+      "deviationBps": 19.14,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 22,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "MSTR",
+      "name": "Strategy Inc.",
+      "token": "0xec262a75e413fafd0df80480274532c79d42da09",
+      "pool": "0x17578c0e0d15da44f31677263114f71ae76653ea",
+      "feeTier": 10000,
+      "liquidity": "106623794941656436",
+      "tradedPrice": "142.0257",
+      "feed": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
+      "feedPrice": "141.7700",
+      "feedAgeSeconds": 4469,
+      "beyondHeartbeat": false,
+      "deviationBps": 18.03,
+      "hasFeed": true,
+      "identifiesItsFeed": false,
+      "separationFromNearestOtherFeed": 0.1,
+      "corroborationRefusal": "not_closest"
+    },
+    {
+      "symbol": "DELL",
+      "name": "Dell",
+      "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
+      "pool": "0xc30c89cb7815a1488b7998d15eec73961707fc5a",
+      "feeTier": 10000,
+      "liquidity": "295355019688142916",
+      "tradedPrice": "519.6091",
+      "feed": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+      "feedPrice": "518.7530",
+      "feedAgeSeconds": 11493,
+      "beyondHeartbeat": false,
+      "deviationBps": 16.5,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 13,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "SLV",
+      "name": "iShares Silver Trust",
+      "token": "0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f",
+      "pool": "0x8cb787e6c315d464775289bad00fdd67d53ecb3d",
+      "feeTier": 3000,
+      "liquidity": "484806797928454357",
+      "tradedPrice": "60.3109",
+      "feed": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
+      "feedPrice": "60.2200",
+      "feedAgeSeconds": 22572,
+      "beyondHeartbeat": false,
+      "deviationBps": 15.08,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 45.2,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "INTC",
+      "name": "Intel",
+      "token": "0xc72b96e0e48ecd4dc75e1e45396e26300bc39681",
+      "pool": "0x2e5a92f5013a64661a49312111be2e8abd33f56a",
+      "feeTier": 3000,
+      "liquidity": "37942583892238554",
+      "tradedPrice": "92.9718",
+      "feed": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
+      "feedPrice": "93.1050",
+      "feedAgeSeconds": 913,
+      "beyondHeartbeat": false,
+      "deviationBps": -14.31,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 55.4,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "SPCX",
+      "name": "Space Exploration Technologies Corp. Class A Common Stock",
+      "token": "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+      "pool": "0xc61284332117c3fb23a2a56cceffd07f7af60029",
+      "feeTier": 500,
+      "liquidity": "2112191768529404901",
+      "tradedPrice": "151.0269",
+      "feed": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
+      "feedPrice": "150.8450",
+      "feedAgeSeconds": 9192,
+      "beyondHeartbeat": false,
+      "deviationBps": 12.05,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 52.8,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "SNDK",
+      "name": "Sandisk Corporation",
+      "token": "0xb90a19ff0af67f7779aff50a882a9cff42446400",
+      "pool": "0xa1e1c9519cd5ae47e9a935645e1a7b935b944559",
+      "feeTier": 10000,
+      "liquidity": "41963382278130081",
+      "tradedPrice": "1578.9220",
+      "feed": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
+      "feedPrice": "1580.7300",
+      "feedAgeSeconds": 906,
+      "beyondHeartbeat": false,
+      "deviationBps": -11.43,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 49.7,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "CRCL",
+      "name": "Circle Internet Group",
+      "token": "0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5",
+      "pool": "0x654e4143e82a5824445ade0824351c2a9acd95a8",
+      "feeTier": 3000,
+      "liquidity": "2726134302110096095",
+      "tradedPrice": "102.0499",
+      "feed": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+      "feedPrice": "102.1100",
+      "feedAgeSeconds": 4571,
+      "beyondHeartbeat": false,
+      "deviationBps": -5.88,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 18.1,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "MU",
+      "name": "Micron Technology",
+      "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
+      "pool": "0xd057b1bc54917855bbee58ead58647f47cab35e5",
+      "feeTier": 3000,
+      "liquidity": "623898016276936851",
+      "tradedPrice": "970.1594",
+      "feed": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+      "feedPrice": "969.6725",
+      "feedAgeSeconds": 1356,
+      "beyondHeartbeat": false,
+      "deviationBps": 5.02,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 514,
+      "corroborationRefusal": null
     },
     {
       "symbol": "SGOV",
@@ -355,43 +735,34 @@
       "pool": "0xfab520051f96f4d2a32c22b6a3dd7fffdf231bfe",
       "feeTier": 3000,
       "liquidity": "8159052615979661413",
-      "tradedPrice": "100.9384",
+      "tradedPrice": "100.9437",
       "feed": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
       "feedPrice": "100.9775",
-      "feedAgeSeconds": 26745,
+      "feedAgeSeconds": 27685,
       "beyondHeartbeat": false,
-      "deviationBps": -3.87,
-      "hasFeed": true
+      "deviationBps": -3.34,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 34.2,
+      "corroborationRefusal": null
     },
     {
-      "symbol": "NVDA",
-      "name": "NVIDIA",
-      "token": "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
-      "pool": "0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
-      "feeTier": 500,
-      "liquidity": "9534352859302946734",
-      "tradedPrice": "230.2165",
-      "feed": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
-      "feedPrice": "230.2800",
-      "feedAgeSeconds": 9026,
+      "symbol": "AMD",
+      "name": "AMD",
+      "token": "0x86923f96303d656e4aa86d9d42d1e57ad2023fdc",
+      "pool": "0x48d284a2a4d3dc1b3da08231fe44317e7e7aa51f",
+      "feeTier": 3000,
+      "liquidity": "93759127980485756",
+      "tradedPrice": "462.0002",
+      "feed": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
+      "feedPrice": "462.0700",
+      "feedAgeSeconds": 1634,
       "beyondHeartbeat": false,
-      "deviationBps": -2.75,
-      "hasFeed": true
-    },
-    {
-      "symbol": "QQQ",
-      "name": "Invesco QQQ",
-      "token": "0xd5f3879160bc7c32ebb4dc785f8a4f505888de68",
-      "pool": "0xd60a5d14db690b7afad71f76b108071d7175597d",
-      "feeTier": 500,
-      "liquidity": "4570315146643193913",
-      "tradedPrice": "719.4087",
-      "feed": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
-      "feedPrice": "719.5900",
-      "feedAgeSeconds": 10547,
-      "beyondHeartbeat": false,
-      "deviationBps": -2.51,
-      "hasFeed": true
+      "deviationBps": -1.51,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 607.6,
+      "corroborationRefusal": null
     },
     {
       "symbol": "AMC",
@@ -399,14 +770,17 @@
       "token": "0x05a3d1cd21d0c88145e82600e62e7e496e0f222b",
       "pool": "0xaa34fea710a1a737840329051d81d3b0b7c564d5",
       "feeTier": 3000,
-      "liquidity": "1066502193334256841",
-      "tradedPrice": "3.7130",
+      "liquidity": "621821417745096629",
+      "tradedPrice": "3.9577",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "AVGO",
@@ -421,7 +795,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "BA",
@@ -430,13 +807,16 @@
       "pool": "0xc6517047b189c72d3baa9ef37d1d28f27a63638a",
       "feeTier": 3000,
       "liquidity": "110709103881979717",
-      "tradedPrice": "209.6841",
+      "tradedPrice": "209.6372",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "BB",
@@ -445,13 +825,16 @@
       "pool": "0xc424e56e816f148a8b30ccbde2128e04d21f51e9",
       "feeTier": 10000,
       "liquidity": "85811452379762252",
-      "tradedPrice": "7.9231",
+      "tradedPrice": "7.8795",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "BE",
@@ -459,14 +842,17 @@
       "token": "0x822cc93ffd030293e9842c30bbd678f530701867",
       "pool": "0x1bad145c8f06444e0df81c28257cd20231bd1f16",
       "feeTier": 3000,
-      "liquidity": "29557041407182512",
-      "tradedPrice": "239.3101",
+      "liquidity": "26261554459335195",
+      "tradedPrice": "240.3844",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "CCL",
@@ -474,14 +860,17 @@
       "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
       "pool": "0xb19ace635ef3a28b85bfb01bae97d0de80750680",
       "feeTier": 10000,
-      "liquidity": "115635980590808683",
-      "tradedPrice": "23.4955",
+      "liquidity": "116741815616591772",
+      "tradedPrice": "23.4925",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "CLOV",
@@ -496,7 +885,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "COST",
@@ -505,13 +897,16 @@
       "pool": "0x0a2121a50a09ed0796ae81f9c53ff9398355a398",
       "feeTier": 3000,
       "liquidity": "999554840289131086",
-      "tradedPrice": "927.0959",
+      "tradedPrice": "926.9624",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "DJT",
@@ -520,13 +915,16 @@
       "pool": "0x31a89afd92f9397465649ad03226c52292fc1ae5",
       "feeTier": 10000,
       "liquidity": "7185689548117556461",
-      "tradedPrice": "9.5877",
+      "tradedPrice": "9.5834",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "F",
@@ -541,7 +939,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "FIG",
@@ -550,13 +951,16 @@
       "pool": "0xca5904c0a9d42f0ec1bf760fdf779907877144fd",
       "feeTier": 3000,
       "liquidity": "254197786674561773",
-      "tradedPrice": "25.0850",
+      "tradedPrice": "25.0258",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "GLD",
@@ -564,14 +968,17 @@
       "token": "0xc9a981fee1f9dec688bb123ccdecc63d0debfc4e",
       "pool": "0x7a6a053eccf1446a2633e05aa6d40d09381997ec",
       "feeTier": 3000,
-      "liquidity": "4621742478460059673",
-      "tradedPrice": "412.0956",
+      "liquidity": "4634928211571137035",
+      "tradedPrice": "412.0930",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "HIMS",
@@ -579,14 +986,17 @@
       "token": "0xccee82fe024c36fa15e1005ede3e9e4787e23d09",
       "pool": "0xc8c90d3a1c1a24967e773ac2ad0d456ba3e31f64",
       "feeTier": 3000,
-      "liquidity": "4680765796269788182",
-      "tradedPrice": "27.7611",
+      "liquidity": "4680969133012631689",
+      "tradedPrice": "27.8126",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "HPE",
@@ -594,14 +1004,17 @@
       "token": "0x59dd09d4900c2e4b5f75b7c0d4e6796fcc234cb1",
       "pool": "0xe0e25884a3b690b1699732de475b2281600b0934",
       "feeTier": 3000,
-      "liquidity": "165670211920141316",
-      "tradedPrice": "53.8753",
+      "liquidity": "57614030640541967",
+      "tradedPrice": "53.8036",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "IBM",
@@ -610,13 +1023,16 @@
       "pool": "0xa0a79bc62fc822f3bcdf0ebbc586031781c53a5b",
       "feeTier": 10000,
       "liquidity": "87234694310831007",
-      "tradedPrice": "230.4518",
+      "tradedPrice": "230.3910",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "INDA",
@@ -625,13 +1041,16 @@
       "pool": "0x07c3a3a6eeb2f122493f32418fbf136403608cb8",
       "feeTier": 500,
       "liquidity": "160258091248553333",
-      "tradedPrice": "50.0088",
+      "tradedPrice": "50.1245",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "JNJ",
@@ -640,28 +1059,34 @@
       "pool": "0x7f0ace18d1dced47063cf26e649bc8ab14d09e67",
       "feeTier": 3000,
       "liquidity": "5042269785816957318",
-      "tradedPrice": "279.7416",
+      "tradedPrice": "279.7585",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "LLY",
       "name": "Eli Lilly",
       "token": "0x8005d266423c7ea827372c9c864491e5786600ea",
-      "pool": "0xf4274130137eee20bad928b593d992716516ceb9",
-      "feeTier": 10000,
-      "liquidity": "219390198335728116",
-      "tradedPrice": "1139.1675",
+      "pool": "0xf212d02146a897f5f686e9d629f6a73da534324a",
+      "feeTier": 500,
+      "liquidity": "243729315439731655",
+      "tradedPrice": "1150.2527",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "LULU",
@@ -669,14 +1094,17 @@
       "token": "0x4e62068525ab11fe768e29dfd00ef909b9803016",
       "pool": "0x0f4227d27082b3bca6818381b9ea6460275e49f4",
       "feeTier": 3000,
-      "liquidity": "957283704125170330",
-      "tradedPrice": "100.0676",
+      "liquidity": "942484043161998033",
+      "tradedPrice": "100.0742",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "MRNA",
@@ -684,14 +1112,17 @@
       "token": "0x43b07d15ce533bec5476d70c22a78a1b2b662155",
       "pool": "0xa34d0667334074df2d5bfd259e79e6b9cf1fa8bf",
       "feeTier": 10000,
-      "liquidity": "133108887045035326",
-      "tradedPrice": "146.3947",
+      "liquidity": "134361322234256384",
+      "tradedPrice": "146.4130",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "MRVL",
@@ -699,14 +1130,17 @@
       "token": "0x62fd0668e10d8b72339be2dcf7643001688ff13b",
       "pool": "0xb5e892f0fc6daadda5b927266fe7907e623e4843",
       "feeTier": 3000,
-      "liquidity": "844316404649430901",
-      "tradedPrice": "207.1000",
+      "liquidity": "322354427152258824",
+      "tradedPrice": "209.9535",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "NET",
@@ -721,7 +1155,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "NFLX",
@@ -730,13 +1167,16 @@
       "pool": "0x59895c0302f41aeaa129d2fa2442cec01e7ef45e",
       "feeTier": 3000,
       "liquidity": "288569765290028420",
-      "tradedPrice": "82.6413",
+      "tradedPrice": "82.6307",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "NU",
@@ -744,14 +1184,17 @@
       "token": "0x408c14038a04f7bd235329e26d2bf569ee20e250",
       "pool": "0xb6d047637151f6de1d02028acdd187aa9cb7afe3",
       "feeTier": 10000,
-      "liquidity": "217588516072966399",
+      "liquidity": "216224330303150150",
       "tradedPrice": "15.5207",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "ON",
@@ -760,13 +1203,16 @@
       "pool": "0xfce637eead7d62d9ed27f81d9767de03e9e534cf",
       "feeTier": 10000,
       "liquidity": "128380407760943777",
-      "tradedPrice": "73.5910",
+      "tradedPrice": "73.5816",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "PFE",
@@ -775,13 +1221,16 @@
       "pool": "0xc7d573fcda6d2107c97fb582ae18411f9db32e7f",
       "feeTier": 3000,
       "liquidity": "3574174206617253585",
-      "tradedPrice": "28.6469",
+      "tradedPrice": "28.6457",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "QUBT",
@@ -790,13 +1239,16 @@
       "pool": "0x227bbce9a81b3694b01754298a983be3f9e44a93",
       "feeTier": 3000,
       "liquidity": "468365132509181702",
-      "tradedPrice": "8.0024",
+      "tradedPrice": "8.0051",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "RBLX",
@@ -805,13 +1257,16 @@
       "pool": "0x1bdb8e3a79cb1a7f228808739311e23098d33d43",
       "feeTier": 3000,
       "liquidity": "11223890653827376818",
-      "tradedPrice": "41.4730",
+      "tradedPrice": "41.4811",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "RCAT",
@@ -820,13 +1275,16 @@
       "pool": "0x64710a70839585af718e1b1faef9e7f1665f1116",
       "feeTier": 10000,
       "liquidity": "171848909944264206",
-      "tradedPrice": "8.5748",
+      "tradedPrice": "8.5784",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "RDDT",
@@ -835,13 +1293,16 @@
       "pool": "0xa8744e76aed23b05f0126335e7bd38f7935d19fe",
       "feeTier": 10000,
       "liquidity": "2122997173940210841",
-      "tradedPrice": "156.9304",
+      "tradedPrice": "156.9292",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "RIVN",
@@ -849,14 +1310,17 @@
       "token": "0xb1bf26c1d20ff267a4f93550d1e0d06ac40a114b",
       "pool": "0xb30a75b200d98a600a3766869344928e35823e23",
       "feeTier": 10000,
-      "liquidity": "757850482487442327",
+      "liquidity": "768290418189695504",
       "tradedPrice": "16.1329",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "RUN",
@@ -871,7 +1335,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "SHOP",
@@ -886,7 +1353,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "SNAP",
@@ -901,7 +1371,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "SOUN",
@@ -910,13 +1383,16 @@
       "pool": "0xe4e5e1f8bb52c51ec86bf2d6494747fb4e6337bc",
       "feeTier": 3000,
       "liquidity": "34664350608486499",
-      "tradedPrice": "6.8160",
+      "tradedPrice": "6.8112",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "TTWO",
@@ -924,14 +1400,17 @@
       "token": "0x5e81213613b6b86eab4c6c50d718d34359459786",
       "pool": "0xd9ab4b7fae6dc2f7020134ec744a8f53ef3e5e24",
       "feeTier": 3000,
-      "liquidity": "2451834457393802050",
-      "tradedPrice": "212.8679",
+      "liquidity": "3377652220737407787",
+      "tradedPrice": "212.8277",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "UPS",
@@ -939,14 +1418,17 @@
       "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
       "pool": "0x3ab74c45dcecc6a62898204dd42143a816b44cb1",
       "feeTier": 10000,
-      "liquidity": "116496824384893879",
-      "tradedPrice": "102.6855",
+      "liquidity": "113804070648337355",
+      "tradedPrice": "102.6439",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "WULF",
@@ -961,7 +1443,10 @@
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
       "symbol": "WYFI",
@@ -969,44 +1454,53 @@
       "token": "0x9e7abd3c9139d14e4c86dce0e455aab7a0c2fb3e",
       "pool": "0x2a3063e34c60253abb23c2442f4cdfbc5cbd02c2",
       "feeTier": 3000,
-      "liquidity": "463295490659852854",
-      "tradedPrice": "18.5395",
+      "liquidity": "584059303181720608",
+      "tradedPrice": "18.5980",
       "feed": null,
       "feedPrice": null,
       "feedAgeSeconds": null,
       "beyondHeartbeat": null,
       "deviationBps": null,
-      "hasFeed": false
+      "hasFeed": false,
+      "identifiesItsFeed": null,
+      "separationFromNearestOtherFeed": null,
+      "corroborationRefusal": null
     },
     {
-      "symbol": "CRCL",
-      "name": "Circle Internet Group",
-      "token": "0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5",
-      "pool": "0x654e4143e82a5824445ade0824351c2a9acd95a8",
-      "feeTier": 3000,
-      "liquidity": "1675754431895133665",
-      "tradedPrice": "102.1162",
-      "feed": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
-      "feedPrice": "102.1100",
-      "feedAgeSeconds": 3631,
-      "beyondHeartbeat": false,
-      "deviationBps": 0.6,
-      "hasFeed": true
-    },
-    {
-      "symbol": "SPCX",
-      "name": "Space Exploration Technologies Corp. Class A Common Stock",
-      "token": "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
-      "pool": "0xc61284332117c3fb23a2a56cceffd07f7af60029",
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "token": "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+      "pool": "0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
       "feeTier": 500,
-      "liquidity": "2245264218961695744",
-      "tradedPrice": "150.8378",
-      "feed": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
-      "feedPrice": "150.8450",
-      "feedAgeSeconds": 8252,
+      "liquidity": "7761066142998414271",
+      "tradedPrice": "230.2982",
+      "feed": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+      "feedPrice": "230.2800",
+      "feedAgeSeconds": 9966,
       "beyondHeartbeat": false,
-      "deviationBps": -0.47,
-      "hasFeed": true
+      "deviationBps": 0.78,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 1114.1,
+      "corroborationRefusal": null
+    },
+    {
+      "symbol": "QQQ",
+      "name": "Invesco QQQ",
+      "token": "0xd5f3879160bc7c32ebb4dc785f8a4f505888de68",
+      "pool": "0xd60a5d14db690b7afad71f76b108071d7175597d",
+      "feeTier": 500,
+      "liquidity": "4570315146643193913",
+      "tradedPrice": "719.6277",
+      "feed": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+      "feedPrice": "719.5900",
+      "feedAgeSeconds": 11487,
+      "beyondHeartbeat": false,
+      "deviationBps": 0.52,
+      "hasFeed": true,
+      "identifiesItsFeed": true,
+      "separationFromNearestOtherFeed": 1285.7,
+      "corroborationRefusal": null
     }
   ]
 }

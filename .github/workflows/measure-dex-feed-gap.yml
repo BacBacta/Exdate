@@ -40,16 +40,22 @@ jobs:
       - name: Read every pool and every feed at one instant
         run: node scripts/measure-dex-feed-gap.mjs
 
+      # Turns accumulated readings into a corroborated pairing, once there are enough of
+      # them. No first-party statement links a token to a feed, so this and the
+      # multiplier-step test are the only evidence there is; both are recorded by name.
+      - name: Corroborate the feed map from the readings so far
+        run: node scripts/corroborate-feed-map.mjs
+
       - name: Commit only if a sample was appended
         run: |
-          if git diff --quiet -- data/dex-feed-gap.observed.json; then
+          if git diff --quiet -- data/dex-feed-gap.observed.json data/token-feed-map.json; then
             echo "nothing appended"
             exit 0
           fi
-          summary=$(node -e "const d=require('./data/dex-feed-gap.observed.json');const s=d.summary;process.stdout.write(d.session+', median '+s.medianAbsDeviationBps+' bps, widest '+s.maxAbsDeviationBps+' bps across '+s.withFeed+' tokens, median feed age '+Math.round(s.medianFeedAgeSeconds/60)+' min')")
+          summary=$(node -e "const d=require('./data/dex-feed-gap.observed.json');const m=require('./data/token-feed-map.json');const s=d.summary;process.stdout.write(d.session+', median '+s.medianAbsDeviationBps+' bps, widest '+s.maxAbsDeviationBps+' bps across '+s.withFeed+' tokens, '+m.corroborated+'/'+m.pairs.length+' pairings corroborated')")
           git config user.name 'exdate-gap'
           git config user.email 'noreply@users.noreply.github.com'
-          git add data/dex-feed-gap.observed.json
+          git add data/dex-feed-gap.observed.json data/token-feed-map.json
           git commit -m "Measure the DEX-to-feed gap: $summary"
 
           for attempt in 1 2 3 4; do

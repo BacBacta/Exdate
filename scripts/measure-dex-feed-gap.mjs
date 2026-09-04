@@ -127,6 +127,43 @@ pools.forEach((pool, i) => {
   }
 })
 
+/**
+ * Every mapped feed's price this instant, so a token's own feed can be ranked against
+ * all the others. That ranking is the second kind of evidence for a pairing no
+ * first-party statement supports: see corroborateFeedByPrice in packages/core.
+ */
+const priceByFeed = new Map()
+for (const [feed, state] of feedState) priceByFeed.set(feed, state.answer * 10n ** BigInt(18 - state.decimals))
+
+const MINIMUM_SEPARATION = 3
+const SEPARATION_FLOOR_BPS = 0.01
+const bpsBetween = (a, b) => (b <= 0n ? null : Math.abs(Number(((a - b) * 1_000_000n) / b) / 100))
+
+/** Mirrors packages/core/src/pools.ts corroborateFeedByPrice, which is where it is tested. */
+function corroborate(tradedWad, ownFeed) {
+  const assigned = priceByFeed.get(ownFeed)
+  if (!assigned) return null
+  const ownBps = bpsBetween(tradedWad, assigned)
+  if (ownBps === null) return null
+  const others = [...priceByFeed.entries()]
+    .filter(([feed]) => feed !== ownFeed)
+    .map(([, price]) => bpsBetween(tradedWad, price))
+    .filter((v) => v !== null)
+  if (others.length === 0) return { ownBps, nearestOtherBps: null, separation: null, corroborates: false, refusal: 'no_other_feeds' }
+  const nearestOtherBps = Math.min(...others)
+  const separation = nearestOtherBps / Math.max(ownBps, SEPARATION_FLOOR_BPS)
+  const refusal = nearestOtherBps < ownBps ? 'not_closest' : separation < MINIMUM_SEPARATION ? 'insufficient_separation' : null
+  return { ownBps, nearestOtherBps, separation, corroborates: refusal === null, refusal }
+}
+
+let previous
+try {
+  previous = read(OUT)
+} catch {
+  previous = { history: [], corroboration: {} }
+}
+const tally = previous.corroboration ?? {}
+
 const rows = []
 for (const [token, best] of bestByToken) {
   const pair = feedByToken.get(token)
@@ -134,6 +171,18 @@ for (const [token, best] of bestByToken) {
   const feedPriceWad = state ? state.answer * 10n ** BigInt(18 - state.decimals) : null
   const deviation = feedPriceWad && feedPriceWad > 0n ? Number(((best.priceWad - feedPriceWad) * 1_000_000n) / feedPriceWad) / 100 : null
   const age = state ? observedAt - state.updatedAt : null
+  const evidence = pair ? corroborate(best.priceWad, pair.feedProxy.toLowerCase()) : null
+  if (evidence) {
+    const entry = (tally[token] ??= { symbol: best.symbol, feed: pair.feedProxy, samples: 0, corroborating: 0, separations: [] })
+    entry.samples++
+    if (evidence.corroborates) entry.corroborating++
+    if (evidence.separation !== null && Number.isFinite(evidence.separation)) {
+      entry.separations.push(Math.round(evidence.separation * 10) / 10)
+      // Keep the distribution bounded; the median is what the verdict reports.
+      if (entry.separations.length > 48) entry.separations.shift()
+    }
+    entry.lastRefusal = evidence.refusal
+  }
   rows.push({
     symbol: best.symbol,
     name: nameByToken.get(token) ?? best.symbol,
@@ -150,6 +199,10 @@ for (const [token, best] of bestByToken) {
     deviationBps: deviation === null ? null : Math.round(deviation * 100) / 100,
     /** Stated because a gap on a token with no feed cannot be measured, only noted. */
     hasFeed: Boolean(pair),
+    /** Does this price identify the feed it is mapped to, among all the others? */
+    identifiesItsFeed: evidence ? evidence.corroborates : null,
+    separationFromNearestOtherFeed: evidence?.separation === null || evidence === null ? null : Math.round(evidence.separation * 10) / 10,
+    corroborationRefusal: evidence?.refusal ?? null,
   })
 }
 
@@ -177,12 +230,6 @@ const summary = {
  * its summary with the market session it fell in - the same classifier, and the same
  * discipline, as the off-hours transfer share.
  */
-let previous
-try {
-  previous = read(OUT)
-} catch {
-  previous = { history: [] }
-}
 const history = previous.history ?? []
 const last = history.at(-1)
 // A duplicate fire adds nothing: two reads a few seconds apart are one observation.
@@ -215,6 +262,22 @@ await writeFile(
       summary,
       /** Per session, once there are enough samples to mean anything. One sample is a reading, not a rate. */
       bySession: sessions,
+      /**
+       * Accumulated evidence that each pool price identifies the feed its token is
+       * mapped to. Read by scripts/corroborate-feed-map.mjs, which turns a run of
+       * agreements into a corroborated pairing - never a single reading.
+       */
+      corroboration: Object.fromEntries(
+        Object.entries(tally).map(([token, entry]) => [
+          token,
+          {
+            ...entry,
+            medianSeparation: entry.separations.length
+              ? [...entry.separations].sort((a, b) => a - b)[Math.floor(entry.separations.length / 2)]
+              : null,
+          },
+        ]),
+      ),
       history,
       tokens: rows.sort((a, b) => Math.abs(b.deviationBps ?? -1) - Math.abs(a.deviationBps ?? -1)),
     },
@@ -222,7 +285,9 @@ await writeFile(
     2,
   ) + '\n',
 )
+const identifying = rows.filter((r) => r.identifiesItsFeed === true).length
 console.error(`# ${session}: ${rows.length} tokens quotable on chain, ${measured.length} of them with a feed to compare against`)
+console.error(`# ${identifying}/${measured.length} prices identify the feed they are mapped to at this reading`)
 console.error(`# median |gap| ${median} bps, widest ${abs.at(-1)} bps, median feed age ${Math.round((ages[Math.floor(ages.length / 2)] ?? 0) / 60)} min`)
 for (const row of rows.slice(0, 6)) {
   console.error(`#   ${row.symbol.padEnd(6)} traded ${String(row.tradedPrice).padStart(11)}  feed ${String(row.feedPrice ?? '-').padStart(11)}  ${row.deviationBps === null ? 'no feed' : String(row.deviationBps).padStart(8) + ' bps'}  feed age ${row.feedAgeSeconds === null ? '-' : Math.round(row.feedAgeSeconds / 60) + ' min'}`)

@@ -508,6 +508,19 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   log, not the price history, which is read back from `getRoundData`; the static `tokens` row is
   written only when it changes; the outbox has unit tests against a fake Ponder store
   (`ponder:schema` aliased in `packages/indexer/vitest.config.ts`).
+- 2026-09-04 — **A second kind of evidence for the token → feed pairing: the price it trades at.**
+  `confidence` was `low` on 34 of 35 pairings, which undercut every haircut, and only SGOV had
+  causal evidence. A pool price identifies its feed by ranking: measured at the first reading, the
+  assigned feed is **uniquely the closest of all 26** in 24 cases, with separations of 3× to 15×.
+  The test is a **ratio, not a distance** - feeds freeze off-hours, so the absolute gap is large for
+  legitimate reasons while the ranking survives - and it refuses below 3×. It is weaker than the
+  step test and labelled as such: two unrelated assets at one price defeat it, which MSTR ($142.68)
+  and USO ($141.99) do to each other, and PLTR and ASML were also refused at the first reading. A
+  pairing lifts only on **≥3 readings with a two-thirds majority**, so one lucky crossing cannot
+  carry it; at one reading nothing is lifted and the map says `needs 3 readings, has 1`.
+  `corroboratedBy` names which evidence carries a pairing, because `corroborated: true` alone would
+  hide that the two are not the same claim. Neither reaches `high`, which stays reserved for a
+  first-party address-level statement that does not exist.
 - 2026-09-02 — The token → feed map is corroborated rather than verified, and the two words now
   mean different things in code. `verified` stays false everywhere (no first-party address-level
   statement exists, and that was probed, not assumed); `corroborated` means the token's own
