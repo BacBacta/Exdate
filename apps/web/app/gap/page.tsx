@@ -193,6 +193,34 @@ export default function Page() {
           </div>
         </section>
 
+        <section className="block" aria-labelledby="pairing-title">
+          <div className="wrap">
+            <h2 className="small" id="pairing-title" data-reveal>
+              What else these readings settle
+            </h2>
+            <p className="note-box big" data-reveal>
+              Nobody states which feed belongs to which token. Chainlink's directory carries no
+              token address, the token contract answers with none, and the issuer publishes no
+              mapping — so the pairing starts as a guess from the ticker, and every measurement
+              built on it inherits that. These readings test it: a token's traded price should sit
+              closer to its own feed than to any of the other {gap.pairing.total - 1}.{' '}
+              <strong>
+                {gap.pairing.byPrice} of {gap.pairing.total} pairings
+              </strong>{' '}
+              now hold up that way, across repeated readings.
+            </p>
+            <p className="after" data-reveal>
+              It is the weaker of the two tests and it is labelled as such: two unrelated assets can
+              trade at one price. Only {gap.pairing.byStep === 1 ? 'one pairing' : `${gap.pairing.byStep} pairings`} — SGOV
+              — has been confirmed the strong way, by its own dividend step moving its own feed. The{' '}
+              {gap.pairing.neither.length} that fail here are mostly the volatile names
+              ({gap.pairing.neither.slice(0, 4).join(', ')} and others): their traded price is
+              genuinely far from the feed, so the test has nothing to recognise. That is the premise
+              failing, not the pairing.
+            </p>
+          </div>
+        </section>
+
         <p className="wrap observed-line">
           Read from Robinhood Chain on {when(gap.observedAt)} UTC. {gap.tokensQuotable} tokens have
           a pool with liquidity; {gap.withFeed} of them have a feed to compare against.

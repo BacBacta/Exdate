@@ -93,6 +93,7 @@ const feedMap = feedMapJson as unknown as {
   pairs: {
     token: string
     feedProxy: string
+    symbol: string
     verified: boolean
     corroborated: boolean
     corroboratedBy?: ('multiplier-step' | 'traded-price')[]
@@ -734,6 +735,24 @@ export const gap = (() => {
     /** False until every session has been sampled; the page then says so instead of comparing. */
     sessionsComparable: sessions.every((s) => s.samples >= MINIMUM_SAMPLES),
     minimumSamples: MINIMUM_SAMPLES,
+    /**
+     * The second thing these readings produce. Comparing a token's traded price
+     * against all 35 feeds says which feed prices it, which is the join no
+     * first-party source states anywhere. Kept separate from the gap because it
+     * is a different claim about the same numbers.
+     */
+    pairing: (() => {
+      const pairs = feedMap.pairs
+      const byPrice = pairs.filter((p) => (p.corroboratedBy ?? []).includes('traded-price'))
+      const byStep = pairs.filter((p) => (p.corroboratedBy ?? []).includes('multiplier-step'))
+      const neither = pairs.filter((p) => !(p.corroboratedBy ?? []).length)
+      return {
+        total: pairs.length,
+        byPrice: byPrice.length,
+        byStep: byStep.length,
+        neither: neither.map((p) => p.symbol),
+      }
+    })(),
   }
 })()
 
