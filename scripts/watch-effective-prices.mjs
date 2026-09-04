@@ -69,6 +69,14 @@ const symbolByToken = loadSymbolMap(root)
 const startedAt = iso(Date.now())
 
 let { captures, byKey } = loadState(root, OUT)
+/**
+ * The head of the last successful scan. Null means a cold start, which scans the
+ * whole lookback so an outage loses nothing; after that only the blocks that
+ * appeared since. Deliberately in memory and not on disk: a restart SHOULD
+ * re-scan wide, because a restart is exactly when something may have been
+ * missed.
+ */
+let scannedThrough = null
 let scans = 0
 let lastHeartbeatAt = 0
 let failureStreak = 0
@@ -134,7 +142,16 @@ async function publish(message) {
 }
 
 async function tick() {
-  const scanned = await scanAnnouncements({ rpc, lookbackBlocks: LOOKBACK_BLOCKS, captures, byKey, symbolByToken, log })
+  const scanned = await scanAnnouncements({
+    rpc,
+    lookbackBlocks: LOOKBACK_BLOCKS,
+    fromBlock: scannedThrough === null ? undefined : scannedThrough + 1,
+    captures,
+    byKey,
+    symbolByToken,
+    log,
+  })
+  scannedThrough = scanned.head
   const pending = pendingCaptures(captures, Date.now())
   const sampled = await sampleCaptures({ pending, deadline: Date.now() + TICK_MS, log })
   const closed = closeOut(captures, Date.now())

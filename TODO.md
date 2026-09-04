@@ -103,6 +103,14 @@ lives in `scripts/phase0/rpc.mjs` (the watcher, the collectors, every script) an
 `RHC_RPC_URLS` overrides it. Verified: the helper answered `chainId 4663` from pocket in 714 ms, and
 Ponder came up on the composed transport, 194/194 tokens polled, zero errors in its log.
 
+**Sizing, measured on 2026-09-04 against Alchemy's published free tier (30 M compute units a month,
+25 requests a second)**: the watcher is 6.0 M CU (20 %), every GitHub collector together 1.5 M
+(5 %), and the indexer 102.6 M (342 %). So a free key covers the watcher and the collectors — the
+reads that cannot be re-done — with room to spare, and only the indexer would need paying for,
+about $29 a month at $0.40/M beyond the free tier. Check any keyed URL with
+`node scripts/probe-endpoint.mjs` before wiring it: it prints where that endpoint can go and never
+prints the URL, so its output is safe to paste anywhere.
+
 **Left to you, cheap**: an account with a provider from the list on
 <https://docs.robinhood.com/chain/run-a-full-node> — Alchemy, Quicknode, Chainstack, dRPC,
 Blockdaemon, Validation Cloud, GlobalStake. A free tier covers the watcher (one scan per 30 s) and

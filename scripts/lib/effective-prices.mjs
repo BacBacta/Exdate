@@ -146,9 +146,37 @@ export function closestDistance(capture) {
  * instant is still reachable: a quote days after the fact says nothing about that
  * instant and would only invite being read as if it did.
  */
+/** Does this error mean "that range is too wide" rather than "that query is wrong"? */
+const isRangeError = (message) =>
+  /range|too many|limit|exceed|max(imum)?|larger than|query returned more|response size/i.test(String(message))
+
+/**
+ * One eth_getLogs, split in half as many times as the endpoint demands.
+ *
+ * Caps differ per provider and change without notice - Robinhood's own takes
+ * 2 000 000 blocks, blockmachine 10 000, ordofi 10 000, and a keyed provider
+ * has its own - so the span is discovered from the refusal rather than
+ * configured. A range that fails at a single block is a real error and is
+ * raised, not swallowed.
+ */
+export async function getLogsPaged({ rpc, from, to, topics = [UI_MULTIPLIER_UPDATED], log = () => {} }) {
+  try {
+    return await rpc('eth_getLogs', [{ fromBlock: hex(from), toBlock: hex(to), topics }])
+  } catch (error) {
+    if (from >= to || !isRangeError(error.message)) throw error
+    const middle = Math.floor((from + to) / 2)
+    log(`# blocks ${from}..${to} refused (${String(error.message).slice(0, 80)}); splitting`)
+    const left = await getLogsPaged({ rpc, from, to: middle, topics, log })
+    const right = await getLogsPaged({ rpc, from: middle + 1, to, topics, log })
+    return [...left, ...right]
+  }
+}
+
 export async function scanAnnouncements({
   rpc,
   lookbackBlocks,
+  /** First block to scan. Omitted means a cold start: head - lookbackBlocks. */
+  fromBlock,
   captures,
   byKey,
   symbolByToken,
@@ -157,8 +185,20 @@ export async function scanAnnouncements({
   log = () => {},
 }) {
   const head = Number(await rpc('eth_blockNumber', []))
-  const from = Math.max(1, head - lookbackBlocks)
-  const logs = await rpc('eth_getLogs', [{ fromBlock: hex(from), toBlock: hex(head), topics: [UI_MULTIPLIER_UPDATED] }])
+  // Where to start. `fromBlock` is what the caller already scanned, so a running
+  // watcher asks only for the blocks that appeared since its last tick - about
+  // 200 at ten blocks a second, against the 900 000 of a cold start.
+  //
+  // What this buys is compatibility, not billing: a provider charges per call
+  // (Alchemy publishes eth_getLogs at 60 compute units flat), so the steady-state
+  // cost is one call either way. What changes is that a 900 000-block query is
+  // refused by almost every keyed provider, and by two of the three third-party
+  // endpoints measured here - so rescanning the whole lookback every thirty
+  // seconds quietly made the watcher unusable anywhere but Robinhood's own RPC,
+  // which is the one place the Terms say not to put it.
+  const from = Math.max(1, fromBlock ?? head - lookbackBlocks)
+  if (from > head) return { changed: false, found: [], head }
+  const logs = await getLogsPaged({ rpc, from, to: head, log })
   log(`# scanned blocks ${from}..${head} for announcements: ${logs.length} log(s)`)
 
   let changed = false

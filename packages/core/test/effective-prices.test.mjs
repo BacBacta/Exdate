@@ -10,21 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import {
-  GIVE_UP_AFTER_SECONDS,
-  SAMPLE_OFFSETS,
-  TOLERANCE_SECONDS,
-  closeOut,
-  closestDistance,
-  decodeAnnouncement,
-  keyOf,
-  pendingCaptures,
-  record,
-  sampleCaptures,
-  scanAnnouncements,
-  summarize,
-  writeState,
-} from '../../../scripts/lib/effective-prices.mjs'
+import { GIVE_UP_AFTER_SECONDS, SAMPLE_OFFSETS, TOLERANCE_SECONDS, closeOut, closestDistance, decodeAnnouncement, getLogsPaged, keyOf, pendingCaptures, record, sampleCaptures, scanAnnouncements, summarize, writeState } from '../../../scripts/lib/effective-prices.mjs'
 
 const WAD = 10n ** 18n
 const word = (n) => BigInt(n).toString(16).padStart(64, '0')
@@ -235,5 +221,100 @@ describe('the state file', () => {
     expect(written.steps.map((s) => s.effectiveAt)).toEqual([step().effectiveAt, later.effectiveAt]) // sorted
     expect(written.summary).toEqual({ steps: 2, withQuoteAtEffect: 0, givenUp: 0 })
     expect(SAMPLE_OFFSETS).toEqual([-30, 0, 30])
+  })
+})
+
+describe('getLogsPaged', () => {
+  const RANGE_ERROR = 'block range exceeds maximum allowed (max=10000, requested=900001)'
+
+  /** A fake endpoint that refuses any span wider than `cap` blocks, as a real one does. */
+  const cappedRpc = (cap, logsAt = new Map()) => {
+    const calls = []
+    return {
+      calls,
+      rpc: async (method, [filter]) => {
+        const from = Number(filter.fromBlock)
+        const to = Number(filter.toBlock)
+        calls.push([from, to])
+        if (to - from + 1 > cap) throw new Error(RANGE_ERROR)
+        return [...logsAt.entries()].filter(([b]) => b >= from && b <= to).map(([, log]) => log)
+      },
+    }
+  }
+
+  it('asks once when the endpoint accepts the whole range', async () => {
+    const { rpc, calls } = cappedRpc(1_000_000)
+    await getLogsPaged({ rpc, from: 1, to: 900_000 })
+    expect(calls).toEqual([[1, 900_000]])
+  })
+
+  it('splits until the endpoint accepts, and loses no log in the seams', async () => {
+    const logs = new Map([
+      [1, { blockNumber: '0x1', tag: 'first' }],
+      [4_999, { blockNumber: '0x137f', tag: 'middle' }],
+      [5_000, { blockNumber: '0x1388', tag: 'just after the first split point' }],
+      [10_000, { blockNumber: '0x2710', tag: 'last' }],
+    ])
+    const { rpc, calls } = cappedRpc(2_500, logs)
+    const found = await getLogsPaged({ rpc, from: 1, to: 10_000 })
+    expect(found).toHaveLength(4)
+    expect(found.map((l) => l.tag)).toEqual(['first', 'middle', 'just after the first split point', 'last'])
+    // Contiguous and non-overlapping: a boundary counted twice would double-count
+    // a step, and a gap would drop one.
+    const accepted = calls.filter(([from, to]) => to - from + 1 <= 2_500).sort((a, b) => a[0] - b[0])
+    expect(accepted[0][0]).toBe(1)
+    expect(accepted[accepted.length - 1][1]).toBe(10_000)
+    for (let i = 1; i < accepted.length; i++) {
+      expect(accepted[i][0]).toBe(accepted[i - 1][1] + 1)
+    }
+  })
+
+  it('raises an error that is not about the range, rather than splitting forever', async () => {
+    let calls = 0
+    const rpc = async () => {
+      calls++
+      throw new Error('execution reverted')
+    }
+    await expect(getLogsPaged({ rpc, from: 1, to: 900_000 })).rejects.toThrow(/execution reverted/)
+    expect(calls).toBe(1)
+  })
+})
+
+describe('scanAnnouncements, incremental', () => {
+  const base = { captures: [], byKey: new Map(), symbolByToken: new Map() }
+
+  it('scans the whole lookback on a cold start', async () => {
+    const seen = []
+    const rpc = async (method, params) => {
+      if (method === 'eth_blockNumber') return '0x' + (1_000_000).toString(16)
+      seen.push([Number(params[0].fromBlock), Number(params[0].toBlock)])
+      return []
+    }
+    await scanAnnouncements({ rpc, lookbackBlocks: 900_000, ...base, captures: [], byKey: new Map() })
+    expect(seen).toEqual([[100_000, 1_000_000]])
+  })
+
+  it('scans only the new blocks once it knows where it got to', async () => {
+    const seen = []
+    const rpc = async (method, params) => {
+      if (method === 'eth_blockNumber') return '0x' + (1_000_300).toString(16)
+      seen.push([Number(params[0].fromBlock), Number(params[0].toBlock)])
+      return []
+    }
+    await scanAnnouncements({ rpc, lookbackBlocks: 900_000, fromBlock: 1_000_001, ...base, captures: [], byKey: new Map() })
+    expect(seen).toEqual([[1_000_001, 1_000_300]])
+  })
+
+  it('asks for nothing when no block has been produced since the last tick', async () => {
+    const seen = []
+    const rpc = async (method, params) => {
+      if (method === 'eth_blockNumber') return '0x' + (1_000_000).toString(16)
+      seen.push(params)
+      return []
+    }
+    const result = await scanAnnouncements({ rpc, lookbackBlocks: 900_000, fromBlock: 1_000_001, ...base, captures: [], byKey: new Map() })
+    expect(seen).toHaveLength(0)
+    expect(result.changed).toBe(false)
+    expect(result.head).toBe(1_000_000)
   })
 })

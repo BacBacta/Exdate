@@ -1216,6 +1216,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   that matters should point `RHC_RPC_URLS` at a keyed provider. A ninth endpoint appeared in the
   registries the same day. The set is not stable; the probe is, so re-run it rather than trusting
   a name.
+- 2026-09-04 — **The watcher rescanned 900 000 blocks every thirty seconds, and that quietly tied it
+  to the one endpoint the Terms say not to use.** Found while sizing an Alchemy key: the scan asks
+  for a day of blocks on every tick, and almost no keyed provider accepts a range that wide — two of
+  the three third-party endpoints measured here cap it at 10 000. So the watcher could only ever run
+  on Robinhood's own RPC, which is exactly what `docs/terms-review.md` set out to avoid. Two fixes,
+  both tested: `getLogsPaged` halves a range until the endpoint accepts it, discovering the cap from
+  the refusal rather than being configured with it (caps differ per provider and change without
+  notice), and raises anything that is not a range error rather than splitting forever; and
+  `scanAnnouncements` takes a `fromBlock`, so a running watcher asks only for the blocks that
+  appeared since its last tick. Proved against a real capped endpoint: a cold start over 120 000
+  blocks split itself down to 7 500-block chunks and completed, then the next two ticks scanned 194
+  and 199 blocks. The mark is kept in memory, not on disk, because a restart *should* rescan wide —
+  a restart is when something may have been missed.
+  **The gain is compatibility, not billing**, and the first version of this comment claimed
+  otherwise before the published rates were checked: a provider charges per call — Alchemy lists
+  `eth_getLogs` at 60 compute units flat — so the steady-state cost is one call either way.
+  Sizing, against Alchemy's free tier of 30 M CU/month and 25 requests/second: **watcher 6.0 M
+  (20 %), all GitHub collectors 1.5 M (5 %), indexer 102.6 M (342 %)**. So the watcher and the
+  collectors — the reads that cannot be re-done — fit a free key with room to spare, and the indexer
+  is the only thing that would need paying for, about $29 a month at $0.40/M beyond the free tier.
+  `scripts/probe-endpoint.mjs` answers "where can this endpoint go" for a keyed URL without ever
+  printing it: it prints the host with the path redacted, writes no file, and tests the two things
+  that decide placement — the watcher's own span, and state at the oldest step.
 - _(append decisions here as they are made)_
 
 ## Status
