@@ -37,7 +37,18 @@ is the same capture as a process that stays alive, written and tested; it needs:
 
 `EXDATE_WATCH_PUSH=false` runs it without committing, for a first look.
 
-## 3. Host the API and the status page
+## 3. Optional: an archive endpoint you control
+
+Two public third-party endpoints serve this chain's history and the project now uses one for the
+wallet page and for `scripts/verify-multiplier-history.mjs`
+(`data/rpc-endpoints.observed.json`). They cost nothing and carry no service commitment, which is
+fine for history, since anything read from them can be re-read. Nothing is blocked on this.
+
+Worth paying for only when you decide to index transfers, and the number to check first is not the
+node: 7–13 M transfers a day is roughly 75 GB of database a month. Both QuickNode and Chainstack
+list this chain; a keyless tier on the endpoint in use allows 300 requests a minute per IP.
+
+## 4. Host the API and the status page
 
 `docker compose up -d` at the repository root brings up Postgres and the indexer, serving
 `/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`, and *Hosting* in the README). Needs
@@ -47,13 +58,13 @@ quotas count per visitor rather than per proxy. `EXDATE_API_KEYS` turns on keys 
 Until this exists there is no public instance — the reference says so — and the signed
 webhook outbox has still never delivered anything.
 
-## 4. Choose a domain
+## 5. Choose a domain
 
 `exdate.xyz` belongs to an unrelated site. The name stands; the domain does not.
 `metadataBase` in `apps/web/app/layout.tsx` still names it and must change with the choice,
 as must `packages/sdk/README.md` and any `api.` subdomain.
 
-## 5. Publish the packages
+## 6. Publish the packages
 
 Both are prepared: `publishConfig` swaps `main`, `types` and `exports` to a `dist/` that
 `tsconfig.build.json` emits at publish time, checked with `pnpm pack`; the workspace keeps
@@ -66,7 +77,7 @@ pnpm --filter @exdate/sdk publish   # pnpm rewrites the workspace: range
 
 `packages/sdk/README.md` currently states that they are not published; update it after.
 
-## 6. Have counsel read the issuer's terms
+## 7. Have counsel read the issuer's terms
 
 Robinhood's developer-documentation terms (RHDA, LLC, 2026-08-24) grant a personal,
 revocable licence and forbid distributing "Robinhood Materials" to third parties or building
