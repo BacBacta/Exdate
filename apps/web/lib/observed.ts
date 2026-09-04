@@ -525,6 +525,84 @@ export const timing = (() => {
   }
 })()
 
+/**
+ * The issuer's delivery record: what it declared, and what reached the chain.
+ *
+ * Every figure is a count with its denominator, never a rate. Twelve changes and six
+ * datable landings are not a distribution, and a page that printed "67 % on time"
+ * would be describing a sample of six as though it described the issuer.
+ */
+export const delivery = (() => {
+  const landed = reconciliations.rows.filter(
+    (row): row is ReconciliationRow & { change: NonNullable<ReconciliationRow['change']>; processDate: string } =>
+      Boolean(row.change) && typeof row.processDate === 'string',
+  )
+  const lags = landed
+    .map((row) => row.change.lagDays)
+    .filter((value): value is number => typeof value === 'number')
+    .sort((a, b) => a - b)
+  const leads = distinctEvents.map((e) => e.leadMinutes).sort((a, b) => a - b)
+  const pending = reconciliations.rows.filter((row) => row.status === 'pending' && row.processDate)
+  const completedNotOnChain = pending
+    .filter((row) => row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED')
+    .map((row) => ({
+      symbol: row.symbol,
+      token: row.token,
+      name: nameByAddress.get(row.token.toLowerCase()) ?? row.symbol,
+      processDate: row.processDate!,
+      daysSince: daysBetween(row.processDate!, observedDay),
+      declared: fixed(row.rate, 4),
+    }))
+    .sort((a, b) => b.daysSince - a.daysSince)
+  const steps = reconciliations.rows.filter((row) => row.change)
+  const middle = <T>(xs: T[]): T | null => xs[Math.floor(xs.length / 2)] ?? null
+
+  return {
+    observedDay,
+    /** Announcements: how much warning the chain gives before a multiplier moves. */
+    announced: {
+      changes: distinctEvents.length,
+      medianLeadMinutes: Math.round(middle(leads) ?? 0),
+      shortestLeadMinutes: Math.round(leads[0] ?? 0),
+      longestLeadMinutes: Math.round(leads.at(-1) ?? 0),
+      /**
+       * Eleven of twelve leads sit between nine and ten minutes; one outlier ran
+       * over an hour. A median alone would hide that, and a range alone would make
+       * the outlier look typical, so the page states both and counts the cluster.
+       */
+      withinTenMinutes: leads.filter((minutes) => minutes <= 10).length,
+      outlierSymbol:
+        leads.length > 1 && (leads.at(-1) ?? 0) > 2 * (middle(leads) ?? 0)
+          ? (distinctEvents.find((e) => e.leadMinutes === leads.at(-1))?.symbol ?? null)
+          : null,
+    },
+    /** Landings: how long after the issuer's own process date the step appeared. */
+    landed: {
+      cases: lags.length,
+      medianLagDays: middle(lags),
+      /** Counted, not rated: six cases do not make a percentage. */
+      byLagDays: [...new Set(lags)].sort((a, b) => a - b).map((days) => ({ days, cases: lags.filter((v) => v === days).length })),
+    },
+    /** The backlog: declared by the issuer, nothing on chain. */
+    outstanding: {
+      declared: pending.length,
+      issuerSaysPaid: completedNotOnChain.length,
+      longestOutstandingDays: completedNotOnChain[0]?.daysSince ?? null,
+      rows: completedNotOnChain,
+    },
+    /** What can be measured at all, and what stops the rest. */
+    measurable: {
+      steps: steps.length,
+      reconciled: steps.filter((row) => row.status === 'matched').length,
+      doesNotAddUp: steps.filter((row) => row.status === 'anomaly' && row.feed).length,
+      noPriceFeed: steps.filter((row) => row.status === 'anomaly' && !row.feed).length,
+      noDeclaration: steps.filter((row) => row.status === 'unmatched').length,
+      tokensWithFeed: feedMap.pairs.length,
+      tokens: tokens.length,
+    },
+  }
+})()
+
 export const observed = {
   chain: { id: 4663, name: 'Robinhood Chain' },
   counts: {

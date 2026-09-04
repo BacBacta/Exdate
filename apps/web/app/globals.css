@@ -341,3 +341,6 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 .datasets p { color: var(--muted); font-size: 15px; text-wrap: pretty; }
 .datasets .meta { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 @media (max-width: 900px) { .datasets li { grid-template-columns: 1fr; } }
+
+/* The count of something that is not the headline: present, not shouted. */
+.gap .big.muted { color: var(--muted); font-weight: 400; }
