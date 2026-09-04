@@ -111,12 +111,37 @@ about $29 a month at $0.40/M beyond the free tier. Check any keyed URL with
 `node scripts/probe-endpoint.mjs` before wiring it: it prints where that endpoint can go and never
 prints the URL, so its output is safe to paste anywhere.
 
-**Left to you, cheap**: an account with a provider from the list on
-<https://docs.robinhood.com/chain/run-a-full-node> — Alchemy, Quicknode, Chainstack, dRPC,
-Blockdaemon, Validation Cloud, GlobalStake. A free tier covers the watcher (one scan per 30 s) and
-most cover the indexer (~30 Multicall requests a minute); a paid tier buys what the free public
-endpoints do not have, a service commitment. Put its URL first in `RHC_RPC_URLS` — in
-`/opt/exdate/.env` for the watcher, `/opt/exdate-api/.env` for the API — and restart.
+**Left to you: Alchemy's Pay As You Go, about $3 a month.** Measured against a real key on
+2026-09-04 with `scripts/probe-endpoint.mjs`, and the deciding number is one Alchemy publishes
+itself: on **Robinhood Mainnet** their `eth_getLogs` block range is **10 on the free tier and
+unlimited on Pay As You Go**. Ten blocks is not a small cap, it is a different product — the
+watcher's own scan of the blocks since its last tick is about 200, so `getLogsPaged` would split it
+into roughly 63 calls, and the watcher alone would cost **327 M compute units a month against a
+30 M free allowance**. On Pay As You Go the same scan is one call: **6.0 M CU for the watcher,
+1.5 M for every GitHub collector, so 7.5 M in total — about $3 a month at $0.40/M**, and the
+throughput needed is 4 requests a second against 300 CU/s.
+
+The rest of the free-tier probe was good: it answers `eth_call` at the oldest multiplier step in
+49 ms, which beats the third-party archive endpoints, and it has no wildcard CORS, which is right
+for a keyed URL and costs nothing here because only servers use it.
+
+Once upgraded, on the watcher machine in `/opt/exdate/.env`:
+
+```
+RHC_RPC_URLS=https://robinhood-mainnet.g.alchemy.com/v2/YOUR_KEY,https://rpc.mainnet.chain.robinhood.com
+RHC_RPC_URL_ARCHIVE=https://robinhood-mainnet.g.alchemy.com/v2/YOUR_KEY
+```
+
+then `systemctl restart exdate-watcher`. Robinhood's endpoint stays last so a provider outage
+cannot lose a capture. **Before upgrading, change nothing**: on the free tier Alchemy cannot serve
+the watcher's scan, and setting only the archive variable changes nothing that runs on a schedule.
+
+The indexer would add 102.6 M CU a month, about $41 — leave it on the public failover unless that
+is worth paying for.
+
+The other providers on <https://docs.robinhood.com/chain/run-a-full-node> — Quicknode, Chainstack,
+dRPC, Blockdaemon, Validation Cloud, GlobalStake — were not probed with a key. `probe-endpoint.mjs`
+answers the same question for any of them without printing the URL.
 
 Not worth doing: a node of your own. Robinhood's page asks for 64 GB RAM, several terabytes of NVMe
 and an Ethereum L1 endpoint, and says "if you just need an RPC endpoint, use the public endpoints or

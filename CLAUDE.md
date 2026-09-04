@@ -1239,6 +1239,23 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `scripts/probe-endpoint.mjs` answers "where can this endpoint go" for a keyed URL without ever
   printing it: it prints the host with the path redacted, writes no file, and tests the two things
   that decide placement — the watcher's own span, and state at the oldest step.
+- 2026-09-04 — **A keyed provider's free tier turned out to be a different product, and the probe
+  is what showed it.** Run against a real Alchemy key on the watcher machine,
+  `scripts/probe-endpoint.mjs` answered: chain, head and state at head fine, state **at the oldest
+  multiplier step in 49 ms** — better than either third-party archive endpoint — no wildcard CORS,
+  which is correct for a keyed URL, and **`eth_getLogs` refused at 900 000 blocks with "Under the
+  Free tier plan, you can make eth_getLogs requests with up to a 10 block range"**. Alchemy's own
+  documentation confirms it per chain: on **Robinhood Mainnet the range is 10 on Free and unlimited
+  on Pay As You Go**. Ten is not a small cap, it is a different capability. Costed with their
+  published 60 CU per `eth_getLogs`: the watcher's ~200-block delta scan would split into about 63
+  calls a tick, **327 M CU a month against a 30 M free allowance**; on Pay As You Go the same scan
+  is one call and the watcher is **6.0 M CU, every collector together 1.5 M, so about $3 a month**
+  — with the indexer a further 102.6 M, about $41, which is why it stays on the public failover.
+  So the answer to "free tier or paid" is neither of the obvious ones: free is not a cheaper version
+  here, it is a version that cannot do the job at all, and the paid one costs about a coffee. Two
+  things this vindicates: the paging fix committed hours earlier, without which the probe would have
+  reported a flat failure instead of a cap; and building the probe at all rather than reading a
+  pricing page — the 10-block limit is on a documentation page nobody would have thought to open.
 - _(append decisions here as they are made)_
 
 ## Status
