@@ -931,7 +931,6 @@ export const observed = {
     /** Set NEXT_PUBLIC_EXDATE_REPO_URL once the repository is public; a link to a private repository is a dead link. */
     github: process.env.NEXT_PUBLIC_EXDATE_REPO_URL ?? null,
     data: '/data/',
-    api: process.env.NEXT_PUBLIC_EXDATE_API_URL ?? 'https://api.exdate.xyz',
     /** The live status page needs a running indexer; until one is hosted, no link is better than a dead one. */
     status: process.env.NEXT_PUBLIC_EXDATE_STATUS_URL ?? null,
     apiDocs: '/docs/api/',

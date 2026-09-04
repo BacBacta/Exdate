@@ -8,7 +8,16 @@ export const metadata: Metadata = {
   title: 'exdate — see what your tokenized stock actually paid you',
   description:
     'When a tokenized stock pays a dividend, nothing lands in your wallet: the token becomes worth a little more. exdate measures how much, and how much went missing on the way.',
-  metadataBase: new URL('https://exdate.xyz'),
+  // Every og:image and twitter:image is made absolute against this. It said
+  // `exdate.xyz`, which belongs to an unrelated site, so every share of a page
+  // here pointed its preview image at a stranger's server. Derived instead:
+  // NEXT_PUBLIC_EXDATE_SITE_URL once a domain exists, else the production URL
+  // Vercel sets on every build - which already follows a custom domain when one
+  // is attached - and the current alias as the last resort.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_EXDATE_SITE_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://exdate-bactas-projects.vercel.app'),
+  ),
   openGraph: {
     title: 'exdate',
     description: 'See what your tokenized stock actually paid you.',

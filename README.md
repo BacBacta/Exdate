@@ -320,7 +320,8 @@ up to one interval (~60 s by default) against a ~9-minute announcement lead.
 ```ts
 import { createClient } from '@exdate/sdk'
 
-const exdate = createClient({ baseUrl: 'https://api.exdate.xyz' })
+// There is no public instance yet; this is your own, from docker-compose.yml.
+const exdate = createClient({ baseUrl: 'http://localhost:42069' })
 const ledger = await exdate.yield('0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5')
 
 ledger.totals?.dividendGrowthBps    // 20.22 — explained by a paired issuer dividend

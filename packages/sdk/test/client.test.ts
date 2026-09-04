@@ -26,15 +26,15 @@ const spy = (reply: (url: string) => Response) => {
 describe('url building', () => {
   it('addresses the configured chain and trims a trailing slash', async () => {
     const { calls, fetch } = spy(() => json({ chainId: 4663, count: 0, polled: 0, tokens: [] }))
-    const client = createClient({ baseUrl: 'https://api.exdate.xyz/', fetch })
+    const client = createClient({ baseUrl: 'https://api.example.com/', fetch })
     await client.tokens()
-    expect(calls).toEqual(['https://api.exdate.xyz/v1/robinhood/tokens'])
+    expect(calls).toEqual(['https://api.example.com/v1/robinhood/tokens'])
   })
 
   it('accepts a chain id as readily as a key', async () => {
     const { calls, fetch } = spy(() => json({}))
-    await createClient({ baseUrl: 'https://api.exdate.xyz', chain: 4663, fetch }).events()
-    expect(calls[0]).toBe('https://api.exdate.xyz/v1/4663/events')
+    await createClient({ baseUrl: 'https://api.example.com', chain: 4663, fetch }).events()
+    expect(calls[0]).toBe('https://api.example.com/v1/4663/events')
   })
 
   it('builds every documented route', async () => {
@@ -65,21 +65,21 @@ describe('url building', () => {
 
   it('passes filters through and omits the ones not given', async () => {
     const { calls, fetch } = spy(() => json({}))
-    const client = createClient({ baseUrl: 'https://api.exdate.xyz', fetch })
+    const client = createClient({ baseUrl: 'https://api.example.com', fetch })
     await client.reconciliations({ status: 'matched' })
     await client.reconciliations({ token: '0xAbC', status: undefined })
     await client.webhooks.events({ type: 'dividend.reconciled', limit: 10 })
-    expect(calls[0]).toBe('https://api.exdate.xyz/v1/robinhood/reconciliations?status=matched')
-    expect(calls[1]).toBe('https://api.exdate.xyz/v1/robinhood/reconciliations?token=0xAbC')
+    expect(calls[0]).toBe('https://api.example.com/v1/robinhood/reconciliations?status=matched')
+    expect(calls[1]).toBe('https://api.example.com/v1/robinhood/reconciliations?token=0xAbC')
     expect(calls[2]).toBe(
-      'https://api.exdate.xyz/v1/robinhood/webhooks/events?type=dividend.reconciled&limit=10',
+      'https://api.example.com/v1/robinhood/webhooks/events?type=dividend.reconciled&limit=10',
     )
   })
 })
 
 describe('failures', () => {
   const client = (reply: (url: string) => Response) =>
-    createClient({ baseUrl: 'https://api.exdate.xyz', fetch: spy(reply).fetch })
+    createClient({ baseUrl: 'https://api.example.com', fetch: spy(reply).fetch })
 
   it('raises the API error with its status and body', async () => {
     const c = client(() => json({ error: 'unknown token', chainId: 4663, address: '0x1' }, 404))
@@ -122,7 +122,7 @@ describe('request options', () => {
       seen = init?.headers
       return json({})
     }) as typeof globalThis.fetch
-    await createClient({ baseUrl: 'https://api.exdate.xyz', fetch, headers: { 'x-api-key': 'k' } }).status()
+    await createClient({ baseUrl: 'https://api.example.com', fetch, headers: { 'x-api-key': 'k' } }).status()
     expect(seen).toMatchObject({ accept: 'application/json', 'x-api-key': 'k' })
   })
 
