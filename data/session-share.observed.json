@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-04T19:15:27.000Z",
-  "sampleCount": 37,
-  "easternHourOfWeekSlotsCovered": 36,
+  "lastSampleAt": "2026-09-04T20:20:52.000Z",
+  "sampleCount": 38,
+  "easternHourOfWeekSlotsCovered": 37,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -24,7 +24,7 @@
   ],
   "transferShare": null,
   "provableTradeShare": null,
-  "pooledOffHoursShareOfSampledTransfers": 0.6212,
+  "pooledOffHoursShareOfSampledTransfers": 0.6396,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -62,13 +62,13 @@
       "label": "after-hours 16:00-20:00 ET",
       "offHours": true,
       "hoursPerWeek": 20,
-      "samples": 4,
-      "transfersSampled": 19943,
-      "secondsSampled": 158,
-      "transfersPerSecondMean": 126.535,
+      "samples": 5,
+      "transfersSampled": 28292,
+      "secondsSampled": 199,
+      "transfersPerSecondMean": 141.955,
       "transfersPerSecondMin": 90,
-      "transfersPerSecondMax": 153.025,
-      "provableTradesPerSecondMean": 31.756
+      "transfersPerSecondMax": 203.634,
+      "provableTradesPerSecondMean": 36.434
     },
     {
       "session": "overnight",
@@ -615,6 +615,20 @@
       "transactionsMovingAToken": 1659,
       "provableTrades": 1390,
       "provableTradesPerSecond": 34.75
+    },
+    {
+      "observedAt": "2026-09-04T20:20:52.000Z",
+      "session": "after_hours",
+      "easternHourOfWeek": 136,
+      "fromBlock": 54544980,
+      "headBlock": 54545379,
+      "windowBlocks": 400,
+      "windowSeconds": 41,
+      "transfers": 8349,
+      "transfersPerSecond": 203.634,
+      "transactionsMovingAToken": 2522,
+      "provableTrades": 2261,
+      "provableTradesPerSecond": 55.146
     }
   ]
 }
