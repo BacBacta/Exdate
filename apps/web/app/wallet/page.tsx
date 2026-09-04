@@ -40,6 +40,7 @@ export default function Page() {
               tokens={observed.tokens}
               declaredByToken={wallet.declaredByToken}
               rpcUrl={wallet.rpcUrl}
+              archiveRpcUrl={wallet.archiveRpcUrl}
               multicall3={wallet.multicall3}
               blockNumberSource={wallet.blockNumberSource}
               steps={wallet.steps}

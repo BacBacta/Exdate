@@ -27,6 +27,7 @@
 // witness.
 //
 //   node scripts/probe-rpc-endpoints.mjs
+import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 
 const root = new URL('../', import.meta.url)
@@ -37,6 +38,15 @@ const PROBE_TOKEN = '0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9'
 const TOTAL_SUPPLY = '0x18160ddd'
 const UI_MULTIPLIER_UPDATED = '0x2205df4534432b2f60654a3fdb48737ffdaf3e9edb1a498bd985bc026b15b055'
 const DEPTHS = [5_000, 100_000, 1_000_000, 20_000_000, 50_000_000]
+/**
+ * Arbitrary depths say how deep a node goes; this says whether it goes deep
+ * enough to be useful. The oldest multiplier step is the oldest block exdate
+ * ever needs to read, and a node that cannot reach it fails on exactly the
+ * wallets the archive path exists for.
+ */
+const OLDEST_STEP_BLOCK = Math.min(
+  ...JSON.parse(readFileSync(new URL('data/effective-blocks.json', root), 'utf8')).blocks.map((b) => b.effectiveBlock),
+)
 const LOG_SPANS = [2_000_000, 100_000, 10_000, 1_000]
 const ORIGIN = 'https://exdate-bactas-projects.vercel.app'
 
@@ -117,7 +127,16 @@ for (const url of urls) {
     continue
   }
 
-  const head = Number((await call(url, 'eth_blockNumber', [])).ok)
+  // An endpoint can answer eth_chainId and then fail on the head, which would
+  // otherwise carry NaN into every block tag below.
+  const headCall = await call(url, 'eth_blockNumber', [])
+  const head = Number(headCall.ok)
+  if (!Number.isFinite(head) || head < 1) {
+    row.error = `answers eth_chainId but not eth_blockNumber: ${headCall.err ?? 'unusable head'}`
+    console.error(`#   ${host.padEnd(34)} ${row.error}`)
+    endpoints.push(row)
+    continue
+  }
   row.head = head
   const latest = await call(url, 'eth_call', [{ to: PROBE_TOKEN, data: TOTAL_SUPPLY }, 'latest'])
   row.latestSupply = latest.ok ? BigInt(latest.ok).toString() : null
@@ -143,6 +162,13 @@ for (const url of urls) {
   row.deepestArchiveDepth = deepest.length ? Math.max(...deepest) : 0
   row.servesArchive = row.deepestArchiveDepth > 0
 
+  // The block that decides whether this node is usable for the wallet history.
+  const oldest = await call(url, 'eth_call', [{ to: PROBE_TOKEN, data: TOTAL_SUPPLY }, hex(OLDEST_STEP_BLOCK)])
+  row.oldestStepBlock = OLDEST_STEP_BLOCK
+  row.reachesOldestStep = Boolean(oldest.ok) && BigInt(oldest.ok).toString() !== row.latestSupply
+  if (oldest.err) row.oldestStepError = oldest.err
+  if (row.reachesOldestStep) row.deepestArchiveDepth = Math.max(row.deepestArchiveDepth, head - OLDEST_STEP_BLOCK)
+
   // The widest eth_getLogs span accepted, topic-filtered.
   row.logs = {}
   for (const span of LOG_SPANS) {
@@ -163,6 +189,7 @@ for (const url of urls) {
 
   console.error(
     `#   ${host.padEnd(34)} archive ${row.servesArchive ? `${row.deepestArchiveDepth / 1e6}M deep` : 'no'}, ` +
+      `oldest step ${row.reachesOldestStep ? 'reached' : 'no'}, ` +
       `getLogs ${row.widestLogSpan.toLocaleString()} blocks, browsers ${row.answersBrowsers ? 'yes' : 'no'}`,
   )
   endpoints.push(row)
@@ -200,6 +227,8 @@ const result = {
     servingArchive: archival.length,
     deepestArchiveHost: archival.sort((a, b) => b.deepestArchiveDepth - a.deepestArchiveDepth)[0]?.host ?? null,
     widestLogSpanHost: [...endpoints].sort((a, b) => (b.widestLogSpan ?? 0) - (a.widestLogSpan ?? 0))[0]?.host ?? null,
+    reachingOldestStep: endpoints.filter((e) => e.reachesOldestStep).length,
+    browserReadableArchive: endpoints.filter((e) => e.reachesOldestStep && e.answersBrowsers).map((e) => e.host),
   },
   crossChecks,
   caveat:

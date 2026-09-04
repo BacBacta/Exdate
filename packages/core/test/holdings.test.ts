@@ -5,8 +5,12 @@ import {
   HOLDINGS_SELECTOR,
   HOLDINGS_SIGNATURE,
   decodeAggregate3,
+  decodeBalancesAt,
   decodeHoldings,
+  encodeBalancesCall,
   encodeHoldingsCall,
+  planBalanceReads,
+  balancesAt,
   formatWad,
   isAddress,
   owedWad,
@@ -207,5 +211,93 @@ describe('walletView', () => {
     const view = walletView(snapshot, {})
     expect(view.lines.map((line) => line.holding.token)).toEqual([AAPL, SGOV])
     expect(view.totalDue).toBe(0n)
+  })
+})
+
+/**
+ * The archive path: the same balances a transfer replay reconstructs, read
+ * directly at the block instead. It exists because the replay is refused past
+ * forty requests, which leaves a busy address with no history at all.
+ */
+describe('reading balances at a past block', () => {
+  it('plans one read per distinct block, carrying only that block\'s tokens', () => {
+    const reads = planBalanceReads([
+      { token: AAPL, block: 200 },
+      { token: SGOV, block: 100 },
+      { token: AAPL, block: 100 },
+      { token: SGOV, block: 100 },
+    ])
+    expect(reads).toHaveLength(2)
+    expect(reads[0]).toEqual({ block: 100, tokens: [AAPL.toLowerCase(), SGOV.toLowerCase()].sort() })
+    expect(reads[1]).toEqual({ block: 200, tokens: [AAPL.toLowerCase()] })
+  })
+
+  it('encodes byte for byte what viem encodes for the same aggregate3', () => {
+    const tokens = [SGOV, AAPL]
+    const holderWord = pad(HOLDER)
+    const expected = encodeFunctionData({
+      abi,
+      functionName: 'aggregate3',
+      args: [
+        tokens.map((token) => ({
+          target: token,
+          allowFailure: true,
+          callData: `${HOLDINGS_SELECTOR.balanceOf}${holderWord}` as `0x${string}`,
+        })) as never,
+      ],
+    })
+    expect(encodeBalancesCall(MULTICALL3, tokens, HOLDER).toLowerCase()).toBe(expected.toLowerCase())
+  })
+
+  it('refuses an address it cannot parse rather than encoding rubbish', () => {
+    expect(() => encodeBalancesCall(MULTICALL3, [SGOV], '0xnope')).toThrow(/not an address/)
+  })
+
+  it('keys the answer exactly as the replay does, so either can feed the same ledger', () => {
+    const read = { block: 1_267_585, tokens: [SGOV.toLowerCase(), AAPL.toLowerCase()] }
+    const encoded = encodeFunctionResult({
+      abi,
+      functionName: 'aggregate3',
+      result: [
+        { success: true, returnData: uint(6_014_300_000_000_000_000n) },
+        { success: true, returnData: uint(14_200_000_000_000_000n) },
+      ],
+    })
+    const balances = decodeBalancesAt(read, encoded)
+    expect(balances.get(`${SGOV.toLowerCase()}:1267585`)).toBe(6_014_300_000_000_000_000n)
+    expect(balances.get(`${AAPL.toLowerCase()}:1267585`)).toBe(14_200_000_000_000_000n)
+
+    // The replay produces the same key for the same (token, block).
+    const replayed = balancesAt(
+      [{ token: SGOV.toLowerCase(), from: '0x0000000000000000000000000000000000000000', to: HOLDER.toLowerCase(), value: 6_014_300_000_000_000_000n, blockNumber: 1_000_000, logIndex: 0 }],
+      HOLDER,
+      [{ token: SGOV, block: 1_267_585 }],
+    )
+    expect([...replayed.keys()]).toEqual([`${SGOV.toLowerCase()}:1267585`])
+    expect(replayed.get(`${SGOV.toLowerCase()}:1267585`)).toBe(balances.get(`${SGOV.toLowerCase()}:1267585`))
+  })
+
+  /**
+   * A token that did not exist at that height reverts. Zero would read as "held
+   * nothing", which is a claim; absent reads as "not known", which is the truth.
+   */
+  it('leaves a reverting sub-call absent rather than calling it zero', () => {
+    const read = { block: 500, tokens: [SGOV.toLowerCase(), AAPL.toLowerCase()] }
+    const encoded = encodeFunctionResult({
+      abi,
+      functionName: 'aggregate3',
+      result: [
+        { success: false, returnData: '0x' },
+        { success: true, returnData: uint(7n) },
+      ],
+    })
+    const balances = decodeBalancesAt(read, encoded)
+    expect(balances.has(`${SGOV.toLowerCase()}:500`)).toBe(false)
+    expect(balances.get(`${AAPL.toLowerCase()}:500`)).toBe(7n)
+  })
+
+  it('refuses a result whose sub-call count does not match what it asked for', () => {
+    const encoded = encodeFunctionResult({ abi, functionName: 'aggregate3', result: [{ success: true, returnData: uint(1n) }] })
+    expect(() => decodeBalancesAt({ block: 1, tokens: [SGOV.toLowerCase(), AAPL.toLowerCase()] }, encoded)).toThrow(/wrong number/)
   })
 })

@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import {
   RangeScanner,
   balancesAt,
+  decodeBalancesAt,
+  encodeBalancesCall,
+  planBalanceReads,
   checkpointKey,
   decodeHoldings,
   decodeTransferLog,
@@ -53,6 +56,12 @@ interface Props {
   tokens: TokenSummary[]
   declaredByToken: Record<string, WalletDeclared[]>
   rpcUrl: string
+  /**
+   * A node that serves state at any height, when one is known. Robinhood's own
+   * keeps none, so without this the history is rebuilt from the wallet's logs
+   * and refused for a busy address. It is a THIRD PARTY, which the page says.
+   */
+  archiveRpcUrl: string | null
   multicall3: string
   blockNumberSource?: BlockNumberSource
   steps: WalletStep[]
@@ -69,7 +78,8 @@ interface Props {
 type HistoryPhase =
   | { kind: 'idle' }
   | { kind: 'reading'; requests: number; remaining: number }
-  | { kind: 'done'; history: WalletHistory; requests: number; cached: boolean }
+  /** `source` names which node answered, because one of them is not Robinhood's. */
+  | { kind: 'done'; history: WalletHistory; requests: number; cached: boolean; source?: 'archive' | 'logs' }
   | { kind: 'refused'; requests: number }
   | { kind: 'error'; message: string }
 
@@ -121,7 +131,7 @@ const groupWords: Record<CalendarGroup, string> = {
   upcoming: 'not due yet',
 }
 
-export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumberSource, steps, scan }: Props) {
+export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multicall3, blockNumberSource, steps, scan }: Props) {
   const [input, setInput] = useState('')
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const [history, setHistory] = useState<HistoryPhase>({ kind: 'idle' })
@@ -203,6 +213,18 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
     }
   }
 
+  /** A past block never changes, so the cache cannot go stale; the key carries the step count. */
+  function remember(address: string, balances: ReadonlyMap<string, bigint>) {
+    try {
+      localStorage.setItem(
+        cacheKey(address),
+        JSON.stringify({ balances: Object.fromEntries([...balances].map(([key, value]) => [key, value.toString()])) }),
+      )
+    } catch {
+      // storage refused: the read still shows
+    }
+  }
+
   async function readHistory(address: string, id: number) {
     const stale = () => id !== request.current
     try {
@@ -216,6 +238,46 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
     } catch {
       // no storage, or an unreadable entry: read the chain
     }
+    /**
+     * The short path: one `eth_call` per distinct effective block against a node
+     * that keeps history. Twelve requests whatever the wallet has done, and the
+     * balance is read rather than reconstructed. Falls through to the replay
+     * below if any read fails, so a third party being down costs nothing.
+     */
+    if (archiveRpcUrl) {
+      const reads = planBalanceReads(checkpoints)
+      const balances = new Map<string, bigint>()
+      let complete = true
+      for (const [index, plan] of reads.entries()) {
+        if (stale()) return
+        setHistory({ kind: 'reading', requests: index + 1, remaining: reads.length - index - 1 })
+        try {
+          const response = await fetch(archiveRpcUrl, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'eth_call',
+              params: [{ to: multicall3, data: encodeBalancesCall(multicall3, plan.tokens, address) }, `0x${plan.block.toString(16)}`],
+            }),
+          })
+          const body = (await response.json()) as { result?: string; error?: { message?: string } }
+          if (!body.result) throw new Error(body.error?.message ?? 'no result')
+          for (const [key, value] of decodeBalancesAt(plan, body.result)) balances.set(key, value)
+        } catch {
+          complete = false
+          break
+        }
+      }
+      if (stale()) return
+      if (complete) {
+        remember(address, balances)
+        setHistory({ kind: 'done', history: walletHistory(balances, steps), requests: reads.length, cached: false, source: 'archive' })
+        return
+      }
+    }
+
     const scanner = new RangeScanner({ fromBlock: scan.fromBlock, toBlock: scan.toBlock })
     const transfers: Transfer[] = []
     for (let job = scanner.next(); job; job = scanner.next()) {
@@ -241,15 +303,8 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
       return
     }
     const balances = balancesAt(transfers, address, checkpoints)
-    try {
-      localStorage.setItem(
-        cacheKey(address),
-        JSON.stringify({ balances: Object.fromEntries([...balances].map(([key, value]) => [key, value.toString()])) }),
-      )
-    } catch {
-      // storage refused: the read still shows
-    }
-    setHistory({ kind: 'done', history: walletHistory(balances, steps), requests: scanner.requests, cached: false })
+    remember(address, balances)
+    setHistory({ kind: 'done', history: walletHistory(balances, steps), requests: scanner.requests, cached: false, source: 'logs' })
   }
 
   async function read(raw: string) {
@@ -574,9 +629,19 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
                 </span>
               </p>
               <p className="wallet-status">
-                Shares held then is this address&rsquo;s balance at the block each change took effect, rebuilt from its
-                own transfers{history.cached ? ', remembered by this browser from an earlier read' : `, read in ${history.requests} requests`}.
-                Tokens held inside a protocol at the time are not seen. Dollar figures use the price and the gap
+                {/*
+                  Which node answered is part of the reading, not a detail. The replay
+                  path only ever shows this address to Robinhood's own node; the archive
+                  path shows it to a third party, and a page that promises the first must
+                  say when it did the second.
+                */}
+                Shares held then is this address&rsquo;s balance at the block each change took effect,{' '}
+                {history.cached
+                  ? 'remembered by this browser from an earlier read'
+                  : history.source === 'archive'
+                    ? `read directly at each block in ${history.requests} requests, from a public archive node that is not Robinhood's`
+                    : `rebuilt from its own transfers, read in ${history.requests} requests from Robinhood's own node`}
+                . Tokens held inside a protocol at the time are not seen. Dollar figures use the price and the gap
                 measured on each token&rsquo;s page.
               </p>
             </>

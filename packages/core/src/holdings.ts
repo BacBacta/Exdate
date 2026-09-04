@@ -382,6 +382,87 @@ export function balancesAt(transfers: readonly Transfer[], wallet: string, check
   return out
 }
 
+/**
+ * The same balances, read from an archive node instead of rebuilt from logs.
+ *
+ * `balancesAt` replays the wallet's own `Transfer` logs because Robinhood's
+ * endpoint keeps no archive: `eth_call` a few thousand blocks back answers
+ * `metadata is not found`. That replay costs up to forty `eth_getLogs` requests
+ * and is REFUSED past that, so a busy address gets no history at all - a
+ * documented limitation of /wallet/.
+ *
+ * Other public endpoints for this chain do serve state at any height
+ * (data/rpc-endpoints.observed.json, where two agree fifty million blocks deep),
+ * and one of them also answers browsers. Against such a node the same answer is
+ * one `eth_call` per distinct block: twelve requests for the whole history, the
+ * same number for a wallet with three transfers and one with three thousand,
+ * and exact rather than reconstructed.
+ *
+ * The cost is not technical and is stated on the page rather than hidden: the
+ * replay only ever shows the address to Robinhood's own node, and this path
+ * shows it to a third party. So the caller chooses, and `planBalanceReads`
+ * exists to make the archive path cheap enough that the choice is real.
+ */
+export interface BalanceRead {
+  block: number
+  tokens: string[]
+}
+
+/**
+ * One read per distinct block, carrying only the tokens that block needs. The
+ * twelve steps span ten tokens, so this is twelve calls rather than one per
+ * (token, block) pair.
+ */
+export function planBalanceReads(checkpoints: readonly Checkpoint[]): BalanceRead[] {
+  const byBlock = new Map<number, Set<string>>()
+  for (const cp of checkpoints) {
+    const set = byBlock.get(cp.block) ?? new Set<string>()
+    set.add(cp.token.toLowerCase())
+    byBlock.set(cp.block, set)
+  }
+  return [...byBlock.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([block, tokens]) => ({ block, tokens: [...tokens].sort() }))
+}
+
+/**
+ * Calldata for one `aggregate3` carrying `balanceOf(holder)` for each token.
+ * Sent with a block tag rather than `latest`, which is the whole point: the
+ * balance the step applied to is the balance one block BEFORE it took effect,
+ * since a transfer in the effective block already ran under the new multiplier.
+ */
+export function encodeBalancesCall(multicall3: string, tokens: readonly string[], holder: string): Hex {
+  if (!isAddress(holder)) throw new Error(`holdings: not an address: ${holder}`)
+  const holderWord = addressWord(holder)
+  const calls: Call[] = tokens.map((token) => ({ target: token, callData: HOLDINGS_SELECTOR.balanceOf + holderWord }))
+  const tuples = calls.map(encodeTuple)
+  const offsets: string[] = []
+  let offset = BigInt(calls.length * 32)
+  for (const tuple of tuples) {
+    offsets.push(word(offset))
+    offset += BigInt(tuple.length / 2)
+  }
+  return `0x${HOLDINGS_SELECTOR.aggregate3.slice(2)}${word(0x20n)}${word(BigInt(calls.length))}${offsets.join('')}${tuples.join('')}`
+}
+
+/**
+ * Decodes one such read into checkpoint-keyed balances, so the result drops
+ * straight into whatever `balancesAt` fed. A token whose sub-call reverted is
+ * ABSENT rather than zero: at an early block a token may not have existed yet,
+ * and zero would read as "held nothing" instead of "could not be read".
+ */
+export function decodeBalancesAt(read: BalanceRead, result: string): Map<string, bigint> {
+  const results = decodeAggregate3(result)
+  if (results.length !== read.tokens.length) throw new Error('holdings: balance read returned the wrong number of sub-calls')
+  const out = new Map<string, bigint>()
+  read.tokens.forEach((token, index) => {
+    const entry = results[index]!
+    if (!entry.success || entry.returnData === '0x') return
+    out.set(checkpointKey(token, read.block), BigInt(entry.returnData))
+  })
+  return out
+}
+
 export interface StepRecord {
   token: string
   effectiveAt: string

@@ -20,6 +20,7 @@ import feedMapJson from '../../../data/token-feed-map.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 import gapJson from '../../../data/dex-feed-gap.observed.json'
 import stateVerificationJson from '../../../data/multiplier-state-verification.json'
+import rpcProbeJson from '../../../data/rpc-endpoints.observed.json'
 import effectivePricesJson from '../../../data/effective-prices.observed.json'
 import cadenceJson from '../../../data/capture-cadence.observed.json'
 
@@ -90,6 +91,18 @@ const registry = registryJson as unknown as {
   fetchedAt: string
   assets: { tokenSymbol: string; tokenName: string; isin?: string | null; deployments?: { contractAddress: string; chainId: number }[] }[]
 }
+const rpcProbe = rpcProbeJson as unknown as {
+  endpoints: {
+    url: string
+    host: string
+    reachable: boolean
+    head?: number
+    servesArchive?: boolean
+    deepestArchiveDepth?: number
+    answersBrowsers?: boolean
+  }[]
+}
+
 const feeds = feedsJson as unknown as { name: string }[]
 const feedMap = feedMapJson as unknown as {
   generatedAt: string
@@ -561,6 +574,30 @@ export const wallet = (() => {
   })
   return {
     rpcUrl: ROBINHOOD_CHAIN.defaultRpcUrl,
+    /**
+     * A node that keeps state at any height AND answers browsers. Robinhood's own
+     * does neither of the first, so without this the history is rebuilt from logs
+     * and refused for a busy address. Chosen from the committed probe rather than
+     * hardcoded, and on three conditions, because failing any one of them would
+     * make the page worse than the replay it replaces:
+     *
+     *   it answers browsers      - /wallet/ has no server in between
+     *   it serves archive        - measured as state DIFFERING from latest
+     *   it reaches the OLDEST    - a node with a million blocks of history cannot
+     *   step                       read a step fifty million blocks back, and
+     *                              would fail on exactly the wallets that need it
+     *
+     * Null when nothing qualifies, and the page keeps the replay. A third party
+     * either way, which the page states when it used one.
+     */
+    archiveRpcUrl: (() => {
+      const oldestStep = Math.min(...effectiveBlocks.blocks.map((b) => b.effectiveBlock))
+      const qualified = rpcProbe.endpoints
+        .filter((e) => e.reachable && e.servesArchive && e.answersBrowsers)
+        .filter((e) => typeof e.head === 'number' && e.head - (e.deepestArchiveDepth ?? 0) <= oldestStep)
+        .sort((a, b) => (b.deepestArchiveDepth ?? 0) - (a.deepestArchiveDepth ?? 0))
+      return qualified[0]?.url ?? null
+    })(),
     multicall3: ROBINHOOD_CHAIN.multicall3Address,
     steps,
     /** The history scan: from public mainnet to the last step, over the tokens that ever moved. */
