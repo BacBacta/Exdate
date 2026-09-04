@@ -1,12 +1,12 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
   "method": "A run scans for UIMultiplierUpdated, which fires about nine minutes before the change, and returns to sample the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. Work beyond a run's budget is handed to the next run through this file.",
-  "lastRunAt": "2026-09-04T15:59:11.152Z",
+  "lastRunAt": "2026-09-04T16:20:59.801Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 4,
     "withQuoteAtEffect": 0,
-    "givenUp": 3
+    "givenUp": 4
   },
   "steps": [
     {
@@ -108,7 +108,9 @@
           "isTradingHalt": false,
           "distanceSeconds": 2914
         }
-      ]
+      ],
+      "givenUp": true,
+      "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
     }
   ]
 }
