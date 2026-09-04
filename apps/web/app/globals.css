@@ -344,3 +344,8 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 
 /* The count of something that is not the headline: present, not shouted. */
 .gap .big.muted { color: var(--muted); font-weight: 400; }
+
+/* The export sits with its own caveat, not above it: a reader should see both at once. */
+.wallet-actions { display: flex; align-items: flex-start; gap: 1rem 1.4rem; flex-wrap: wrap; margin-top: 1.6rem; }
+.wallet-actions span { flex: 1 1 34ch; font-size: 14px; color: var(--muted); text-wrap: pretty; }
+.wallet-actions .btn { flex: none; }

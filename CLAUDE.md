@@ -865,6 +865,23 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   caught while writing it: the `secrets` context is **not available in a step's `if`**, so the
   guard is lifted into the job's `env` — written the documented-looking way it evaluates to
   nothing and every step runs regardless.
+- 2026-09-04 — **The wallet's dividend record, as a file.** Step 2 works out per past step what an
+  address held, what it gained and what arrived, and it existed only on screen, where it cannot be
+  handed to an accountant or reconciled against a broker statement. `Download as CSV` builds it in
+  the browser from what is already computed - nothing is sent anywhere, the same promise the rest
+  of the page makes. It lives in `holdings.ts` rather than its own module for the reason that file
+  already carries: **Turbopack does not follow core's `.js` specifiers**, so anything the wallet
+  bundles must import nothing, and a separate `statement.ts` broke the build on exactly that.
+  Two things the export gets right that a naive one would not. **A non-zero amount never prints as
+  zero**: AAPL against 0.0142 shares is worth thousandths of a cent, and `0.00` in a record reads
+  as *nothing happened*, so money is written to six places and anything that would still round away
+  falls back to full precision - COST's dust shows as `0.000000000000000126` rather than `0`. And
+  every row carries a **`basis`** column saying in words why it has the figures it has, because a
+  blank must never be mistaken for a zero months later by someone who was not here. CSV escaping is
+  RFC 4180 with a test for a comma inside a token name, which would otherwise shift every later
+  column of that row. The export states on its face that it values a distribution at the price
+  exdate measured at the instant of the step, which is a measurement and **not any tax authority's
+  method**.
 - _(append decisions here as they are made)_
 
 ## Status

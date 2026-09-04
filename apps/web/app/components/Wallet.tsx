@@ -20,6 +20,9 @@ import {
   type StepRecord,
   type Transfer,
   type WalletHistory,
+  buildDividendStatement,
+  statementFilename,
+  statementToCsv,
 } from '@exdate/core/holdings'
 import { dateLong, pctInt } from '../../lib/format'
 import { LedgerHead } from './Chrome'
@@ -453,6 +456,26 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
     )
   }
 
+  /**
+   * The same figures the section shows, as a file. On screen they cannot be handed to
+   * an accountant or reconciled against a broker statement. Built in the browser from
+   * what is already computed: nothing is sent anywhere, which is the same promise the
+   * rest of the page makes.
+   */
+  function downloadStatement(address: string, computed: WalletHistory, observedAt: string) {
+    const named = new Map(steps.map((step) => [step.token.toLowerCase(), { symbol: step.symbol, name: step.name }]))
+    const rows = buildDividendStatement(computed.exposures, {
+      name: (token) => named.get(token) ?? { symbol: token, name: token },
+    })
+    const blob = new Blob([statementToCsv(rows)], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = statementFilename(address, observedAt)
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   function History({ address }: { address: string }) {
     const stepByKey = new Map(steps.map((step) => [checkpointKey(step.token, step.effectiveBlock), step]))
     return (
@@ -535,6 +558,21 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, multicall3, blockNumbe
                   )
                 })}
               </ul>
+              <p className="wallet-actions">
+                <button
+                  className="btn ghost small"
+                  type="button"
+                  onClick={() => downloadStatement(address, history.history, new Date().toISOString())}
+                >
+                  Download as CSV
+                </button>
+                <span>
+                  One row per dividend, with the shares held, what was declared and what arrived. A
+                  figure exdate could not measure is left empty rather than written as zero, and each
+                  row carries why. It values a distribution at the price measured when the step took
+                  effect, which is a measurement and not any tax authority&rsquo;s method.
+                </span>
+              </p>
               <p className="wallet-status">
                 Shares held then is this address&rsquo;s balance at the block each change took effect, rebuilt from its
                 own transfers{history.cached ? ', remembered by this browser from an earlier read' : `, read in ${history.requests} requests`}.

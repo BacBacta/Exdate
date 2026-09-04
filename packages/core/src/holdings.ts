@@ -539,3 +539,147 @@ export class RangeScanner {
     return !this.#exhausted && this.#pending.length === 0
   }
 }
+
+
+// ---------------------------------------------------------------------------
+// A holder's own record of what past multiplier steps delivered to them.
+//
+// The wallet page works this out already and shows it on screen. On screen it cannot be
+// handed to an accountant, reconciled against a broker statement, or kept. This turns
+// the same figures into rows and a CSV, with no I/O and no rounding decisions hidden
+// inside a template.
+//
+// It lives here rather than in its own file for the reason the top of this module gives:
+// Turbopack does not follow the `.js` specifiers the rest of core uses, so anything the
+// wallet page bundles has to import nothing.
+//
+// What it is not: a tax return. exdate values a distribution at the underlying price it
+// measured at the instant the step took effect, which is a measurement and not any tax
+// authority's prescribed method, and it says so on every export. A row exdate could not
+// price carries no dollar figure at all rather than a zero.
+// ---------------------------------------------------------------------------
+
+export interface StatementRow {
+  /** When the multiplier change took effect, ISO. */
+  effectiveAt: string
+  symbol: string
+  name: string
+  token: string
+  /** Underlying shares the address held when the step took effect. */
+  sharesHeld: string
+  /** Shares the step added. Exact, on chain, no price involved. */
+  sharesGained: string
+  /** The issuer's declared amount per underlying share, or null where none survives. */
+  declaredPerShare: string | null
+  /** rate x shares held. */
+  declaredTotal: string | null
+  /** What the step actually delivered per share, at the price in force. */
+  arrivedPerShare: string | null
+  arrivedTotal: string | null
+  /** The share of the declared amount that did not arrive, as a percentage. */
+  shortfallPercent: string | null
+  /** Why a figure is missing, in words, so a blank is never mistaken for a zero. */
+  basis: string
+}
+
+export interface StatementMeta {
+  /** Names and symbols by lowercase address; a step record carries only the address. */
+  name(token: string): { symbol: string; name: string }
+}
+
+const SHARE_PLACES = 8
+/** Micro-dollars. A dividend on a fraction of a share is genuinely worth thousandths of a cent. */
+const MONEY_PLACES = 6
+
+/**
+ * Formats a WAD value so that a non-zero amount never prints as zero.
+ *
+ * A statement is read as a record of what happened. "0.00" against a holding that did
+ * receive something says the opposite of the truth, and in an accounting context that
+ * is the worst possible rounding. So a value that would round away falls back to full
+ * precision: exact, ugly, and machine-readable, which is what a CSV is for.
+ */
+function exact(value: bigint, places: number): string {
+  const rounded = formatWad(value, places)
+  if (value !== 0n && /^0\.?0*$/.test(rounded)) return formatWad(value, 18)
+  return rounded
+}
+
+/**
+ * Why a row has the dollar figures it has, or has none. Carried on every row because a
+ * statement is read months later, by someone who was not here when it was made.
+ */
+function basisFor(exposure: StepExposure): string {
+  if (exposure.declared !== null && exposure.arrived !== null) {
+    return 'declared by the issuer; arrived valued at the underlying price exdate measured when the step took effect'
+  }
+  if (exposure.declared !== null) {
+    return exposure.step.hasFeed
+      ? 'declared by the issuer; the observed step does not reconcile against the price, so no arrived value is claimed'
+      : 'declared by the issuer; no price feed for this token, so no arrived value is claimed'
+  }
+  return "no declaration survives for this step: the issuer's feed keeps about a month, so the amount is unrecoverable"
+}
+
+/** Rows for one address, newest first, one per step it was exposed to. */
+export function buildDividendStatement(exposures: readonly StepExposure[], meta: StatementMeta): StatementRow[] {
+  return exposures.map((exposure) => {
+    const { symbol, name } = meta.name(exposure.step.token.toLowerCase())
+    const shortfall =
+      exposure.declared !== null && exposure.arrived !== null && exposure.declared > 0n
+        ? formatWad(((exposure.declared - exposure.arrived) * 100n * 10n ** 18n) / exposure.declared, 2, true)
+        : null
+    return {
+      effectiveAt: exposure.step.effectiveAt,
+      symbol,
+      name,
+      token: exposure.step.token,
+      sharesHeld: exact(exposure.sharesBefore, SHARE_PLACES),
+      sharesGained: exact(exposure.sharesGained, SHARE_PLACES),
+      declaredPerShare: exposure.step.rate ?? null,
+      declaredTotal: exposure.declared === null ? null : exact(exposure.declared, MONEY_PLACES),
+      arrivedPerShare: exposure.step.receivedPerShare ?? null,
+      arrivedTotal: exposure.arrived === null ? null : exact(exposure.arrived, MONEY_PLACES),
+      shortfallPercent: shortfall,
+      basis: basisFor(exposure),
+    }
+  })
+}
+
+/**
+ * RFC 4180 escaping. A field is quoted only when it has to be - a comma, a quote, or a
+ * line break - and an inner quote is doubled. Token names carry commas and periods, and
+ * a naive join would silently shift every later column of that row.
+ */
+export function csvField(value: string | null | undefined): string {
+  if (value === null || value === undefined) return ''
+  return /[",\r\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value
+}
+
+export const STATEMENT_COLUMNS: { key: keyof StatementRow; header: string }[] = [
+  { key: 'effectiveAt', header: 'effective_at' },
+  { key: 'symbol', header: 'symbol' },
+  { key: 'name', header: 'name' },
+  { key: 'token', header: 'token_address' },
+  { key: 'sharesHeld', header: 'shares_held' },
+  { key: 'sharesGained', header: 'shares_gained' },
+  { key: 'declaredPerShare', header: 'declared_per_share_usd' },
+  { key: 'declaredTotal', header: 'declared_total_usd' },
+  { key: 'arrivedPerShare', header: 'arrived_per_share_usd' },
+  { key: 'arrivedTotal', header: 'arrived_total_usd' },
+  { key: 'shortfallPercent', header: 'shortfall_percent' },
+  { key: 'basis', header: 'basis' },
+]
+
+/** CRLF line endings, which is what RFC 4180 says and what a spreadsheet expects. */
+export function statementToCsv(rows: readonly StatementRow[]): string {
+  const header = STATEMENT_COLUMNS.map((column) => column.header).join(',')
+  const body = rows.map((row) => STATEMENT_COLUMNS.map((column) => csvField(row[column.key])).join(','))
+  return [header, ...body].join('\r\n') + '\r\n'
+}
+
+/** `exdate-dividends-0x8601…f58b1-2026-09-04.csv`: sortable, and it names the address it describes. */
+export function statementFilename(address: string, observedAt: string): string {
+  const short = `${address.slice(0, 6)}${address.slice(-5)}`.toLowerCase()
+  return `exdate-dividends-${short}-${observedAt.slice(0, 10)}.csv`
+}
