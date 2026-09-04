@@ -882,6 +882,18 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   column of that row. The export states on its face that it values a distribution at the price
   exdate measured at the instant of the step, which is a measurement and **not any tax authority's
   method**.
+- 2026-09-04 — **A gap without depth is not a finding.** The first cross-session readings arrived
+  and the widest was GME at **664 bps**, which could equally have been a real dislocation or a
+  price on a pool holding a few hundred dollars — the page gave a reader no way to tell. Uniswap's
+  `liquidity` ranks pools correctly but means nothing to anyone, so each pool's **actual balances**
+  are now read alongside and published as one figure: GME's gap sits on a pool holding **$809 046**,
+  which settles it. The balances are context, not a selection rule: the deepest pool by `L` is
+  still the one quoted, because that is what governs the price printed. Also the first evidence
+  that the gap moves with the session — **median 20 bps overnight against 33 bps pre-market** — on
+  two and one samples respectively, which is a hint and not yet the claim; the page still refuses
+  to compare sessions until each has three. Verified the whole chain by dispatching the workflow
+  by hand rather than assuming it: measure → corroborate → commit → push, all of it. 20 of 26
+  pairings now agree in every reading and lift on the third.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -20,8 +20,10 @@ const OUT = 'data/dex-feed-gap.observed.json'
 
 const MULTICALL3 = '0xcA11bde05977b3631167028862bE2a173976CA11'
 const HEARTBEAT_SECONDS = 86_400
-const SEL = { slot0: '0x3850c7bd', liquidity: '0x1a686502', latestRoundData: '0xfeaf968c', decimals: '0x313ce567' }
+const SEL = { slot0: '0x3850c7bd', liquidity: '0x1a686502', latestRoundData: '0xfeaf968c', decimals: '0x313ce567', balanceOf: '0x70a08231' }
+const USDG = '0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168'
 const Q192 = 1n << 192n
+const WAD_ = 10n ** 18n
 const USDG_DECIMALS = 6
 
 const pad = (a) => a.replace(/^0x/, '').toLowerCase().padStart(64, '0')
@@ -85,9 +87,20 @@ const feedByToken = new Map(feedMap.pairs.map((p) => [p.token.toLowerCase(), p])
 // Re-read every pool now: the committed prices date from discovery, and a gap has to be
 // measured at one instant on both sides or it is measuring the delay between two reads.
 const pools = dex.pools
+/**
+ * Also what each pool actually holds.
+ *
+ * `liquidity` is Uniswap's virtual L at the current tick: it ranks pools correctly but
+ * means nothing to a reader, and a gap of 675 bps reads very differently on a pool
+ * holding a million dollars than on one holding a hundred. The balances are the
+ * interpretable measure, so they are read alongside and published - they do not change
+ * which pool is chosen, they let a reader judge the price that pool prints.
+ */
 const poolCalls = pools.flatMap((p) => [
   { target: p.pool, callData: SEL.slot0 },
   { target: p.pool, callData: SEL.liquidity },
+  { target: p.token, callData: SEL.balanceOf + pad(p.pool) },
+  { target: USDG, callData: SEL.balanceOf + pad(p.pool) },
 ])
 const feeds = [...new Set(pools.map((p) => feedByToken.get(p.token.toLowerCase())?.feedProxy).filter(Boolean))]
 const feedCalls = feeds.flatMap((feed) => [
@@ -111,11 +124,13 @@ feeds.forEach((feed, i) => {
 /** Deepest pool per token: a thin pool prints a price no size can trade at. */
 const bestByToken = new Map()
 pools.forEach((pool, i) => {
-  const [slot0, liquidity] = [poolAnswers[i * 2], poolAnswers[i * 2 + 1]]
+  const [slot0, liquidity, tokenBalance, quoteBalance] = poolAnswers.slice(i * 4, i * 4 + 4)
   if (!slot0?.success || slot0.returnData.length < 130) return
   const sqrtPriceX96 = BigInt('0x' + slot0.returnData.slice(2, 66))
   const depth = liquidity?.success ? BigInt(liquidity.returnData) : 0n
   if (sqrtPriceX96 === 0n || depth === 0n) return
+  const heldToken = tokenBalance?.success ? BigInt(tokenBalance.returnData) : 0n
+  const heldQuote = quoteBalance?.success ? BigInt(quoteBalance.returnData) : 0n
   const key = pool.token.toLowerCase()
   const decimals = decimalsByToken.get(key) ?? 18
   const scale = 10n ** BigInt(18 + decimals - USDG_DECIMALS)
@@ -123,7 +138,16 @@ pools.forEach((pool, i) => {
   const priceWad = pool.stockIsToken0 ? (squared * scale) / Q192 : (Q192 * scale) / squared
   const current = bestByToken.get(key)
   if (!current || depth > current.liquidity) {
-    bestByToken.set(key, { pool: pool.pool, feeTier: pool.feeTier, liquidity: depth, priceWad, symbol: pool.symbol })
+    bestByToken.set(key, {
+      pool: pool.pool,
+      feeTier: pool.feeTier,
+      liquidity: depth,
+      priceWad,
+      symbol: pool.symbol,
+      heldToken,
+      /** USDG has 6 decimals, so scale it to WAD before it stands next to a WAD price. */
+      heldQuoteWad: heldQuote * 10n ** 12n,
+    })
   }
 })
 
@@ -190,6 +214,11 @@ for (const [token, best] of bestByToken) {
     pool: best.pool,
     feeTier: best.feeTier,
     liquidity: best.liquidity.toString(),
+    /** What the pool actually holds, which is what says whether its price can be traded. */
+    poolTokens: (Number(best.heldToken) / 1e18).toFixed(4),
+    poolQuoteUsd: (Number(best.heldQuoteWad) / 1e18).toFixed(2),
+    /** Both sides at the pool's own price. A rough figure, and the only interpretable one. */
+    poolValueUsd: ((Number(best.heldQuoteWad) + Number((best.heldToken * best.priceWad) / WAD_)) / 1e18).toFixed(2),
     tradedPrice: (Number(best.priceWad) / 1e18).toFixed(4),
     feed: pair?.feedProxy ?? null,
     feedPrice: feedPriceWad === null ? null : (Number(feedPriceWad) / 1e18).toFixed(4),
@@ -290,6 +319,9 @@ console.error(`# ${session}: ${rows.length} tokens quotable on chain, ${measured
 console.error(`# ${identifying}/${measured.length} prices identify the feed they are mapped to at this reading`)
 console.error(`# median |gap| ${median} bps, widest ${abs.at(-1)} bps, median feed age ${Math.round((ages[Math.floor(ages.length / 2)] ?? 0) / 60)} min`)
 for (const row of rows.slice(0, 6)) {
-  console.error(`#   ${row.symbol.padEnd(6)} traded ${String(row.tradedPrice).padStart(11)}  feed ${String(row.feedPrice ?? '-').padStart(11)}  ${row.deviationBps === null ? 'no feed' : String(row.deviationBps).padStart(8) + ' bps'}  feed age ${row.feedAgeSeconds === null ? '-' : Math.round(row.feedAgeSeconds / 60) + ' min'}`)
+  console.error(
+    `#   ${row.symbol.padEnd(6)} traded ${String(row.tradedPrice).padStart(11)}  feed ${String(row.feedPrice ?? '-').padStart(11)}  ` +
+      `${row.deviationBps === null ? 'no feed' : String(row.deviationBps).padStart(8) + ' bps'}  pool $${Number(row.poolValueUsd).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+  )
 }
 console.error(`# wrote ${OUT}`)

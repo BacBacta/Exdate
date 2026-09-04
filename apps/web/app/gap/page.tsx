@@ -24,6 +24,10 @@ const age = (seconds: number | null) => {
   const minutes = Math.round(seconds / 60)
   return minutes < 90 ? `${minutes} min old` : `${Math.round(minutes / 60)} h old`
 }
+/** Whole dollars: the pool's size is context for the gap, not a figure to the cent. */
+const money = (value: string | undefined) =>
+  value === undefined ? null : `$${Math.round(Number(value)).toLocaleString('en-US')}`
+
 const when = (iso: string) =>
   new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(
     new Date(iso),
@@ -80,6 +84,7 @@ export default function Page() {
                     </a>
                     <span className="sym">
                       {row.symbol} · oracle {age(row.feedAgeSeconds)}
+                      {money(row.poolValueUsd) ? ` · pool ${money(row.poolValueUsd)}` : ''}
                     </span>
                   </div>
                   <div className="amt">
@@ -101,7 +106,9 @@ export default function Page() {
               deepest USDG pool, and every pool and every feed is read at the same instant —
               otherwise the number would measure the delay between two reads rather than a gap.
               Both sides quote the token itself, which already includes the multiplier, so
-              neither is adjusted.
+              neither is adjusted. Each row states what its pool holds, because a wide gap on a
+              pool with a few hundred dollars in it is a price nobody can trade, and a wide gap
+              on a deep one is a dislocation.
             </p>
           </div>
         </section>

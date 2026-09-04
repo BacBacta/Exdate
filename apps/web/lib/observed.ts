@@ -160,6 +160,7 @@ const gapData = gapJson as unknown as {
     name: string
     token: string
     feeTier: number
+    poolValueUsd?: string
     tradedPrice: string
     feedPrice: string | null
     feedAgeSeconds: number | null
