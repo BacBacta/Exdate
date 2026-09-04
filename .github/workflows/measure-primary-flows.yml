@@ -1,0 +1,60 @@
+# Net creation and redemption, once a day.
+#
+# Mint minus burn is the signal an ETF publishes as net flow: whether the wrapper is
+# growing or shrinking. For these tokens nobody publishes it. The issuer's own
+# /rhj/prices carries gross mint/burn turnover with no sign and no history; the chain
+# carries both, exactly.
+#
+# Daily because that is the cadence a flow figure is read at, and because each run
+# picks up from the block the last one stopped at - so the windows are contiguous and
+# a delayed run loses nothing. A run that would have to cover more than three days
+# reads the most recent three and says the ledger has a gap before them.
+name: measure-primary-flows
+
+on:
+  schedule:
+    # 05:10 UTC: after the US close and its settlement, before the next pre-market.
+    - cron: '10 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure-primary-flows
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Exits without writing when no block is new; marks a window incomplete rather
+      # than publishing a partial count as if the unread logs were zero.
+      - name: Read one window of creations and redemptions
+        run: node scripts/measure-primary-flows.mjs
+
+      - name: Commit only if a window was appended
+        run: |
+          if git diff --quiet -- data/primary-flows.observed.json; then
+            echo "nothing appended"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/primary-flows.observed.json');const w=d.windows.at(-1);process.stdout.write(w.hours+' h, '+w.mints+' mints, '+w.burns+' burns, net '+w.netCreated+' across '+w.tokensWithFlow+' tokens'+(w.incomplete?' (incomplete)':''))")
+          git config user.name 'exdate-flows'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/primary-flows.observed.json
+          git commit -m "Measure primary flows: $summary"
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

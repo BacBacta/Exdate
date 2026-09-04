@@ -235,6 +235,13 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   which confirms the ≈375 k figure from Phase 0. The busiest token is not AAPL: ZM, COST and SPCX
   each exceeded 1 M/day in a sample. `node scripts/phase0/measure-transfers.mjs`,
   `data/transfer-volume.observed.json`.
+- **Primary flows are cheap to read and nobody publishes them.** Mint is a `Transfer` from
+  `address(0)`, burn is a `Transfer` to it, so net creation - the signal an ETF publishes as net
+  flow - is exact on chain. Measured 2026-09-04: a 5.6 h window across all 194 tokens took **6
+  requests and 2.4 s** (372 mints, 101 burns, 62 tokens, net +703 255 tokens, of which AMC alone
+  +687 395). A full day is ~20 requests. The issuer's own `/rhj/prices` carries
+  `mintBurnTokenVolume` and `mintBurnUsdVolume`, but that is gross turnover with no sign and no
+  history. `scripts/measure-primary-flows.mjs`, `data/primary-flows.observed.json`, daily Action.
 - **74 % of transactions that move a Stock Token also move USDG in the same transaction** — the
   provable-trade share, ≈2 M/day. Most on-chain activity is trading, not custody movement.
 - A dedicated archive endpoint is required before indexing transfers: 7–13 M logs/day is 85–145
@@ -769,6 +776,15 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   published while `isTradingHalt` is true is refused, not priced: that is a last price, not a
   market. **No haircut changes today** — the capture pays off from the next dividend onward, and
   says so rather than backfilling.
+- 2026-09-04 — **Net creation, per token, daily.** The one dataset here that needs no oracle, no
+  issuer declaration and no interpretation: mint minus burn, from the chain, signed. It is what an
+  ETF publishes as net flow and what says whether the wrapper is growing; the issuer publishes
+  gross turnover with no sign and no history, and nobody publishes the rest. Windows are contiguous
+  by construction - each run starts at the block after the last one stopped - so a delayed run
+  loses nothing and none of them double count. A range the node times out on is halved; one that
+  fails at the floor is listed and the window is marked `incomplete`, because a missing range is
+  not a zero. A run that would have to cover more than three days reads the most recent three and
+  records `precededByGap` rather than implying the ledger is continuous.
 - _(append decisions here as they are made)_
 
 ## Status
