@@ -95,6 +95,7 @@ export function Footer() {
             <a href="/#proof">Proof</a>
             <a href="/record/">Delivery record</a>
             <a href="/flows/">Creations</a>
+            <a href="/gap/">Oracle gap</a>
             <a href="/#coverage">Coverage</a>
             <a href="/#developers">Developers</a>
             <a href={links.apiDocs}>API</a>

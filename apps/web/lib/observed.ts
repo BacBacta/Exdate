@@ -18,6 +18,7 @@ import registryJson from '../../../data/robinhood-assets.snapshot.json'
 import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
+import gapJson from '../../../data/dex-feed-gap.observed.json'
 
 // The JSON files are cast to the handful of fields the page reads, so a field
 // the page does not use can change shape without touching this module.
@@ -138,6 +139,34 @@ const sessionShare = sessionShareJson as unknown as {
   sufficient: boolean
   lastSampleAt: string
   easternHourOfWeekSlotsCovered: number
+}
+
+const gapData = gapJson as unknown as {
+  observedAt: string
+  session: string
+  summary: {
+    tokensQuotable: number
+    withFeed: number
+    withoutFeed: number
+    medianAbsDeviationBps: number | null
+    maxAbsDeviationBps: number | null
+    medianFeedAgeSeconds: number | null
+    feedsBeyondHeartbeat: number
+  }
+  bySession: Record<string, { samples: number; medianAbsDeviationBps: number | null }>
+  history: { observedAt: string; session: string }[]
+  tokens: {
+    symbol: string
+    name: string
+    token: string
+    feeTier: number
+    tradedPrice: string
+    feedPrice: string | null
+    feedAgeSeconds: number | null
+    beyondHeartbeat: boolean | null
+    deviationBps: number | null
+    hasFeed: boolean
+  }[]
 }
 
 // --- arithmetic on WAD values, exact, no floats ------------------------------
@@ -653,6 +682,48 @@ export const flows = (() => {
     redeemed: rows.filter((row) => row.netNumber < 0),
     /** Hours the whole committed ledger covers, so a reader can see it is a series. */
     ledgerHours: Number(windows.reduce((sum, w) => sum + w.hours, 0).toFixed(2)),
+  }
+})()
+
+/**
+ * How far the price a token trades at sits from the oracle a lending market liquidates
+ * against. Both quote the raw token, so the two are directly comparable.
+ *
+ * The per-session medians are only worth showing once every session has been sampled:
+ * one reading during one session says nothing about how the gap behaves across a week,
+ * and this refuses rather than implies it.
+ */
+export const gap = (() => {
+  const SESSIONS = ['pre_market', 'regular', 'after_hours', 'overnight', 'weekend'] as const
+  const MINIMUM_SAMPLES = 3
+  const sessions = SESSIONS.map((key) => ({
+    key,
+    label: { pre_market: 'Pre-market', regular: 'Market open', after_hours: 'After hours', overnight: 'Overnight', weekend: 'Weekend' }[key],
+    samples: gapData.bySession[key]?.samples ?? 0,
+    medianAbsDeviationBps: gapData.bySession[key]?.medianAbsDeviationBps ?? null,
+  }))
+  return {
+    observedAt: gapData.observedAt,
+    session: gapData.session,
+    /** Reads after "during": the label has to carry its own article. */
+    sessionLabel:
+      {
+        pre_market: 'the pre-market session',
+        regular: 'an open market',
+        after_hours: 'the after-hours session',
+        overnight: 'the overnight session',
+        weekend: 'the weekend',
+      }[gapData.session] ?? gapData.session,
+    ...gapData.summary,
+    medianFeedAgeMinutes:
+      gapData.summary.medianFeedAgeSeconds === null ? null : Math.round(gapData.summary.medianFeedAgeSeconds / 60),
+    measured: gapData.tokens.filter((row) => row.deviationBps !== null),
+    unpriced: gapData.tokens.filter((row) => row.deviationBps === null),
+    samples: gapData.history.length,
+    sessions,
+    /** False until every session has been sampled; the page then says so instead of comparing. */
+    sessionsComparable: sessions.every((s) => s.samples >= MINIMUM_SAMPLES),
+    minimumSamples: MINIMUM_SAMPLES,
   }
 })()
 
