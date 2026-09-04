@@ -30,8 +30,24 @@ say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 note() { printf '  %s\n' "$*"; }
 die() { printf '\n\033[31mstopped:\033[0m %s\n' "$*" >&2; exit 1; }
 
-[ "$(id -u)" -eq 0 ] || die "run as root (sudo bash), it creates a user and a systemd unit"
+# Where am I? Checked before anything else, because the two wrong answers both
+# look plausible from a phone: Termux ships apt and a shell, so the Debian check
+# below passes there, and the root check then sends the operator off to install
+# sudo for a machine that can never run this. Say it plainly instead.
+if [ -n "${TERMUX_VERSION:-}" ] || case "${PREFIX:-}" in *com.termux*) true;; *) false;; esac; then
+  die "this is Termux on Android, not the server.
+  The watcher runs on the VPS. From here, connect to it first:
+
+    ssh root@YOUR.SERVER.IP
+
+  and run the same command there. Do not install sudo or tsu for this."
+fi
+command -v systemctl >/dev/null && [ -d /run/systemd/system ] || die "no systemd here, so there is nothing to install the service into.
+  This belongs on the Linux server, reached with: ssh root@YOUR.SERVER.IP"
 command -v apt-get >/dev/null || die "this expects Debian or Ubuntu; on anything else follow deploy/exdate-watcher.service by hand"
+# Hetzner hands you a root shell, so this usually passes without sudo at all.
+[ "$(id -u)" -eq 0 ] || die "run this as root: it creates a user and a systemd unit.
+  On a fresh VPS you are already root; otherwise prefix the command with sudo."
 
 say "1. Packages"
 # Checked one by one: a box can have git and curl and no ssh-keygen, and
