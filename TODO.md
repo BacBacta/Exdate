@@ -214,8 +214,11 @@ legal advice; it is what makes counsel's hour count. The short version:
 - **EU database right** (Directive 96/9/EC) is a separate question the US Terms do not address.
 - **Arbitration opt-out closes on 2026-10-31** (§12.13, sixty days from first access, by post only).
 
-Cheap and lawyer-free: the disclaimer, the `LICENSE` file, moving production reads off the Public
-RPC, and the wording decision. For counsel, in order: is `/rhj` a Service; does §2.4 permit a
+Cheap and lawyer-free, in the order Appendix A of the review gives them: a managed RPC provider
+for production reads (Robinhood's own node page says *use a provider* and lists seven — a node
+needs 64 GB RAM, several TB and an L1 endpoint), the email in Appendix B, the disclaimer (done),
+the wording decision, the `LICENSE` file, serving fewer issuer columns verbatim, and a data licence
+with a `source` carve-out. For counsel, in order: is `/rhj` a Service; does §2.4 permit a
 production product; the republication as it stands; the EU right; what can be licensed; the
 opt-out; Chainlink's terms, which render in JavaScript and were not readable from the workspace.
 And one option that changes the whole picture: §5.11 gives `robinhoodchain@robinhood.com` — a

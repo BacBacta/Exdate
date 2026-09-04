@@ -181,6 +181,10 @@ to the published version). Neither is published today, and the SDK README says s
 
 ### Terms that bind the data
 
+exdate is an independent measurement. It is not affiliated with, endorsed by, or officially
+connected with Robinhood Markets, Inc. or any of its affiliates. The reading of Robinhood's terms
+against what this repository does is in [`docs/terms-review.md`](docs/terms-review.md).
+
 The on-chain record is public. The issuer's registry and corporate-action feed come from
 `api.robinhood.com/rhj`, which needs no key but sits under Robinhood's developer-documentation
 terms (RHDA, LLC): a personal, revocable licence that forbids distributing "Robinhood Materials" to

@@ -107,7 +107,8 @@ export function Footer() {
         <p className="fine">
           Data read from Robinhood Chain: {counts.tokens} tokens, last observed {observedDay}. Stock
           Tokens are debt securities issued by Robinhood Assets (Jersey) Limited, not equity. Nothing
-          here is investment advice.
+          here is investment advice. exdate is an independent measurement and is not affiliated
+          with, endorsed by, or officially connected with Robinhood Markets, Inc.
         </p>
       </div>
     </footer>

@@ -213,10 +213,19 @@ practice and low risk, but it is a question about Apple and Ford, not about Robi
 
 - Add the §5.7(b)(ii) disclaimer to the site footer and the README.
 - Add a `LICENSE` file matching the MIT claim (owner's choice of licence, one minute once chosen).
-- Move production chain reads off the Public RPC — a node exdate runs, or a third-party endpoint —
-  so the on-chain product is outside every clause of the Terms. TODO item 3 called this optional;
-  §2.1 and §2.4 make it the terms-driven answer. The capture watcher is the priority, since its
-  reads cannot be re-done.
+- Move production chain reads off the Public RPC, so the on-chain product is outside every clause
+  of the Terms. TODO item 3 called this optional; §2.1 and §2.4 make it the terms-driven answer.
+  **Not by running a node**: Robinhood's own *Run a full node* page (read 2026-09-04) asks for a
+  modern 8+ core CPU, **64 GB RAM (128 recommended)**, "several TBs" of local NVMe, *and* an
+  Ethereum L1 execution endpoint plus a beacon endpoint, and says outright: "If you don't already
+  know why you need your own node, you probably don't. If you just need an RPC endpoint, use the
+  public endpoints **or a provider**." It then lists seven managed providers — Alchemy (with an
+  API-key URL), Quicknode, Blockdaemon, dRPC, Validation Cloud, Chainstack, GlobalStake. A managed
+  provider is not a Robinhood Service; it is a third party under its own commercial terms, which
+  permit production use, and a paid tier buys the one thing the free public endpoints in
+  `data/rpc-endpoints.observed.json` lack — a service commitment. The capture watcher is the
+  priority, since its reads cannot be re-done, and at one scan per 30 s it fits any free tier;
+  the indexer's ~30 Multicall requests a minute fit most. `RHC_RPC_URL` already takes any URL.
 - Decide the wording: "Stock Tokens" in the title, OG image, token list and README, or accept the
   §5.7(j) risk knowingly. This is the owner's call because it is the product's sentence.
 
@@ -248,3 +257,82 @@ over facts already published, and it does not reach anyone who read exdate's dat
 Robinhood's Services. The measurements — the haircuts, the state confirmations, the gaps — are
 exdate's, made from public chain state. What is at stake is the *pipe* and the *declared rates*,
 and the first of those has a substitute today.
+
+## Appendix A — Doing this without counsel
+
+Most of the exposure is removable by engineering and by one email. What remains is a risk taken
+knowingly, and §8 says what it is. In order:
+
+1. **Switch production reads to a managed RPC provider** (§7 above). Watcher first, then the
+   indexer and the collectors. This takes every on-chain read out of the Terms entirely — the
+   chain is not a Service and the provider is not Robinhood.
+2. **Send the request in Appendix B to `robinhoodchain@robinhood.com`.** A written yes answers
+   counsel questions 1, 2, 3 and 5. A no answers them too. Silence after a reasonable time is
+   itself a fact to record.
+3. **Display the §5.7(b)(ii) disclaimer** — done 2026-09-04, footer and README.
+4. **Decide the words.** §5.7(j) is explicit and cheap: *see what your Stock Tokens actually paid
+   you*; "tokenized real-world assets such as Stock Tokens" where a plain description is wanted.
+   Leaving "tokenized stock" is a knowing choice against a written condition.
+5. **Add a `LICENSE` file** for the code once a licence is chosen — MIT is what three packages
+   already claim. This is a grant to the world and is not undone by deleting the file later, so it
+   is a yes to give, not a default to assume.
+6. **Serve less of the issuer verbatim.** The product needs a declared rate and a process date per
+   dividend to show a haircut; it does not need the whole registry snapshot mirrored at
+   `/data/` with `tradingCapabilities` and CDN logo URLs. Serving only the columns the pages use
+   shrinks §5.2(a)/(c) and the EU-right question at once, at no product cost. Dropping `logoURI`
+   from the token list removes the third-party-logo question entirely.
+7. **A data licence with a carve-out**, when the measurements are meant to be reused: CC-BY-4.0
+   over exdate's own columns, with a sentence excluding every field whose `source` begins with
+   `robinhood:`. That is a statement of what exdate can grant, and nothing it cannot.
+8. **The arbitration opt-out**, if wanted, before 2026-10-31, by post (Appendix C). It costs a
+   stamp, keeps a court available instead of an arbitrator, and cannot be done after the date.
+
+## Appendix B — The request to Robinhood
+
+To `robinhoodchain@robinhood.com`. One screen, no adjectives.
+
+> Subject: Stock Token API use by an independent measurement project (exdate)
+>
+> Hello,
+>
+> I run exdate (https://www.exdate.me, source at https://github.com/BacBacta/Exdate), an
+> independent, non-commercial measurement of Robinhood Chain Stock Tokens: it indexes the
+> ERC-8056 multiplier changes on chain and reconciles each one against the corporate action
+> declared in your Stock Token API, publishing the observed distribution per share with every
+> source named. It is not affiliated with Robinhood and says so.
+>
+> I am writing to make sure this use of the Stock Token API sits inside your Terms of Service,
+> and to ask on what conditions if it does not. Concretely, exdate:
+>
+> - reads GET /rhj/corporate-actions about hourly and GET /rhj/prices/{symbol} for a few seconds
+>   around each multiplier change, well inside the documented 60 requests/second;
+> - keeps a cumulative archive of corporate-action rows (the endpoint serves a one-month window),
+>   and publishes, per dividend, the declared rate and process date next to the on-chain step
+>   they explain, attributed to "robinhood:/rhj/corporate-actions";
+> - publishes a token list of the 194 Stock Tokens from GET /rhj/assets, and uses the Robinhood
+>   Chain name only to identify what is measured.
+>
+> Two questions:
+>
+> 1. Is using the Stock Token API in a publicly available product, and republishing
+>    corporate-action rows with attribution, acceptable under the Terms — and if only on
+>    conditions (attribution form, rate, fields), which?
+> 2. May exdate offer its own derived measurements under an open data licence, with every
+>    field taken from the Stock Token API excluded from that licence?
+>
+> I will follow whatever form of attribution or linking you prefer. Thank you.
+>
+> [name, entity if any, email]
+
+## Appendix C — The arbitration rejection notice (§12.13)
+
+Signed, on paper, posted before **2026-10-31** to: RHDA, LLC, 85 Willow Road, Menlo Park,
+CA 94025, Attn: ROBINHOOD CHAIN Arbitration Rejection Notice.
+
+> I, [full name], [postal address], [email], first accessed the Robinhood Chain Services on or
+> about 2 September 2026. I reject the Arbitration Agreement in Section 12 of the Robinhood Chain
+> Terms of Service (Last Updated August 24, 2026).
+>
+> [signature, date]
+
+Keep proof of posting. The Terms say this is "the only manner" and that a late notice is invalid.
