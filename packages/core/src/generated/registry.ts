@@ -3155,10 +3155,8 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
     "feedDecimals": 8,
     "feedHeartbeatSeconds": 86400,
     "feedVerified": false,
-    "feedCorroborated": true,
-    "feedCorroboratedBy": [
-      "traded-price"
-    ]
+    "feedCorroborated": false,
+    "feedCorroboratedBy": []
   },
   {
     "chainId": 4663,
