@@ -894,6 +894,22 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   to compare sessions until each has three. Verified the whole chain by dispatching the workflow
   by hand rather than assuming it: measure → corroborate → commit → push, all of it. 20 of 26
   pairings now agree in every reading and lift on the third.
+- 2026-09-04 — **The site now deploys itself, and the fallback workflow is gone.** The Vercel
+  project is linked to `BacBacta/Exdate` with `claude/lance-en5q6j` as its production branch, so
+  the record and the published pages can no longer drift: a collector's commit deploys the pages
+  that read it. Verified rather than assumed — the push at 08:33:55 produced a `git`-source
+  deployment **two seconds later** that reached `READY`, `target: production`, with the production
+  alias reassigned to it (`aliasAssigned: true`, `aliasError: null`), and the live root, the token
+  list and an unknown path answer 200 / 200 / 404. That settles the open question behind
+  `deploy-site.yml`: the `TEAM_ACCESS_REQUIRED` block is a property of **CLI** deploys, where
+  Vercel checks the commit author in the metadata the CLI attaches, and a git-connected deploy is
+  attributed to the installation instead — this deployment carried an agent-authored commit and
+  was not blocked. So the workflow is deleted rather than kept as insurance: it never deployed
+  anything (it waits on a `VERCEL_TOKEN` that does not exist), and a CI file that looks like it
+  publishes the site while the site is published by something else is worse than no file. The
+  durable-token path stays available in this entry if the link is ever removed: `VERCEL_ORG_ID`
+  `team_yvcPXxh5OyD9bGT9ogPgtNEw`, `VERCEL_PROJECT_ID` `prj_k3kFLnvN5qsU47DHRGhowCN9Ev2n`, and
+  `scripts/deploy-web.sh`, which uploads from a copy with no `.git` so there is no author to check.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -18,36 +18,7 @@ Add repository secrets under **Settings → Secrets and variables → Actions**,
 Optionally set the repository *variable* `EXDATE_SITE_URL` so the notices link to the right
 host. Nothing else changes: delivery is recorded in `data/effective-prices.observed.json`.
 
-## 2. Let the site deploy itself
-
-The Vercel project is **connected to no repository**: it only updates when someone
-deploys by hand. Seven collectors now commit data on their own schedules, so from here
-every one of those commits makes the published pages staler than the record in git —
-and "every number traces to a committed observation" stops being true once the two
-disagree.
-
-### Done: the project is linked to GitHub
-
-The Vercel GitHub App is installed and the project is linked to `BacBacta/Exdate` with
-`claude/lance-en5q6j` as its production branch, so every push deploys by itself — no
-token to store, rotate or leak.
-
-### Or this: give the workflow a durable token
-
-`.github/workflows/deploy-site.yml` is already written and needs three things:
-
-- secret `VERCEL_TOKEN` — a durable token from <https://vercel.com/account/tokens>.
-  Create it there and paste it straight into GitHub; it should never pass through a
-  chat or a file. The token used interactively expires after eight hours; an account
-  token does not.
-- variable `VERCEL_ORG_ID` = `team_yvcPXxh5OyD9bGT9ogPgtNEw`
-- variable `VERCEL_PROJECT_ID` = `prj_k3kFLnvN5qsU47DHRGhowCN9Ev2n`
-
-Both live under **Settings → Secrets and variables → Actions**, on the *Secrets* and
-*Variables* tabs. Until they exist the workflow runs, says what is missing, and exits
-without failing.
-
-## 3. Host the API and the status page
+## 2. Host the API and the status page
 
 `docker compose up -d` at the repository root brings up Postgres and the indexer, serving
 `/v1` on port 42069 (`Dockerfile`, `docker-compose.yml`, and *Hosting* in the README). Needs
@@ -57,13 +28,13 @@ quotas count per visitor rather than per proxy. `EXDATE_API_KEYS` turns on keys 
 Until this exists there is no public instance — the reference says so — and the signed
 webhook outbox has still never delivered anything.
 
-## 4. Choose a domain
+## 3. Choose a domain
 
 `exdate.xyz` belongs to an unrelated site. The name stands; the domain does not.
 `metadataBase` in `apps/web/app/layout.tsx` still names it and must change with the choice,
 as must `packages/sdk/README.md` and any `api.` subdomain.
 
-## 5. Publish the packages
+## 4. Publish the packages
 
 Both are prepared: `publishConfig` swaps `main`, `types` and `exports` to a `dist/` that
 `tsconfig.build.json` emits at publish time, checked with `pnpm pack`; the workspace keeps
@@ -76,7 +47,7 @@ pnpm --filter @exdate/sdk publish   # pnpm rewrites the workspace: range
 
 `packages/sdk/README.md` currently states that they are not published; update it after.
 
-## 6. Have counsel read the issuer's terms
+## 5. Have counsel read the issuer's terms
 
 Robinhood's developer-documentation terms (RHDA, LLC, 2026-08-24) grant a personal,
 revocable licence and forbid distributing "Robinhood Materials" to third parties or building

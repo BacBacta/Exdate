@@ -48,22 +48,39 @@ pnpm typecheck
 The poller writes its first rows within about a minute. Until then the page says so; it never
 shows a zero it has not observed.
 
-The public site is live at **https://exdate-bactas-projects.vercel.app** and deploys to Vercel from `vercel.json` at the repository root: one project builds
-the workspace (`pnpm --filter @exdate/web build`) and serves the static export from
-`apps/web/out`. `framework` is deliberately `null` rather than `nextjs` — the site is
-`output: 'export'`, so there is no server to detect and "run this command, serve this folder"
-behaves identically locally and on Vercel. From an agent container, deploy with
-`scripts/deploy-web.sh`: it uploads the tree from a copy without `.git`, because Vercel blocks a
-CLI deployment whose commit author is not a member of the team, and the commits here are the
-agent's.
+The public site is live at **https://exdate-bactas-projects.vercel.app** and deploys to Vercel
+from `vercel.json` at the repository root: one project builds the workspace
+(`pnpm --filter @exdate/web build`) and serves the static export from `apps/web/out`.
+`framework` is deliberately `null` rather than `nextjs` — the site is `output: 'export'`, so there
+is no server to detect and "run this command, serve this folder" behaves identically locally and
+on Vercel.
 
-Three GitHub Actions run in `.github/workflows`. `ci` typechecks, tests, builds the status page and
-proves the generated registry still matches the data it comes from. `archive-corporate-actions`
-runs daily, merges the issuer's window into `data/corporate-actions.archive.json` and commits it
-only when something changed — not housekeeping, since the issuer keeps about a month and every day
-it does not run is a day of dividend history that becomes unrecoverable. `measure-session-share`
-runs hourly and appends one sampled window to `data/session-share.observed.json`; it takes a week to
-cover the clock, which is why it is a schedule and not a script anyone runs once.
+**Deployment is automatic**: the project is connected to this repository with the default branch
+as its production branch, so every push builds and goes live. That is not a convenience — the
+collectors below commit on their own schedules, and a site that only updated by hand would start
+showing figures older than the files it claims to read. Deploying by hand is still possible from
+an agent container with `scripts/deploy-web.sh`, which uploads the tree from a copy without
+`.git`: Vercel blocks a **CLI** deployment whose commit author is not a member of the team, and
+the commits here are the agent's. A git-connected deployment is attributed to the installation
+instead and is not blocked, which is why the fallback deploy workflow was removed.
+
+Six GitHub Actions run in `.github/workflows`, and five of them are collectors: they exist because
+the things exdate measures are **not readable after the fact**. The issuer keeps about a month of
+corporate actions and quotes only the present; the chain keeps no archive state; a session's
+transfer rate is a rate, not a total. Every day one of these does not run is a day that cannot be
+recovered later.
+
+| Workflow | When | What it collects |
+|---|---|---|
+| `ci` | push | typecheck, tests, status-page build, and proof the generated registry still matches its data |
+| `archive-corporate-actions` | daily | merges the issuer's one-month window into `data/corporate-actions.archive.json`, and rebuilds the token list; commits only when something changed |
+| `capture-effective-prices` | every 5 min | watches for a `UIMultiplierUpdated` announcement and returns at `effectiveAt` to sample the issuer's quote — the price a haircut is computed from; also sends the alerts below |
+| `measure-session-share` | hourly | one sampled window into `data/session-share.observed.json`; it takes a week to cover the clock, which is why it is a schedule and not a script anyone runs once |
+| `measure-dex-feed-gap` | hourly | the distance between the traded price and the Chainlink answer per token, and the pairing corroboration built on it |
+| `measure-primary-flows` | daily | mint minus burn per token, in contiguous windows, so a delayed run loses nothing |
+
+Each commits to the default branch, which deploys the site — so the published pages and the
+committed record move together.
 
 ### Alerts
 
