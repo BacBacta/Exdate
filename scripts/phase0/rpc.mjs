@@ -1,10 +1,39 @@
-// Minimal JSON-RPC client with a global rate limiter.
+// Minimal JSON-RPC client with a global rate limiter and an ordered failover.
 //
 // The public Robinhood Chain endpoint answers 429 aggressively and times out on
 // wide eth_getLogs ranges, so every Phase 0 script funnels through here rather
 // than through a library that would fan out concurrent requests.
+//
+// Which endpoint answers first is a terms question before it is a reliability
+// one. Robinhood's Terms of Service (docs/terms-review.md) make the public RPC
+// a "Service", bind every Service to "testing, experimentation, evaluation, and
+// development purposes" (s2.4) and say the RPC is "not intended for
+// production-grade" use (s2.1) - while the chain itself is expressly NOT a
+// Service. A third-party endpoint is therefore outside the Terms entirely, and
+// it goes first. Robinhood's own stays as the fallback: a capture that cannot be
+// re-read must not be lost to a third party's outage, and a fallback that is
+// used only when the first endpoint fails is the smallest use of the Service
+// that keeps the record complete.
+//
+//   RHC_RPC_URLS=https://a,https://b   ordered list, tried left to right
+//   RHC_RPC_URL=https://a              one endpoint, no failover (kept for compatibility)
 
-const RPC_URL = process.env.RHC_RPC_URL || 'https://rpc.mainnet.chain.robinhood.com'
+const DEFAULT_RPC_URLS = [
+  // Measured in data/rpc-endpoints.observed.json: serves state at any height,
+  // reaches the oldest multiplier step, and takes a 2,000,000-block eth_getLogs -
+  // the same span Robinhood's does. Refuses browsers, which does not matter here.
+  'https://robinhood.api.pocket.network',
+  // The operator's own endpoint, fallback only.
+  'https://rpc.mainnet.chain.robinhood.com',
+]
+const configured = (process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '')
+  .split(',')
+  .map((u) => u.trim())
+  .filter(Boolean)
+const RPC_URLS = configured.length ? configured : DEFAULT_RPC_URLS
+const RPC_URL = RPC_URLS[0]
+/** A request that hangs would block the failover behind it, so none may. Wide scans measured under 5 s. */
+const REQUEST_TIMEOUT_MS = Number(process.env.RHC_RPC_TIMEOUT_MS || 25_000)
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -26,6 +55,7 @@ export function makeRpc(url, defaults = {}) {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       })
       if (res.status === 429) {
         await sleep(1500 * (attempt + 1))
@@ -45,10 +75,34 @@ export function makeRpc(url, defaults = {}) {
   }
 }
 
-export const rpc = makeRpc(RPC_URL)
+/**
+ * The endpoints in order, each with its own limiter. A call moves to the next
+ * endpoint on ANY failure from the current one - a network error, a timeout,
+ * exhausted retries, or an RPC error - because a third party's quirk must never
+ * cost a reading. A revert that is real reverts on every endpoint and surfaces
+ * as the last one's error, at the price of one extra call.
+ */
+export function makeFailoverRpc(urls, defaults = {}) {
+  const clients = urls.map((url) => ({ url, call: makeRpc(url, defaults) }))
+  if (clients.length === 0) throw new Error('no RPC endpoint configured')
+  return async function call(method, params, options = {}) {
+    const failures = []
+    for (const client of clients) {
+      try {
+        return await client.call(method, params, options)
+      } catch (error) {
+        failures.push(`${new URL(client.url).host}: ${String(error.message).slice(0, 140)}`)
+      }
+    }
+    throw new Error(`${method} failed on every endpoint - ${failures.join(' | ')}`)
+  }
+}
+
+export const rpc = makeFailoverRpc(RPC_URLS)
 
 export const hex = (n) => '0x' + BigInt(n).toString(16)
 export const RPC_URL_IN_USE = RPC_URL
+export const RPC_URLS_IN_USE = RPC_URLS
 
 // Function selectors used by the Phase 0 scripts.
 export const SELECTOR = {

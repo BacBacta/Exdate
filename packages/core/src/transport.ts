@@ -1,4 +1,4 @@
-import { http, type HttpTransportConfig, type Transport } from 'viem'
+import { fallback, http, type HttpTransportConfig, type Transport } from 'viem'
 
 /**
  * A transport built for the Robinhood Chain public RPC specifically.
@@ -127,4 +127,27 @@ export function throttledHttp(url: string, options: ThrottledHttpOptions = {}): 
       },
     } as ReturnType<Transport>
   }
+}
+
+/**
+ * The throttled transport over several endpoints, tried in order.
+ *
+ * Which endpoint comes first is a terms question before it is a reliability
+ * one (docs/terms-review.md): Robinhood's public RPC is a "Service" under its
+ * Terms, bound to "testing, experimentation, evaluation, and development"
+ * purposes and "not intended for production-grade" use, while the chain itself
+ * is expressly not a Service. So a third-party endpoint goes first and
+ * Robinhood's own answers only when it fails. viem's `fallback` moves to the
+ * next transport on an error; each inner transport has already retried its own
+ * rate limits by then, and `retryCount: 0` keeps the outer layer from
+ * multiplying those retries again. `rank: false` keeps the order as given.
+ */
+export function failoverHttp(urls: readonly string[], options: ThrottledHttpOptions = {}): Transport {
+  const [first, ...rest] = urls
+  if (!first) throw new Error('failoverHttp: no RPC endpoint configured')
+  if (rest.length === 0) return throttledHttp(first, options)
+  return fallback(
+    urls.map((url) => throttledHttp(url, options)),
+    { rank: false, retryCount: 0 },
+  )
 }

@@ -30,10 +30,10 @@ export default function Page() {
           <div className="wrap hero-grid">
             <div>
               <h1 id="hero-title" data-reveal>
-                See what your tokenized stock actually paid you.
+                See what your Stock Tokens actually paid you.
               </h1>
               <p className="lede" data-reveal style={delay(90)}>
-                When a tokenized stock pays a dividend, nothing lands in your wallet. The token
+                When a Stock Token pays a dividend, nothing lands in your wallet. The token
                 quietly becomes worth a little more. exdate measures exactly how much, and how
                 much went missing on the way.
               </p>
@@ -193,7 +193,7 @@ export default function Page() {
           <div className="wrap">
             <div className="block-head" data-reveal>
               <h2 id="coverage-title">Where it looks today</h2>
-              <p>Built for every chain that issues tokenized stocks. Measured wherever there is something real to measure.</p>
+              <p>Built for every issuer of tokenized real-world assets such as Stock Tokens. Measured wherever there is something real to measure.</p>
             </div>
             <LedgerHead cols={['Chain', 'Tokens', 'Price feeds', '']} />
             <ul className="ledger">

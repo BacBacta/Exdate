@@ -52,6 +52,13 @@ nowhere else.
   `node scripts/probe-rpc-endpoints.mjs`. Two independent endpoints agree at 20 M and 50 M blocks
   deep, three at 1 M, so the history is corroborated rather than taken from one witness.
   Set `RHC_RPC_URL_ARCHIVE` to use one.
+  - **Production reads go to a third party first, Robinhood's endpoint only as the fallback** —
+    since 2026-09-04, for a terms reason (`docs/terms-review.md`): the chain is outside Robinhood's
+    Terms, its public RPC is a "Service" bound to testing and development and "not intended for
+    production-grade" use. `scripts/phase0/rpc.mjs` (`makeFailoverRpc`, `RHC_RPC_URLS`) and the
+    indexer's `failoverHttp` carry the same order: `robinhood.api.pocket.network`, then Robinhood's.
+    The wallet page's balance read stays on Robinhood's RPC from the visitor's own browser, because
+    the browser-answering third parties cap logs at 1 000 blocks — stated on the page.
   - Archive is tested as **state that differs from latest**, never `block.number`: Multicall3's
     `getBlockNumber()` answers on any node, and an endpoint serving head state at every height
     would pass a naive test. The decisive check is `reachesOldestStep`, not an arbitrary depth: a
@@ -1161,6 +1168,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   Chainlink's terms render in JavaScript and could not be read from here — recorded as unread rather
   than paraphrased. The worst case is stated as what it is: contractual and personal to exdate —
   revocation, blocking, deletion of the archive, the indemnity — not a claim over facts.
+- 2026-09-04 — **The terms review acted on, without counsel: what could be removed was removed,
+  and the rest is named.** Six of Appendix A's eight items are in the repository. (1) Production
+  reads leave Robinhood's RPC: an ordered failover — `makeFailoverRpc` in the dependency-free
+  `scripts/phase0/rpc.mjs` for the watcher, the collectors and every script, and `failoverHttp`
+  (viem `fallback` over the throttled transport, `rank: false`, outer `retryCount: 0` so the inner
+  retries are not multiplied) for the indexer — puts `robinhood.api.pocket.network` first and
+  Robinhood's endpoint last, with `RHC_RPC_URLS` as the override and a 25 s request timeout so a
+  hanging endpoint cannot block the fallback behind it. Robinhood's own *Run a full node* page
+  settled the alternative: 64 GB RAM, terabytes of NVMe, an L1 endpoint, and "use the public
+  endpoints or a provider" — so a node was not built and a provider account is the owner's one
+  remaining step. Verified: the helper answered from pocket in 714 ms, Ponder came up on the
+  composed transport with 194/194 polled and a clean log. (3) The §5.7(b)(ii) disclaimer is in the
+  footer and the README. (4) "tokenized stock(s)" is gone from every surface that describes
+  Robinhood's product — title, OG image, lede, footer, README, token-list keyword — replaced by
+  "Stock Tokens" and the Terms' own "tokenized real-world assets such as Stock Tokens"; Coinbase's
+  product keeps Base's wording, which is Base's. (5) `LICENSE` exists, MIT, and every package
+  declares it. (6) The site stops mirroring the issuer's three files at `/data/`; the `/data/` page
+  lists them without a download, says whose they are, and links the repository. (7)
+  `DATA-LICENSE.md`: CC BY 4.0 over exdate's observations, with every `source: robinhood:*` field
+  and the three files carved out, because a non-sublicensable licence cannot be passed on. Also
+  fixed on the way: the token list's own `logoURI` still pointed at the old Vercel alias. What only
+  the owner can do is written where it belongs: the email to Robinhood (Appendix B), the
+  arbitration notice by post before 2026-10-31 (Appendix C), and a keyed provider.
 - _(append decisions here as they are made)_
 
 ## Status

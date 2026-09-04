@@ -260,6 +260,13 @@ and the first of those has a substitute today.
 
 ## Appendix A — Doing this without counsel
 
+*Status 2026-09-04: items 1, 3, 4, 5, 6 and 7 below are done in the repository; 2 and 8 need the
+owner's hand, and item 1's paid tier needs the owner's account. One use of Robinhood's RPC remains
+by design: `/wallet/` has each visitor's own browser read their balance through Robinhood's
+endpoint (one Multicall call, retried), because the third-party endpoints that answer browsers cap
+`eth_getLogs` at 1 000 blocks and the balance path needs none — that is a visitor evaluating their
+own holdings, which is the use the Terms name, and it is stated on the page.*
+
 Most of the exposure is removable by engineering and by one email. What remains is a risk taken
 knowingly, and §8 says what it is. In order:
 

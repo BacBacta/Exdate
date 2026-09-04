@@ -77,7 +77,7 @@ export function Footer() {
             <Mark />
             <span className="wordmark">exdate</span>
           </span>
-          <p>The corporate-action layer for tokenized stocks.</p>
+          <p>The corporate-action layer for Stock Tokens.</p>
         </div>
         <div>
           <h4>Use</h4>

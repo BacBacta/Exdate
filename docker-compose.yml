@@ -39,7 +39,10 @@ services:
     environment:
       DATABASE_URL: postgres://exdate:${POSTGRES_PASSWORD:-exdate}@db:5432/exdate
       DATABASE_SCHEMA: exdate
-      RHC_RPC_URL: ${RHC_RPC_URL:-https://rpc.mainnet.chain.robinhood.com}
+      # Empty means the code's own order: a third-party endpoint first, Robinhood's
+      # as the fallback (see .env.example and docs/terms-review.md).
+      RHC_RPC_URLS: ${RHC_RPC_URLS:-}
+      RHC_RPC_URL: ${RHC_RPC_URL:-}
       EXDATE_POLL_INTERVAL_BLOCKS: ${EXDATE_POLL_INTERVAL_BLOCKS:-600}
       # keys as key:label:requestsPerMinute, comma separated; empty = open at the anonymous rate
       EXDATE_API_KEYS: ${EXDATE_API_KEYS:-}
@@ -69,7 +72,10 @@ services:
       - .:/repo
       - ${EXDATE_WATCHER_SSH_DIR:-~/.ssh}:/root/.ssh:ro
     environment:
-      RHC_RPC_URL: ${RHC_RPC_URL:-https://rpc.mainnet.chain.robinhood.com}
+      # Empty means the code's own order: a third-party endpoint first, Robinhood's
+      # as the fallback (see .env.example and docs/terms-review.md).
+      RHC_RPC_URLS: ${RHC_RPC_URLS:-}
+      RHC_RPC_URL: ${RHC_RPC_URL:-}
       EXDATE_WATCH_TICK_MS: ${EXDATE_WATCH_TICK_MS:-30000}
       EXDATE_WATCH_HEARTBEAT_MS: ${EXDATE_WATCH_HEARTBEAT_MS:-21600000}
       EXDATE_WATCH_PUSH: ${EXDATE_WATCH_PUSH:-true}

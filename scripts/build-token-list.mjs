@@ -54,7 +54,7 @@ const formatWad = (value, places) => {
   return fraction ? `${whole}.${fraction}` : `${whole}`
 }
 
-const site = (process.env.EXDATE_SITE_URL ?? 'https://exdate-bactas-projects.vercel.app').replace(/\/+$/, '')
+const site = (process.env.EXDATE_SITE_URL || 'https://www.exdate.me').replace(/\/+$/, '')
 
 const tokens = []
 for (const asset of registry.assets ?? registry) {
@@ -117,7 +117,7 @@ const list = {
   // byte-identical, so a commit means the data changed and not that a job ran.
   timestamp: unchanged ? previous.timestamp : new Date().toISOString(),
   version,
-  keywords: ['tokenized stocks', 'robinhood', 'dividends', 'corporate actions'],
+  keywords: ['stock tokens', 'robinhood', 'dividends', 'corporate actions'],
   logoURI: `${site}/icon.svg`,
   tokens,
 }

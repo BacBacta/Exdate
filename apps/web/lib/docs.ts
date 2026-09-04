@@ -29,7 +29,18 @@ export interface Dataset {
   what: string
   observedAt: string | null
   bytes: number
+  /**
+   * True for the issuer's own files, copied from Robinhood's Stock Token API.
+   * They stay in the repository as the input the reconciliations are checked
+   * against and are not served from the site: exdate's licence to that content
+   * is personal and non-sublicensable (DATA-LICENSE.md). Rendered without a
+   * download link, and outside the CC BY 4.0 grant.
+   */
+  issuer: boolean
 }
+
+/** Kept in step with ISSUER_FILES in scripts/sync-public.mjs, which is what actually withholds them. */
+const ISSUER_FILES = new Set(['robinhood-assets.snapshot.json', 'robinhood-corporate-actions.snapshot.json', 'corporate-actions.archive.json'])
 
 const DATASETS: [string, string][] = [
   ['reconciliations.observed.json', 'Every dividend reconciled against its multiplier step: declared, arrived, the gap, the price at effect'],
@@ -61,6 +72,6 @@ const dateOf = (json: Record<string, unknown>): string | null => {
 export function datasets(): Dataset[] {
   return DATASETS.map(([file, what]) => {
     const raw = readFileSync(join(ROOT, 'data', file), 'utf8')
-    return { file, what, observedAt: dateOf(JSON.parse(raw) as Record<string, unknown>), bytes: Buffer.byteLength(raw) }
+    return { file, what, observedAt: dateOf(JSON.parse(raw) as Record<string, unknown>), bytes: Buffer.byteLength(raw), issuer: ISSUER_FILES.has(file) }
   })
 }

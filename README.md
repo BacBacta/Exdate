@@ -1,6 +1,6 @@
 # exdate
 
-**The corporate-action layer for tokenized stocks.**
+**The corporate-action layer for Stock Tokens.**
 
 Robinhood Stock Tokens don't pay cash dividends onchain — they raise an ERC-8056 multiplier that
 changes how many underlying shares each token represents, while raw balances stay put. Standard
@@ -189,8 +189,17 @@ The on-chain record is public. The issuer's registry and corporate-action feed c
 `api.robinhood.com/rhj`, which needs no key but sits under Robinhood's developer-documentation
 terms (RHDA, LLC): a personal, revocable licence that forbids distributing "Robinhood Materials" to
 third parties or building a competing product. Whether an archived JSON row is such material is a
-question for counsel before any of it is sold or licensed; this repository redistributes the feed's
-rows today, with their source named on every one.
+question for counsel before any of it is sold or licensed; this repository keeps the feed's rows,
+with their source named on every one, and the site no longer serves the issuer's files as
+downloadable datasets. exdate's own observations are under CC BY 4.0 with the issuer's fields
+carved out ([`DATA-LICENSE.md`](DATA-LICENSE.md)); the code is MIT ([`LICENSE`](LICENSE)).
+
+The same Terms bind every Service to "testing, experimentation, evaluation, and development"
+purposes and say the public RPC is "not intended for production-grade" use, while the chain
+itself is expressly not a Service. So production reads go to a measured third-party endpoint
+first and touch Robinhood's only as a fallback — `scripts/phase0/rpc.mjs` and the indexer's
+`failoverHttp` both carry that order, and `RHC_RPC_URLS` overrides it. A paid provider from
+Robinhood's own list adds the one thing the free endpoints lack, a service commitment.
 
 ### Verification scripts
 

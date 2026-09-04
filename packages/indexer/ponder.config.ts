@@ -1,7 +1,21 @@
-import { ROBINHOOD_CHAIN, stockTokenAbi, throttledHttp, tokenAddresses } from '@exdate/core'
+import { ROBINHOOD_CHAIN, failoverHttp, stockTokenAbi, tokenAddresses } from '@exdate/core'
 import { createConfig } from 'ponder'
 
-const rpcUrl = process.env.RHC_RPC_URL_ARCHIVE || process.env.RHC_RPC_URL || ROBINHOOD_CHAIN.defaultRpcUrl
+/**
+ * Endpoints in order, tried left to right. RHC_RPC_URL_ARCHIVE alone wins when
+ * set - that is the operator choosing to have Ponder own the whole history from
+ * one archive provider. Otherwise RHC_RPC_URLS, then RHC_RPC_URL, then the
+ * built-in order, which is the same one scripts/phase0/rpc.mjs carries (that
+ * file imports nothing, so the list is written twice on purpose): a measured
+ * third-party endpoint first, Robinhood's own only as the fallback. The reason
+ * is in docs/terms-review.md and on failoverHttp.
+ */
+const DEFAULT_RPC_URLS = ['https://robinhood.api.pocket.network', ROBINHOOD_CHAIN.defaultRpcUrl]
+const rpcUrls = (process.env.RHC_RPC_URL_ARCHIVE || process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '')
+  .split(',')
+  .map((u) => u.trim())
+  .filter(Boolean)
+const rpcUrlsInUse = rpcUrls.length ? rpcUrls : DEFAULT_RPC_URLS
 
 /**
  * Minimum gap between two RPC calls, ms. The public endpoint rejects roughly
@@ -43,7 +57,7 @@ export default createConfig({
       // Absorbs HTTP 429 internally. A surfaced 429 makes Ponder deactivate the
       // provider and collapse its sync range to the 25-block floor, from which
       // the backfill never recovers on this endpoint.
-      rpc: throttledHttp(rpcUrl, {
+      rpc: failoverHttp(rpcUrlsInUse, {
         minGapMs,
         timeout: 45_000,
         onThrottle: ({ method, attempt, delayMs }) => {

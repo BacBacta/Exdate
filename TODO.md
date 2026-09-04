@@ -90,16 +90,32 @@ checkout, push access proved with a dry run, the chain, a real issuer quote, and
 the issuer's own — the watcher wakes on that clock, so minutes of drift means missing windows.
 Add `--send-test-alert` to prove delivery. `EXDATE_WATCH_PUSH=false` runs it without committing.
 
-## 3. Optional: an archive endpoint you control
+## 3. An RPC provider with a commitment — the code already puts a third party first
 
-Two public third-party endpoints serve this chain's history and the project now uses one for the
-wallet page and for `scripts/verify-multiplier-history.mjs`
-(`data/rpc-endpoints.observed.json`). They cost nothing and carry no service commitment, which is
-fine for history, since anything read from them can be re-read. Nothing is blocked on this.
+**Done in code on 2026-09-04, for a terms reason** (`docs/terms-review.md` §2): Robinhood's public
+RPC is a "Service" bound to "testing, experimentation, evaluation, and development" and "not
+intended for production-grade" use, while the chain itself is expressly outside the Terms. So every
+production read now goes to a measured third-party endpoint first — `robinhood.api.pocket.network`,
+which serves state at any height, reaches the oldest step and takes the same 2 000 000-block
+`eth_getLogs` as Robinhood's — and touches Robinhood's endpoint only when that one fails. The order
+lives in `scripts/phase0/rpc.mjs` (the watcher, the collectors, every script) and in the indexer's
+`failoverHttp` (`packages/core/src/transport.ts`, viem `fallback` over the throttled transport);
+`RHC_RPC_URLS` overrides it. Verified: the helper answered `chainId 4663` from pocket in 714 ms, and
+Ponder came up on the composed transport, 194/194 tokens polled, zero errors in its log.
 
-Worth paying for only when you decide to index transfers, and the number to check first is not the
-node: 7–13 M transfers a day is roughly 75 GB of database a month. Both QuickNode and Chainstack
-list this chain; a keyless tier on the endpoint in use allows 300 requests a minute per IP.
+**Left to you, cheap**: an account with a provider from the list on
+<https://docs.robinhood.com/chain/run-a-full-node> — Alchemy, Quicknode, Chainstack, dRPC,
+Blockdaemon, Validation Cloud, GlobalStake. A free tier covers the watcher (one scan per 30 s) and
+most cover the indexer (~30 Multicall requests a minute); a paid tier buys what the free public
+endpoints do not have, a service commitment. Put its URL first in `RHC_RPC_URLS` — in
+`/opt/exdate/.env` for the watcher, `/opt/exdate-api/.env` for the API — and restart.
+
+Not worth doing: a node of your own. Robinhood's page asks for 64 GB RAM, several terabytes of NVMe
+and an Ethereum L1 endpoint, and says "if you just need an RPC endpoint, use the public endpoints or
+a provider".
+
+Transfer indexing is a separate question with a separate cost — roughly 75 GB of database a month —
+and nothing here changes it.
 
 ## 4. Host the API and the status page — done, live
 
@@ -214,11 +230,12 @@ legal advice; it is what makes counsel's hour count. The short version:
 - **EU database right** (Directive 96/9/EC) is a separate question the US Terms do not address.
 - **Arbitration opt-out closes on 2026-10-31** (§12.13, sixty days from first access, by post only).
 
-Cheap and lawyer-free, in the order Appendix A of the review gives them: a managed RPC provider
-for production reads (Robinhood's own node page says *use a provider* and lists seven — a node
-needs 64 GB RAM, several TB and an L1 endpoint), the email in Appendix B, the disclaimer (done),
-the wording decision, the `LICENSE` file, serving fewer issuer columns verbatim, and a data licence
-with a `source` carve-out. For counsel, in order: is `/rhj` a Service; does §2.4 permit a
+Cheap and lawyer-free, in the order Appendix A of the review gives them — **done on 2026-09-04
+unless marked**: production reads moved off Robinhood's RPC in code (item 3); the disclaimer; the
+wording ("Stock Tokens" everywhere Robinhood's product is described); the `LICENSE` file (MIT, as the
+packages already claimed); the issuer's files withheld from the site's `/data/` mirror; a data
+licence with a `source` carve-out (`DATA-LICENSE.md`). **Still yours**: the email in Appendix B, the
+arbitration notice in Appendix C before 2026-10-31, and a provider account (item 3). For counsel, in order: is `/rhj` a Service; does §2.4 permit a
 production product; the republication as it stands; the EU right; what can be licensed; the
 opt-out; Chainlink's terms, which render in JavaScript and were not readable from the workspace.
 And one option that changes the whole picture: §5.11 gives `robinhoodchain@robinhood.com` — a

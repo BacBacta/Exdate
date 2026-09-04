@@ -6,7 +6,7 @@ import { cents, observed } from '../lib/observed'
  * at build time from the same committed data as the page.
  */
 export const dynamic = 'force-static'
-export const alt = 'exdate — see what your tokenized stock actually paid you'
+export const alt = 'exdate — see what your Stock Tokens actually paid you'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -48,7 +48,7 @@ export default function Image() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
           <div style={{ fontSize: 62, fontWeight: 500, letterSpacing: -2.5, lineHeight: 1.05, maxWidth: 700 }}>
-            See what your tokenized stock actually paid you.
+            See what your Stock Tokens actually paid you.
           </div>
           <div style={{ fontSize: 27, color: '#605f59', lineHeight: 1.3, maxWidth: 700 }}>
             {`${pct}% of ${hero.name}’s last dividend never arrived on chain. Declared $${cents(hero.declared)}, arrived $${cents(hero.received)}.`}
