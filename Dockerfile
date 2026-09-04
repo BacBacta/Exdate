@@ -12,7 +12,10 @@ RUN corepack enable
 
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* ./
+# tsconfig.base.json is not optional here: every workspace tsconfig extends it,
+# and without it in the context the build fails with "extends: ../../tsconfig.base.json
+# doesn't resolve correctly" - found by building this image, not by reading it.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json .npmrc* ./
 COPY packages/core/package.json packages/core/
 COPY packages/api/package.json packages/api/
 COPY packages/sdk/package.json packages/sdk/

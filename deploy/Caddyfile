@@ -1,0 +1,41 @@
+# TLS and the two public names, in front of the compose network.
+#
+# Caddy gets and renews certificates from Let's Encrypt on its own; the only
+# requirement is that both names already resolve to this machine and that 80 and
+# 443 are open inbound, since the ACME HTTP challenge answers on 80.
+#
+# X-Forwarded-For is what makes the API's anonymous quota count per visitor
+# rather than per proxy - `reverse_proxy` sets it, and the API reads it in
+# packages/api/src/limits.ts. Nothing else here may be dropped for the same
+# reason: strip the header and every anonymous caller shares one bucket.
+#
+# The names come from EXDATE_API_HOST and EXDATE_STATUS_HOST in .env. They have
+# no default: a Caddyfile with a guessed hostname would ask Let's Encrypt for a
+# certificate on a domain that is not yours, and be rate-limited for it.
+
+{$EXDATE_API_HOST} {
+	encode zstd gzip
+
+	# The API answers cross-origin by design - a browser reading it is a
+	# supported consumer - so it sets its own CORS headers and Caddy must not
+	# add a second set. Two Access-Control-Allow-Origin headers is a refusal.
+	reverse_proxy indexer:42069
+
+	log {
+		output stdout
+		format console
+	}
+}
+
+{$EXDATE_STATUS_HOST} {
+	encode zstd gzip
+
+	# Server-rendered: this container reads the API over the compose network,
+	# so the API's address never reaches the browser.
+	reverse_proxy status:3000
+
+	log {
+		output stdout
+		format console
+	}
+}
