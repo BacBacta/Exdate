@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-04T01:28:27.000Z",
-  "sampleCount": 20,
-  "easternHourOfWeekSlotsCovered": 19,
+  "lastSampleAt": "2026-09-04T02:30:08.000Z",
+  "sampleCount": 21,
+  "easternHourOfWeekSlotsCovered": 20,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -24,7 +24,7 @@
   ],
   "transferShare": null,
   "provableTradeShare": null,
-  "pooledOffHoursShareOfSampledTransfers": 0.6289,
+  "pooledOffHoursShareOfSampledTransfers": 0.6466,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -75,13 +75,13 @@
       "label": "overnight 20:00-04:00 ET",
       "offHours": true,
       "hoursPerWeek": 40,
-      "samples": 3,
-      "transfersSampled": 10031,
-      "secondsSampled": 122,
-      "transfersPerSecondMean": 82.037,
+      "samples": 4,
+      "transfersSampled": 13871,
+      "secondsSampled": 162,
+      "transfersPerSecondMean": 85.528,
       "transfersPerSecondMin": 37,
       "transfersPerSecondMax": 149.512,
-      "provableTradesPerSecondMean": 25.149
+      "provableTradesPerSecondMean": 24.881
     },
     {
       "session": "weekend",
@@ -377,6 +377,20 @@
       "transactionsMovingAToken": 2113,
       "provableTrades": 1918,
       "provableTradesPerSecond": 46.78
+    },
+    {
+      "observedAt": "2026-09-04T02:30:08.000Z",
+      "session": "overnight",
+      "easternHourOfWeek": 118,
+      "fromBlock": 53910124,
+      "headBlock": 53910523,
+      "windowBlocks": 400,
+      "windowSeconds": 40,
+      "transfers": 3840,
+      "transfersPerSecond": 96,
+      "transactionsMovingAToken": 1149,
+      "provableTrades": 963,
+      "provableTradesPerSecond": 24.075
     }
   ]
 }
