@@ -285,6 +285,12 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                         <a href={step.txUrl} rel="noopener">
                           transaction
                         </a>
+                        {/*
+                          Nothing is emitted on chain when a change takes effect, so this
+                          says the change was read in the chain's own state at that block
+                          rather than worked out from the clock.
+                        */}
+                        {step.confirmedAtBlock === null ? null : <> · confirmed in state at block {step.confirmedAtBlock}</>}
                       </span>
                     </div>
                     <div className="amt">

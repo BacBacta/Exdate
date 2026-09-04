@@ -1,0 +1,244 @@
+{
+  "note": "Every multiplier step confirmed against the chain's own state. ERC-8056 emits UIMultiplierUpdated once, at announcement, carrying a future effectiveAt, and emits NOTHING when the change takes effect - so until an archive endpoint was found, the application was derived from the clock rather than observed. Reading uiMultiplier() at the block before effectiveAt and at the block itself makes the transition a measurement.",
+  "method": "Two eth_call reads per step at the straddling blocks, plus two at the announcement block to observe the scheduled-but-not-applied state. Blocks come from data/effective-blocks.json, resolved by bisection over block headers.",
+  "archiveEndpoint": "https://rpc-robinhood.blockmachine.io",
+  "archiveIsThirdParty": true,
+  "observedAt": "2026-09-04T11:20:16.658Z",
+  "summary": {
+    "steps": 12,
+    "transitionConfirmed": 12,
+    "transitionDisagrees": 0,
+    "unreadable": 0,
+    "pendingStateConfirmed": 12
+  },
+  "steps": [
+    {
+      "token": "0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931",
+      "symbol": "CRWD",
+      "effectiveAt": "2026-07-02T13:30:00Z",
+      "announcedBlock": 1231096,
+      "effectiveBlock": 1267585,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "4000000000000000000",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "4000000000000000000",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "4000000000000000000"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-07-08T20:14:32Z",
+      "announcedBlock": 4629631,
+      "effectiveBlock": 4635248,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000957519890990718",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000957519890990718",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000957519890990718"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
+      "symbol": "MU",
+      "effectiveAt": "2026-07-24T15:10:24Z",
+      "announcedBlock": 18239875,
+      "effectiveBlock": 18245701,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000074823219171086",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000074823219171086",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000074823219171086"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0xb0992820e760d836549ba69bc7598b4af75dee03",
+      "symbol": "ORCL",
+      "effectiveAt": "2026-07-27T15:10:23Z",
+      "announcedBlock": 20823272,
+      "effectiveBlock": 20829027,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1002210914971013375",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1002210914971013375",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1002210914971013375"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
+      "symbol": "DELL",
+      "effectiveAt": "2026-08-03T15:10:23Z",
+      "announcedBlock": 26853518,
+      "effectiveBlock": 26859241,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000063708620124549",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000063708620124549",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000063708620124549"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x47f93d52cbec7c6d2cfc080e154002370a60daea",
+      "symbol": "ASML",
+      "effectiveAt": "2026-08-06T15:10:25Z",
+      "announcedBlock": 29439914,
+      "effectiveBlock": 29445528,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000101323251417769",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000101323251417769",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000101323251417769"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-08-07T15:10:24Z",
+      "announcedBlock": 30302195,
+      "effectiveBlock": 30308049,
+      "declaredOldMultiplier": "1000957519890990718",
+      "declaredNewMultiplier": "1002981519346766532",
+      "stateBefore": "1000957519890990718",
+      "stateAfter": "1002981519346766532",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000957519890990718",
+        "newUIMultiplier": "1002981519346766532"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2",
+      "symbol": "COST",
+      "effectiveAt": "2026-08-10T15:10:24Z",
+      "announcedBlock": 32889913,
+      "effectiveBlock": 32895477,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000612040296259656",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000612040296259656",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000612040296259656"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
+      "symbol": "AAPL",
+      "effectiveAt": "2026-08-14T15:12:46Z",
+      "announcedBlock": 36345344,
+      "effectiveBlock": 36351132,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000566080061092436",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000566080061092436",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000566080061092436"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
+      "symbol": "CCL",
+      "effectiveAt": "2026-08-31T15:10:26Z",
+      "announcedBlock": 50955407,
+      "effectiveBlock": 50960761,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1021486444855206408",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1021486444855206408",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1021486444855206408"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+      "symbol": "SGOV",
+      "effectiveAt": "2026-09-01T00:00:26Z",
+      "announcedBlock": 51269236,
+      "effectiveBlock": 51274920,
+      "declaredOldMultiplier": "1002981519346766532",
+      "declaredNewMultiplier": "1005101770003214918",
+      "stateBefore": "1002981519346766532",
+      "stateAfter": "1005101770003214918",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1002981519346766532",
+        "newUIMultiplier": "1005101770003214918"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+      "symbol": "F",
+      "effectiveAt": "2026-09-02T15:10:26Z",
+      "announcedBlock": 52665452,
+      "effectiveBlock": 52671215,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1000145502866134027",
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1000145502866134027",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1000145502866134027"
+      },
+      "pendingAtAnnouncement": true
+    }
+  ]
+}

@@ -1,0 +1,354 @@
+{
+  "note": "Every public RPC endpoint for Robinhood Chain, probed for what it can actually do. Robinhood's own endpoint serves no archive, which is why this repository long recorded that the chain has none; that is false of the chain. Archive is tested with a state read whose value must DIFFER from latest, since block.number answers on any node and head state served for every height would otherwise pass.",
+  "chainId": 4663,
+  "probeToken": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+  "discoveredFrom": [
+    "chainlist.org",
+    "chainid.network"
+  ],
+  "observedAt": "2026-09-04T11:22:18.072Z",
+  "summary": {
+    "discovered": 8,
+    "reachable": 5,
+    "servingArchive": 3,
+    "deepestArchiveHost": "robinhood.api.pocket.network",
+    "widestLogSpanHost": "rpc.mainnet.chain.robinhood.com"
+  },
+  "crossChecks": [
+    {
+      "depth": 100000,
+      "witnesses": 2,
+      "agree": true,
+      "hosts": [
+        "robinhood.rpc.blxrbdn.com",
+        "rpc-robinhood.blockmachine.io"
+      ]
+    },
+    {
+      "depth": 1000000,
+      "witnesses": 3,
+      "agree": true,
+      "hosts": [
+        "robinhood.rpc.blxrbdn.com",
+        "robinhood.api.pocket.network",
+        "rpc-robinhood.blockmachine.io"
+      ]
+    },
+    {
+      "depth": 20000000,
+      "witnesses": 2,
+      "agree": true,
+      "hosts": [
+        "robinhood.api.pocket.network",
+        "rpc-robinhood.blockmachine.io"
+      ]
+    },
+    {
+      "depth": 50000000,
+      "witnesses": 2,
+      "agree": true,
+      "hosts": [
+        "robinhood.api.pocket.network",
+        "rpc-robinhood.blockmachine.io"
+      ]
+    }
+  ],
+  "caveat": "These are third-party public endpoints with no service commitment. They are sound for history, which can be re-read at any time, and must not be depended on for a capture that cannot be re-read.",
+  "endpoints": [
+    {
+      "url": "https://rpc.mainnet.chain.robinhood.com",
+      "host": "rpc.mainnet.chain.robinhood.com",
+      "reachable": true,
+      "chainId": 4663,
+      "head": 54225870,
+      "latestSupply": "15152871181750000000000",
+      "archive": {
+        "5000": {
+          "block": 54220870,
+          "answered": true,
+          "supply": "15152871181750000000000",
+          "differsFromLatest": false
+        },
+        "100000": {
+          "block": 54125870,
+          "answered": false,
+          "error": "metadata is not found, 54125873"
+        },
+        "1000000": {
+          "block": 53225870,
+          "answered": false,
+          "error": "metadata is not found, 53225873"
+        },
+        "20000000": {
+          "block": 34225870,
+          "answered": false,
+          "error": "metadata is not found, 34225873"
+        },
+        "50000000": {
+          "block": 4225870,
+          "answered": false,
+          "error": "metadata is not found, 4225873"
+        }
+      },
+      "deepestArchiveDepth": 0,
+      "servesArchive": false,
+      "logs": {
+        "2000000": {
+          "accepted": true,
+          "logs": 1,
+          "ms": 55
+        }
+      },
+      "widestLogSpan": 2000000,
+      "answersBrowsers": true
+    },
+    {
+      "url": "https://robinhood.rpc.blxrbdn.com",
+      "host": "robinhood.rpc.blxrbdn.com",
+      "reachable": true,
+      "chainId": 4663,
+      "head": 54225847,
+      "latestSupply": "15152871181750000000000",
+      "archive": {
+        "5000": {
+          "block": 54220847,
+          "answered": true,
+          "supply": "15152871181750000000000",
+          "differsFromLatest": false
+        },
+        "100000": {
+          "block": 54125847,
+          "answered": true,
+          "supply": "14849546887590000000000",
+          "differsFromLatest": true
+        },
+        "1000000": {
+          "block": 53225847,
+          "answered": true,
+          "supply": "14624363359480000000000",
+          "differsFromLatest": true
+        },
+        "20000000": {
+          "block": 34225847,
+          "answered": false,
+          "error": "missing trie node c0931c69cdc969ae392b08b997ed7a3dc7b36e3db4a141f6d2a99f5aa24316f3 (path ) state 0xc0931c69cdc969ae392b0"
+        },
+        "50000000": {
+          "block": 4225847,
+          "answered": false,
+          "error": "missing trie node bd72104f26fc6dd5a544ffb4462f1b0808be9da47a94a31abcd07d941893a45d (path ) state 0xbd72104f26fc6dd5a544f"
+        }
+      },
+      "deepestArchiveDepth": 1000000,
+      "servesArchive": true,
+      "logs": {
+        "1000": {
+          "accepted": false,
+          "error": "HTTP 403, not JSON"
+        },
+        "10000": {
+          "accepted": false,
+          "error": "HTTP 403, not JSON"
+        },
+        "100000": {
+          "accepted": false,
+          "error": "HTTP 403, not JSON"
+        },
+        "2000000": {
+          "accepted": false,
+          "error": "HTTP 403, not JSON"
+        }
+      },
+      "widestLogSpan": 0,
+      "answersBrowsers": true
+    },
+    {
+      "url": "https://robinhood-rpc.publicnode.com",
+      "host": "robinhood-rpc.publicnode.com",
+      "reachable": true,
+      "chainId": 4663,
+      "head": 54225895,
+      "latestSupply": "15152871181750000000000",
+      "archive": {
+        "5000": {
+          "block": 54220895,
+          "answered": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "100000": {
+          "block": 54125895,
+          "answered": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "1000000": {
+          "block": 53225895,
+          "answered": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "20000000": {
+          "block": 34225895,
+          "answered": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "50000000": {
+          "block": 4225895,
+          "answered": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        }
+      },
+      "deepestArchiveDepth": 0,
+      "servesArchive": false,
+      "logs": {
+        "1000": {
+          "accepted": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "10000": {
+          "accepted": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "100000": {
+          "accepted": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        },
+        "2000000": {
+          "accepted": false,
+          "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+        }
+      },
+      "widestLogSpan": 0,
+      "answersBrowsers": true
+    },
+    {
+      "url": "https://robinhood.api.pocket.network",
+      "host": "robinhood.api.pocket.network",
+      "reachable": true,
+      "chainId": 4663,
+      "head": 54225908,
+      "latestSupply": "15152871181750000000000",
+      "archive": {
+        "5000": {
+          "block": 54220908,
+          "answered": true,
+          "supply": "15152871181750000000000",
+          "differsFromLatest": false
+        },
+        "100000": {
+          "block": 54125908,
+          "answered": false,
+          "error": "historical state 2b3816699260444876cf0dca901761ab9e92bbb6e533e489579f7d0a62c2ecb7 is not available"
+        },
+        "1000000": {
+          "block": 53225908,
+          "answered": true,
+          "supply": "14624363359480000000000",
+          "differsFromLatest": true
+        },
+        "20000000": {
+          "block": 34225908,
+          "answered": true,
+          "supply": "5802761000000000000000",
+          "differsFromLatest": true
+        },
+        "50000000": {
+          "block": 4225908,
+          "answered": true,
+          "supply": "1406977000000000000000",
+          "differsFromLatest": true
+        }
+      },
+      "deepestArchiveDepth": 50000000,
+      "servesArchive": true,
+      "logs": {
+        "2000000": {
+          "accepted": true,
+          "logs": 1,
+          "ms": 1879
+        }
+      },
+      "widestLogSpan": 2000000,
+      "answersBrowsers": false
+    },
+    {
+      "url": "https://lb.routeme.sh/rpc/evm/4663",
+      "host": "lb.routeme.sh",
+      "reachable": false,
+      "error": "public rate limit exceeded — sign up for free at https://routeme.sh to continue (economy and performance routing at comp"
+    },
+    {
+      "url": "https://rpc.nodeflare.app/robinhood/public",
+      "host": "rpc.nodeflare.app",
+      "reachable": false,
+      "error": "HTTP 403, not JSON"
+    },
+    {
+      "url": "https://rpc-robinhood.blockmachine.io",
+      "host": "rpc-robinhood.blockmachine.io",
+      "reachable": true,
+      "chainId": 4663,
+      "head": 54225979,
+      "latestSupply": "15152871181750000000000",
+      "archive": {
+        "5000": {
+          "block": 54220979,
+          "answered": true,
+          "supply": "15152871181750000000000",
+          "differsFromLatest": false
+        },
+        "100000": {
+          "block": 54125979,
+          "answered": true,
+          "supply": "14849546887590000000000",
+          "differsFromLatest": true
+        },
+        "1000000": {
+          "block": 53225979,
+          "answered": true,
+          "supply": "14624363359480000000000",
+          "differsFromLatest": true
+        },
+        "20000000": {
+          "block": 34225979,
+          "answered": true,
+          "supply": "5802761000000000000000",
+          "differsFromLatest": true
+        },
+        "50000000": {
+          "block": 4225979,
+          "answered": true,
+          "supply": "1406977000000000000000",
+          "differsFromLatest": true
+        }
+      },
+      "deepestArchiveDepth": 50000000,
+      "servesArchive": true,
+      "logs": {
+        "1000": {
+          "accepted": true,
+          "logs": 0,
+          "ms": 496
+        },
+        "10000": {
+          "accepted": false,
+          "error": "block range exceeds maximum allowed (max=10000, requested=10001) — the range is INCLUSIVE, so page with to = from + 9999"
+        },
+        "100000": {
+          "accepted": false,
+          "error": "block range exceeds maximum allowed (max=10000, requested=100001) — the range is INCLUSIVE, so page with to = from + 999"
+        },
+        "2000000": {
+          "accepted": false,
+          "error": "block range exceeds maximum allowed (max=10000, requested=2000001) — the range is INCLUSIVE, so page with to = from + 99"
+        }
+      },
+      "widestLogSpan": 1000,
+      "answersBrowsers": true
+    },
+    {
+      "url": "https://rpc.arrowrpc.com",
+      "host": "rpc.arrowrpc.com",
+      "reachable": false,
+      "error": "HTTP 530, not JSON"
+    }
+  ]
+}

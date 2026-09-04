@@ -19,6 +19,7 @@ import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 import gapJson from '../../../data/dex-feed-gap.observed.json'
+import stateVerificationJson from '../../../data/multiplier-state-verification.json'
 import effectivePricesJson from '../../../data/effective-prices.observed.json'
 import cadenceJson from '../../../data/capture-cadence.observed.json'
 
@@ -411,6 +412,13 @@ export function tokenPage(address: string) {
       stepBps: event.stepBps,
       leadMinutes: Math.round(event.leadMinutes),
       txUrl: `${EXPLORER}/tx/${event.tx}`,
+      /**
+       * The block at which the change was seen to take effect in the chain's own
+       * state. ERC-8056 emits nothing at that moment, so before this was read the
+       * application was derived from the clock. Null when the step has not been
+       * checked against state.
+       */
+      confirmedAtBlock: stateConfirmed.get(`${event.token.toLowerCase()}:${event.effectiveAt}`) ?? null,
     }))
     .reverse()
 
@@ -706,6 +714,18 @@ export const flows = (() => {
  * one reading during one session says nothing about how the gap behaves across a week,
  * and this refuses rather than implies it.
  */
+/**
+ * Steps whose transition was observed in state: uiMultiplier() read at the block
+ * before effectiveAt and at the block itself, both agreeing with the announcement
+ * log. Keyed on token and instant, so a step the check could not read is simply
+ * absent rather than reported as confirmed.
+ */
+const stateConfirmed = new Map<string, number>(
+  (stateVerificationJson as unknown as { steps: { token: string; effectiveAt: string; effectiveBlock: number; transitionObserved: boolean | null }[] }).steps
+    .filter((step) => step.transitionObserved === true)
+    .map((step) => [`${step.token.toLowerCase()}:${step.effectiveAt}`, step.effectiveBlock]),
+)
+
 export const gap = (() => {
   const SESSIONS = ['pre_market', 'regular', 'after_hours', 'overnight', 'weekend'] as const
   const MINIMUM_SAMPLES = 3

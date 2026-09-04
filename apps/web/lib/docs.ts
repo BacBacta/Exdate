@@ -35,6 +35,8 @@ const DATASETS: [string, string][] = [
   ['reconciliations.observed.json', 'Every dividend reconciled against its multiplier step: declared, arrived, the gap, the price at effect'],
   ['multiplier-events.observed.json', 'Every UIMultiplierUpdated log since public mainnet, from a whole-chain scan'],
   ['effective-blocks.json', 'The block at which each multiplier change took effect, resolved by bisection'],
+  ['multiplier-state-verification.json', "Every step read back in the chain's own state at the blocks straddling it, since nothing is emitted when a change takes effect"],
+  ['rpc-endpoints.observed.json', 'Every public RPC endpoint for this chain, probed for archive depth and log limits'],
   ['corporate-actions.archive.json', "The issuer's corporate-action feed, archived daily since it keeps only a month"],
   ['robinhood-assets.snapshot.json', "The issuer's token registry: 194 assets, addresses, ISINs, multipliers"],
   ['chainlink-feeds.snapshot.json', "Chainlink's feed directory for Robinhood Chain"],
