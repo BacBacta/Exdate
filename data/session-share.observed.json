@@ -9,9 +9,9 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-04T13:21:27.000Z",
-  "sampleCount": 31,
-  "easternHourOfWeekSlotsCovered": 30,
+  "lastSampleAt": "2026-09-04T14:21:35.000Z",
+  "sampleCount": 32,
+  "easternHourOfWeekSlotsCovered": 31,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": false,
@@ -24,7 +24,7 @@
   ],
   "transferShare": null,
   "provableTradeShare": null,
-  "pooledOffHoursShareOfSampledTransfers": 0.7815,
+  "pooledOffHoursShareOfSampledTransfers": 0.7549,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -49,13 +49,13 @@
       "label": "regular session 09:30-16:00 ET",
       "offHours": false,
       "hoursPerWeek": 32.5,
-      "samples": 6,
-      "transfersSampled": 28482,
-      "secondsSampled": 253,
-      "transfersPerSecondMean": 112.02,
+      "samples": 7,
+      "transfersSampled": 33082,
+      "secondsSampled": 290,
+      "transfersPerSecondMean": 113.777,
       "transfersPerSecondMin": 59.683,
       "transfersPerSecondMax": 149.568,
-      "provableTradesPerSecondMean": 25.607
+      "provableTradesPerSecondMean": 25.509
     },
     {
       "session": "after_hours",
@@ -531,6 +531,20 @@
       "transactionsMovingAToken": 992,
       "provableTrades": 798,
       "provableTradesPerSecond": 19.95
+    },
+    {
+      "observedAt": "2026-09-04T14:21:35.000Z",
+      "session": "regular",
+      "easternHourOfWeek": 130,
+      "fromBlock": 54331930,
+      "headBlock": 54332329,
+      "windowBlocks": 400,
+      "windowSeconds": 37,
+      "transfers": 4600,
+      "transfersPerSecond": 124.324,
+      "transactionsMovingAToken": 1182,
+      "provableTrades": 922,
+      "provableTradesPerSecond": 24.919
     }
   ]
 }
