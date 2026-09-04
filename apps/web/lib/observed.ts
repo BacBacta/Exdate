@@ -17,6 +17,7 @@ import reconciliationsJson from '../../../data/reconciliations.observed.json'
 import registryJson from '../../../data/robinhood-assets.snapshot.json'
 import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
+import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 
 // The JSON files are cast to the handful of fields the page reads, so a field
 // the page does not use can change shape without touching this module.
@@ -107,6 +108,20 @@ const archive = archiveJson as unknown as {
   actions: ArchivedAction[]
 }
 const base = baseJson as unknown as { verifiedAt: string; summary: { tokens: number; feeds: number } }
+const primaryFlows = primaryFlowsJson as unknown as {
+  windows: {
+    fromTime: string
+    toTime: string
+    hours: number
+    incomplete: boolean
+    precededByGap: boolean
+    tokensWithFlow: number
+    mints: number
+    burns: number
+    netCreated: string
+    tokens: { token: string; symbol: string | null; minted: string; burned: string; net: string; mints: number; burns: number }[]
+  }[]
+}
 const effectiveBlocks = effectiveBlocksJson as unknown as {
   resolvedAt: string
   blocks: {
@@ -600,6 +615,44 @@ export const delivery = (() => {
       tokensWithFeed: feedMap.pairs.length,
       tokens: tokens.length,
     },
+  }
+})()
+
+/**
+ * Creations and redemptions, from the chain: mint is a Transfer from address(0),
+ * burn is a Transfer to it, and the difference is net creation - what an ETF
+ * publishes as net flow and what nobody publishes for these tokens. The issuer's own
+ * endpoint carries gross turnover with no sign and no history.
+ *
+ * A window is only ever what was actually read: an incomplete one says so rather than
+ * letting an unread range read as a zero.
+ */
+export const flows = (() => {
+  const windows = primaryFlows.windows ?? []
+  const latest = windows.at(-1)
+  if (!latest) return null
+  const rows = latest.tokens
+    .map((row) => ({
+      ...row,
+      name: nameByAddress.get(row.token.toLowerCase()) ?? row.symbol ?? row.token,
+      netNumber: Number(row.net),
+    }))
+    .sort((a, b) => Math.abs(b.netNumber) - Math.abs(a.netNumber))
+  return {
+    windows: windows.length,
+    from: latest.fromTime,
+    to: latest.toTime,
+    hours: latest.hours,
+    incomplete: latest.incomplete,
+    precededByGap: latest.precededByGap,
+    tokensWithFlow: latest.tokensWithFlow,
+    mints: latest.mints,
+    burns: latest.burns,
+    netCreated: latest.netCreated,
+    created: rows.filter((row) => row.netNumber > 0),
+    redeemed: rows.filter((row) => row.netNumber < 0),
+    /** Hours the whole committed ledger covers, so a reader can see it is a series. */
+    ledgerHours: Number(windows.reduce((sum, w) => sum + w.hours, 0).toFixed(2)),
   }
 })()
 
