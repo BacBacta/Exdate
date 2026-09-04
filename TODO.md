@@ -26,7 +26,18 @@ GitHub cron that fires every 7 to 25 minutes in practice
 (`data/capture-cadence.observed.json`); at the nine-minute budget that catches about 70 % of steps.
 A process that is always there catches all of them.
 
-Take any small VPS, Debian or Ubuntu, 1 GB is plenty (the watcher measures 78 MB). Then, as root:
+Take any small VPS, Debian or Ubuntu, 1 GB is plenty (the watcher measures 78 MB).
+
+On Hetzner Cloud specifically, four choices matter and one of them costs money if you get it wrong:
+
+| Choice | Take | Why |
+|---|---|---|
+| Public IP | **IPv4 on**, IPv6 optional | Verified over DNS: `github.com`, `ssh.github.com` and `api.robinhood.com` publish **no AAAA record**. An IPv6-only server cannot push, and cannot read the quote it exists to capture. Hetzner bills the IPv4 separately, and it is not optional here. |
+| Image | Ubuntu 24.04 | What `deploy/install.sh` expects and was exercised on. |
+| Type | the smallest shared-vCPU | The watcher measures 78 MB. Prefer x86 (CX/CPX) over ARM (CAX) only if this box will later also run the API and Postgres from item 4. |
+| Firewall | inbound 22 only; leave outbound alone | Hetzner's default firewall allows all outbound. If you add rules, the watcher needs outbound 443 and 22 (or 443 to `ssh.github.com`, which the installer falls back to). |
+
+Add your own SSH key in the creation form rather than taking a root password by email. Then, as root:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/install.sh | bash

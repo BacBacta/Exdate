@@ -143,12 +143,23 @@ else
 fi
 
 say "6. Service"
-install -m 644 "$DIR/deploy/exdate-watcher.service" /etc/systemd/system/exdate-watcher.service
+# The unit ships with the defaults baked in; substitute whatever this run used,
+# or a non-default EXDATE_USER/EXDATE_DIR would install a unit pointing at a
+# path that does not exist. node's path is resolved too rather than assumed to
+# be /usr/bin on every distribution.
+NODE_BIN="$(command -v node)"
+sed -e "s#^User=.*#User=$USER_NAME#" \
+    -e "s#^WorkingDirectory=.*#WorkingDirectory=$DIR#" \
+    -e "s#^EnvironmentFile=.*#EnvironmentFile=-$DIR/.env#" \
+    -e "s#^ReadWritePaths=.*#ReadWritePaths=$DIR#" \
+    -e "s#^ExecStart=.*#ExecStart=$NODE_BIN scripts/watch-effective-prices.mjs#" \
+    "$DIR/deploy/exdate-watcher.service" > /etc/systemd/system/exdate-watcher.service
+chmod 644 /etc/systemd/system/exdate-watcher.service
 systemctl daemon-reload
-note "installed exdate-watcher.service"
+note "installed exdate-watcher.service (user $USER_NAME, dir $DIR, node $NODE_BIN)"
 
 say "7. Preflight"
-if sudo -u "$USER_NAME" --preserve-env=HOME env HOME="/home/$USER_NAME" node "$DIR/scripts/check-watcher.mjs"; then
+if sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" "$NODE_BIN" "$DIR/scripts/check-watcher.mjs"; then
   systemctl enable --now exdate-watcher
   sleep 3
   systemctl is-active --quiet exdate-watcher && note "running" || die "service failed to start: journalctl -u exdate-watcher"
