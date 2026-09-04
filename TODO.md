@@ -100,11 +100,22 @@ quotas count per visitor rather than per proxy. `EXDATE_API_KEYS` turns on keys 
 Until this exists there is no public instance — the reference says so — and the signed
 webhook outbox has still never delivered anything.
 
-## 5. Choose a domain
+## 5. Choose a domain — done: exdate.me
 
-`exdate.xyz` belongs to an unrelated site. The name stands; the domain does not.
-`metadataBase` in `apps/web/app/layout.tsx` still names it and must change with the choice,
-as must `packages/sdk/README.md` and any `api.` subdomain.
+**Bought and live on 2026-09-04.** `exdate.me` resolves to Vercel and 308-redirects to
+`https://www.exdate.me/`, which serves the site. `www` is therefore the canonical host and is what
+`metadataBase` names; `NEXT_PUBLIC_EXDATE_SITE_URL` overrides it if that ever changes.
+
+`exdate.xyz` from the 2026-09-02 naming decision belongs to an unrelated site and is now referenced
+nowhere in the product.
+
+Not deducing it from the platform was deliberate, and measured: `VERCEL_PROJECT_PRODUCTION_URL` is
+documented as the project's production domain, and on the live build Vercel filled it with the
+claimed `*.vercel.app` alias rather than the custom domain — so the share cards named the alias.
+The canonical host is a fact, so it is written down.
+
+Two subdomains are reserved by this choice and are not live yet: `api.exdate.me` and
+`status.exdate.me`, both waiting on item 4.
 
 ## 6. Publish the packages
 

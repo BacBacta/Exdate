@@ -477,9 +477,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 
 - 2026-09-01 — exdate targets Robinhood Chain (194 tokens, public data gap) rather than Base
   (4 tokens). Base remains a planned second issuer for neutrality.
-- 2026-09-02 — Name: **exdate**. Repo `exdate`, API `api.exdate.xyz`, SDK `@exdate/sdk`.
+- 2026-09-02 — Name: **exdate**. Repo `exdate`, SDK `@exdate/sdk`.
   *(2026-09-03: `exdate.xyz` turned out to belong to someone else — see the entry of that day. The
-  name stands; the domain does not.)*
+  name stands; the domain did not. 2026-09-04: the domain is **`exdate.me`**, and the canonical host
+  is `https://www.exdate.me` — the apex 308-redirects there. `api.exdate.me` and `status.exdate.me`
+  are reserved and not yet live.)*
 - 2026-09-02 — Phase 0 complete. Token addresses promoted from `TODO_VERIFY` to verified against
   the issuer's own registry. See `docs/phase-0-verification.md`.
 - 2026-09-02 — **Proposed, pending human greenlight**: drop `applied_tx` / `applied_at` from
@@ -1051,6 +1053,20 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   they share one file and each owns one field, steps merge by key, so the overlap costs work and
   loses nothing — what it does cost is the alarm, since nothing checks the heartbeat until the
   scheduled job is the watchdog.
+- 2026-09-04 — **The site has a domain of its own, and the platform was the wrong place to ask for
+  it.** `metadataBase` still read `https://exdate.xyz`, so - verified in the built HTML - every
+  `og:image` and `twitter:image` on the live site was made absolute against a domain belonging to an
+  unrelated business: sharing an exdate page anywhere fetched the preview from a stranger's server
+  and credited them. Two more places named it as ours, the site's `links.api` (which nothing read)
+  and the README's SDK example (which told a reader to point their client there); both gone, and the
+  SDK tests moved to `example.com`, which is reserved for exactly that use. The first fix derived the
+  host from `VERCEL_PROJECT_PRODUCTION_URL`, and the deployed build disproved it: Vercel filled that
+  variable with the project's claimed `*.vercel.app` alias, not the custom domain, so the cards named
+  the alias. **`exdate.me`** is now bought and serving, so the canonical host is written down rather
+  than deduced - `https://www.exdate.me`, since the apex 308-redirects to `www` - with
+  `NEXT_PUBLIC_EXDATE_SITE_URL` as the override. `api.exdate.me` and `status.exdate.me` are reserved
+  and deliberately named nowhere in the product until something answers on them: publishing an
+  endpoint that does not exist is the same failure as publishing a number nobody measured.
 - _(append decisions here as they are made)_
 
 ## Status

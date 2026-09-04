@@ -8,16 +8,14 @@ export const metadata: Metadata = {
   title: 'exdate — see what your tokenized stock actually paid you',
   description:
     'When a tokenized stock pays a dividend, nothing lands in your wallet: the token becomes worth a little more. exdate measures how much, and how much went missing on the way.',
-  // Every og:image and twitter:image is made absolute against this. It said
-  // `exdate.xyz`, which belongs to an unrelated site, so every share of a page
-  // here pointed its preview image at a stranger's server. Derived instead:
-  // NEXT_PUBLIC_EXDATE_SITE_URL once a domain exists, else the production URL
-  // Vercel sets on every build - which already follows a custom domain when one
-  // is attached - and the current alias as the last resort.
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_EXDATE_SITE_URL ||
-      (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://exdate-bactas-projects.vercel.app'),
-  ),
+  // Every og:image and twitter:image is made absolute against this, so it decides
+  // whose server answers when someone shares a page. It said `exdate.xyz`, which
+  // belongs to an unrelated site. VERCEL_PROJECT_PRODUCTION_URL was tried next
+  // and is not the right source either: measured on the live build, Vercel filled
+  // it with the project's claimed *.vercel.app alias rather than the custom
+  // domain. The canonical host is a fact now, so it is written down - www, since
+  // the apex 308-redirects there - and an env var can still override it.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_EXDATE_SITE_URL || 'https://www.exdate.me'),
   openGraph: {
     title: 'exdate',
     description: 'See what your tokenized stock actually paid you.',
