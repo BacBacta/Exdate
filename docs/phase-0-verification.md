@@ -509,10 +509,21 @@ mechanism is a standing limit on this test: a total-return feed is *designed* to
 multiplier change, so a step and its equity drop cancelling out is evidence of nothing either way.
 
 **What changed as a result.** `token-feed-map.json` keeps `verified: false` on all 35 rows —
-nothing here is a first-party statement about an address — and gains `corroborated`, true for SGOV
-alone, with the evidence attached per row. The reconciliation's confidence ladder now reads:
-ticker match only → `low` always; corroborated → `medium` from three events; first-party link →
-`high` from ten, which nothing reaches today. Full output: `data/feed-map-verification.json`.
+nothing here is a first-party statement about an address — and gains `corroborated`, with the
+evidence attached per row. The reconciliation's confidence ladder now reads: ticker match only →
+`low` always; corroborated → `medium` from three events; first-party link → `high` from ten, which
+nothing reaches today. Full output: `data/feed-map-verification.json`.
+
+**Since 2026-09-04, a second and weaker test feeds the same field**, so the row must say which one
+carries it. The hourly DEX-to-feed measurement (`scripts/measure-dex-feed-gap.mjs`) compares each
+token's traded price against every mapped feed; when a token's own feed is repeatedly the closest
+by a real margin, `corroborate-feed-map.mjs` records `traded-price`. That identifies the underlying
+and does **not** test the mechanism a haircut depends on — two unrelated assets can trade at one
+price — where the step test above is causal. 23 of 35 rows carry the price evidence; SGOV alone
+carries the step evidence, and carries both. The 12 that carry neither are mostly high-volatility
+names whose traded price is genuinely dislocated from the feed, so the test fails on its premise
+rather than on the pairing. Both reach `medium`; `corroboratedBy` is what keeps the weaker from
+being read as the stronger.
 
 ---
 

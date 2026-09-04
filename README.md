@@ -165,7 +165,7 @@ Committed artifacts, all first-party or read from the chain:
 | `data/robinhood-assets.snapshot.json` | 194 Stock Tokens from the issuer's own registry |
 | `data/robinhood-corporate-actions.snapshot.json` | 43 dividends from the issuer's own feed (12 done, 31 upcoming) |
 | `data/chainlink-feeds.snapshot.json` | 57 Chainlink feeds on Robinhood Chain |
-| `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`**, one row corroborated |
+| `data/token-feed-map.json` | token → feed pairing, **every row `verified: false`**, 23 of 35 corroborated by behaviour, with `corroboratedBy` naming which |
 | `data/feed-map-verification.json` | what that pairing was actually tested against |
 | `data/svr-proxy-check.json` | the primary and SVR proxies of all 35 feeds, compared by address |
 | `data/transfer-volume.observed.json` | what indexing transfers would cost, measured |
@@ -352,9 +352,20 @@ that is committed. What does exist: all 35 aggregators name their ticker in thei
 `description()`, the issuer's registry carries 194 distinct tickers for 194 assets, and **SGOV's
 2026-07-08 multiplier step was seen moving its assigned feed by +9.5778 bps against an expected
 +9.5752 — on a feed whose ordinary movement is 0.0094 bps, and uniquely closest among all 35 feeds
-measured at that instant**. That row is marked `corroborated`; the other 34 are not, and the
-reconciliation confidence ladder keeps `high` reserved for a first-party statement that does not
-yet exist.
+measured at that instant**. That is the causal test, and SGOV is the only row that passes it: a
+0.5 % deviation threshold puts ~50 bps between consecutive rounds, so a dividend-sized step is
+invisible on every other token.
+
+A second, weaker test runs hourly and now carries **23 of the 35 rows**: a token's on-chain traded
+price should sit closer to its own feed than to any of the other 34, and repeatedly does. It
+identifies the underlying rather than testing the mechanism — two unrelated assets can trade at one
+price — so the two are never merged into one word. `corroboratedBy` names which evidence a row
+carries, everywhere the fact travels: the map, the generated registry, `reconcile()`, the API, the
+SDK and both sites. The 12 rows that pass neither are mostly the volatile names, where the traded
+price is genuinely far from the feed and the test has nothing to recognise.
+
+The confidence ladder keeps `high` reserved for a first-party statement that does not yet exist;
+both kinds of corroboration reach `medium`, and the row says which one it stands on.
 
 One exists on the other chain, which is the useful contrast. Coinbase's oracle registry on Base
 answers a per-token read for its thirteen B20 tokens and **reverts** for WETH or for an address
