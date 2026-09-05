@@ -4,7 +4,7 @@ import {
   WEBHOOK_SIGNATURE_HEADER,
   verifySignature,
 } from '@exdate/core/webhooks'
-import type { AnyWebhookEnvelope, VerificationFailure } from '@exdate/core/webhooks'
+import type { AnyWebhookEnvelope, VerificationFailure, WebhookEventType } from '@exdate/core/webhooks'
 import type {
   CalendarResponse,
   ChainsResponse,
@@ -18,6 +18,9 @@ import type {
   TokensResponse,
   WebhookCatalogue,
   WebhookOutboxResponse,
+  WebhookSubscriptionCreated,
+  WebhookSubscriptionStatus,
+  WebhookTestResult,
   YieldLedger,
   MeResponse,
 } from './types.js'
@@ -139,6 +142,10 @@ export interface ExdateClient {
     catalogue(): Promise<WebhookCatalogue>
     /** The outbox: what was noticed, and what each delivery did. */
     events(query?: { type?: string; status?: string; limit?: number }): Promise<WebhookOutboxResponse>
+    subscribe(input: SubscribeInput): Promise<WebhookSubscriptionCreated>
+    subscription(id: string, secret: string): Promise<WebhookSubscriptionStatus>
+    unsubscribe(id: string, secret: string): Promise<WebhookSubscriptionStatus>
+    test(id: string, secret: string): Promise<WebhookTestResult>
     verify: typeof verifyWebhook
     parse: typeof parseWebhook
     fromRequest: typeof webhookFromRequest
@@ -160,14 +167,22 @@ export function createClient(options: ClientOptions): ExdateClient {
     return `${base}${path}${suffix}`
   }
 
-  async function get<T>(path: string, query?: Query): Promise<T> {
-    const target = url(path, query)
+  async function request<T>(
+    method: 'GET' | 'POST' | 'DELETE',
+    path: string,
+    extra: { query?: Query; body?: unknown; headers?: Record<string, string> } = {},
+  ): Promise<T> {
+    const target = url(path, extra.query)
     const response = await doFetch(target, {
+      method,
       headers: {
         accept: 'application/json',
+        ...(extra.body !== undefined ? { 'content-type': 'application/json' } : {}),
         ...(options.apiKey ? { authorization: `Bearer ${options.apiKey}` } : {}),
         ...options.headers,
+        ...extra.headers,
       },
+      ...(extra.body !== undefined ? { body: JSON.stringify(extra.body) } : {}),
       ...(timeoutMs > 0 ? { signal: AbortSignal.timeout(timeoutMs) } : {}),
     })
     const text = await response.text()
@@ -188,6 +203,9 @@ export function createClient(options: ClientOptions): ExdateClient {
     }
     return body as T
   }
+  const get = <T,>(path: string, query?: Query) => request<T>('GET', path, { query })
+  /** The subscription secret travels in its own header: `Authorization` carries API keys. */
+  const owned = (secret: string) => ({ [SUBSCRIPTION_SECRET_HEADER]: secret })
 
   return {
     /** The configured chain, resolved the way every route resolves it. */
@@ -240,6 +258,21 @@ export function createClient(options: ClientOptions): ExdateClient {
       /** The outbox: what was noticed, and what each delivery did. */
       events: (query?: { type?: string; status?: string; limit?: number }) =>
         get<WebhookOutboxResponse>(`/v1/${chain}/webhooks/events`, query),
+      /**
+       * Subscribe an https endpoint. The answer carries the secret ONCE: it signs
+       * every delivery and is what reads, tests and revokes the subscription.
+       * Throws a 501 ExdateError on an instance that keeps no subscription store.
+       */
+      subscribe: (input: SubscribeInput) => request<WebhookSubscriptionCreated>('POST', '/v1/webhooks/subscriptions', { body: input }),
+      /** The subscription and what the outbox did for it. 404 for a wrong secret and an unknown id alike. */
+      subscription: (id: string, secret: string) =>
+        request<WebhookSubscriptionStatus>('GET', `/v1/webhooks/subscriptions/${id}`, { headers: owned(secret) }),
+      /** Revoke. Deliveries stop with the next poll; the record stays, marked revoked. */
+      unsubscribe: (id: string, secret: string) =>
+        request<WebhookSubscriptionStatus>('DELETE', `/v1/webhooks/subscriptions/${id}`, { headers: owned(secret) }),
+      /** Replay the most recent recorded event to the endpoint, signed with the secret, and report what it answered. */
+      test: (id: string, secret: string) =>
+        request<WebhookTestResult>('POST', `/v1/webhooks/subscriptions/${id}/test`, { query: { chain }, headers: owned(secret) }),
       verify: verifyWebhook,
       parse: parseWebhook,
       fromRequest: webhookFromRequest,
@@ -247,6 +280,17 @@ export function createClient(options: ClientOptions): ExdateClient {
   }
 }
 
+
+/** The header a subscription secret travels in; the same string the API serves in its catalogue. */
+export const SUBSCRIPTION_SECRET_HEADER = 'x-exdate-subscription-secret'
+
+export interface SubscribeInput {
+  /** https only, on a public host. */
+  url: string
+  /** Omitted means every event type. */
+  events?: WebhookEventType[]
+  description?: string
+}
 
 export interface VerifyInput {
   /** One secret, or several while rotating. */

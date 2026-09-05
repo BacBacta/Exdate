@@ -43,7 +43,7 @@ export default function Page() {
                 <li>
                   <a href={links.apiDocs}>
                     <h2>API reference</h2>
-                    <p>Every route with a real captured response. Opens on a first call in 30 seconds.</p>
+                    <p>Every route with a real captured response. Opens on a first call in 30 seconds; subscribe to webhooks with one call.</p>
                   </a>
                 </li>
                 <li>

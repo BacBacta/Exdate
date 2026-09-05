@@ -50,6 +50,13 @@ services:
       EXDATE_KEY_RPM: ${EXDATE_KEY_RPM:-600}
       # signed webhook receivers, a JSON array: [{"id":"curator","url":"https://…","secret":"…","events":["dividend.reconciled"]}]
       EXDATE_WEBHOOK_ENDPOINTS: ${EXDATE_WEBHOOK_ENDPOINTS:-}
+      # Self-service subscriptions (POST /v1/webhooks/subscriptions) live in one
+      # file the process owns, on a volume so they outlive a rebuild. Set
+      # EXDATE_WEBHOOK_SELF_SERVICE=false to turn the routes off.
+      EXDATE_WEBHOOK_SELF_SERVICE: ${EXDATE_WEBHOOK_SELF_SERVICE:-true}
+      EXDATE_WEBHOOK_SUBSCRIPTIONS_FILE: /var/lib/exdate/webhook-subscriptions.json
+    volumes:
+      - subscriptions:/var/lib/exdate
     # Loopback only: Caddy reaches it over the compose network, and an API
     # published on the public interface would answer unencrypted beside the
     # TLS one it is meant to be read through.
@@ -135,5 +142,6 @@ services:
 
 volumes:
   pgdata:
+  subscriptions:
   caddy_data:
   caddy_config:

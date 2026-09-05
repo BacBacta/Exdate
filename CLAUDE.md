@@ -1568,6 +1568,23 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (they are public URLs, not secrets); the next deployment restores the links. The lesson is the one
   this file already carries about `deploy-site.yml`'s health check: a link that renders only when
   configured fails silently when the configuration is lost, and nothing checked for it.
+- 2026-09-05 — **Webhooks can be subscribed to without the operator, and the store is a file, not a
+  table.** The quarter list's last item. `POST /v1/webhooks/subscriptions` takes an https URL and
+  optional event types and answers with a secret once; that secret signs every delivery and, in its
+  own header (`x-exdate-subscription-secret`, because `Authorization` carries API keys and the
+  limiter would answer *unknown API key*), reads, tests and revokes the subscription. The test
+  replays the most recent event actually recorded, so a subscriber sees a real payload of a real
+  type reach its handler. Refused: http, loopback and private addresses (a public API that will
+  POST wherever it is told is otherwise a door to what sits beside it), more than five per host,
+  more than five signups per client per hour; a wrong secret and an unknown id answer alike. The
+  store is one JSON file the process owns (mode 0600, written whole and renamed into place, on a
+  volume in Docker), because the API's database handle is for reading and because subscriptions
+  carry secrets and belong in no table the API serves — the same shape as the operator's env var,
+  with the one difference that the API may append to it. The outbox reads it at every cycle, so a
+  subscription made a minute ago receives the next event. Tested at the routes (14 cases), at the
+  store (5) and in the SDK (3); the contract assert caught the first version leaking `secret` into
+  the plain view type, which is what it is for. **Not live yet**: `api.exdate.me` runs the checkout
+  the installer last reset, and only the owner can run `deploy/install-api.sh` on the machine.
 - _(append decisions here as they are made)_
 
 ## Status

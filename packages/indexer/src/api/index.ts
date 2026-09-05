@@ -10,7 +10,8 @@ import type {
   WebhookDeliveryRow,
   WebhookEventRow,
 } from '@exdate/api'
-import { endpoints } from '../webhooks.js'
+import { subscriptionStore } from '../subscriptions.js'
+import { currentEndpoints } from '../webhooks.js'
 import type { Address, Hex } from 'viem'
 
 /**
@@ -162,6 +163,9 @@ const repository: Repository = {
 // malformed entry stops the process rather than admitting nobody.
 export default createApi({
   repository,
-  webhookEndpointsConfigured: endpoints.length,
+  webhookEndpointsConfigured: () => currentEndpoints().length,
+  // Self-service subscriptions: a file the process owns, never a served table.
+  subscriptions: subscriptionStore ?? undefined,
+  subscriptionPolicy: { allowPrivate: process.env.EXDATE_WEBHOOK_ALLOW_PRIVATE === 'true' },
   limits: limitsFromEnv(process.env),
 })

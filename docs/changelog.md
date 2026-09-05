@@ -7,6 +7,11 @@ measurements behind them, is `CLAUDE.md` in the repository.
 
 ## 2026-09-05
 
+- **API.** Self-service webhook subscriptions: `POST /v1/webhooks/subscriptions` takes an https URL
+  and optional event types and answers with a secret once; `GET`, `DELETE` and `POST …/test` on
+  `/v1/webhooks/subscriptions/:id` with that secret in `x-exdate-subscription-secret`. `GET
+  /v1/webhooks` gains `selfService` (null on an instance that keeps no store). The SDK gains
+  `webhooks.subscribe`, `subscription`, `unsubscribe` and `test`.
 - **Site.** `/calendar.ics` (every declared dividend and every observed multiplier change),
   `/t/<address>/calendar.ics` per token, `/feed.xml`; one link preview per token; a badge per token
   at `/badge/<address>.svg` and `/badge.svg`; `/how/`, `/dividends/`, `/docs/`, `/about/` and this

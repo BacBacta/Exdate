@@ -381,6 +381,59 @@ id and **host** only; the configured URL and its secret never leave the process.
 
 `?type=`, `?status=` and `?limit=` filter; the counts stay whole.
 
+## Subscribing without the operator
+
+`POST /v1/webhooks/subscriptions` takes an https URL, optionally the event types wanted, and answers
+with a secret **once**. From then on that secret signs every delivery and is what reads, tests and
+revokes the subscription, in its own header (`x-exdate-subscription-secret`, never `Authorization`,
+which carries API keys). Captured from a local instance on 2026-09-05:
+
+```bash
+curl -X POST https://api.exdate.me/v1/webhooks/subscriptions \
+  -H 'content-type: application/json' \
+  -d '{"url":"https://hooks.example.com/exdate","events":["dividend.reconciled","multiplier.scheduled"],"description":"curator alerts"}'
+```
+
+```json
+{
+  "id": "sub_64772d9c918bddc7d43db52d",
+  "url": "https://hooks.example.com/exdate",
+  "host": "hooks.example.com",
+  "events": ["dividend.reconciled", "multiplier.scheduled"],
+  "description": "curator alerts",
+  "createdAt": "2026-09-05T17:00:00.000Z",
+  "revokedAt": null,
+  "status": "active",
+  "secret": "whsec_b9d7120a0bfc9ebe33e8d8fda28ad063d7dab3faf463f56df4dcdad33727d0f3",
+  "note": "the secret is shown once: it signs every delivery and is what reads, tests and revokes this subscription.",
+  "secretHeader": "x-exdate-subscription-secret",
+  "verify": "verifySignature() in @exdate/sdk, over the raw body, with this secret"
+}
+```
+
+Then, with `-H 'x-exdate-subscription-secret: whsec_…'`:
+
+| Call | Answer |
+|---|---|
+| `GET /v1/webhooks/subscriptions/:id` | the record plus `deliveries: { queued, delivered, failed, lastDeliveredAt }` |
+| `POST /v1/webhooks/subscriptions/:id/test` | the most recent event actually recorded, replayed now, signed with your secret: `{ ok, eventId, type, delivery, responseStatus, error, sentAt }` |
+| `DELETE /v1/webhooks/subscriptions/:id` | the record marked `revoked`; deliveries stop with the next poll, the record stays |
+
+What is refused, and why: anything but https (a signed body over http is a body anyone on the path can
+read); loopback, link-local and private addresses (a public API that will POST to an address of the
+caller's choosing is otherwise a way to reach whatever sits next to it); more than 5 active
+subscriptions per host and more than 5 signups per client per hour. A wrong secret and an unknown id
+answer alike, `404 {"error":"unknown subscription, or wrong secret"}`, so the ids do not enumerate. An
+instance that keeps no subscription store answers `501`, and `GET /v1/webhooks` says `selfService:
+null`. Subscriptions never appear in the outbox as URLs: like the operator's own endpoints they are
+served as a host only, and stored outside the database in a file the process owns.
+
+```ts
+const sub = await exdate.webhooks.subscribe({ url: 'https://hooks.example.com/exdate', events: ['dividend.reconciled'] })
+// keep sub.secret; it is not shown again
+await exdate.webhooks.test(sub.id, sub.secret) // { ok: true, responseStatus: 200, … }
+```
+
 ---
 
 ## Verifying a webhook

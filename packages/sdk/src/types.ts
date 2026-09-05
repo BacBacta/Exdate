@@ -320,6 +320,52 @@ export interface WebhookCatalogue {
   idempotency: { key: string; note: string }
   retries: { scheduleSeconds: readonly number[]; maxAttempts: number }
   endpointsConfigured: number
+  /** Null on an instance that keeps no subscription store. */
+  selfService: {
+    create: string
+    body: { url: string; events: string; description: string }
+    secretHeader: string
+    manage: string
+    test: string
+    limits: { activePerHost: number; signupsPerHourPerClient: number; httpsOnly: boolean; publicHostsOnly: boolean }
+  } | null
+}
+
+/** A self-service subscription as the API describes it to its owner. */
+export interface WebhookSubscriptionView {
+  id: string
+  url: string
+  host: string
+  /** Null means every event type. */
+  events: string[] | null
+  description: string | null
+  createdAt: string
+  revokedAt: string | null
+  status: 'active' | 'revoked'
+}
+
+/** The answer to a subscription: the secret, once. */
+export interface WebhookSubscriptionCreated extends WebhookSubscriptionView {
+  secret: string
+  note: string
+  secretHeader: string
+  verify: string
+}
+
+/** What the outbox has done for a subscription, alongside its record. */
+export interface WebhookSubscriptionStatus extends WebhookSubscriptionView {
+  deliveries: { queued: number; delivered: number; failed: number; lastDeliveredAt: string | null }
+}
+
+/** A test delivery: the most recent recorded event, replayed now. */
+export interface WebhookTestResult {
+  ok: boolean
+  eventId: string
+  type: string
+  delivery: string
+  responseStatus: number | null
+  error: string | null
+  sentAt: string
 }
 
 export interface WebhookOutboxResponse {

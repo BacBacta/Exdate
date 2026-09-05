@@ -5,6 +5,10 @@ import type {
   serializeReconciliation,
   serializeToken,
   serializeWebhookEvent,
+  serializeSubscription,
+  serializeSubscriptionCreated,
+  serializeSubscriptionStatus,
+  TestDeliveryResult as ServedTestDeliveryResult,
 } from '@exdate/api'
 import type {
   CorporateActionView,
@@ -13,6 +17,10 @@ import type {
   ReconciliationView,
   TokenView,
   WebhookOutboxResponse,
+  WebhookSubscriptionCreated,
+  WebhookSubscriptionStatus,
+  WebhookSubscriptionView,
+  WebhookTestResult,
 } from '../src/index.js'
 
 /**
@@ -65,3 +73,18 @@ export const meIsCompatible: MeResponse = servedMe
 export const meIsComplete: ServedMe = sdkMe
 
 export const contractChecked = true
+
+// A subscription, as the API describes it to its owner: the plain view, the
+// one reply that carries the secret, the view with the outbox's tally, and a
+// test delivery's report.
+type ApiSubscription = ReturnType<typeof serializeSubscription>
+const _subscriptionMatches: (row: ApiSubscription) => WebhookSubscriptionView = (row) => row
+never_<Extra<ApiSubscription, WebhookSubscriptionView>>()
+type ApiSubscriptionCreated = ReturnType<typeof serializeSubscriptionCreated>
+const _createdMatches: (row: ApiSubscriptionCreated) => WebhookSubscriptionCreated = (row) => row
+never_<Extra<ApiSubscriptionCreated, WebhookSubscriptionCreated>>()
+type ApiSubscriptionStatus = ReturnType<typeof serializeSubscriptionStatus>
+const _statusMatches: (row: ApiSubscriptionStatus) => WebhookSubscriptionStatus = (row) => row
+never_<Extra<ApiSubscriptionStatus, WebhookSubscriptionStatus>>()
+const _testMatches: (row: ServedTestDeliveryResult) => WebhookTestResult = (row) => row
+never_<Extra<ServedTestDeliveryResult, WebhookTestResult>>()

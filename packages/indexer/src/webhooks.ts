@@ -17,6 +17,7 @@ import {
 } from '@exdate/core'
 import type { Context } from 'ponder:registry'
 import type { Address } from 'viem'
+import { subscriptionStore } from './subscriptions.js'
 
 /**
  * The webhook outbox: enqueue here, deliver from the poll cycle.
@@ -45,6 +46,15 @@ type WebhookContext = { db: Context<'Poll:block'>['db'] }
  * indistinguishable from silence because nothing happened.
  */
 export const endpoints: WebhookEndpoint[] = parseWebhookEndpoints(process.env.EXDATE_WEBHOOK_ENDPOINTS)
+
+/**
+ * Everything deliveries go to, at this moment: the operator's endpoints plus
+ * every self-service subscription not revoked. Read at each call rather than
+ * once, because a subscription made a minute ago must receive the next event.
+ */
+export function currentEndpoints(): WebhookEndpoint[] {
+  return [...endpoints, ...(subscriptionStore?.activeEndpoints() ?? [])]
+}
 
 const DELIVERY_TIMEOUT_MS = Number(process.env.EXDATE_WEBHOOK_TIMEOUT_MS ?? 10_000)
 /** Cap per cycle so a large backlog cannot stretch one poll indefinitely. */
@@ -104,7 +114,7 @@ export async function enqueueWebhook<T extends WebhookEventType>(
     .onConflictDoNothing()
   if (!inserted) return false
 
-  for (const endpoint of endpoints) {
+  for (const endpoint of currentEndpoints()) {
     if (!endpointWants(endpoint, input.type)) continue
     await context.db
       .insert(webhookDeliveries)
@@ -136,8 +146,9 @@ export async function enqueueWebhook<T extends WebhookEventType>(
  * and no reads.
  */
 export async function deliverDueWebhooks(context: WebhookContext, now: bigint): Promise<number> {
-  if (endpoints.length === 0) return 0
-  const byId = new Map(endpoints.map((endpoint) => [endpoint.id, endpoint]))
+  const live = currentEndpoints()
+  if (live.length === 0) return 0
+  const byId = new Map(live.map((endpoint) => [endpoint.id, endpoint]))
 
   const rows = (await context.db.sql.select().from(webhookDeliveries))
     .filter((row) => row.status === 'queued' && row.nextAttemptAt <= now)

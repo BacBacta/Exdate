@@ -28,22 +28,52 @@ import {
   serializeWebhookEvent,
 } from './serialize.js'
 import { RateLimiter, clientIp, presentedKey, type Caller, type LimitsConfig } from './limits.js'
+import {
+  DEFAULT_SUBSCRIPTION_POLICY,
+  SUBSCRIPTION_SECRET_HEADER,
+  SignupWindow,
+  newSecret,
+  newSubscriptionId,
+  secretsMatch,
+  serializeSubscription,
+  serializeSubscriptionCreated,
+  serializeSubscriptionStatus,
+  validateSubscriptionEvents,
+  validateSubscriptionUrl,
+  type DeliveryTally,
+  type SubscriptionPolicy,
+  type SubscriptionStore,
+  type TestDeliveryResult,
+  type WebhookSubscription,
+} from './subscriptions.js'
 import type { Repository } from './types.js'
 
 export * from './types.js'
 export * from './serialize.js'
 export * from './limits.js'
+export * from './subscriptions.js'
 
 export interface ApiOptions {
   repository: Repository
   /** Injected so responses are deterministic under test. */
   now?: () => bigint
   /**
-   * How many webhook endpoints the process was started with. The endpoints
-   * themselves carry secrets and are never served; the count is what tells an
-   * operator whether silence means "nothing happened" or "nobody is listening".
+   * How many webhook endpoints deliveries go to. The endpoints themselves
+   * carry secrets and are never served; the count is what tells an operator
+   * whether silence means "nothing happened" or "nobody is listening". A
+   * function, because self-service subscriptions change it while the process
+   * runs.
    */
-  webhookEndpointsConfigured?: number
+  webhookEndpointsConfigured?: number | (() => number)
+  /**
+   * Where self-service subscriptions are kept. Absent, the subscription
+   * routes answer 501 and the catalogue says self-service is off; the
+   * operator's own endpoints in EXDATE_WEBHOOK_ENDPOINTS are unaffected.
+   */
+  subscriptions?: SubscriptionStore
+  subscriptionPolicy?: SubscriptionPolicy
+  /** Injected so the test delivery can be observed without a network. */
+  fetchImpl?: typeof fetch
   /** API keys and quotas; absent means open at the default anonymous rate. See limits.ts. */
   limits?: LimitsConfig
   /** Milliseconds, injected so quota windows are deterministic under test. */
@@ -70,12 +100,19 @@ export function createApi({
   repository,
   now = () => BigInt(Math.floor(Date.now() / 1000)),
   webhookEndpointsConfigured = 0,
+  subscriptions,
+  subscriptionPolicy,
+  fetchImpl = globalThis.fetch,
   limits = { keys: [], anonymousRequestsPerMinute: 60 },
   nowMs = () => Date.now(),
   clientAddress = () => null,
 }: ApiOptions) {
   const app = new Hono<{ Variables: { caller: Caller } }>()
   const limiter = new RateLimiter(limits, nowMs)
+  const endpointsConfigured = () =>
+    typeof webhookEndpointsConfigured === 'function' ? webhookEndpointsConfigured() : webhookEndpointsConfigured
+  const policy = { ...DEFAULT_SUBSCRIPTION_POLICY, ...subscriptionPolicy }
+  const signups = new SignupWindow(policy.signupsPerHourPerClient, nowMs)
 
   app.use('/v1/*', cors())
 
@@ -155,9 +192,174 @@ export function createApi({
         note: 'event ids are deterministic, so a redelivery or a second observation of the same occurrence carries the id you already have.',
       },
       retries: { scheduleSeconds: WEBHOOK_RETRY_SCHEDULE_SECONDS, maxAttempts: WEBHOOK_MAX_ATTEMPTS },
-      endpointsConfigured: webhookEndpointsConfigured,
+      endpointsConfigured: endpointsConfigured(),
+      /**
+       * How to subscribe without the operator: null when this instance keeps
+       * no store for it. The limits are stated so a refusal is not a surprise.
+       */
+      selfService: subscriptions
+        ? {
+            create: 'POST /v1/webhooks/subscriptions',
+            body: { url: 'https://…', events: 'optional array of event types; all of them when omitted', description: 'optional, free text' },
+            secretHeader: SUBSCRIPTION_SECRET_HEADER,
+            manage: 'GET or DELETE /v1/webhooks/subscriptions/:id, with the secret in that header',
+            test: 'POST /v1/webhooks/subscriptions/:id/test replays the most recent recorded event, signed with the subscription secret',
+            limits: {
+              activePerHost: policy.maxPerHost,
+              signupsPerHourPerClient: policy.signupsPerHourPerClient,
+              httpsOnly: true,
+              publicHostsOnly: !policy.allowPrivate,
+            },
+          }
+        : null,
     }),
   )
+
+  /**
+   * Self-service subscriptions. The secret is shown once, at creation, and
+   * from then on identifies the subscriber: the same secret that signs the
+   * deliveries reads the subscription back, revokes it and asks for a test.
+   * A wrong secret and an unknown id answer alike, so the ids do not
+   * enumerate.
+   */
+  const notEnabled = { error: 'self-service subscriptions are not enabled on this instance', see: 'GET /v1/webhooks' }
+  const findOwned = async (c: { req: { param(name: string): string; raw: Request } }): Promise<WebhookSubscription | null> => {
+    const presented = c.req.raw.headers.get(SUBSCRIPTION_SECRET_HEADER)
+    const rows = await subscriptions!.list()
+    const row = rows.find((candidate) => candidate.id === c.req.param('id'))
+    return row && secretsMatch(presented, row.secret) ? row : null
+  }
+  const unknownSubscription = { error: 'unknown subscription, or wrong secret', secretHeader: SUBSCRIPTION_SECRET_HEADER }
+
+  app.post('/v1/webhooks/subscriptions', async (c) => {
+    if (!subscriptions) return c.json(notEnabled, 501)
+    let body: Record<string, unknown>
+    try {
+      const parsed: unknown = await c.req.json()
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return c.json({ error: 'body must be a JSON object' }, 400)
+      body = parsed as Record<string, unknown>
+    } catch {
+      return c.json({ error: 'body must be JSON' }, 400)
+    }
+    const url = validateSubscriptionUrl(body.url, policy)
+    if (!url.ok) return c.json({ error: url.error }, 400)
+    const events = validateSubscriptionEvents(body.events)
+    if (!events.ok) return c.json({ error: events.error }, 400)
+    const description = body.description === undefined || body.description === null ? null : body.description
+    if (description !== null && (typeof description !== 'string' || description.length > policy.maxDescriptionLength)) {
+      return c.json({ error: `description must be a string of at most ${policy.maxDescriptionLength} characters` }, 400)
+    }
+    const client = clientIp(c.req.raw.headers, clientAddress(c.req.raw))
+    if (!signups.take(client)) {
+      c.header('Retry-After', '3600')
+      return c.json({ error: `at most ${policy.signupsPerHourPerClient} signups per hour per client` }, 429)
+    }
+    const active = (await subscriptions.list()).filter((row) => row.revokedAt === null)
+    if (active.length >= policy.maxTotal) return c.json({ error: 'this instance holds as many subscriptions as it will' }, 503)
+    if (active.filter((row) => new URL(row.url).host === url.url.host).length >= policy.maxPerHost) {
+      return c.json({ error: `at most ${policy.maxPerHost} active subscriptions per host; revoke one first` }, 409)
+    }
+    const subscription: WebhookSubscription = {
+      id: newSubscriptionId(),
+      url: url.url.toString(),
+      secret: newSecret(),
+      events: events.events,
+      description,
+      createdAt: new Date(Number(now()) * 1000).toISOString(),
+      createdFrom: client,
+      revokedAt: null,
+    }
+    await subscriptions.create(subscription)
+    return c.json(serializeSubscriptionCreated(subscription), 201)
+  })
+
+  app.get('/v1/webhooks/subscriptions/:id', async (c) => {
+    if (!subscriptions) return c.json(notEnabled, 501)
+    const row = await findOwned(c)
+    if (!row) return c.json(unknownSubscription, 404)
+    // What the outbox did for this endpoint, across every chain, as counts.
+    const tally: DeliveryTally = { queued: 0, delivered: 0, failed: 0, lastDeliveredAt: null }
+    for (const chain of Object.values(CHAINS)) {
+      for (const delivery of await repository.webhookDeliveries(chain.id)) {
+        if (delivery.endpointId !== row.id) continue
+        if (delivery.status === 'queued') tally.queued++
+        else if (delivery.status === 'delivered') tally.delivered++
+        else if (delivery.status === 'failed') tally.failed++
+        if (delivery.deliveredAt !== null) {
+          const at = new Date(Number(delivery.deliveredAt) * 1000).toISOString()
+          if (tally.lastDeliveredAt === null || at > tally.lastDeliveredAt) tally.lastDeliveredAt = at
+        }
+      }
+    }
+    return c.json(serializeSubscriptionStatus(row, tally))
+  })
+
+  app.delete('/v1/webhooks/subscriptions/:id', async (c) => {
+    if (!subscriptions) return c.json(notEnabled, 501)
+    const row = await findOwned(c)
+    if (!row) return c.json(unknownSubscription, 404)
+    const at = new Date(Number(now()) * 1000).toISOString()
+    const revoked = await subscriptions.revoke(row.id, at)
+    const tally: DeliveryTally = { queued: 0, delivered: 0, failed: 0, lastDeliveredAt: null }
+    return c.json({ ...serializeSubscriptionStatus({ ...row, revokedAt: row.revokedAt ?? at }, tally), revokedNow: revoked })
+  })
+
+  /**
+   * A test delivery: the most recent event actually recorded, signed with
+   * this subscription's secret and sent now, so a subscriber sees a real
+   * payload of a real type reach its handler before the next event does.
+   */
+  app.post('/v1/webhooks/subscriptions/:id/test', async (c) => {
+    if (!subscriptions) return c.json(notEnabled, 501)
+    const row = await findOwned(c)
+    if (!row) return c.json(unknownSubscription, 404)
+    if (row.revokedAt) return c.json({ error: 'subscription is revoked' }, 409)
+    const chain = resolveChain(c.req.query('chain') ?? 'robinhood')
+    if (!chain) return c.json(unknownChain, 404)
+    const event = (await repository.webhookEvents(chain.id)).find(
+      (candidate) => row.events === null || (row.events as string[]).includes(candidate.type),
+    )
+    if (!event) return c.json({ error: 'nothing recorded yet that this subscription would receive; there is nothing to replay' }, 409)
+    const sentAt = now()
+    const delivery = `test|${row.id}|${event.id}`
+    const { signBody } = await import('@exdate/core')
+    const signature = await signBody({ secret: row.secret, timestamp: sentAt, body: event.payload })
+    const report = (result: TestDeliveryResult) => c.json(result)
+    try {
+      const response = await fetchImpl(row.url, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'user-agent': 'exdate-webhooks/1',
+          [WEBHOOK_EVENT_HEADER]: event.type,
+          [WEBHOOK_EVENT_ID_HEADER]: event.id,
+          [WEBHOOK_DELIVERY_HEADER]: delivery,
+          [WEBHOOK_SIGNATURE_HEADER]: signature,
+        },
+        body: event.payload,
+        signal: AbortSignal.timeout(10_000),
+      })
+      return report({
+        ok: response.ok,
+        eventId: event.id,
+        type: event.type,
+        delivery,
+        responseStatus: response.status,
+        error: response.ok ? null : `HTTP ${response.status}`,
+        sentAt: new Date(Number(sentAt) * 1000).toISOString(),
+      })
+    } catch (error) {
+      return report({
+        ok: false,
+        eventId: event.id,
+        type: event.type,
+        delivery,
+        responseStatus: null,
+        error: (error as Error).message.slice(0, 200),
+        sentAt: new Date(Number(sentAt) * 1000).toISOString(),
+      })
+    }
+  })
 
   app.get('/v1/chains', (c) =>
     c.json({
@@ -370,7 +572,7 @@ export function createApi({
         delivered: tally('delivered'),
         failed: tally('failed'),
       },
-      endpointsConfigured: webhookEndpointsConfigured,
+      endpointsConfigured: endpointsConfigured(),
       returned: Math.min(filtered.length, limit),
       events: filtered
         .slice(0, limit)

@@ -124,6 +124,17 @@ The signature travels in the `exdate-signature` header as `t=<unix seconds>,v1=<
 HMAC-SHA256 over `${t}.${rawBody}`, checked against a 300 s window. The other headers are
 `exdate-event` (the type), `exdate-event-id` and `exdate-delivery`.
 
+To be sent anything, subscribe an https endpoint. The secret comes back **once**, signs every
+delivery, and is what reads, tests and revokes the subscription:
+
+```ts
+const sub = await exdate.webhooks.subscribe({ url: 'https://hooks.example.com/exdate', events: ['dividend.reconciled'] })
+sub.secret                                            // keep it; it is not shown again
+await exdate.webhooks.test(sub.id, sub.secret)        // replays the latest recorded event: { ok, responseStatus, … }
+await exdate.webhooks.subscription(sub.id, sub.secret) // { status, deliveries: { queued, delivered, failed, … } }
+await exdate.webhooks.unsubscribe(sub.id, sub.secret)
+```
+
 `parseWebhook({ secret, header, body })` does the same from parts, and `verifyWebhook(…)` returns
 `{ valid: false, reason }` — `malformed_header`, `timestamp_outside_tolerance`, `signature_mismatch` —
 rather than throwing, so a handler can log which check failed without touching the secret.
