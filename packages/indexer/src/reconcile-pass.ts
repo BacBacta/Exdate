@@ -132,6 +132,23 @@ export async function runReconcilePass(
     readonly unknown[]
   >
 
+  /**
+   * Which behaviour corroborates a token -> feed pairing, for the row's own column.
+   *
+   * A fact about the PAIRING, not about this row, which is why it is set on every
+   * write path and not only on the priced one. The 2026-09-05 audit found the
+   * opposite: a pending or unmatched row published `feedCorroboratedBy: []` while the
+   * map, the token list and the site all said the same pairing was corroborated by
+   * traded price - SGOV, MU, DELL, ASML, MSFT, GOOGL and NVDA among them (F09). A row
+   * forced to `low` for a reason of its own - no price, no issuer rate - still has
+   * whatever evidence its pairing has, and core's Reconciliation type says so.
+   */
+  const corroborationOf = (address: string | null | undefined) => {
+    if (!address) return null
+    const by = findToken(chainId, address as Address)?.feedCorroboratedBy ?? []
+    return by.length ? by.join(',') : null
+  }
+
   const write = async (row: ReconciliationRow) => {
     await context.db
       .insert(reconciliations)
@@ -175,6 +192,7 @@ export async function runReconcilePass(
       rate: action.rate ?? null,
       status: 'pending',
       confidence: 'low',
+      feedCorroboratedBy: corroborationOf(action.token),
       note:
         action.status === 'CORPORATE_ACTION_STATUS_COMPLETED'
           ? 'the issuer marks this action completed, but no multiplier step has been observed on chain'
@@ -219,6 +237,7 @@ export async function runReconcilePass(
           : ((change.newMultiplier - change.oldMultiplier) * 10n ** 18n) / change.oldMultiplier,
       status: 'unmatched',
       confidence: 'low',
+      feedCorroboratedBy: corroborationOf(String(change.token)),
       note: "no issuer corporate action explains this step - the issuer's feed only keeps about a month of history",
     })
   }
@@ -288,6 +307,7 @@ export async function runReconcilePass(
         // same thing here as it does for a dividend.
         expectedStepWad: split.declaredRatioWad === undefined ? null : split.declaredRatioWad - 10n ** 18n,
         status: split.status,
+        feedCorroboratedBy: corroborationOf(String(change.token)),
         note: `${action.type}: ${split.note}`,
       })
       continue

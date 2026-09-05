@@ -7,6 +7,29 @@ Brief : `docs/data-audit-prompt.md`. Preuves : `docs/audit/2026-09-05-data/`. Au
 collecteur a été rejoué dans un clone propre ; les points d'accès utilisés sont publics et sans
 clé ; chaque verdict est reproductible avec les commandes citées.
 
+## État des correctifs — 5 septembre 2026, 21:00 UTC
+
+Ce rapport reste le constat daté du 5 septembre. Les correctifs ont été appliqués **après** sa
+remise, l'audit ayant pour règle de proposer sans modifier. Ce que le dépôt porte maintenant :
+
+| Constat | Sév. | État | Où |
+|---|---|---|---|
+| F01 UPS absent du scan | S0 | **corrigé** | chaîne rejouée (14 journaux, 13 changements) et `.github/workflows/rescan-chain.yml` toutes les 6 h |
+| F02 grand livre sur l'instantané | S3 | **corrigé** | `build-reconciliations.mjs` lit `corporate-actions.archive.json` ; 51 lignes |
+| F03 corroboration divergente | S2 | **corrigé** | `scripts/rebuild-record.mjs`, appelé par les trois workflows ; `--offline` pour l'horaire |
+| F04 un seul témoin d'archive | S2 | **corrigé** (mesuré, pas résolu) | `witnesses[]` par pas ; sonde quotidienne ; le fichier dit 1 témoin |
+| F05 `crossChecks` effacé | S2 | **corrigé** | bloc mesuré reporté, `crossChecksCarriedOver` |
+| F06 marqueurs de source | S3 | **corrigé** | blocs `sources` dans les fichiers dérivés ; tableau et texte d'attribution dans `DATA-LICENSE.md` |
+| F07 horodatages manquants | S4 | **corrigé** | les deux instantanés portent `fetchedAt` et `source` |
+| F08 prix arrondi stocké | S4 | **corrigé** | `price.answer`, `impliedHaircutBpsExact`, formatage WAD exact |
+| F09 corroboration absente hors lignes priçées | S4 | **corrigé** | l'indexeur l'écrit sur les quatre chemins |
+| F10 comptes périmés dans la note | S4 | **corrigé** | `CLAUDE.md` daté et renvoyant au fichier |
+| F11 déploiement depuis une copie en retard | S4 | **corrigé** | `deploy-web.sh` refuse un `HEAD` derrière `origin` |
+| F12 registre émetteur périmé | S4 | **corrigé** | rafraîchi par le job quotidien, sans churn |
+
+Le contrôle permanent passe : **0 échec, 1 avertissement** — un seul témoin d'archive répond
+aujourd'hui, ce qui ne dépend pas de ce dépôt et est signalé plutôt que masqué.
+
 ## 6.1 Résumé exécutif
 
 1. **Exacts** : les deux décotes publiées se recalculent à la main depuis les entrées committées —

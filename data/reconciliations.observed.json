@@ -1,6 +1,6 @@
 {
   "note": "Issuer corporate actions paired with the multiplier steps they produced, priced at the Chainlink round in force at effectiveAt. Every input is first-party or on-chain; nothing is estimated. Rebuild with: node scripts/build-reconciliations.mjs",
-  "builtAt": "2026-09-05T20:28:37.552Z",
+  "builtAt": "2026-09-05T20:42:39.569Z",
   "chainId": 4663,
   "rounding": "impliedHaircutBps is truncated toward zero; impliedHaircutBpsExact carries the same figure to two decimals. price.answer and price.answerDecimals are the aggregator's own integer answer; price.value and price.underlying are that answer in full precision, not a display rounding.",
   "matchWindowDays": 4,
@@ -8,6 +8,42 @@
     -100,
     5000
   ],
+  "sources": {
+    "robinhood:/rhj/corporate-actions": [
+      "rows[].actionId",
+      "rows[].type",
+      "rows[].actionStatus",
+      "rows[].processDate",
+      "rows[].rate",
+      "rows[].oldRate",
+      "rows[].newRate"
+    ],
+    "robinhood:/rhj/prices": [
+      "rows[].issuerSpotToday",
+      "rows[].price where price.source is robinhood:/rhj/prices"
+    ],
+    "robinhood:/rhj/assets": [
+      "rows[].symbol",
+      "rows[].token"
+    ],
+    "onchain:UIMultiplierUpdated": [
+      "rows[].change"
+    ],
+    "chainlink:getRoundData": [
+      "rows[].price where price.source is chainlink:getRoundData"
+    ],
+    "exdate": [
+      "rows[].status",
+      "rows[].note",
+      "rows[].feed",
+      "rows[].expectedStepWad",
+      "rows[].observedStepWad",
+      "rows[].receivedPerShare",
+      "rows[].impliedHaircutBps",
+      "rows[].impliedHaircutBpsExact",
+      "rows[].impliedReinvestPrice"
+    ]
+  },
   "builtFrom": {
     "corporateActions": "data/corporate-actions.archive.json",
     "multiplierEvents": "data/multiplier-events.observed.json",
@@ -199,7 +235,7 @@
         "bid": "1699",
         "ask": "1714.87",
         "mid": "1706.9350",
-        "generatedAt": "2026-09-05T20:28:12.793896330Z",
+        "generatedAt": "2026-09-05T20:42:21.010948434Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 10.506
       },
@@ -273,7 +309,7 @@
         "bid": "100.42",
         "ask": "100.5",
         "mid": "100.4600",
-        "generatedAt": "2026-09-05T20:28:20.804148115Z",
+        "generatedAt": "2026-09-05T20:42:29.398284834Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.51
       },
@@ -354,7 +390,7 @@
         "bid": "911.33",
         "ask": "921.07",
         "mid": "916.2000",
-        "generatedAt": "2026-09-05T20:28:30.184526065Z",
+        "generatedAt": "2026-09-05T20:42:28.095990258Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 2.621
       },
@@ -395,7 +431,7 @@
         "bid": "300",
         "ask": "320.1",
         "mid": "310.0500",
-        "generatedAt": "2026-09-05T20:28:22.835109864Z",
+        "generatedAt": "2026-09-05T20:42:26.240598341Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.538
       },
@@ -508,7 +544,7 @@
         "bid": "23.27",
         "ask": "23.81",
         "mid": "23.5400",
-        "generatedAt": "2026-09-05T20:28:23.542898815Z",
+        "generatedAt": "2026-09-05T20:42:25.713192196Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 0.297
       },
@@ -542,7 +578,7 @@
         "bid": "14.42",
         "ask": "15",
         "mid": "14.7100",
-        "generatedAt": "2026-09-05T20:28:30.729290099Z",
+        "generatedAt": "2026-09-05T20:42:37.224412865Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 70.082
       },
@@ -656,7 +692,7 @@
         "bid": "101.56",
         "ask": "103.11",
         "mid": "102.3350",
-        "generatedAt": "2026-09-05T20:28:35.197006444Z",
+        "generatedAt": "2026-09-05T20:42:35.188267711Z",
         "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 7.256
       },

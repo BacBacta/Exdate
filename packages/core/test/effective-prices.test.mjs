@@ -214,7 +214,22 @@ describe('the state file', () => {
       now: () => EFFECTIVE,
     })
     const written = JSON.parse(await readFile(join(dir, 'state.json'), 'utf8'))
-    expect(Object.keys(written)).toEqual(['note', 'method', 'lastRunAt', 'toleranceSeconds', 'summary', 'watcher', 'watchdog', 'steps'])
+    // `source` and `exdateObserves` name whose content the quotes are, because
+    // DATA-LICENSE.md carves the issuer's out of exdate's grant and a reader of this
+    // file alone could not otherwise tell (audit 2026-09-05, F06).
+    expect(Object.keys(written)).toEqual([
+      'note',
+      'source',
+      'exdateObserves',
+      'method',
+      'lastRunAt',
+      'toleranceSeconds',
+      'summary',
+      'watcher',
+      'watchdog',
+      'steps',
+    ])
+    expect(written.source).toBe('robinhood:/rhj/prices')
     expect(written.method).toBe('the one-shot method')
     expect(written.watcher.heartbeatAt).toBe('2026-09-04T09:00:00.000Z')
     expect(written.watchdog).toEqual({ stale: false })

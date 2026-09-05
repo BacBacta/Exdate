@@ -313,6 +313,12 @@ export async function writeState(root, out, { previous, captures, method, patch 
     previous ?? {}
   const state = {
     note: NOTE,
+    // Named in the file rather than only in the licence: every quote below is the
+    // issuer's, and DATA-LICENSE.md carves the issuer's content out of exdate's own
+    // CC BY 4.0 grant. A reader must be able to tell the two apart from the file
+    // itself (audit 2026-09-05, F06).
+    source: 'robinhood:/rhj/prices',
+    exdateObserves: 'which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was',
     method: method ?? previous?.method ?? null,
     lastRunAt: iso(now()),
     toleranceSeconds: TOLERANCE_SECONDS,

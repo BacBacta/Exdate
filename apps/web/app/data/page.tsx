@@ -68,9 +68,10 @@ export default function Page() {
               exdate’s own observations are licensed under{' '}
               <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>: use them,
               republish them, build on them, and say where they came from. The grant does not cover
-              any field whose <code>source</code> begins with <code>robinhood:</code>, nor the
-              issuer’s files above — that content is Robinhood’s, reproduced as the input each
-              measurement is checked against, under a licence exdate cannot pass on.
+              the issuer’s files above, nor the issuer’s fields inside the files that are built on
+              them — each of those names its own <code>sources</code> — that content is Robinhood’s,
+              reproduced as the input each measurement is checked against, under a licence exdate
+              cannot pass on.
               {github ? (
                 <>
                   {' '}

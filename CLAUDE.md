@@ -47,14 +47,15 @@ nowhere else.
 - **Robinhood's own endpoint keeps no archive; the chain has one.** `eth_call` at
   `latest - 10 000` answers `metadata is not found` there, and that was recorded as a property of
   the chain for a month because nobody had looked at another endpoint. It is a property of that
-  endpoint. The public chain registries list eight; **six answer, three serve state at any height,
-  and two reach the oldest multiplier step** — but **which** two is not stable: measured again on the
-  evening of 2026-09-04, `pocket.network` had lost archive since that morning and a newly listed
-  `rpc.ordofi.network` had it, with a 10 000-block log cap against blockmachine's 1 000. Re-probe
-  rather than trust the file's names. `data/rpc-endpoints.observed.json`,
-  `node scripts/probe-rpc-endpoints.mjs`. Two independent endpoints agree at 20 M and 50 M blocks
-  deep, three at 1 M, so the history is corroborated rather than taken from one witness.
-  Set `RHC_RPC_URL_ARCHIVE` to use one.
+  endpoint. The public chain registries list nine, and **how many of them serve archive state is a
+  reading with a date on it, never a number to quote from here**: `pocket.network` had it one
+  morning and not that evening, `rpc.ordofi.network` gained it the same day and had lost it again
+  by 2026-09-05. **On 2026-09-05: six answer, two serve state at any height, and exactly one
+  (`blockmachine.io`) reaches the oldest multiplier step** — so the state confirmation rests on one
+  witness today, and `data/multiplier-state-verification.json` says so per step rather than
+  implying more. `data/rpc-endpoints.observed.json` is refreshed daily by
+  `.github/workflows/probe-rpc-endpoints.yml`; `node scripts/probe-rpc-endpoints.mjs` to re-run it.
+  Set `RHC_RPC_URLS_ARCHIVE` (comma-separated) to name the endpoints yourself.
   - **Production reads go to a third party first, Robinhood's endpoint only as the fallback** —
     since 2026-09-04, for a terms reason (`docs/terms-review.md`): the chain is outside Robinhood's
     Terms, its public RPC is a "Service" bound to testing and development and "not intended for
@@ -219,7 +220,9 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   `Robinhood AAPL / USD`, `RHAMD / USD`, `Robinhood SGOV-USD`), and the issuer's registry carries
   **194 distinct tickers for 194 assets**, so a ticker resolves to exactly one address. Each half is
   first-party; only the join is inference.
-- **23 of 35 pairings are corroborated by behaviour, in two different ways** — and the two are
+- **21 of 35 pairings are corroborated by behaviour, in two different ways** (read from
+  `data/token-feed-map.json` on 2026-09-05 at 20:28 UTC — it is a moving majority recomputed every
+  hour, so read the file rather than this line) — and the two are
   never merged, because they are not the same claim. `corroboratedBy` names which, everywhere the
   fact travels: the map, the generated registry, `reconcile()`, the API, the SDK and both sites.
   - **Causal — `multiplier-step`, SGOV alone.** Its 2026-07-08 step moved its feed by +9.5778 bps
@@ -230,14 +233,17 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
     invisible. SGOV's 2026-09-01 step disagrees (−3.03 vs +21.14 bps) and is reported as such: the
     equity leg is unobservable from here, and a total-return feed is designed to stay flat through
     a step.
-  - **Identification — `traded-price`, 23 pairings** (SGOV among them, so it carries both).
-    The token's on-chain traded price sits far closer to this feed's answer than to any other
-    mapped feed, on a majority of at least three readings. Weaker on purpose: two unrelated assets
-    can trade at one price. The 12 that fail are the informative half — CLSK, COIN, CRCL, CRWV,
-    EWY, GME, IONQ, MSTR, NBIS, ORCL, RGTI, RKLB — almost all high-volatility names whose traded
-    price is genuinely dislocated from the feed (GME's gap has been read at 664 bps on a pool
-    holding $809 046). The test fails there because the premise fails, not because the pairing is
-    wrong.
+  - **Identification — `traded-price`, 20 pairings** at the same reading (SGOV among them, so it
+    carries both). The token's on-chain traded price sits far closer to this feed's answer than to
+    any other mapped feed, on a majority of at least three readings. Weaker on purpose: two
+    unrelated assets can trade at one price. The 15 that fail are the informative half — ASML,
+    CLSK, COIN, CRCL, CRWV, DELL, EWY, IONQ, MSTR, NBIS, ORCL, RGTI, RKLB, SNDK, USO — almost all
+    high-volatility names whose traded price is genuinely dislocated from the feed (GME's gap has
+    been read at 664 bps on a pool holding $809 046). The test fails there because the premise
+    fails, not because the pairing is wrong. The membership moves hour to hour: DELL and ASML were
+    inside it at the 2026-09-05 audit and outside it that morning, which is why every surface is
+    rebuilt from the map in one chain (`scripts/rebuild-record.mjs`) rather than on its own
+    schedule.
 - Confidence ladder, in `reconcile.ts`: ticker match only → `low` always; `feedCorroborated` →
   `medium` from three events; a first-party address link → `high` from ten, which nothing reaches.
   **Both kinds of corroboration land on `medium`** — `medium` already means "believed on
@@ -353,14 +359,16 @@ First sample 2026-09-03 07:48 UTC (overnight): 1 517 transfers in 41 s = **37 tr
 
 ## Observed corporate actions
 
-**13 `UIMultiplierUpdated` logs = 12 distinct changes across 10 tokens** since 2026-07-02 (CRWD
+**14 `UIMultiplierUpdated` logs = 13 distinct changes across 11 tokens** since 2026-07-02 (CRWD
 announced the same change twice). Full data in `data/multiplier-events.observed.json`.
-Rescan the whole chain: `node scripts/backfill-multiplier-events.mjs`, then
-`node scripts/generate-registry.mjs`.
+**The rescan runs on a schedule** — `.github/workflows/rescan-chain.yml`, every six hours — because
+it did not, and a step went unrecorded for two days (see the 2026-09-05 audit entry in the decision
+log). By hand: `node scripts/backfill-multiplier-events.mjs`, then `node scripts/rebuild-record.mjs`.
 
-The most recent is **F (Ford), 2026-09-02, +1.46 bps**, announced 15:00:41 UTC and effective
-15:10:26 UTC — caught the same day, against an issuer row with `processDate` 2026-09-01 and a
-declared rate of $0.15.
+The most recent is **UPS, 2026-09-04, +22.09 bps**, announced 15:00:41 UTC and effective
+15:10:26 UTC, against an issuer row with `processDate` 2026-09-03 and a declared rate of $1.64.
+It is also the one the scheduled rescan exists for: the log was on chain, the watcher had sampled
+it, and `data/` did not learn of it until 2026-09-05.
 
 Observed step range: **+0.64 bps (DELL) to +214.86 bps (CCL)**, plus CRWD at ×4 (a split). The
 "0.05 %–2 %" band from the kickoff prompt does not hold — do not classify `kind` by magnitude.
@@ -368,25 +376,30 @@ Observed step range: **+0.64 bps (DELL) to +214.86 bps (CCL)**, plus CRWD at ×4
 **SGOV is the reference token**: three chained events (1.0 → 1.000957 → 1.002981 → 1.005101),
 which makes it the right fixture for reconciliation tests.
 
-Reconciliation against the issuer's own rates, price = Chainlink round at `effectiveAt`, all rows
-`confidence: low`. Live at `GET /v1/:chain/reconciliations`; rebuild offline with
-`node scripts/build-reconciliations.mjs`.
+Reconciliation against the issuer's own rates, price = the issuer's quote captured at the instant
+where one exists, else the Chainlink round in force at `effectiveAt`. **51 rows: 2 matched, 5
+anomaly, 38 pending, 6 unmatched.** Live at `GET /v1/:chain/reconciliations`; rebuild offline with
+`node scripts/rebuild-record.mjs`. The declared side comes from
+**`data/corporate-actions.archive.json`, not the issuer's one-month snapshot** — the snapshot is
+refreshed by nothing and loses rows out of the window, and being wrong in both directions at once
+is what cost two dividends their place in the ledger (audit F02).
 
 | Token | Gross | Received | Haircut | Implied ÷ spot | Status |
 |---|---|---|---|---|---|
-| AAPL | $0.27 | $0.1728 | **36.0 %** | 1.47 | matched |
-| SGOV | $0.306812 | $0.2034 | **33.7 %** | 1.51 | matched |
-| ASML | $1.817086 | $0.1749 | 90.4 % | 10.7 | anomaly |
-| COST | $1.47 | no feed | — | 2.58 | anomaly |
+| AAPL | $0.27 | $0.172751 | **36.0 %** (3 601.81 bps) | 1.54 | matched |
+| SGOV | $0.306812 | $0.203167 | **33.8 %** (3 378.13 bps) | 1.51 | matched |
+| ASML | $1.817086 | $0.174925 | 90.4 % | 10.5 | anomaly |
+| COST | $1.47 | no feed | — | 2.62 | anomaly |
 | CCL | $0.15 | no feed | — | 0.30 | anomaly |
-| F | $0.15 | no feed | — | 74.5 | anomaly |
+| F | $0.15 | no feed | — | 70.1 | anomaly |
+| UPS | $1.64 | no feed, quote 350 s late on a halted market | — | 7.26 | anomaly |
 | BND, SHY, UMC, SIMO, FIX, CTSH, HWM | — | `COMPLETED` by issuer, multiplier still 1.0 | — | — | **pending** (BND: 4 weeks) |
 
 Mid-30s on two independent tokens is consistent with 30 % US non-resident withholding plus
 something unexplained. Report the observed number; never claim the decomposition.
 
 **The implied-price ratio is the discriminator that survives having no oracle.** A step that really
-was a reinvestment implies a price near spot: the two matched rows land at 1.47 and 1.51, every
+was a reinvestment implies a price near spot: the two matched rows land at 1.54 and 1.51, every
 anomaly is far outside. It uses `/rhj/prices`, which covers all 194 tokens, so it works for the 159
 with no Chainlink feed. It is a plausibility check and never a reconciliation input — it is today's
 price, not the price at `effectiveAt`.
@@ -1650,6 +1663,42 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (`backfill-multiplier-events` → `resolve-effective-blocks` → `verify-multiplier-history` →
   `build-reconciliations` → `generate-registry` → `build-token-list`) is the owner's first fix, and
   making it a collector the second.
+- 2026-09-05 — **The audit's findings applied, and the two that mattered were both "nothing was
+  scheduled".** F01: UPS's dividend of 4 September landed on chain and `data/` did not know,
+  because the whole-chain scan was a command someone had to remember. Rerunning it fixed the
+  record — 14 logs, 13 changes, 11 tokens, and the UPS page, badge, token list and calendar now say
+  the money arrived — but the fix is `.github/workflows/rescan-chain.yml`, every six hours,
+  committing only when the chain actually moved. F02: `build-reconciliations.mjs` read the issuer's
+  one-month snapshot, which no collector refreshes, so two declared dividends were missing; it
+  reads `data/corporate-actions.archive.json` now, which is the **only** input that is both current
+  and complete — refreshing the snapshot instead would have lost ASML's 5 August row, already out
+  of the issuer's window and unrecoverable. 49 rows → 51, matching the live indexer exactly.
+  F03 was four surfaces rebuilt on four schedules, so `scripts/rebuild-record.mjs` is now the one
+  place the dependency order lives and every workflow that changes an input calls it. Its
+  `--offline` mode is the part worth remembering: the hourly job **stamps** the reconciliation
+  file's feed block from the map instead of rebuilding it, because rebuilding hourly would re-read
+  historical Chainlink rounds and let one transient failure rewrite a published haircut as an
+  anomaly. `build-reconciliations.mjs` also refuses outright to publish fewer `matched` rows than
+  the file already holds — rehearsed by forcing ASML to `matched`, where it names the row and exits
+  1. F04: `verify-multiplier-history.mjs` asks every archive endpoint that can answer and records
+  `witnesses[]` per step; re-probing found ordofi had lost archive since the file was written, so
+  the record now says **one** witness where it used to imply two, and a daily probe keeps the
+  candidate list current. F05: a measured `crossChecks` block is carried forward instead of being
+  erased by the documented command. F07: both issuer snapshots carry `fetchedAt` and `source`, and
+  every reader takes either shape. F08: the aggregator's own integer answer is kept
+  (`price.answer`), prices are formatted exactly from the WAD rather than through
+  `Number(x) / 1e18` — which had stored `305.1711` where the round said `305.17105` — and
+  `impliedHaircutBpsExact` sits beside the truncated figure. F09: the corroboration of a pairing is
+  a fact about the **pairing**, so the indexer writes it on the pending, unmatched and split paths
+  too, not only the priced one. F11: `deploy-web.sh` fetches and refuses to publish a checkout
+  behind its own branch, which is how the live site came to show a figure older than the record it
+  claims to read. F12: the issuer registry is refreshed daily, free to schedule because
+  `writeSnapshot` leaves unchanged content completely alone, timestamp included — so the generated
+  registry stays byte-identical on a rebuild, which is how CI tells drift from a rebuild.
+  The one thing deliberately **not** fixed in code is F06's other half: the token list carries no
+  `sources` block, because its schema rejects unknown top-level fields and an invalid list is
+  silently ignored by every consumer — `DATA-LICENSE.md` names its issuer fields in a table
+  instead, and carries the attribution text a re-user must reproduce.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -1719,8 +1768,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   row, and all 43 archived actions are cash dividends — so it refuses and the row stays
   `unsupported_action_type` with the observed ratio stated.
 - The token → feed pairing is **causally** corroborated for 1 of 35 tokens (SGOV, by its own step);
-  22 more are corroborated only by their traded price, which identifies the underlying and does not
-  test the mechanism a haircut depends on, and 12 are still a bare ticker match. No first-party link
+  a further 19–22 depending on the hour are corroborated only by their traded price, which
+  identifies the underlying and does not test the mechanism a haircut depends on, and the rest are
+  a bare ticker match. Read `data/token-feed-map.json` for today's split, never a number from here. No first-party link
   exists to close the gap; a second SGOV-like token (low-volatility underlying, large step) would
   causally corroborate another row. See `docs/phase-0-verification.md` §14.
 - The poller and the gap sweep have no tests of their own: they need a chain and a Ponder process,

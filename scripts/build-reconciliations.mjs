@@ -523,6 +523,37 @@ await writeFile(new URL('data/reconciliations.observed.json', root), JSON.string
     'impliedHaircutBps is truncated toward zero; impliedHaircutBpsExact carries the same figure to two decimals. price.answer and price.answerDecimals are the aggregator\'s own integer answer; price.value and price.underlying are that answer in full precision, not a display rounding.',
   matchWindowDays: MATCH_WINDOW_DAYS,
   plausibleHaircutBps: [-100, 5000],
+  // Which fields are copied from the issuer and which exdate measured. Named here
+  // because DATA-LICENSE.md carves the issuer's content out of exdate's CC BY 4.0
+  // grant, and a reader of this file alone could not otherwise tell them apart: the
+  // licence said every such value carries a `source` beginning with `robinhood:`,
+  // and in this file none did (audit 2026-09-05, F06).
+  sources: {
+    'robinhood:/rhj/corporate-actions': [
+      'rows[].actionId',
+      'rows[].type',
+      'rows[].actionStatus',
+      'rows[].processDate',
+      'rows[].rate',
+      'rows[].oldRate',
+      'rows[].newRate',
+    ],
+    'robinhood:/rhj/prices': ['rows[].issuerSpotToday', "rows[].price where price.source is robinhood:/rhj/prices"],
+    'robinhood:/rhj/assets': ['rows[].symbol', 'rows[].token'],
+    'onchain:UIMultiplierUpdated': ['rows[].change'],
+    'chainlink:getRoundData': ["rows[].price where price.source is chainlink:getRoundData"],
+    'exdate': [
+      'rows[].status',
+      'rows[].note',
+      'rows[].feed',
+      'rows[].expectedStepWad',
+      'rows[].observedStepWad',
+      'rows[].receivedPerShare',
+      'rows[].impliedHaircutBps',
+      'rows[].impliedHaircutBpsExact',
+      'rows[].impliedReinvestPrice',
+    ],
+  },
   builtFrom: {
     corporateActions: 'data/corporate-actions.archive.json',
     multiplierEvents: 'data/multiplier-events.observed.json',
