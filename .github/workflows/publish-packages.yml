@@ -265,6 +265,51 @@ jobs:
           echo "--- what the scope already holds"
           api /-/org/exdate/package
 
+      # Is trusted publishing configured? npm answers that nowhere: "npm does
+      # not verify your trusted publisher configuration when you save it", and
+      # "errors will only appear when you attempt to publish". There is no read
+      # endpoint - four candidate paths were tried and all 404.
+      #
+      # So this rehearses the OIDC path with the token deliberately removed and
+      # --dry-run on, and reports what npm says. The docs do not state whether a
+      # dry run performs the token exchange, so this measures it rather than
+      # assuming: if npm exchanges first, a missing Trusted Publisher shows up
+      # here for free and a configured one is confirmed without spending a
+      # version number. If npm never contacts the registry, the output says so
+      # and we have learnt that a dry run cannot answer the question.
+      #
+      # It never fails the job. It is an experiment, not a gate.
+      - name: Rehearse the trusted-publishing path (publishes nothing)
+        if: ${{ inputs.confirm != 'PUBLISH' }}
+        run: |
+          if [ -n "${NPM_CONFIG_USERCONFIG:-}" ] && [ -f "$NPM_CONFIG_USERCONFIG" ]; then
+            sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG"
+          fi
+          npm config delete //registry.npmjs.org/:_authToken 2>/dev/null || true
+          echo "auth lines left in the job's npmrc: $(grep -c authToken "${NPM_CONFIG_USERCONFIG:-/dev/null}" 2>/dev/null || echo 0)"
+          echo
+
+          for t in /tmp/pack/exdate-core-*.tgz /tmp/pack/exdate-sdk-*.tgz; do
+            echo "=== npm publish --dry-run $(basename "$t") , no token, OIDC only"
+            set +e
+            out="$(npm publish "$t" --access public --dry-run 2>&1)"
+            status=$?
+            set -e
+            printf '%s\n' "$out" | tail -25
+            echo "--- exit $status"
+            if printf '%s' "$out" | grep -qiE 'oidc|trusted publish|id.token|exchange'; then
+              echo "VERDICT: npm did reach for OIDC on a dry run - this rehearsal is meaningful."
+            elif [ $status -eq 0 ]; then
+              echo "VERDICT: the dry run succeeded WITHOUT mentioning OIDC, so it most likely"
+              echo "  never authenticated at all. That means a dry run cannot tell you whether"
+              echo "  the Trusted Publisher is configured; only a real publish can."
+            else
+              echo "VERDICT: npm refused. Read the message above - if it names authentication or"
+              echo "  a trusted publisher, that IS the answer about the configuration."
+            fi
+            echo
+          done
+
       - name: Publish
         # An exact string, not a boolean. A `type: boolean` input reaches an
         # expression as a boolean here and as the STRING "false" elsewhere, and
