@@ -1699,6 +1699,31 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `sources` block, because its schema rejects unknown top-level fields and an invalid list is
   silently ignored by every consumer — `DATA-LICENSE.md` names its issuer fields in a table
   instead, and carries the attribution text a re-user must reproduce.
+- 2026-09-05 — **The hosted API redeployed, and the thing that broke was the fix from an hour
+  earlier.** `api.exdate.me` was serving the 2026-09-04 image: a registry generated on the 2nd,
+  `feedCorroboratedBy: []` on every unpriced row, and the subscription routes 404. The cause is
+  structural rather than an oversight — the generated registry is compiled INTO the image, so the
+  corroboration of every pairing is code as far as the container is concerned — so the answer is
+  `deploy/update-api.sh` on a fifteen-minute systemd timer, rebuilding only when a commit changes
+  what the image contains (`data/`-only commits move the checkout forward without a rebuild, which
+  is safe because nothing the container runs reads `data/`; checked, not assumed).
+  **Then the redeploy itself proved that timer would have taken the API down on every tick.**
+  Ponder refuses a schema written by a different build, and the build id it compares is
+  `sha256(version + config + schema + indexing functions)` — read out of
+  `ponder/dist/esm/build/index.js`, not guessed — where the indexing functions include everything
+  they import, **the generated registry among them**. So every upgrade worth making invalidates the
+  schema, the indexer crashloops on `MigrationError`, and Caddy answers 502 while the status page
+  correctly says it has nothing to show. Both deploy scripts now recover, triggered by **Ponder's
+  own refusal in the log** rather than by predicting which commits change a hash, so it cannot fire
+  when Ponder is content; the negative case dies with "it is not the Ponder schema" instead of
+  dropping anything. What a drop costs is only derived tables — the poller rewrites token states,
+  reconciliations and the seeded events within one interval, `feed_rounds` is an observation log
+  whose prices are re-readable from `getRoundData`, and the self-service subscriptions are a file
+  on a volume, not a table. Two smaller things the same run caught: the Termux guard printed
+  `ssh root@YOUR.SERVER.IP` while holding the host name it could have printed, and the timer's
+  confirmation line read `NextElapseUSecRealtime`, which systemd only sets on `OnCalendar` timers,
+  so it printed an empty value and confirmed nothing — the same shape as the "containers up" check
+  that was once true of a run where nothing worked.
 - _(append decisions here as they are made)_
 
 ## Status
