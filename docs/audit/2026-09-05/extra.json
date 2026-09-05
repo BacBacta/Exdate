@@ -1,0 +1,72 @@
+{
+ "light": {
+  "scrollWidth": 416,
+  "clientWidth": 360,
+  "button": {
+   "text": "Look up",
+   "color": "rgb(246, 245, 241)",
+   "bg": "rgb(22, 22, 21)",
+   "fontSize": "15px",
+   "disabled": true,
+   "contrast": "16.60",
+   "contrastVsPage": "16.60"
+  },
+  "bodyBg": "rgb(246, 245, 241)",
+  "colorsUsed": [
+   "rgb(22, 22, 21)",
+   "rgb(58, 57, 53)",
+   "rgb(107, 106, 99)"
+  ],
+  "widest": null
+ },
+ "dark": {
+  "scrollWidth": 416,
+  "clientWidth": 360,
+  "button": {
+   "text": "Look up",
+   "color": "rgb(12, 12, 11)",
+   "bg": "rgb(239, 238, 232)",
+   "fontSize": "15px",
+   "disabled": true,
+   "contrast": "16.84",
+   "contrastVsPage": "16.84"
+  },
+  "bodyBg": "rgb(12, 12, 11)",
+  "colorsUsed": [
+   "rgb(239, 238, 232)",
+   "rgb(207, 206, 199)",
+   "rgb(157, 156, 149)"
+  ],
+  "widest": null
+ },
+ "tokenCost": {
+  "pluralGlitch": "+0.06% shares since launch: 0 dividends reconciled, 1 step unexplained",
+  "small": [
+   {
+    "tag": "A",
+    "text": "← Find another token",
+    "w": 136,
+    "h": 18
+   },
+   {
+    "tag": "A",
+    "text": "",
+    "w": 130,
+    "h": 18
+   },
+   {
+    "tag": "A",
+    "text": "transaction",
+    "w": 89,
+    "h": 18
+   }
+  ],
+  "addressShown": "0x4EA005168D7F09a7A0Ba9D1DEf21a479950E44C2",
+  "copyButton": false
+ },
+ "wallet": {
+  "history": "What past dividends delivered 0.033 shares gained across 1 dividend. None of them reconciled against a declared amount, so no dollar figure is claimed. iShares 0-3 Month Treasury Bond SGOV · 1 September 2026 Shares held then 15.6259 Shares gained 0.033 nothing declared Download as CSV One row per dividend, with the shares held, what was declared and what arrived. A figure exdate could not measure is left empty rather than written as zero, and each row carries why. It values a distribution at the price measured when the step took effect, which is a measurement and not any tax authority’s method. Shares held then is this address’s balance at the block each change took effect, read directly at ",
+  "csv": true,
+  "source": "h change took effect, read directly at each block in 12 requests, from a public archive node that is not Robinhood's. Tokens held inside a protocol at the time are not seen. Dollar figures use the price and "
+ }
+}

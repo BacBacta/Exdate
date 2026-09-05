@@ -1,0 +1,418 @@
+{
+ "calendar": {
+  "words": 920,
+  "fk_all": [
+   21.4,
+   18,
+   686,
+   16
+  ],
+  "fk_first160": [
+   14.4,
+   37,
+   126,
+   5
+  ],
+  "jargon": {
+   "declared": 43,
+   "owed": 42,
+   "issuer": 4,
+   "shares": 3,
+   "multiplier": 2,
+   "oracle": 1,
+   "feed": 1,
+   "SDK": 1,
+   "API": 1
+  },
+  "numbers_sample": [
+   "Declared per share $0.2516 Owed per",
+   "token $0.2516 31 days",
+   "Declared per share $0.2508 Owed per",
+   "token $0.2508 30 days",
+   "Declared per share $0.3067 Owed per",
+   "token $0.3067 30 days",
+   "Declared per share $0.4975 Owed per",
+   "token $0.4975 16 days",
+   "Declared per share $0.9000 Owed per",
+   "token $0.9000 12 days",
+   "Declared per share $0.3300 Owed per",
+   "token $0.3300 11 days"
+  ],
+  "numbers_total": 74,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " dividends across 35 tokens, as of 5 September 2026"
+ },
+ "data": {
+  "words": 543,
+  "fk_all": [
+   21.8,
+   13,
+   499,
+   12
+  ],
+  "fk_first160": [
+   25.1,
+   5,
+   151,
+   3
+  ],
+  "jargon": {
+   "feed": 9,
+   "multiplier": 7,
+   "issuer": 7,
+   "archive": 4,
+   "block": 3,
+   "oracle": 2,
+   "Chainlink": 2,
+   "reconcil": 2,
+   "RPC": 2,
+   "corroborat": 1,
+   "proxy": 1,
+   "declared": 1,
+   "arrived": 1,
+   "SDK": 1
+  },
+  "numbers_sample": [],
+  "numbers_total": 0,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " reconciliations.observed.json Every dividend reconciled against its multiplier step:"
+ },
+ "docs-api": {
+  "words": 2144,
+  "fk_all": [
+   14.7,
+   33,
+   2062,
+   85
+  ],
+  "fk_first160": [
+   11.6,
+   45,
+   147,
+   8
+  ],
+  "jargon": {
+   "multiplier": 31,
+   "feed": 26,
+   "issuer": 14,
+   "declared": 14,
+   "bps": 12,
+   "API": 10,
+   "effectiveAt": 9,
+   "pending": 7,
+   "webhook": 6,
+   "round": 6,
+   "onchain": 6,
+   "corroborat": 5,
+   "matched": 5,
+   "arrived": 5
+  },
+  "numbers_sample": [
+   "Robinhood Chain mainnet on 2026-09-02",
+   "2026-09-03",
+   "2026-09-02",
+   "2026-09-02",
+   "2026-09-01",
+   "2026-09-02",
+   "2026-09-01",
+   "2026-08-31",
+   "2026-09-02",
+   "2026-08-06",
+   "2026-08-06",
+   "2026-08-07"
+  ],
+  "numbers_total": 20,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " Every example below is a real response, captured from the indexer running against Robinhood Chain"
+ },
+ "docs-sdk": {
+  "words": 1029,
+  "fk_all": [
+   16.3,
+   31,
+   1038,
+   35
+  ],
+  "fk_first160": [
+   13.9,
+   45,
+   167,
+   6
+  ],
+  "jargon": {
+   "webhook": 14,
+   "multiplier": 11,
+   "SDK": 9,
+   "API": 8,
+   "ledger": 7,
+   "pending": 7,
+   "declared": 7,
+   "owed": 6,
+   "feed": 4,
+   "reconcil": 4,
+   "issuer": 4,
+   "indexer": 4,
+   "bps": 3,
+   "underlying": 3
+  },
+  "numbers_sample": [
+   "28 for BND on 2026-09-02 declared_complete_not_on_chain is the",
+   "t.event.data.impliedHaircutBps // 3378 \u2014 33.78 % of SGOV's August dividend"
+  ],
+  "numbers_total": 2,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": "string , and anything exdate has not observed is null \u2014 never 0 , never absent."
+ },
+ "flows": {
+  "words": 773,
+  "fk_all": [
+   17.4,
+   23,
+   560,
+   19
+  ],
+  "fk_first160": [
+   11.5,
+   50,
+   147,
+   7
+  ],
+  "jargon": {
+   "mint": 44,
+   "shares": 5,
+   "oracle": 2,
+   "multiplier": 1,
+   "feed": 1,
+   "burn": 1,
+   "ledger": 1,
+   "issuer": 1,
+   "underlying": 1,
+   "SDK": 1,
+   "API": 1,
+   "block": 1
+  },
+  "numbers_sample": [],
+  "numbers_total": 0,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " Data read from Robinhood Chain: 194 tokens, last observed 5 September 2026 . Stock Tokens are debt securities issued "
+ },
+ "gap": {
+  "words": 1177,
+  "fk_all": [
+   15.1,
+   39,
+   879,
+   30
+  ],
+  "fk_first160": [
+   11.5,
+   52,
+   134,
+   6
+  ],
+  "jargon": {
+   "oracle": 71,
+   "pool": 32,
+   "bps": 31,
+   "feed": 12,
+   "Chainlink": 3,
+   "basis point": 2,
+   "liquidity": 2,
+   "shares": 2,
+   "multiplier": 1,
+   "pre-market": 1,
+   "overnight": 1,
+   "USDG": 1,
+   "issuer": 1,
+   "SDK": 1
+  },
+  "numbers_sample": [
+   "h old \u00b7 pool $63,448 Traded $",
+   "1766.7100 Oracle $ 1729.6464 +214 bps",
+   "h old \u00b7 pool $445,545 Traded $",
+   "515.3970 Oracle $ 521.9720 -126 bps",
+   "h old \u00b7 pool $2,592,712 Traded $",
+   "149.5091 Oracle $ 147.9597 +105 bps",
+   "h old \u00b7 pool $298,999 Traded $",
+   "143.2008 Oracle $ 142.2965 +64 bps",
+   "h old \u00b7 pool $48,279 Traded $",
+   "1721.2781 Oracle $ 1711.8027 +55 bps",
+   "h old \u00b7 pool $103,059 Traded $",
+   "174.8845 Oracle $ 173.9498 +54 bps"
+  ],
+  "numbers_total": 69,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " Data read from Robinhood Chain: 194 tokens, last observed 5 September 2026 . Stock Tokens are debt securities issued "
+ },
+ "home": {
+  "words": 599,
+  "fk_all": [
+   10.3,
+   49,
+   543,
+   35
+  ],
+  "fk_first160": [
+   8.1,
+   62,
+   142,
+   10
+  ],
+  "jargon": {
+   "declared": 13,
+   "arrived": 12,
+   "feed": 7,
+   "owed": 7,
+   "API": 4,
+   "issuer": 3,
+   "SDK": 3,
+   "shares": 2,
+   "tokenized": 2,
+   "multiplier": 1,
+   "oracle": 1,
+   "reconcil": 1,
+   "webhook": 1,
+   "announcement": 1
+  },
+  "numbers_sample": [
+   "Robinhood Stock Tokens 36 % never arrived",
+   "36 % of Apple \u2019s last",
+   "arrived on chain. Declared $ 0.27 \u00b7 Arrived $ 0.17",
+   "AAPL Declared $ 0.27 Arrived $0.17",
+   "36 % iShares 0-3",
+   "SGOV Declared $ 0.31 Arrived $0.20",
+   "34 % Ford Motor",
+   "F Declared $ 0.15 Arrived \u2014",
+   "CCL Declared $ 0.15 Arrived \u2014",
+   "COST Declared $ 1.47 Arrived \u2014",
+   "ASML Declared $ 1.82 Arrived $0.17"
+  ],
+  "numbers_total": 11,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " same records. Every value is exact; anything not observed is null, never zero. The token list imports the whole regis"
+ },
+ "record": {
+  "words": 564,
+  "fk_all": [
+   12.1,
+   48,
+   494,
+   22
+  ],
+  "fk_first160": [
+   12.3,
+   50,
+   145,
+   6
+  ],
+  "jargon": {
+   "declared": 11,
+   "issuer": 7,
+   "feed": 5,
+   "multiplier": 4,
+   "process date": 2,
+   "oracle": 1,
+   "Chainlink": 1,
+   "reconcil": 1,
+   "announcement": 1,
+   "owed": 1,
+   "shares": 1,
+   "SDK": 1,
+   "API": 1,
+   "on-chain": 1
+  },
+  "numbers_sample": [
+   "Declared per share $0.2516 31 days",
+   "Declared per share $0.2508 30 days",
+   "Declared per share $0.3067 30 days",
+   "Declared per share $0.4975 16 days",
+   "Declared per share $0.9000 12 days",
+   "Declared per share $0.3300 11 days",
+   "Declared per share $0.1400 11 days"
+  ],
+  "numbers_total": 7,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": "suer calls paid that have not moved a multiplier, as of 5 September 2026"
+ },
+ "token-cost": {
+  "words": 27,
+  "fk_all": [
+   3.3,
+   92,
+   24,
+   2
+  ],
+  "fk_first160": [
+   3.3,
+   92,
+   24,
+   2
+  ],
+  "jargon": {},
+  "numbers_sample": [],
+  "numbers_total": 0,
+  "has_licence": false,
+  "has_contact": false,
+  "dated": null
+ },
+ "token-sgov": {
+  "words": 27,
+  "fk_all": [
+   3.3,
+   92,
+   24,
+   2
+  ],
+  "fk_first160": [
+   3.3,
+   92,
+   24,
+   2
+  ],
+  "jargon": {},
+  "numbers_sample": [],
+  "numbers_total": 0,
+  "has_licence": false,
+  "has_contact": false,
+  "dated": null
+ },
+ "wallet": {
+  "words": 227,
+  "fk_all": [
+   9.6,
+   51,
+   222,
+   16
+  ],
+  "fk_first160": [
+   7.6,
+   62,
+   159,
+   13
+  ],
+  "jargon": {
+   "declared": 2,
+   "owed": 2,
+   "shares": 2,
+   "multiplier": 1,
+   "oracle": 1,
+   "issuer": 1,
+   "SDK": 1,
+   "API": 1,
+   "block": 1
+  },
+  "numbers_sample": [],
+  "numbers_total": 0,
+  "has_licence": true,
+  "has_contact": false,
+  "dated": " with no price involved. What actually arrives is measured on each token\u2019s page once the step lands. Below the holdings, "
+ }
+}

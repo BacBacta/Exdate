@@ -1,0 +1,432 @@
+{
+ "ranAt": "2026-09-05T12:07:10.114Z",
+ "holder": "(not committed)",
+ "tasks": {
+  "T1": {
+   "steps": [
+    {
+     "step": "locate the finder on the home page",
+     "finderVisible": {
+      "top": 490,
+      "inFold": true
+     }
+    },
+    {
+     "step": "type AAPL",
+     "resultsShown": [
+      "Apple AAPL"
+     ]
+    },
+    {
+     "step": "land on the AAPL token page",
+     "h1": [
+      "Apple"
+     ],
+     "h2": [
+      "Dividends",
+      "Multiplier history",
+      "Price feed"
+     ],
+     "showsDeclared": true,
+     "showsArrived": true,
+     "showsGap": true,
+     "showsDollar": true,
+     "jargonAboveFold": [
+      "reconcil",
+      "multiplier",
+      "Chainlink",
+      "feed"
+     ]
+    },
+    {
+     "step": "find how it was measured",
+     "disclosures": [
+      "How this was measured"
+     ]
+    },
+    {
+     "step": "the sentence answering \"what did I get\"",
+     "quote": "% shares since launch: 1 dividend reconciled. Dividends 13 August 2026 issuer\u2019s process date Declared per share $0.2700 Arrived per share $0.1728 36% never arrived How this was measured Declared is per underlying share, from the issuer\u2019s own feed. Owed per token is that rate times what"
+    }
+   ],
+   "shots": [
+    "w01-t1-home.png",
+    "w02-t1-finder-aapl.png",
+    "w03-t1-aapl-fold.png",
+    "w04-t1-aapl-details-open.png"
+   ],
+   "elapsedMs": 3050,
+   "success": true
+  },
+  "T2": {
+   "steps": [
+    {
+     "step": "read the empty state",
+     "foldText": "Skip to content\nexdate\nTokens\nWallet\nCalendar\n\nAny Robinhood Chain address\n\nWhat your wallet holds. What it is owed.\n\nPaste an address. Your browser reads every Robinhood Stock Token it holds, straight from the chain, and states what each declared dividend would owe it. No signature, no account, nothing sent to exdate.\n\nYour wallet address\nRead\n\nRead in your browser, straight from Robinhood Chain\u2019s public node. No signature. exdate has no server, so the address goes nowhere else.\n\nShares represented is the balance times the multiplier in force, read at the same block. Owed is the issuer\u2019s declared rate times those shares: what a full payment would deliver, with no price involved. What actually arrives is measured on each token\u2019s page once the step lands. Below the holdings, what past dividends delivered to this address is rebuilt from its own transfers.\n\nexdate\n\nThe corporate-action laye"
+    },
+    {
+     "step": "state 600 ms after submit",
+     "text": "Skip to content exdate Tokens Wallet Calendar Any Robinhood Chain address What your wallet holds. What it is owed. Paste an address. Your browser reads every Robinhood Stock Token it holds, straight from the chain, and states what each declared dividend would owe it. No signature, no account, nothing sent to exdate. Your wallet address Reading\u2026 Read in your browser, straight from Robinhood Chain\u2019s public node. No signature. exdate has no server, so the address goes nowhere else. Reading 194 tokens for 0x9e0c\u2026fe67\u2026 Shares represented is the balance times the multiplier in force, read at the sam"
+    },
+    {
+     "step": "holdings read",
+     "settled": true,
+     "readMs": 1752
+    },
+    {
+     "step": "headline as read",
+     "headline": "Skip to content exdate Tokens Wallet Calendar Any Robinhood Chain address What your wallet holds. What it is owed. Paste an address. Your browser reads every Robinhood Stock Token it holds, straight from the chain, and states what each declared dividend would owe it. No signature, no account, nothing sent to exdate. Your wallet address Read Read in your browser, straight from Robinhood Chain\u2019s public node. No signature. exdate has no server, so the address goes nowhere else. 4 Stock Tokens held 0x9e0c\u2026fe67 \u00b7 block 55,108,286 \u00b7 5 Sept, 12:07 UTC $0.04 declared, due, and not yet on chain iShares 0-3 Month Treasury Bond SGOV Tokens 0.1303 Shares represented 0.1309 $0.04 owed Details iShares Silver Trust SLV Tokens 0.1097 Shares represented 0.1097 nothing declared SPDR S&P 500 ETF Trust SPY Tokens 0.0386 Shares represented 0.0386 nothing declared Invesco QQQ QQQ Tokens 0.0184 Shares represented 0.0184 nothing declared What past dividends delivered Reading this address\u2019s transfers in the 10 tokens that moved\u2026 1 request, 11 to go. Shares represented is the balance times the multiplier in force, read at the same block. Owed is the issuer\u2019s declared rate times those shares: what a full payment would deliver, with no price involved. What actually arrives is measured on each token\u2019s page once the step lands. Below the holdings, what past dividends delivered to this address is rebuilt fro"
+    },
+    {
+     "step": "history read",
+     "settled": true,
+     "totalMs": 2833
+    },
+    {
+     "step": "history text",
+     "excerpt": "d Invesco QQQ QQQ Tokens 0.0184 Shares represented 0.0184 nothing declared What past dividends delivered Reading this address\u2019s transfers in the 10 tokens that moved\u2026 1 request, 11 to go. Shares represented is the balance times the multiplier in force, read at the same block. Owed is the issuer\u2019s declared rate times those shares: what a full payment would deliver, with no price involved. Wh"
+    },
+    {
+     "step": "CSV export present",
+     "csv": false,
+     "whichNode": "ead in your browser, straight from Robinhood Chain\u2019s public node. No signature. exdate has no server, so the address goes nowhere else. 4 Stock Tokens held 0x9e0c\u2026fe67 \u00b7 block 55,108,2"
+    }
+   ],
+   "shots": [
+    "w05-t2-wallet-empty.png",
+    "w06-t2-wallet-waiting.png",
+    "w07-t2-wallet-holdings.png",
+    "w08-t2-wallet-history.png"
+   ],
+   "elapsedMs": 4185,
+   "success": true
+  },
+  "T3": {
+   "steps": [
+    {
+     "step": "from home, which header label leads to oracle safety?",
+     "header": [
+      "exdate",
+      "Tokens",
+      "Wallet",
+      "Calendar",
+      "Find your token",
+      "Your wallet",
+      "Calendar",
+      "Live status",
+      "How it works",
+      "Proof",
+      "Delivery record",
+      "Creations",
+      "Oracle gap",
+      "Coverage",
+      "Developers",
+      "API",
+      "SDK",
+      "Data",
+      "GitHub"
+     ]
+    },
+    {
+     "step": "gap page fold",
+     "foldText": "Skip to content exdate Tokens Wallet Calendar Traded price against the oracle What it trades at, and what the oracle says. 214 basis points at the widest, across 26 tokens, read during the weekend on 5 September at 11:26 UTC A lending market liquidates against the Chainlink price. That feed runs 24/5 and holds its last answer outside market hours; the chain never stops trading. The distance between the two is the risk a curator carries, and it is widest exactly when the feed is stalest. At this reading the median feed was 975 minutes old and the median token traded 39 basis points from it. Every token that trades and has a feed Sandisk Corporation SNDK \u00b7 oracle 15 h old \u00b7 pool $63,448 Traded $1766.7100 Oracle $1729.6464 +214 bps Dell DELL \u00b7 oracle 15 h old \u00b7 pool $445,545 Traded $515.3970 Oracle $521.9720 -126 bps Space Exploration Technologies Corp. Class A Common Stock SPCX \u00b7 oracle 16 h old \u00b7 pool $2,592,712 Traded $149.5091 Oracle $147.9597 +105 bps Strategy Inc. MSTR \u00b7 oracle 13 h old \u00b7 pool $298,999 Traded $143.2008 Oracle $142.2965 +64 bps ASML Holding NV ASML \u00b7 oracle 16 h old \u00b7 pool $48,279 Traded $1721.2781 Oracle $1711.8027 +55 bps Palantir Technologies PLTR \u00b7 oracle 16 "
+    },
+    {
+     "step": "per-token row",
+     "quote": " -8 bps iShares 0-3 Month Treasury Bond SGOV \u00b7 oracle 35 h old \u00b7 pool $1,896,956 Traded $100.9163 Oracle $100.9775 -6 bps Positive means the token trades above the oracle. The price is taken from the deepest USDG pool, and every pool and every feed is read at the same instant \u2014 otherwise the number woul",
+     "hasFeedAge": true,
+     "hasPoolDepth": true,
+     "hasCorroboration": false,
+     "hasSession": true,
+     "refusalWording": null
+    },
+    {
+     "step": "links from a gap row to its token page",
+     "count": 38
+    },
+    {
+     "step": "token page feed section",
+     "quote": "d in state at block 4635248 Before 1 After 1.000958 +0.096% Price feed This token has a Chainlink price feed, paired by ticker and confirmed twice over: by its own dividend step and by the price it trades at. The feed is total return: it already includes the multiplier, so never multiply it again. It holds its last price outside market hours, so always check how old a",
+     "apiLinked": true,
+     "webhookMentioned": false
+    }
+   ],
+   "shots": [
+    "w09-t3-gap-fold.png",
+    "w10-t3-sgov-feed.png"
+   ],
+   "elapsedMs": 2474,
+   "success": true
+  },
+  "T4": {
+   "steps": [
+    {
+     "step": "home links to the token list / licence",
+     "tokenListLinks": [
+      {
+       "t": "Token list",
+       "h": "/tokenlist.json"
+      }
+     ],
+     "licenceLinks": []
+    },
+    {
+     "step": "developers section text",
+     "text": "Built to integrate. A REST API, a typed SDK and signed webhooks over the same records. Every value is exact; anything not observed is null, never zero. The token list imports the whole registry into a wallet in one URL, carrying what each token represents in shares and what it is owed. API reference Live API SDK Token list Data Source const owed = await exdate.pending(token) owed.declared[0].grossPerToken // what is owed per token, no price needed owed.notComputed // what it refuses to estimate, and why"
+    },
+    {
+     "step": "tokenlist.json",
+     "status": 200,
+     "cors": "*",
+     "name": "exdate Robinhood Stock Tokens",
+     "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 3
+     },
+     "tokens": 194,
+     "extensionKeys": [
+      "underlyingSharesPerToken",
+      "isin",
+      "priceFeed",
+      "priceFeedCorroboratedBy",
+      "dividendDeclaredNotOnChain",
+      "dividendOwedPerToken",
+      "dividendProcessDate",
+      "exdateUrl"
+     ],
+     "hasLicenceField": [],
+     "keywords": [
+      "stock tokens",
+      "robinhood",
+      "dividends",
+      "corporate actions"
+     ]
+    },
+    {
+     "step": "/data/ page",
+     "mentionsLicence": "row on a schedule, the rest when a scan is rerun. exdate\u2019s own observations are licensed under CC BY 4.0: use them, republish them, build on them, and say where they came from. The grant does not cover any field whose source begins with robinhoo",
+     "mentionsTokenList": false
+    },
+    {
+     "step": "/docs/api/ signals for a PM",
+     "versioning": true,
+     "contact": true,
+     "rateLimits": true,
+     "keys": true,
+     "sla": true
+    }
+   ],
+   "shots": [
+    "w11-t4-developers.png",
+    "w12-t4-data.png"
+   ],
+   "elapsedMs": 3622,
+   "success": true
+  },
+  "T5": {
+   "steps": [
+    {
+     "step": "search every likely page for the off-hours share",
+     "hits": [
+      {
+       "route": "/",
+       "found": false,
+       "quote": null
+      },
+      {
+       "route": "/record/",
+       "found": false,
+       "quote": null
+      },
+      {
+       "route": "/gap/",
+       "found": true,
+       "quote": "r Technologies PLTR \u00b7 oracle 16 h old \u00b7 pool $103,059 Traded $174.8845 Oracle $173.9498 +54 bps iShares Silver Trust SLV \u00b7 oracle 16 h old \u00b7 pool $524,096 Traded $60.1574 Oracle $59.8550 +51 bps AMD AMD \u00b7"
+      },
+      {
+       "route": "/flows/",
+       "found": false,
+       "quote": null
+      },
+      {
+       "route": "/data/",
+       "found": false,
+       "quote": null
+      },
+      {
+       "route": "/calendar/",
+       "found": false,
+       "quote": null
+      }
+     ]
+    },
+    {
+     "step": "share card metadata on /",
+     "og": [
+      [
+       "og:title",
+       "exdate"
+      ],
+      [
+       "og:description",
+       "See what your Stock Tokens actually paid you."
+      ],
+      [
+       "og:image",
+       "https://www.exdate.me/opengraph-image?7bb9b10d9d97e136"
+      ],
+      [
+       "og:image:type",
+       "image/png"
+      ],
+      [
+       "og:image:width",
+       "1200"
+      ],
+      [
+       "og:image:height",
+       "630"
+      ],
+      [
+       "og:image:alt",
+       "exdate \u2014 see what your Stock Tokens actually paid you"
+      ],
+      [
+       "og:type",
+       "website"
+      ],
+      [
+       "twitter:card",
+       "summary_large_image"
+      ],
+      [
+       "twitter:title",
+       "exdate"
+      ],
+      [
+       "twitter:description",
+       "See what your Stock Tokens actually paid you."
+      ],
+      [
+       "twitter:image",
+       "https://www.exdate.me/opengraph-image?7bb9b10d9d97e136"
+      ],
+      [
+       "twitter:image:alt",
+       "exdate \u2014 see what your Stock Tokens actually paid you"
+      ],
+      [
+       "twitter:image:type",
+       "image/png"
+      ],
+      [
+       "twitter:image:width",
+       "1200"
+      ],
+      [
+       "twitter:image:height",
+       "630"
+      ]
+     ]
+    },
+    {
+     "step": "is the home page dated?",
+     "quote": "Data read from Robinhood Chain: 194 tokens, last observed 5 September 2026. Stock Tokens are debt securities issued by Robinhood Assets ("
+    }
+   ],
+   "shots": [],
+   "elapsedMs": 5084,
+   "success": true
+  },
+  "T6": {
+   "steps": [
+    {
+     "step": "webhook code samples on /docs/sdk/",
+     "count": 1,
+     "samples": [
+      "import { webhookFromRequest } from '@exdate/sdk'\n\nexport async function POST(request: Request) {\n  const result = await webhookFromRequest(request, { secret: process.env.EXDATE_WEBHOOK_SECRET! })\n  if (!result.ok) return new Response(result.reason, { status: 400 })\n\n  // Narrowing on `type` narrows `data` with it.\n  if (result.event.type === 'dividend.reconciled') {\n    result.event.data.impliedHaircutBps // 3378 \u2014 33.78 % of SGOV's August dividend withheld\n  }\n  return new Response('ok')\n}"
+     ]
+    },
+    {
+     "step": "install + registry truth",
+     "installLine": "pnpm add @exdate/sdk Until the package is on npm, add it from the wo",
+     "saysNotPublished": false,
+     "namesHeader": false,
+     "namesTolerance": true,
+     "namesFailureReasons": true
+    },
+    {
+     "step": "/docs/api/ webhook section",
+     "catalogue": true,
+     "eventTypes": 3,
+     "exampleResponse": true
+    }
+   ],
+   "shots": [
+    "w13-t6-sdk-fold.png"
+   ],
+   "elapsedMs": 1835,
+   "success": true
+  }
+ },
+ "keyboard": {
+  "home": {
+   "tabsToFinder": 6,
+   "firstStops": [
+    {
+     "tag": "A",
+     "id": "",
+     "text": "Skip to content",
+     "outline": "solid 2px",
+     "box": false
+    },
+    {
+     "tag": "A",
+     "id": "",
+     "text": "exdate",
+     "outline": "solid 2px",
+     "box": false
+    },
+    {
+     "tag": "A",
+     "id": "",
+     "text": "Tokens",
+     "outline": "solid 2px",
+     "box": false
+    },
+    {
+     "tag": "A",
+     "id": "",
+     "text": "Wallet",
+     "outline": "solid 2px",
+     "box": false
+    },
+    {
+     "tag": "A",
+     "id": "",
+     "text": "Calendar",
+     "outline": "solid 2px",
+     "box": false
+    },
+    {
+     "tag": "INPUT",
+     "id": "find-input",
+     "text": "",
+     "outline": "none 0px",
+     "box": true
+    }
+   ],
+   "finderFocusVisible": true,
+   "skipLinkFirst": true
+  },
+  "wallet": {
+   "tabsToInput": 6
+  },
+  "tokenDisclosure": {
+   "focusable": true,
+   "nativeDetails": true,
+   "openBefore": false
+  }
+ }
+}
