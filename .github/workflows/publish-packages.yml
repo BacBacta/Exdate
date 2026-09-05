@@ -15,8 +15,13 @@
 # rather than `pnpm publish`, which documents --provenance but not OIDC.
 #
 #   Actions -> publish-packages -> Run workflow
-#     dry_run: true   (default) packs and prints exactly what would be published
-#     dry_run: false            publishes
+#     confirm: (empty)   packs, checks the credential, prints what would go
+#     confirm: PUBLISH   publishes
+#
+# A typed word rather than a checkbox, because the checkbox failed quietly: a
+# boolean input compared against `false` in an `if:` is skipped when the value
+# arrives as a string, and the run still reports success. The last step asks the
+# registry what it actually holds rather than trusting that a step was reached.
 #
 # Order matters: @exdate/sdk depends on @exdate/core, and pnpm rewrites
 # `workspace:*` to the exact version at pack time, so core must exist on the
@@ -26,10 +31,10 @@ name: publish-packages
 on:
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: 'Pack and report only; publish nothing'
-        type: boolean
-        default: true
+      confirm:
+        description: 'Type PUBLISH to publish for real. Anything else, including empty, is a dry run.'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -127,7 +132,14 @@ jobs:
           fi
 
       - name: Publish
-        if: ${{ inputs.dry_run == false }}
+        # An exact string, not a boolean. A `type: boolean` input reaches an
+        # expression as a boolean here and as the STRING "false" elsewhere, and
+        # `'false' == false` is false in GitHub's expression language - so the
+        # step would be skipped and the run would still report success. Twice in
+        # a row the operator was told "publish done" while nothing had left, and
+        # a condition whose failure mode is silence is the wrong condition for an
+        # irreversible action. Typing PUBLISH is unambiguous in both directions.
+        if: ${{ inputs.confirm == 'PUBLISH' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -135,12 +147,37 @@ jobs:
           pnpm --filter @exdate/core publish --access public --no-git-checks --provenance
           pnpm --filter @exdate/sdk  publish --access public --no-git-checks --provenance
 
-      - name: What happened
+      # Ask the registry, rather than reporting on the strength of a step having
+      # been reached. A publish that was skipped, or one that npm accepted and
+      # did not serve, both look like success from inside the job.
+      - name: Say what the registry now holds
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "Dry run: nothing was published. The tarballs above are what would go."
-            echo "Re-run with dry_run unchecked to publish."
+          confirmed='${{ inputs.confirm }}'
+          published=0
+          for pkg in @exdate/core @exdate/sdk; do
+            enc="${pkg/\//%2f}"
+            code=$(curl -s -o /tmp/reg.json -w '%{http_code}' --max-time 30 "https://registry.npmjs.org/$enc" || echo 000)
+            if [ "$code" = "200" ]; then
+              node -e '
+                const d = require("/tmp/reg.json")
+                const v = d["dist-tags"].latest, m = d.versions[v]
+                console.log(`  on the registry: ${d._id}@${v} (${d.time[v]}), ${Math.round(m.dist.unpackedSize / 1024)} KB, provenance ${m.dist.attestations ? "yes" : "no"}`)'
+              published=$((published+1))
+            else
+              echo "  not on the registry: $pkg (HTTP $code)"
+            fi
+          done
+
+          if [ "$confirmed" = "PUBLISH" ]; then
+            if [ "$published" -eq 2 ]; then
+              echo "Both packages are live. A version cannot be republished; bump the version for the next release."
+              echo "Now configure trusted publishing on each package at npmjs.com and delete NPM_TOKEN."
+            else
+              echo "The publish step ran but the registry does not hold both packages."
+              exit 1
+            fi
           else
-            echo "Published. Check https://www.npmjs.com/package/@exdate/core and /@exdate/sdk"
-            echo "A version cannot be republished; bump the version in package.json for the next release."
+            echo "DRY RUN - nothing was published, whatever the tarballs above show."
+            echo "To publish for real: Run workflow again and type PUBLISH in the confirm box."
+            [ "$published" -eq 0 ] || echo "(the packages listed above were published by an earlier run)"
           fi
