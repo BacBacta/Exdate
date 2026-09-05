@@ -1,5 +1,6 @@
 import type { FeedCorroboration } from './generated/registry.js'
 import { WAD } from './multiplier.js'
+import { CONFIDENCE_MIN_EVENTS_HIGH, CONFIDENCE_MIN_EVENTS_MEDIUM, PLAUSIBLE_HAIRCUT_BPS } from './method.js'
 
 /**
  * Reconciliation: the declared corporate action against the observed multiplier
@@ -296,7 +297,9 @@ export interface Reconciliation {
   note?: string
 }
 
-const DEFAULT_PLAUSIBLE_HAIRCUT_BPS = [-100, 5_000] as const
+/** Re-exported for the callers that already imported it from here. Defined in ./method.ts, which
+ * a plain script can read - the methodology note is generated from it rather than restating it. */
+const DEFAULT_PLAUSIBLE_HAIRCUT_BPS = PLAUSIBLE_HAIRCUT_BPS
 
 export function reconcile(input: ReconcileInput): Reconciliation {
   const {
@@ -333,9 +336,9 @@ export function reconcile(input: ReconcileInput): Reconciliation {
    * that names the evidence.
    */
   const confidence: Confidence =
-    observedEventCount < 3 || !(feedVerified || feedCorroborated)
+    observedEventCount < CONFIDENCE_MIN_EVENTS_MEDIUM || !(feedVerified || feedCorroborated)
       ? 'low'
-      : !feedVerified || observedEventCount < 10
+      : !feedVerified || observedEventCount < CONFIDENCE_MIN_EVENTS_HIGH
         ? 'medium'
         : 'high'
 

@@ -57,6 +57,12 @@ jobs:
       # matters is that it is still exactly what git yields - and that replaying it returns what
       # each file actually held, at every revision. An index that had drifted would answer "what
       # did you publish at time T" with something nobody ever published.
+      # The methodology note is generated from the constants it describes. Editing a constant and
+      # not the note - or the note and not the constant - turns this red. A document invited to be
+      # cited cannot be the fifth thing this project found drifting from its own code.
+      - name: Does the methodology note still match the code?
+        run: node --experimental-strip-types --no-warnings scripts/build-methodology.mjs --check
+
       - name: Is the history index still what git says?
         run: node scripts/build-history.mjs --check
 

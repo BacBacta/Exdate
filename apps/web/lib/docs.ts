@@ -22,6 +22,10 @@ export const DOCS = [
   { page: '/docs/api/', file: 'docs/api.md', raw: '/docs/api.md', name: 'API reference' },
   { page: '/docs/sdk/', file: 'packages/sdk/README.md', raw: '/docs/sdk.md', name: 'SDK' },
   { page: '/docs/changelog/', file: 'docs/changelog.md', raw: '/docs/changelog.md', name: 'Changelog' },
+  // Generated from the constants it describes (scripts/build-methodology.mjs), so the page cannot
+  // state a parameter the code does not hold. Served raw as well: a researcher citing it wants the
+  // source, and its version changes only when a parameter does.
+  { page: '/docs/methodology/', file: 'docs/methodology.md', raw: '/docs/methodology.md', name: 'Méthode' },
 ] as const
 export type DocPage = (typeof DOCS)[number]['page']
 

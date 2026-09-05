@@ -94,6 +94,9 @@ export default function Page() {
                 ) : null}
               </ul>
               <p className="licence">
+                How a figure is produced — pairing, price, calculation, the states that refuse to be a
+                measurement — is in the <a href="/docs/methodology/">méthode</a>, generated from the
+                constants it describes so it cannot state a parameter the code does not hold.{' '}
                 exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT. The API is
                 versioned by path (<code>/v1</code>) and every change is dated in the{' '}
                 <a href="/docs/changelog/">changelog</a>.

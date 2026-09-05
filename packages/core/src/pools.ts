@@ -172,7 +172,9 @@ export function compareToFeed(input: {
 export const MINIMUM_SEPARATION = 3
 
 /** Below this, `ownBps` is treated as this value: an exact match must not divide by zero. */
-const SEPARATION_FLOOR_BPS = 0.01
+/** Floor on the assigned feed's own distance, so a near-exact match cannot divide by ~zero and
+ * make the separation ratio meaningless. Exported because the methodology note states it. */
+export const SEPARATION_FLOOR_BPS = 0.01
 
 export type PriceCorroborationRefusal = 'no_other_feeds' | 'not_closest' | 'insufficient_separation'
 
