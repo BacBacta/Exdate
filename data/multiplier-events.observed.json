@@ -2,8 +2,8 @@
   "note": "Every UIMultiplierUpdated log on Robinhood Chain, found by scripts/backfill-multiplier-events.mjs. Each row is a real log with its transaction hash; nothing here is derived or estimated.",
   "chainId": 4663,
   "scannedFromBlock": 900000,
-  "scannedThroughBlock": 52672800,
-  "scannedAt": "2026-09-02T15:13:53.064Z",
+  "scannedThroughBlock": 55405015,
+  "scannedAt": "2026-09-05T20:26:39.248Z",
   "events": [
     {
       "chainId": 4663,
@@ -173,6 +173,19 @@
       "newMultiplier": "1000145502866134027",
       "stepBps": 1.46,
       "tx": "0x17717969d77a298b876c0c3c735b6367ee1f75e1906f67953a6a30dc35cc442e"
+    },
+    {
+      "chainId": 4663,
+      "symbol": "UPS",
+      "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+      "block": 54355503,
+      "announcedAt": "2026-09-04T15:00:41Z",
+      "effectiveAt": "2026-09-04T15:10:26Z",
+      "leadMinutes": 9.8,
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1002208724969205741",
+      "stepBps": 22.09,
+      "tx": "0xc3a0a692808a98d480dc407c4817334ba33ca4d8d60de81b9b7c320fcfba81bb"
     }
   ]
 }

@@ -3590,6 +3590,19 @@ export const SCANNED_MULTIPLIER_EVENTS: readonly ScannedMultiplierEvent[] = [
     "newMultiplier": "1000145502866134027",
     "stepBps": 1.46,
     "tx": "0x17717969d77a298b876c0c3c735b6367ee1f75e1906f67953a6a30dc35cc442e"
+  },
+  {
+    "chainId": 4663,
+    "symbol": "UPS",
+    "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+    "block": 54355503,
+    "announcedAt": "2026-09-04T15:00:41Z",
+    "effectiveAt": "2026-09-04T15:10:26Z",
+    "leadMinutes": 9.8,
+    "oldMultiplier": "1000000000000000000",
+    "newMultiplier": "1002208724969205741",
+    "stepBps": 22.09,
+    "tx": "0xc3a0a692808a98d480dc407c4817334ba33ca4d8d60de81b9b7c320fcfba81bb"
   }
 ] as const
 
@@ -4300,5 +4313,5 @@ export const ARCHIVED_CORPORATE_ACTIONS: readonly ArchivedCorporateAction[] = [
 ] as const
 
 export const SCAN_FROM_BLOCK = 900000
-export const SCAN_THROUGH_BLOCK = 52672800
-export const SCANNED_AT = "2026-09-02T15:13:53.064Z"
+export const SCAN_THROUGH_BLOCK = 55405015
+export const SCANNED_AT = "2026-09-05T20:26:39.248Z"

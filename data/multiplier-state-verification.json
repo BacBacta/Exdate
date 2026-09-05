@@ -1,15 +1,22 @@
 {
   "note": "Every multiplier step confirmed against the chain's own state. ERC-8056 emits UIMultiplierUpdated once, at announcement, carrying a future effectiveAt, and emits NOTHING when the change takes effect - so until an archive endpoint was found, the application was derived from the clock rather than observed. Reading uiMultiplier() at the block before effectiveAt and at the block itself makes the transition a measurement.",
-  "method": "Two eth_call reads per step at the straddling blocks, plus two at the announcement block to observe the scheduled-but-not-applied state. Blocks come from data/effective-blocks.json, resolved by bisection over block headers.",
+  "method": "Four eth_call reads per step per endpoint: the two straddling blocks, plus two at the announcement block to observe the scheduled-but-not-applied state. Every archive endpoint that answers is asked and recorded under witnesses[]; a step reads `unreadable` only when none answered, and `witnessesDisagree` when two of them read different state at one block. Blocks come from data/effective-blocks.json, resolved by bisection over block headers.",
+  "archiveEndpoints": [
+    "rpc-robinhood.blockmachine.io",
+    "rpc.ordofi.network"
+  ],
   "archiveEndpoint": "https://rpc-robinhood.blockmachine.io",
   "archiveIsThirdParty": true,
-  "observedAt": "2026-09-04T11:20:16.658Z",
+  "observedAt": "2026-09-05T20:28:14.897Z",
   "summary": {
-    "steps": 12,
-    "transitionConfirmed": 12,
+    "steps": 13,
+    "transitionConfirmed": 13,
     "transitionDisagrees": 0,
     "unreadable": 0,
-    "pendingStateConfirmed": 12
+    "pendingStateConfirmed": 13,
+    "endpointsAsked": 2,
+    "minWitnessesPerStep": 1,
+    "stepsWithTwoOrMoreWitnesses": 0
   },
   "steps": [
     {
@@ -20,6 +27,33 @@
       "effectiveBlock": 1267585,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "4000000000000000000",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "4000000000000000000",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "4000000000000000000"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 1239020dd6e2cd59de553be8d4c3bdf0e378e708dd3217c0e3023d09b43bc5c4 (path ) state 0x1239020dd6e2cd59de553be8d4c3bdf0e378e708dd3217c0e30",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node 1b4d409a515ebcd1f36e646518ae0c7cc7f8a527cb98852887192bbcf77c078d (path ) state 0x1b4d409a515ebcd1f36e646518ae0c7cc7f8a527cb988528871"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "4000000000000000000",
       "beforeMatches": true,
@@ -39,6 +73,33 @@
       "effectiveBlock": 4635248,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000957519890990718",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000957519890990718",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000957519890990718"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 2fc562e09eed5d13ffc6ffcaf35f012ced7008e3a3c4a23490bc2eedb6d933e0 (path ) state 0x2fc562e09eed5d13ffc6ffcaf35f012ced7008e3a3c4a23490b",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node 7e0f0a0e7c1d14ee71d144fa18a93ba987da3fbf1cbcf00c7610513552919b18 (path ) state 0x7e0f0a0e7c1d14ee71d144fa18a93ba987da3fbf1cbcf00c761"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000957519890990718",
       "beforeMatches": true,
@@ -58,6 +119,33 @@
       "effectiveBlock": 18245701,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000074823219171086",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000074823219171086",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000074823219171086"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node c35562a2f4ebd8a81cc1ffdfb72e41c98aebc1f95f4beef7c927a0b6a1475c7c (path ) state 0xc35562a2f4ebd8a81cc1ffdfb72e41c98aebc1f95f4beef7c92",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node c6deea3ec2b3ae7cc5e6ec54144e6ac8b973ef601a9f2a3f08c016d7cb33aa02 (path ) state 0xc6deea3ec2b3ae7cc5e6ec54144e6ac8b973ef601a9f2a3f08c"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000074823219171086",
       "beforeMatches": true,
@@ -77,6 +165,33 @@
       "effectiveBlock": 20829027,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1002210914971013375",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1002210914971013375",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1002210914971013375"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 0ae92d6099fbe36d06f4b35be7cca8d3f9d759d15557453503e36544f3562653 (path ) state 0x0ae92d6099fbe36d06f4b35be7cca8d3f9d759d15557453503e",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node a7adf6348b84e47876bdbaf58b0a8054f6075a68203338e47d9186c7e031b90f (path ) state 0xa7adf6348b84e47876bdbaf58b0a8054f6075a68203338e47d9"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1002210914971013375",
       "beforeMatches": true,
@@ -96,6 +211,33 @@
       "effectiveBlock": 26859241,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000063708620124549",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000063708620124549",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000063708620124549"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node d608d4a814a2ab38d5a61c2b6fc135188e4bb6a0507eb0d159706ae9811c00ea (path ) state 0xd608d4a814a2ab38d5a61c2b6fc135188e4bb6a0507eb0d1597",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node d136e5e9d10ae71f83883d8690be019e4eb2c0e3a17af53434b5f2fafbe12859 (path ) state 0xd136e5e9d10ae71f83883d8690be019e4eb2c0e3a17af53434b"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000063708620124549",
       "beforeMatches": true,
@@ -115,6 +257,33 @@
       "effectiveBlock": 29445528,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000101323251417769",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000101323251417769",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000101323251417769"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node c1850495f96ae25f6011b8b72f2a42affacc9b11e5218a44d766239a3f12a065 (path ) state 0xc1850495f96ae25f6011b8b72f2a42affacc9b11e5218a44d76",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node b7e71ac60119348db3ae131b21e648ac1630e083e062e13a514a26ab2602f26f (path ) state 0xb7e71ac60119348db3ae131b21e648ac1630e083e062e13a514"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000101323251417769",
       "beforeMatches": true,
@@ -134,6 +303,33 @@
       "effectiveBlock": 30308049,
       "declaredOldMultiplier": "1000957519890990718",
       "declaredNewMultiplier": "1002981519346766532",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000957519890990718",
+          "stateAfter": "1002981519346766532",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000957519890990718",
+            "newUIMultiplier": "1002981519346766532"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node bf371237836b67f30c4571295604cbfa685343a3fa004c7b5f87f756a5f6fff9 (path ) state 0xbf371237836b67f30c4571295604cbfa685343a3fa004c7b5f8",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node c7d017b77ca6679c0324bb63d6b277e025cfcfc4921e8ed1c422083f5f1bfeb9 (path ) state 0xc7d017b77ca6679c0324bb63d6b277e025cfcfc4921e8ed1c42"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000957519890990718",
       "stateAfter": "1002981519346766532",
       "beforeMatches": true,
@@ -153,6 +349,33 @@
       "effectiveBlock": 32895477,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000612040296259656",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000612040296259656",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000612040296259656"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 657b411eb5531c015564c757c647cf257b1f8e430f017a40849b0617e6d725be (path ) state 0x657b411eb5531c015564c757c647cf257b1f8e430f017a40849",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node 3f6fa3db591a66b61dc05536729b027a5a4fdf14c0284f5b897abcbb4ecbc56d (path ) state 0x3f6fa3db591a66b61dc05536729b027a5a4fdf14c0284f5b897"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000612040296259656",
       "beforeMatches": true,
@@ -172,6 +395,33 @@
       "effectiveBlock": 36351132,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000566080061092436",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000566080061092436",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000566080061092436"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 197dcd684a3c37983b8fcc4e1d99d5cc8bf7f5d66252a90c550fe86ad3069b9e (path ) state 0x197dcd684a3c37983b8fcc4e1d99d5cc8bf7f5d66252a90c550",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node b711f4bdc2df8bc7f8890b5e49fa8763692fdb4d8baa717a49c6a1dc1f45b838 (path ) state 0xb711f4bdc2df8bc7f8890b5e49fa8763692fdb4d8baa717a49c"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000566080061092436",
       "beforeMatches": true,
@@ -191,6 +441,33 @@
       "effectiveBlock": 50960761,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1021486444855206408",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1021486444855206408",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1021486444855206408"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 7ff63929b60a56193ec7c1264bd4fc3789069c534ee700b1ff4ad838b18ea14d (path ) state 0x7ff63929b60a56193ec7c1264bd4fc3789069c534ee700b1ff4",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node 82b89adba4e6ee3e3fa8705a7943486de31905e04340944129fa88eb2c546ea4 (path ) state 0x82b89adba4e6ee3e3fa8705a7943486de31905e04340944129f"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1021486444855206408",
       "beforeMatches": true,
@@ -210,6 +487,33 @@
       "effectiveBlock": 51274920,
       "declaredOldMultiplier": "1002981519346766532",
       "declaredNewMultiplier": "1005101770003214918",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1002981519346766532",
+          "stateAfter": "1005101770003214918",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1002981519346766532",
+            "newUIMultiplier": "1005101770003214918"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 89f35bd2bc75a14f8adb28ebb8b59047e31f9515210130af7cd070dca3d7bace (path ) state 0x89f35bd2bc75a14f8adb28ebb8b59047e31f9515210130af7cd",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node b3e62961cb36e830a9820a9040ebb0a74b49bfeee3b99427af7b7f65d50dd721 (path ) state 0xb3e62961cb36e830a9820a9040ebb0a74b49bfeee3b99427af7"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1002981519346766532",
       "stateAfter": "1005101770003214918",
       "beforeMatches": true,
@@ -229,6 +533,33 @@
       "effectiveBlock": 52671215,
       "declaredOldMultiplier": "1000000000000000000",
       "declaredNewMultiplier": "1000145502866134027",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1000145502866134027",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1000145502866134027"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 2367e47e83e682ea8b475f103bf8009b6e09b1e91bc80f783e8517130097d040 (path ) state 0x2367e47e83e682ea8b475f103bf8009b6e09b1e91bc80f783e8",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node 2ff8a5f36a1f33bc8510b40a177a8e6b08cfcd3c6ffcf578eea90819cdedea6a (path ) state 0x2ff8a5f36a1f33bc8510b40a177a8e6b08cfcd3c6ffcf578eea"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
       "stateBefore": "1000000000000000000",
       "stateAfter": "1000145502866134027",
       "beforeMatches": true,
@@ -237,6 +568,52 @@
       "stateAtAnnouncement": {
         "uiMultiplier": "1000000000000000000",
         "newUIMultiplier": "1000145502866134027"
+      },
+      "pendingAtAnnouncement": true
+    },
+    {
+      "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+      "symbol": "UPS",
+      "effectiveAt": "2026-09-04T15:10:26Z",
+      "announcedBlock": 54355503,
+      "effectiveBlock": 54361262,
+      "declaredOldMultiplier": "1000000000000000000",
+      "declaredNewMultiplier": "1002208724969205741",
+      "witnesses": [
+        {
+          "host": "rpc-robinhood.blockmachine.io",
+          "isThirdParty": true,
+          "stateBefore": "1000000000000000000",
+          "stateAfter": "1002208724969205741",
+          "beforeMatches": true,
+          "afterMatches": true,
+          "transitionObserved": true,
+          "stateAtAnnouncement": {
+            "uiMultiplier": "1000000000000000000",
+            "newUIMultiplier": "1002208724969205741"
+          },
+          "pendingAtAnnouncement": true
+        },
+        {
+          "host": "rpc.ordofi.network",
+          "isThirdParty": true,
+          "transitionObserved": null,
+          "transitionError": "eth_call: missing trie node 781596c2f6be7166a7336ea28d6e96a99d06e8fe41e51045c5e9339b13ef055f (path ) state 0x781596c2f6be7166a7336ea28d6e96a99d06e8fe41e51045c5e",
+          "pendingAtAnnouncement": null,
+          "announcementError": "eth_call: missing trie node 1f30a50ae7f41ac1e5256ccc49e6a6772ea1a68a5d76982d98dbbcdf43477d22 (path ) state 0x1f30a50ae7f41ac1e5256ccc49e6a6772ea1a68a5d76982d98d"
+        }
+      ],
+      "witnessesAsked": 2,
+      "witnessesAnswering": 1,
+      "witnessesDisagree": false,
+      "stateBefore": "1000000000000000000",
+      "stateAfter": "1002208724969205741",
+      "beforeMatches": true,
+      "afterMatches": true,
+      "transitionObserved": true,
+      "stateAtAnnouncement": {
+        "uiMultiplier": "1000000000000000000",
+        "newUIMultiplier": "1002208724969205741"
       },
       "pendingAtAnnouncement": true
     }

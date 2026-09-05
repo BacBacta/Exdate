@@ -4,9 +4,20 @@
 //   node scripts/build-reconciliations.mjs
 //
 // Three inputs, all first-party:
-//   data/robinhood-corporate-actions.snapshot.json   the issuer's declared rate
+//   data/corporate-actions.archive.json              the issuer's declared rate
 //   data/multiplier-events.observed.json             the on-chain step
 //   Chainlink getRoundData(roundId)                  the price at effectiveAt
+//
+// The archive rather than data/robinhood-corporate-actions.snapshot.json, which is
+// what this read until the 2026-09-05 data audit (F02). Two reasons, and they pull
+// in opposite directions, which is why only the archive satisfies both. The snapshot
+// is refreshed by no collector, so an action declared after it was taken is missing
+// here: VRT (24 Sept) and AVGO (30 Sept) were absent from the ledger, the calendar
+// and the feed for two days. And the issuer's window is about a month deep with no
+// pagination, so refreshing the snapshot would *lose* rows instead: ASML's 5 August
+// action has already fallen out, and a row that leaves the window can never be read
+// back. The archive is cumulative - it only ever gains rows - so it is the one input
+// that is both current and complete.
 //
 // The price read needs no archive node: an aggregator keeps its own round history
 // in current storage, so a plain full node answers a historical round.
@@ -70,7 +81,7 @@ const GET_ROUND_DATA = '0x9a6fc8f5'
 const root = new URL('../', import.meta.url)
 const read = async (path) => JSON.parse(await readFile(new URL(path, root), 'utf8'))
 
-const corporateActions = (await read('data/robinhood-corporate-actions.snapshot.json')).corpActions ?? []
+const corporateActions = (await read('data/corporate-actions.archive.json')).actions ?? []
 const scan = await read('data/multiplier-events.observed.json')
 const feedMap = await read('data/token-feed-map.json')
 
@@ -105,6 +116,18 @@ function issuerQuoteAt(token, effectiveAt) {
   }
   // A quote published while trading is halted is a last price, not a market.
   return best && best.isTradingHalt !== true ? best : null
+}
+
+/**
+ * A WAD as an exact decimal string, trailing zeros trimmed. Never Number(x) / 1e18,
+ * which loses digits above ~9 000 and was how `305.1711` came to be stored where the
+ * aggregator had answered `305.17105` (audit 2026-09-05, F08).
+ */
+function formatWad(value) {
+  const negative = value < 0n
+  const abs = negative ? -value : value
+  const fraction = (abs % WAD).toString().padStart(18, '0').replace(/0+$/, '')
+  return `${negative ? '-' : ''}${abs / WAD}${fraction ? `.${fraction}` : ''}`
 }
 
 const feedForToken = new Map(feedMap.pairs.map((pair) => [pair.token.toLowerCase(), pair]))
@@ -347,6 +370,7 @@ for (const row of rows) {
     row.expectedStepWad = expectedStepWad.toString()
     row.receivedPerShare = (Number(receivedWad) / 1e18).toFixed(6)
     row.impliedHaircutBps = haircutBps
+    row.impliedHaircutBpsExact = haircutBpsPrecise
     row.status = haircutBpsPrecise >= -100 && haircutBpsPrecise <= 5_000 ? 'matched' : 'anomaly'
     row.note =
       row.status === 'matched'
@@ -391,10 +415,13 @@ for (const row of rows) {
 
   row.price = {
     source: 'chainlink:getRoundData',
+    /** The aggregator's own integer answer and its decimals, so the read can be repeated. */
+    answer: round.answer.toString(),
+    answerDecimals: round.decimals,
     /** The Chainlink answer as published: the token price, multiplier included. */
-    value: (Number(tokenPriceWad) / 1e18).toFixed(4),
+    value: formatWad(tokenPriceWad),
     /** The equity price it implies at oldMultiplier; the reconciliation input. */
-    underlying: (Number(priceWad) / 1e18).toFixed(4),
+    underlying: formatWad(priceWad),
     multiplierInForce: row.change.oldMultiplier,
     roundId: round.roundId.toString(),
     updatedAt: new Date(Number(round.updatedAt) * 1000).toISOString(),
@@ -404,6 +431,7 @@ for (const row of rows) {
   row.expectedStepWad = expectedStepWad.toString()
   row.receivedPerShare = (Number(receivedWad) / 1e18).toFixed(6)
   row.impliedHaircutBps = haircutBps
+  row.impliedHaircutBpsExact = haircutBpsPrecise
   // Band checked on the precise value so truncation cannot pull a row inside.
   row.status = haircutBpsPrecise >= -100 && haircutBpsPrecise <= 5_000 ? 'matched' : 'anomaly'
   row.note =
@@ -422,11 +450,14 @@ rows.sort((a, b) => (a.processDate ?? a.change?.effectiveAt ?? '').localeCompare
 const tally = (status) => rows.filter((row) => row.status === status).length
 await writeFile(new URL('data/reconciliations.observed.json', root), JSON.stringify({
   note: 'Issuer corporate actions paired with the multiplier steps they produced, priced at the Chainlink round in force at effectiveAt. Every input is first-party or on-chain; nothing is estimated. Rebuild with: node scripts/build-reconciliations.mjs',
+  builtAt: new Date().toISOString(),
   chainId: CHAIN_ID,
+  rounding:
+    'impliedHaircutBps is truncated toward zero; impliedHaircutBpsExact carries the same figure to two decimals. price.answer and price.answerDecimals are the aggregator\'s own integer answer; price.value and price.underlying are that answer in full precision, not a display rounding.',
   matchWindowDays: MATCH_WINDOW_DAYS,
   plausibleHaircutBps: [-100, 5000],
   builtFrom: {
-    corporateActions: 'data/robinhood-corporate-actions.snapshot.json',
+    corporateActions: 'data/corporate-actions.archive.json',
     multiplierEvents: 'data/multiplier-events.observed.json',
     prices: "the issuer's own quote captured at effectiveAt where one exists (all 194 tokens, seconds old), else the Chainlink round in force (35 tokens, and it can be hours stale)",
   },

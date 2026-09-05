@@ -1,10 +1,10 @@
 {
   "name": "exdate Robinhood Stock Tokens",
-  "timestamp": "2026-09-05T06:38:51.926Z",
+  "timestamp": "2026-09-05T20:28:44.563Z",
   "version": {
     "major": 1,
     "minor": 0,
-    "patch": 3
+    "patch": 4
   },
   "keywords": [
     "stock tokens",
@@ -386,9 +386,9 @@
         "isin": "US11135F1012",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
-        "dividendDeclaredNotOnChain": false,
-        "dividendOwedPerToken": null,
-        "dividendProcessDate": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.65",
+        "dividendProcessDate": "2026-09-30",
         "exdateUrl": "https://www.exdate.me/t/0x156e175dd063a8ce274c50654ef40e0032b3fbcf/"
       }
     },
@@ -907,7 +907,7 @@
         "underlyingSharesPerToken": "1.000063708620124549",
         "isin": "US24703L2025",
         "priceFeed": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
-        "priceFeedCorroboratedBy": "traded-price",
+        "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
         "dividendOwedPerToken": null,
         "dividendProcessDate": null,
@@ -3208,13 +3208,13 @@
       "decimals": 18,
       "logoURI": "https://cdn.robinhood.com/ncw_assets/logos/0xf23250dac154d05bb671cb0d0ebef3c635c79ce2.png",
       "extensions": {
-        "underlyingSharesPerToken": "1",
+        "underlyingSharesPerToken": "1.002208724969205741",
         "isin": "US9113121068",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
-        "dividendDeclaredNotOnChain": true,
-        "dividendOwedPerToken": "1.64",
-        "dividendProcessDate": "2026-09-03",
+        "dividendDeclaredNotOnChain": false,
+        "dividendOwedPerToken": null,
+        "dividendProcessDate": null,
         "exdateUrl": "https://www.exdate.me/t/0xf23250dac154d05bb671cb0d0ebef3c635c79ce2/"
       }
     },
@@ -3284,9 +3284,9 @@
         "isin": "US92537N1081",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
-        "dividendDeclaredNotOnChain": false,
-        "dividendOwedPerToken": null,
-        "dividendProcessDate": null,
+        "dividendDeclaredNotOnChain": true,
+        "dividendOwedPerToken": "0.0625",
+        "dividendProcessDate": "2026-09-24",
         "exdateUrl": "https://www.exdate.me/t/0xfa78c12e6488814a0262e4e802749a4a737d5fb7/"
       }
     },

@@ -1,5 +1,5 @@
 {
-  "resolvedAt": "2026-09-03T12:41:49.408Z",
+  "resolvedAt": "2026-09-05T20:26:47.221Z",
   "method": "first block whose timestamp >= effectiveAt, bisection over eth_getBlockByNumber headers from the announcement block; a balance \"at the step\" is the balance after all transfers in blocks < effectiveBlock",
   "source": "data/multiplier-events.observed.json",
   "blocks": [
@@ -134,6 +134,17 @@
       "previousBlockTimestamp": "2026-09-02T15:10:25.000Z",
       "oldMultiplier": "1000000000000000000",
       "newMultiplier": "1000145502866134027"
+    },
+    {
+      "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+      "symbol": "UPS",
+      "effectiveAt": "2026-09-04T15:10:26Z",
+      "announcedBlock": 54355503,
+      "effectiveBlock": 54361262,
+      "effectiveBlockTimestamp": "2026-09-04T15:10:26.000Z",
+      "previousBlockTimestamp": "2026-09-04T15:10:25.000Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1002208724969205741"
     }
   ]
 }
