@@ -41,8 +41,16 @@ die() { printf '\n\033[31mstopped:\033[0m %s\n' "$*" >&2; exit 1; }
 main() {
 
 if [ -n "${TERMUX_VERSION:-}" ] || case "${PREFIX:-}" in *com.termux*) true;; *) false;; esac; then
+  # Name the machine rather than printing a placeholder. This script already knows
+  # which host the API answers on, and that name resolves to the server by
+  # definition - it is the same check step 2 makes. Telling someone to fill in
+  # YOUR.SERVER.IP sends them to look up an address the script was holding.
   die "this is Termux on Android, not the server.
-  Connect to the machine first: ssh root@YOUR.SERVER.IP"
+  Connect to the machine first, then run this again:
+
+    ssh root@$API_HOST 'curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/install-api.sh | bash'
+
+  A name rather than an address on purpose: it follows the machine if it ever moves."
 fi
 command -v apt-get >/dev/null || die "this expects Debian or Ubuntu; elsewhere run docker-compose.yml by hand"
 [ "$(id -u)" -eq 0 ] || die "run this as root: it installs Docker and opens 80 and 443."
