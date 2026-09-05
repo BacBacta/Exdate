@@ -14,6 +14,7 @@ const REWRITES: [string, string][] = [
   ['../packages/sdk/README.md', '/docs/sdk/'],
   ['../../README.md', '/'],
   ['../../docs/api.md', '/docs/api/'],
+  ['../../docs/changelog.md', '/docs/changelog/'],
 ]
 
 export function renderDoc(relativePath: string): { html: string; title: string } {

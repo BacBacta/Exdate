@@ -94,7 +94,9 @@ export default function Page() {
                 ) : null}
               </ul>
               <p className="licence">
-                exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT.
+                exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT. The API is
+                versioned by path (<code>/v1</code>) and every change is dated in the{' '}
+                <a href="/docs/changelog/">changelog</a>.
                 {links.github ? (
                   <>
                     {' '}

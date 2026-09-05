@@ -88,6 +88,18 @@ export function Footer() {
             <span className="wordmark">exdate</span>
           </span>
           <p>The corporate-action layer for Stock Tokens.</p>
+          {/* Who stands behind the numbers, and how to reach them (audit 2026-09-05, F26). */}
+          <p className="made">
+            <a href="/about/">About</a>
+            {links.github ? (
+              <>
+                {' · '}
+                <a href={`${links.github}/issues`}>Contact</a>
+              </>
+            ) : null}
+            {' · '}
+            <a href="/docs/changelog/">Changelog</a>
+          </p>
         </div>
         <div>
           <h2>Look up</h2>

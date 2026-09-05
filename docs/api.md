@@ -9,6 +9,9 @@ Base URL: **`https://api.exdate.me`**, or wherever you run the indexer yourself 
 in the README). The public instance is one small machine with no availability commitment. `:chain`
 accepts the key (`robinhood`) or the id (`4663`).
 
+The API is versioned by path: everything here is `/v1`, nothing under it has been removed or
+renamed since it went live, and every addition is dated in [the changelog](../../docs/changelog.md).
+
 Two rules hold everywhere:
 
 - **every bigint is a decimal string** — `"1005101770003214918"`, never a JS number;

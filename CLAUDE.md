@@ -1551,6 +1551,23 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (the audit counted eight screens); 469 visible words against 451, because the three measured
   figures carry their dates and sample sizes and those are not cut. All fourteen routes: no
   overflow at 320 or 360, axe clean.
+- 2026-09-05 — **The quarter list, first four: search and sort on the oracle page, badges, an
+  about page, a changelog — and a regression the move had left behind.** F07: each row of `/gap/`
+  carries what backs its pairing (`step + price`, `step`, `price`, `ticker only`), and the 26 rows
+  sort by gap, oracle age, pool depth or name and filter by name, in the browser over static rows.
+  Badges: `/badge/<address>.svg` for all 194 tokens and `/badge.svg`, built at export from the same
+  lead the token page opens on, with the Markdown and HTML to paste them on each token page.
+  `/about/` (F26): what exdate is, refuses, is not, who makes it (named from the repository's owner,
+  never typed in) and how to reach it (`NEXT_PUBLIC_EXDATE_CONTACT` when set, GitHub issues
+  otherwise); the footer carries About · Contact · Changelog. `docs/changelog.md` (F19) rendered at
+  `/docs/changelog/`, dated from the git history; `docs/api.md` states the path versioning and
+  links it. Found while building the about page: **the new Vercel project had no environment
+  variables at all** — the move on 2026-09-05 recreated the project by API and carried none across,
+  so since then the live site had rendered no Source, Live status or Live API link, and the about
+  page would have named nobody. The four `NEXT_PUBLIC_*` values are set on `exdate-site` again
+  (they are public URLs, not secrets); the next deployment restores the links. The lesson is the one
+  this file already carries about `deploy-site.yml`'s health check: a link that renders only when
+  configured fails silently when the configuration is lost, and nothing checked for it.
 - _(append decisions here as they are made)_
 
 ## Status
