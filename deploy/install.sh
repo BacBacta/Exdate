@@ -172,20 +172,27 @@ if [ -d "$DIR/.git" ]; then
   # database". Testing ownership instead was a proxy for this and missed it on a
   # real machine: the mode can be wrong while the owner is right, and a directory
   # deeper than .git/objects can be the one that refuses.
-  probe="$DIR/.git/objects/.exdate-write-probe"
-  if ! sudo -u "$USER_NAME" sh -c ": > '$probe'" 2>/dev/null; then
-    note "$USER_NAME cannot write to $DIR/.git/objects; repairing owner and mode"
+  # git does not write into .git/objects itself; it writes into the 256 fan-out
+  # directories under it, and into pack/ and info/. So the question is whether
+  # the service account can write to EVERY directory in there, and the way to
+  # ask it is to run find as that account and let the kernel answer.
+  #
+  # Two weaker tests were tried on a real machine first and both passed while the
+  # fetch still failed: looking for files not owned by the account (the mode can
+  # be wrong while the owner is right), and writing a probe file into
+  # .git/objects itself (which is writable even when objects/ab is not).
+  unwritable="$(sudo -u "$USER_NAME" find "$DIR/.git" -type d ! -writable -print -quit 2>/dev/null || true)"
+  if [ -n "$unwritable" ]; then
+    note "$USER_NAME cannot write to $unwritable; repairing owner and mode under $DIR"
     chown -R "$USER_NAME:$USER_NAME" "$DIR"
-    # u+rwX: files readable and writable by the owner, directories also
-    # traversable. X is capital on purpose - it does not make a plain file
-    # executable.
+    # Capital X on purpose: directories become traversable, plain files are not
+    # made executable.
     chmod -R u+rwX "$DIR/.git"
-    sudo -u "$USER_NAME" sh -c ": > '$probe'" 2>/dev/null \
-      || die "$USER_NAME still cannot write to $DIR/.git/objects after repair.
-  Look at: ls -ld $DIR/.git/objects && df -h $DIR
-  A full disk reports the same way."
+    still="$(sudo -u "$USER_NAME" find "$DIR/.git" -type d ! -writable -print -quit 2>/dev/null || true)"
+    [ -z "$still" ] || die "$USER_NAME still cannot write to $still after chown and chmod.
+  Look at: ls -ld '$still' && df -h $DIR
+  A full disk reports the same way as a permission problem here."
   fi
-  rm -f "$probe"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" fetch --quiet origin "$BRANCH"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" checkout --quiet "$BRANCH"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" reset --quiet --hard "origin/$BRANCH"

@@ -1268,6 +1268,19 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   that cannot push is not making that claim, so it no longer writes the block at all — captures it
   makes are still merged, because those are real observations. Verified by running the trial again
   and diffing: the block is byte-identical afterwards.
+- 2026-09-05 — **Three tries at the same permission bug, and only the third asked the machine
+  instead of guessing.** One `git pull` run as root in `/opt/exdate` — a directory the `exdate`
+  service account owns and pushes from — left the checkout unable to fetch: *insufficient permission
+  for adding an object to repository database `.git/objects`*. The first fix looked for files not
+  owned by the account; it found none on the real machine and the fetch still failed, because the
+  mode can be wrong while the owner is right. The second wrote a probe file into `.git/objects`; it
+  succeeded, because `.git/objects` is writable even when `objects/ab` is not — git does not write
+  into `objects/` itself but into the 256 fan-out directories under it, and into `pack/` and
+  `info/`. The third asks the kernel the actual question, as the account that will do the writing:
+  `sudo -u exdate find .git -type d ! -writable`. Rehearsed against the real shape — a fan-out
+  directory owned by root — where the second probe passes and repairs nothing while the third
+  detects and fixes it. The operating rule is in `TODO.md`: that checkout is updated with the
+  installer, never with `git` by hand as root.
 - _(append decisions here as they are made)_
 
 ## Status
