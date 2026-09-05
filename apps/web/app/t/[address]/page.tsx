@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { Footer, LedgerHead, Nav } from '../../components/Chrome'
 import { CopyAddress } from '../../components/CopyAddress'
 import { Subscribe } from '../../components/Subscribe'
+import { Embed } from '../../components/Embed'
+import { tokenBadgeText } from '../../../lib/badge'
 import { tokensWithCalendar } from '../../../lib/feeds'
 import { dateLong, delay, pctInt } from '../../../lib/format'
 import { observed, tokenPage } from '../../../lib/observed'
@@ -363,6 +365,12 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                 what={`${token.symbol}’s declared dividends and every change on chain`}
               />
             ) : null}
+            <Embed
+              site={observed.links.site}
+              address={token.address.toLowerCase()}
+              name={token.name}
+              alt={tokenBadgeText(token.address)?.title ?? `${token.name} on exdate`}
+            />
           </div>
         </section>
 

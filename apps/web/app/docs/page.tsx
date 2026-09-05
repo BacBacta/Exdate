@@ -67,6 +67,15 @@ export default function Page() {
                   </a>
                 </li>
                 <li>
+                  <a href="/badge.svg">
+                    <h2>Badges</h2>
+                    <p>
+                      <code>/badge/&lt;address&gt;.svg</code>: a token&rsquo;s state in one line, to paste into a README or a
+                      dashboard. Each token page has the snippet.
+                    </p>
+                  </a>
+                </li>
+                <li>
                   <a href="/calendar.ics">
                     <h2>Calendar and feed</h2>
                     <p>
