@@ -1416,6 +1416,39 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   which the `0.1.0` pair can never offer. Installed from `@exdate/sdk@next` into an empty directory
   and run: 194 tokens, 13 logs, the WAD round trip lossless, AAPL at 3600 bps, webhook valid.
   `NPM_TOKEN` can be deleted.
+- 2026-09-05 — **The site audited against its own brief, and the first fix could not ship because
+  the data pipeline had spent the deploy quota.** `docs/ux-audit-prompt.md` is the brief (five
+  personas, seven non-negotiable constraints, twelve phases, NN/g severity, WCAG 2.2 AA, CWV,
+  Flesch-Kincaid, live-verified comparables); `docs/ux-audit-2026-09-05.md` is the audit, in French,
+  with the evidence in `docs/audit/2026-09-05/`. Score **2.75 / 5**, 28 findings. Two were
+  severity 4 and 3 and nobody had noticed: **`/t/<EIP-55 address>/` was a 404** — token pages exist
+  under the lowercase form only, while the registry, every explorer, every wallet and the token
+  page itself display the checksummed form, so every link from outside hit "This page could not be
+  found" with no finder; and **the home page was 416 px wide on a 360 px phone** (a link row that
+  could not wrap, then an `<input>` whose intrinsic ~230 px width flowed into the hero grid's
+  min-content), so phones rendered the whole site zoomed out with the *Look up* button cut off.
+  Found by my own capture script auditing 404s first, because it used checksummed addresses too.
+  The "this week" list shipped in `32f0548`: a `not-found.tsx` that lowercases a token URL before
+  paint and carries the finder; the two overflow causes plus `/data/` at 422 px and `/flows/` at
+  361 px caught by the re-measure; focusable code blocks with distinct landmark names; a copy
+  button on a truncated address; the wallet naming both reads before either runs, the archive one a
+  checkbox; "2 steps unexplained" → "2 changes with no issuer record"; "975 minutes" → "16 h 15
+  min"; licence and contact in the developers block; footer headings at h2; the SDK README no
+  longer claiming the package is not on npm. All twelve routes re-measured on the built output: no
+  overflow at 320 or 360, axe clean. **Then Vercel answered "Deployment rate limited — retry in 24
+  hours."** The branch had received 125 commits in 24 h, 67 from collectors, and the Hobby plan
+  allows 100 deployments a day: the collectors had deployed the site into its quota and a
+  severity-4 fix waited a day. `scripts/vercel-ignore.sh`, wired as `ignoreCommand`, is the
+  stateless answer: a person's or the agent's commit always builds; a collector's builds only when
+  it is the first collector commit of its UTC hour (`git log -2`, which Vercel's checkout has). The
+  obvious rule — "skip if the previous commit is recent" — was written first and is wrong: with
+  commits every ten minutes every one has a recent predecessor and nothing builds again. Rehearsed
+  against the day's real history: 67 collector commits → 33 builds, 34 skipped, and on a day
+  without development pushes at most 24. The pages stay within an hour of the record, and every
+  build still reads all of `data/`. Still owed by the audit's month list: the token page opening
+  on the answer (F03), the wallet's post-read flow (F13), ICS and RSS (F04), a "what we measured"
+  section carrying the 73.9 % (F05), per-token share cards (F14), the IA and a shorter home
+  (F06/F17), the LCP (F10).
 - _(append decisions here as they are made)_
 
 ## Status

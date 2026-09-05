@@ -3,6 +3,7 @@
   "buildCommand": "pnpm --filter @exdate/web build",
   "installCommand": "pnpm install --frozen-lockfile",
   "outputDirectory": "apps/web/out",
+  "ignoreCommand": "bash scripts/vercel-ignore.sh",
   "framework": null,
   "github": {
     "silent": true
