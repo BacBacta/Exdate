@@ -23,10 +23,11 @@ export async function generateMetadata({ params }: { params: Promise<{ address: 
   const { address } = await params
   const token = tokenPage(address)
   if (!token) return { title: 'exdate' }
-  return {
-    title: `${token.name} (${token.symbol}) — exdate`,
-    description: `What the ${token.symbol} Robinhood Stock Token represents today, every dividend declared for it, what arrived on chain, and what is still owed.`,
-  }
+  const title = `${token.name} (${token.symbol}) — exdate`
+  const description = `What the ${token.symbol} Robinhood Stock Token represents today, every dividend declared for it, what arrived on chain, and what is still owed.`
+  // og:title read "exdate" on every token page, so a shared SGOV link said
+  // nothing about SGOV (audit 2026-09-05, F14).
+  return { title, description, openGraph: { title, description } }
 }
 
 type Token = NonNullable<ReturnType<typeof tokenPage>>
@@ -62,6 +63,89 @@ function stateOf(dividend: Dividend): { text: string; on: boolean } {
     default:
       return { text: 'moved on chain, nothing declared', on: false }
   }
+}
+
+/**
+ * The answer to the question a holder came with - did I get my dividend? -
+ * before any mechanism. The page used to open on the multiplier and reach
+ * "34% never arrived" two and a half screens down (audit 2026-09-05, F03).
+ * Every sentence here is one of the ledger's own states, restated; nothing is
+ * computed that the rows below do not show, and the link leads to them.
+ */
+function Answer({ token, owed }: { token: Token; owed: Dividend[] }) {
+  const lines: React.ReactNode[] = []
+  const upcoming = token.dividends.filter((d) => d.state === 'pending' && d.upcoming)
+  const measured = token.dividends.find((d) => d.state === 'matched' || d.state === 'anomaly') ?? null
+  const moved = token.dividends.find((d) => d.state === 'unmatched') ?? null
+
+  if (owed.length === 1) {
+    const one = owed[0]!
+    lines.push(
+      <>
+        <strong>One dividend is owed and not yet on chain</strong>: declared for {dateLong(one.processDate)}, ${one.owedPerToken} per
+        token{one.issuerCompleted ? ', and the issuer already calls it paid' : ''}.
+      </>,
+    )
+  } else if (owed.length > 1) {
+    const oldest = owed[owed.length - 1]!
+    lines.push(
+      <>
+        <strong>{owed.length} dividends are owed and not yet on chain</strong>, the oldest declared for {dateLong(oldest.processDate)}
+        {owed.some((d) => d.issuerCompleted) ? '; the issuer already calls some of them paid' : ''}.
+      </>,
+    )
+  } else if (upcoming.length > 0) {
+    const next = upcoming[upcoming.length - 1]!
+    lines.push(
+      <>
+        <strong>Next dividend declared for {dateLong(next.processDate)}</strong>: ${next.declared} per share
+        {next.owedPerToken && next.owedPerToken !== next.declared ? `, $${next.owedPerToken} per token if it arrives in full` : ''}.
+        Nothing is owed yet.
+      </>,
+    )
+  }
+
+  if (measured) {
+    const on = dateLong(measured.processDate ?? measured.effectiveAt)
+    lines.push(
+      measured.state === 'matched' ? (
+        <>
+          Last dividend on chain, {on}:{' '}
+          <strong>
+            ${measured.arrived} arrived of ${measured.declared} declared, {pctInt(measured.haircutBps)}% never arrived.
+          </strong>
+        </>
+      ) : (
+        <>
+          Last dividend on chain, {on}: ${measured.declared} declared,{' '}
+          {measured.hasFeed ? 'and the step doesn’t add up against its price feed' : 'and no price feed to measure what arrived'}.
+        </>
+      ),
+    )
+  }
+  if (moved && (!measured || (moved.effectiveAt ?? '') > (measured.effectiveAt ?? ''))) {
+    lines.push(
+      <>
+        The multiplier {measured ? 'moved again' : 'last moved'} on {dateLong(moved.effectiveAt)} with no dividend declared in the
+        issuer&rsquo;s feed.
+      </>,
+    )
+  }
+  if (lines.length === 0) {
+    lines.push(<>No dividend has been declared for this token in the issuer&rsquo;s feed, and its multiplier has never moved.</>)
+  }
+  return (
+    <div className="token-answer">
+      {lines.map((line, index) => (
+        <p key={index}>{line}</p>
+      ))}
+      {token.dividends.length > 0 ? (
+        <a className="how" href="#dividends">
+          How this was measured ↓
+        </a>
+      ) : null}
+    </div>
+  )
 }
 
 const pct3 = (value: number | null) => (value == null ? '—' : `${value > 0 ? '+' : ''}${value.toFixed(3)}%`)
@@ -182,10 +266,10 @@ export default async function Page({ params }: { params: Promise<{ address: stri
             </p>
             <div className="token-head">
               <div data-reveal>
-                <p className="token-kind">Robinhood Stock Token</p>
+                <p className="token-kind">Robinhood Stock Token · {token.symbol}</p>
                 <h1 id="token-title">{token.name}</h1>
+                <Answer token={token} owed={owed} />
                 <p className="token-meta">
-                  <span>{token.symbol}</span>
                   {token.isin ? <span>ISIN {token.isin}</span> : null}
                   {/*
                     Short to the eye, whole to the clipboard: forty characters
@@ -196,12 +280,11 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                   <CopyAddress address={token.address} href={token.explorerUrl} />
                 </p>
               </div>
+              {/* The mechanism, one rung below the answer: what a token represents today. */}
               <div className="stat" data-reveal style={delay(120)}>
                 <div className="v">{token.multiplier}</div>
                 <div className="k">
-                  {token.moved
-                    ? `shares per token, since ${dateLong(token.lastChangedAt)}`
-                    : 'share per token, unchanged since launch'}
+                  {token.moved ? `shares per token today, since ${dateLong(token.lastChangedAt)}` : 'share per token, unchanged since launch'}
                 </div>
                 {token.sinceLaunch ? (
                   <p className="since">
@@ -210,7 +293,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                       fault report to a holder (audit 2026-09-05, F24): neither
                       word is defined anywhere above it. Say what each count is.
                     */}
-                    +{token.sinceLaunch.growthPct}% shares since launch:{' '}
+                    +{token.sinceLaunch.growthPct}% since launch, from {token.steps.length} change{token.steps.length === 1 ? '' : 's'}:{' '}
                     {token.sinceLaunch.reconciled} dividend{token.sinceLaunch.reconciled === 1 ? '' : 's'} matched to what the
                     issuer declared
                     {token.sinceLaunch.unexplained > 0
@@ -294,6 +377,12 @@ export default async function Page({ params }: { params: Promise<{ address: stri
               <h2 className="small" id="steps-title" data-reveal>
                 Multiplier history
               </h2>
+              {/* The word is defined where it is first used (audit 2026-09-05, F03). */}
+              <p className="lead" data-reveal>
+                A <em>step</em> is one change of the multiplier: the moment a dividend is folded into what
+                each token represents. Nothing is emitted on chain when it takes effect, so each one was
+                read back in the chain&rsquo;s own state.
+              </p>
               <LedgerHead cols={['Change', 'Before', 'After', 'Step']} />
               <ul className="ledger">
                 {token.steps.map((step, index) => (

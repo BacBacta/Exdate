@@ -244,7 +244,13 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 .token-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2rem 3rem; align-items: end; }
 .token-kind { font-size: 14px; color: var(--muted); margin-bottom: 0.8rem; }
 .token-head h1 { max-width: 20ch; font-size: clamp(2.1rem, 4.6vw, 3.8rem); }
-.token-meta { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; font-size: 13.5px; color: var(--muted); font-family: var(--mono); }
+/* The answer, between the name and the mechanism: the state of this token's dividends in plain words. */
+.token-answer { margin-top: 1.4rem; max-width: 52ch; font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.token-answer p + p { margin-top: 0.55rem; }
+.token-answer strong { color: var(--ink); font-weight: 500; }
+.token-answer .how { display: inline-block; margin-top: 0.8rem; padding: 0.15rem 0; font-size: 15px; color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+.lead { color: var(--muted); font-size: 15px; max-width: 60ch; text-wrap: pretty; margin-bottom: 1.2rem; }
+.token-meta { margin-top: 1.4rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; font-size: 13.5px; color: var(--muted); font-family: var(--mono); }
 .token-meta a { color: inherit; word-break: break-all; }
 .token-meta a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; }
 .stat { text-align: right; }
