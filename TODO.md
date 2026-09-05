@@ -85,6 +85,12 @@ this one's form. If the server was created without one, rebuild it with a cloud-
 carrying `users:` / `ssh_authorized_keys:`; a password set by email will not work, because the image
 disables password authentication.
 
+**Never run `git` as root in `/opt/exdate`.** The checkout belongs to the `exdate` service account,
+which pushes from it; one root-run `git pull` leaves root-owned files under `.git/objects` and every
+later fetch dies with *insufficient permission for adding an object to repository database*. The
+installer now detects and repairs that before fetching, so re-running it is the fix — but the way to
+update this checkout is the installer, not git by hand.
+
 `node scripts/check-watcher.mjs` answers "could this machine do the job" on demand: node, the
 checkout, push access proved with a dry run, the chain, a real issuer quote, and the clock against
 the issuer's own — the watcher wakes on that clock, so minutes of drift means missing windows.

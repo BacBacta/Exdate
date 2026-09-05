@@ -164,6 +164,16 @@ fi
 
 say "4. Repository at $DIR"
 if [ -d "$DIR/.git" ]; then
+  # Re-assert ownership before touching git. The service account owns this
+  # checkout and pushes from it, but a single `git` run as root - a pull, a
+  # status, anything that writes - leaves root-owned files under .git/objects,
+  # and every later `sudo -u $USER_NAME git fetch` then dies with "insufficient
+  # permission for adding an object to repository database". Cheap, idempotent,
+  # and it repairs the machine instead of explaining the error.
+  if [ -n "$(find "$DIR/.git" ! -user "$USER_NAME" -print -quit 2>/dev/null)" ]; then
+    note "some files under $DIR are not owned by $USER_NAME; repairing"
+    chown -R "$USER_NAME:$USER_NAME" "$DIR"
+  fi
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" fetch --quiet origin "$BRANCH"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" checkout --quiet "$BRANCH"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" reset --quiet --hard "origin/$BRANCH"
