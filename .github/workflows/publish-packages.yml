@@ -59,6 +59,23 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
+      # Trusted publishing (OIDC) needs a newer npm than Node 22 ships with.
+      # npm's words: "Trusted publishing requires npm CLI version 11.5.1 or
+      # later and Node version 22.14.0 or higher." Installed and then CHECKED,
+      # because a silently old npm would fall back to needing a token and the
+      # failure would read as a permissions problem again.
+      - name: Use an npm that can do trusted publishing
+        run: |
+          npm install -g npm@latest
+          echo "node $(node --version)  npm $(npm --version)"
+          node -e '
+            const need = [11, 5, 1]
+            const got = process.argv[1].split(".").map(Number)
+            const ok = got[0] > need[0] || (got[0] === need[0] &&
+              (got[1] > need[1] || (got[1] === need[1] && got[2] >= need[2])))
+            if (!ok) { console.error(`npm ${process.argv[1]} is older than 11.5.1; trusted publishing will not work`); process.exit(1) }
+          ' "$(npm --version)"
+
       - run: pnpm install --frozen-lockfile
 
       # A broken package is worse than an unpublished one, and a version cannot
@@ -121,9 +138,26 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TOK: ${{ secrets.NPM_TOKEN }}   # matched against npm's printed prefix; never echoed
         run: |
+          # No token is not an error once trusted publishing is configured on
+          # each package: npm exchanges this job's OIDC token for a short-lived
+          # credential, and generates provenance itself. So an empty secret
+          # means that path, and the publish below proves whether it is - the
+          # final step asks the registry rather than trusting either branch.
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "NPM_TOKEN is not set on this repository. Add it under Settings -> Secrets and variables -> Actions."
-            exit 1
+            echo "No NPM_TOKEN. Publishing will use trusted publishing (OIDC), which requires"
+            echo "a Trusted Publisher configured on BOTH @exdate/core and @exdate/sdk at"
+            echo "npmjs.com, naming repository BacBacta/Exdate and workflow publish-packages.yml."
+            echo "If it is not configured, the publish below fails with an authentication error"
+            echo "rather than a permissions one."
+            # setup-node writes `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
+            # into the job's .npmrc. With no secret that expands to an empty
+            # bearer, which npm would send instead of falling through to OIDC.
+            # Remove the line rather than leave an empty credential in place.
+            if [ -n "${NPM_CONFIG_USERCONFIG:-}" ] && [ -f "$NPM_CONFIG_USERCONFIG" ]; then
+              sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG"
+              echo "removed the empty auth line from $NPM_CONFIG_USERCONFIG"
+            fi
+            exit 0
           fi
           npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
 
