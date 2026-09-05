@@ -1397,6 +1397,16 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   word the search looks for. What is checkable on this side was checked against npm's own list and
   matches: bare workflow filename, `repository` equal to the canonical `BacBacta/Exdate`,
   `id-token: write`, npm gated at 11.5.1 (the runner installs 12.0.2 over the 10.x Node 22 ships).
+  **Answered by the one test that works**, at no cost: a real publish of `0.1.1-oidc.0` under
+  dist-tag `next` with the credential removed from the job's npmrc. npm signed a provenance
+  statement and wrote it to Sigstore's transparency log (`logIndex 2723807089`) — so the OIDC
+  identity is fine — and then refused the `PUT` with **`OIDC permission denied for this action`**,
+  a different error from the token era's `You may not perform that action with these credentials`.
+  So no Trusted Publisher is configured, or one is configured without the direct `npm publish`
+  action (npm's form offers `npm stage publish` and direct publish separately). A refused PUT
+  creates nothing: the registry still holds only `0.1.0`, so the prerelease number is not spent
+  and the same run repeats once the setting exists. The prerelease-under-`next` shape is what made
+  the test free — `latest` never moved, and `0.1.1` is still available for the next real release.
 - _(append decisions here as they are made)_
 
 ## Status
