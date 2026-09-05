@@ -98,8 +98,17 @@ jobs:
 
       # A dry run that never talks to the registry cannot tell you the two things
       # that actually fail a first publish: a token that is not accepted, and a
-      # scope that is not yours. Both are checked here, in BOTH modes, so the
-      # dry run is a real rehearsal rather than a local pack.
+      # scope this account may not write to. Both are asked here, in BOTH modes.
+      #
+      # The previous version of this step ran `npm access list packages @exdate`
+      # and reported "the scope is visible to this token" when it succeeded. That
+      # command exits 0 with NO credential at all (measured: empty HOME, no
+      # token, exit 0, no output), so it said yes to everything and said it right
+      # before a 403. A check whose success does not depend on the thing being
+      # checked is worse than no check - it is the same mistake as probing
+      # `.git/objects` for writability when git writes into its fan-out
+      # subdirectories. What follows asks endpoints that require the credential
+      # and prints what they answer.
       - name: Check the credential and the scope
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -111,25 +120,54 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
 
           who=$(npm whoami --registry=https://registry.npmjs.org 2>&1) || {
-            echo "npm rejected the token: $who"
-            echo "It must be a GRANULAR access token with Read and write on the @exdate scope."
+            echo "npm rejected the token entirely: $who"
+            echo "It must be a GRANULAR access token - npm removed classic and Automation tokens in November 2025."
             exit 1
           }
           echo "npm accepts the token as: $who"
 
-          # Can this credential write to the @exdate scope? `npm access` answers
-          # for a scope even before it holds any package. A failure here is the
-          # org missing, or the token scoped to the organization rather than to
-          # the scope - which npm documents as not granting publish rights.
-          if npm access list packages @exdate --registry=https://registry.npmjs.org >/dev/null 2>&1; then
-            echo "the @exdate scope is visible to this token"
+          # Authenticated, so a wrong or read-only credential answers differently
+          # from a correct one. The roster endpoint returns {} unauthenticated
+          # (measured against @babel and @vercel too), and the member list with
+          # roles when the caller is a member.
+          api() {
+            curl -sS --max-time 30 -w '\n%{http_code}' \
+              -H "authorization: Bearer $NODE_AUTH_TOKEN" \
+              "https://registry.npmjs.org$1"
+          }
+
+          echo "--- who this token is, according to npm"
+          api /-/npm/v1/user | sed '$d' | head -c 400; echo
+
+          echo "--- members of the exdate scope, as this token sees them"
+          roster="$(api /-/org/exdate/user)"
+          code="$(printf '%s' "$roster" | tail -1)"
+          body="$(printf '%s' "$roster" | sed '$d')"
+          echo "HTTP $code: $(printf '%s' "$body" | head -c 400)"
+
+          role="$(printf '%s' "$body" | node -e '
+            let d = ""
+            process.stdin.on("data", (c) => (d += c)).on("end", () => {
+              let j = {}
+              try { j = JSON.parse(d) } catch { return }
+              process.stdout.write(String(j[process.argv[1]] ?? ""))
+            })' "$who")"
+
+          if [ -n "$role" ]; then
+            echo "$who is a member of the exdate scope with the role: $role"
+            case "$role" in
+              owner|admin|developer) echo "That role may publish. A 403 below is then the TOKEN, not the account." ;;
+              *) echo "That role may NOT publish to the scope." ;;
+            esac
           else
-            echo "WARNING: could not list @exdate packages with this token."
-            echo "  If the scope is empty this can be normal; if the first publish then fails with"
-            echo "  403, the cause is one of: the exdate organisation does not exist, the token has"
-            echo "  no Read and write on the @exdate SCOPE, or it was granted the organisation"
-            echo "  instead - which npm states does not permit publishing."
+            echo "This token does not see $who as a member of the exdate scope."
+            echo "  Either the scope belongs to another account, or the token was granted"
+            echo "  the ORGANISATION rather than the scope - npm states that organisation"
+            echo "  access does not confer publish rights on packages."
           fi
+
+          echo "--- what the scope already holds, as this token sees it"
+          api /-/org/exdate/package | sed '$d' | head -c 400; echo
 
       - name: Publish
         # An exact string, not a boolean. A `type: boolean` input reaches an
