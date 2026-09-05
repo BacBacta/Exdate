@@ -76,7 +76,12 @@ export default function Page() {
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="block tight" aria-label="What you can do here">
+        <section className="block tight" aria-labelledby="index-title">
+          {/* A heading for the three doors: their h3s followed the hero's h1
+              directly, which every audit tool reads as a skipped level. */}
+          <h2 className="sr-only" id="index-title">
+            What you can do here
+          </h2>
           <div className="wrap index">
             <a href="#find" data-reveal>
               <h3>Find your token</h3>
@@ -258,8 +263,35 @@ export default function Page() {
                 <a href={links.data}>Data</a>
                 {links.github ? <a href={links.github}>Source</a> : null}
               </p>
+              {/*
+                What a wallet PM asks before importing anything: under what
+                licence, and whom to ask. Both were a page deep or absent
+                (audit 2026-09-05, F19). The issues link renders only when the
+                repository URL is configured, like every other link here.
+              */}
+              <p className="licence">
+                exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT.
+                {links.github ? (
+                  <>
+                    {' '}
+                    Questions and bugs: <a href={`${links.github}/issues`}>GitHub issues</a>.
+                  </>
+                ) : null}
+              </p>
             </div>
-            <pre className="code" data-reveal style={delay(120)}>
+            {/*
+              tabIndex, role and a name: a code block that scrolls sideways is a
+              scrollable region, and one that cannot take focus cannot be scrolled
+              from a keyboard (WCAG 2.1.1; axe scrollable-region-focusable).
+            */}
+            <pre
+              className="code"
+              data-reveal
+              style={delay(120)}
+              tabIndex={0}
+              role="region"
+              aria-label="Example: reading what a token is owed with the SDK"
+            >
               <code>
                 {`const owed = await exdate.pending(token)\n\n`}
                 {`owed.declared[0].grossPerToken\n`}

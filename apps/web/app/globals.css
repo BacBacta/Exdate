@@ -253,7 +253,16 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 /* --- developers ----------------------------------------------------------- */
 .dev-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
 .dev p { margin-top: 1rem; color: var(--muted); max-width: 44ch; text-wrap: pretty; }
-.dev .links { display: flex; gap: 1.5rem; margin-top: 1.6rem; }
+/*
+  flex-wrap, because six links in a row that cannot wrap set the block's
+  minimum width at 396 px, which set the page's width at 416 px on a 360 px
+  phone, which zoomed the whole site out by 13 % (measured 2026-09-05:
+  document.scrollWidth 416 for viewports of 360 and 320). A row of links must
+  never be the widest thing on the page.
+*/
+.dev .links { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; margin-top: 1.6rem; }
+.dev .licence { margin-top: 1.1rem; font-size: 13.5px; color: var(--muted); max-width: none; }
+.dev .licence a { color: inherit; text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
 .code {
   padding: 1.4rem 1.5rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
   font-family: var(--mono); font-size: 14px; line-height: 1.7; color: var(--ink-2); overflow-x: auto;
@@ -349,3 +358,51 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 .wallet-actions { display: flex; align-items: flex-start; gap: 1rem 1.4rem; flex-wrap: wrap; margin-top: 1.6rem; }
 .wallet-actions span { flex: 1 1 34ch; font-size: 14px; color: var(--muted); text-wrap: pretty; }
 .wallet-actions .btn { flex: none; }
+
+/* --- 2026-09-05 audit fixes ------------------------------------------------ */
+/* Footer column titles are h2 now (they were h4 after an h2, then h3, which pages
+   whose only heading is an h1 still reported as a skipped level). Same look. */
+.foot h2 { font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+/* Standalone links get a 24 px tall target (WCAG 2.5.8); links inside a
+   sentence are exempt and left alone. */
+.crumb a { display: inline-block; padding: 0.25rem 0; }
+.token-meta a, .token-meta .addr { display: inline-flex; align-items: center; min-height: 24px; }
+/* The address: short to the eye, whole to the clipboard. */
+.addr { display: inline-flex; align-items: center; gap: 0.5rem; }
+.copy-btn { font: inherit; font-size: 12px; letter-spacing: 0.02em; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.6rem; min-height: 24px; cursor: pointer; }
+.copy-btn:hover { border-color: var(--ink); }
+.copy-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Docs: a code block scrolls inside its own box and never widens the page;
+   a code token in a table header keeps the ink colour, not the muted one. */
+.prose { min-width: 0; }
+.prose pre { max-width: 100%; }
+.prose code { overflow-wrap: anywhere; }
+.prose th code { color: var(--ink); }
+.prose pre:focus-visible, .code:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* The 404. */
+.not-found .lede { margin-top: 1rem; }
+.not-found .hero-find { margin-top: 2rem; max-width: 34rem; }
+.not-found .finder-hint a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; }
+/* Wallet: the choice of what to read, before it is read. */
+.wallet-opt { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.9rem; font-size: 14px; color: var(--muted); max-width: 52ch; }
+.wallet-opt input { margin-top: 0.3rem; width: 18px; height: 18px; flex: none; }
+/* The finder row was the widest thing on the phone: an <input> carries an
+   intrinsic width of about 230 px (its default size="20"), and a flex
+   container's min-content is the sum of its items' intrinsic widths, so the
+   row's min-content came to 344 px and the hero grid track took it - on a
+   320 px screen. width: 0 removes the contribution; flex: 1 still grows it. */
+.finder input { width: 0; }
+/* A 42-character address in a paragraph must be allowed to break. */
+.feed-params, .feed-params a, .feed-params code { overflow-wrap: anywhere; }
+/* /data/ on a phone: the three-column row and its no-wrap meta made the page
+   422 px wide at 320 (audit re-measure). One column, and the meta may wrap. */
+@media (max-width: 900px) {
+  .datasets li { grid-template-columns: 1fr; gap: 0.3rem 0; }
+  .datasets .meta { white-space: normal; }
+}
+.datasets li > span:first-child { font-family: var(--mono); font-size: 14px; word-break: break-all; }
+/* On a phone the net figure of a flows row (+2,038,389 at 24 px) is wider
+   than a third of the screen; it takes its own line instead of the margin. */
+@media (max-width: 600px) {
+  .ledger li .gap { grid-column: 1 / -1; text-align: left; }
+}

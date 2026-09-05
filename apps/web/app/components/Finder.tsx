@@ -56,7 +56,12 @@ export function Finder({ tokens }: { tokens: TokenSummary[] }) {
           onChange={(event) => setQuery(event.target.value)}
           aria-describedby="find-hint"
         />
-        <button className="btn" type="submit" disabled={matches.length === 0}>
+        {/*
+          Never disabled. Greyed out until something is typed, the only button
+          on the first screen read as inert (measured 2026-09-05, captures 001
+          and 011). An empty submit is a no-op, which costs nothing.
+        */}
+        <button className="btn" type="submit">
           Look up
         </button>
       </div>

@@ -1,10 +1,10 @@
 {
   "name": "exdate Robinhood Stock Tokens",
-  "timestamp": "2026-09-04T22:14:30.555Z",
+  "timestamp": "2026-09-05T06:38:51.926Z",
   "version": {
     "major": 1,
     "minor": 0,
-    "patch": 2
+    "patch": 3
   },
   "keywords": [
     "stock tokens",
@@ -745,7 +745,7 @@
         "underlyingSharesPerToken": "1",
         "isin": "US1725731079",
         "priceFeed": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
-        "priceFeedCorroboratedBy": "traded-price",
+        "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
         "dividendOwedPerToken": null,
         "dividendProcessDate": null,
@@ -2329,7 +2329,7 @@
         "underlyingSharesPerToken": "1",
         "isin": "US69608A1088",
         "priceFeed": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
-        "priceFeedCorroboratedBy": null,
+        "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
         "dividendOwedPerToken": null,
         "dividendProcessDate": null,
@@ -2869,7 +2869,7 @@
         "underlyingSharesPerToken": "1",
         "isin": "US80004C2008",
         "priceFeed": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
-        "priceFeedCorroboratedBy": "traded-price",
+        "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
         "dividendOwedPerToken": null,
         "dividendProcessDate": null,
@@ -3247,7 +3247,7 @@
         "underlyingSharesPerToken": "1",
         "isin": "US91232N2071",
         "priceFeed": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
-        "priceFeedCorroboratedBy": "traded-price",
+        "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
         "dividendOwedPerToken": null,
         "dividendProcessDate": null,

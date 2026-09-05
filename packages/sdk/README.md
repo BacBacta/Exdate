@@ -11,8 +11,10 @@ string**, and **anything exdate has not observed is `null`** — never `0`, neve
 pnpm add @exdate/sdk
 ```
 
-Until the package is on npm, add it from the workspace (`"@exdate/sdk": "workspace:*"`) or from a
-checkout. It depends on `@exdate/core` only; installing it never pulls in the server.
+Published on npm from this repository through trusted publishing: from `0.1.1` on, every version
+carries a provenance attestation naming the workflow, repository and commit that built it, which
+you can read back with `npm view @exdate/sdk --json` (`dist.attestations`). The `next` dist-tag
+carries prereleases. It depends on `@exdate/core` only; installing it never pulls in the server.
 
 ## Reading
 
@@ -117,6 +119,10 @@ export async function POST(request: Request) {
   return new Response('ok')
 }
 ```
+
+The signature travels in the `exdate-signature` header as `t=<unix seconds>,v1=<hex digest>`:
+HMAC-SHA256 over `${t}.${rawBody}`, checked against a 300 s window. The other headers are
+`exdate-event` (the type), `exdate-event-id` and `exdate-delivery`.
 
 `parseWebhook({ secret, header, body })` does the same from parts, and `verifyWebhook(…)` returns
 `{ valid: false, reason }` — `malformed_header`, `timestamp_outside_tolerance`, `signature_mismatch` —

@@ -20,7 +20,15 @@ export function renderDoc(relativePath: string): { html: string; title: string }
   let markdown = readFileSync(join(ROOT, relativePath), 'utf8')
   for (const [from, to] of REWRITES) markdown = markdown.split(`(${from})`).join(`(${to})`)
   const title = /^#\s+(.+)$/m.exec(markdown)?.[1] ?? relativePath
-  const html = marked.parse(markdown, { async: false, gfm: true }) as string
+  // A code block that scrolls sideways is a scrollable region; without a
+  // tabindex it cannot take focus and so cannot be scrolled from a keyboard.
+  // axe reported 8 and 7 such blocks on the two reference pages (2026-09-05).
+  // Each one is a landmark, and landmarks on a page must have distinct names.
+  let sample = 0
+  const html = (marked.parse(markdown, { async: false, gfm: true }) as string).replace(
+    /<pre>/g,
+    () => `<pre tabindex="0" role="region" aria-label="Code sample ${++sample}">`,
+  )
   return { html, title }
 }
 

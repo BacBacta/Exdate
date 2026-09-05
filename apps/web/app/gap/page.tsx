@@ -24,6 +24,18 @@ const age = (seconds: number | null) => {
   const minutes = Math.round(seconds / 60)
   return minutes < 90 ? `${minutes} min old` : `${Math.round(minutes / 60)} h old`
 }
+/**
+ * "975 minutes" is a number nobody reads as a duration; "16 h 15 min" is.
+ * Minutes stay minutes below an hour and a half, which is where people stop
+ * converting in their head (audit 2026-09-05, F16).
+ */
+const ageWords = (minutes: number | null | undefined) => {
+  if (minutes === null || minutes === undefined) return '—'
+  if (minutes < 90) return `${Math.round(minutes)} min`
+  const h = Math.floor(minutes / 60)
+  const m = Math.round(minutes - h * 60)
+  return m === 0 ? `${h} h` : `${h} h ${m} min`
+}
 /** Whole dollars: the pool's size is context for the gap, not a figure to the cent. */
 const money = (value: string | undefined) =>
   value === undefined ? null : `$${Math.round(Number(value)).toLocaleString('en-US')}`
@@ -63,7 +75,7 @@ export default function Page() {
               holds its last answer outside market hours; the chain never stops trading. The
               distance between the two is the risk a curator carries, and it is widest exactly
               when the feed is stalest. At this reading the median feed was{' '}
-              <strong>{gap.medianFeedAgeMinutes} minutes old</strong> and the median token traded{' '}
+              <strong>{ageWords(gap.medianFeedAgeMinutes)} old</strong> and the median token traded{' '}
               <strong>{gap.medianAbsDeviationBps?.toFixed(0)} basis points</strong> from it.
             </p>
           </div>

@@ -80,7 +80,7 @@ export function Footer() {
           <p>The corporate-action layer for Stock Tokens.</p>
         </div>
         <div>
-          <h4>Use</h4>
+          <h2>Use</h2>
           <nav aria-label="Tools">
             <a href="/#find">Find your token</a>
             <a href="/wallet/">Your wallet</a>
@@ -89,7 +89,7 @@ export function Footer() {
           </nav>
         </div>
         <div>
-          <h4>About</h4>
+          <h2>About</h2>
           <nav aria-label="About">
             <a href="/#how">How it works</a>
             <a href="/#proof">Proof</a>

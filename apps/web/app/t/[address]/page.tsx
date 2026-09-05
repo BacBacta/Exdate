@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Footer, LedgerHead, Nav } from '../../components/Chrome'
+import { CopyAddress } from '../../components/CopyAddress'
 import { dateLong, delay, pctInt } from '../../../lib/format'
 import { observed, tokenPage } from '../../../lib/observed'
 
@@ -184,9 +185,13 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                 <p className="token-meta">
                   <span>{token.symbol}</span>
                   {token.isin ? <span>ISIN {token.isin}</span> : null}
-                  <a href={token.explorerUrl} rel="noopener">
-                    {token.address}
-                  </a>
+                  {/*
+                    Short to the eye, whole to the clipboard: forty characters
+                    wrapped over two lines with nothing to press was the worst
+                    way to offer the one string every visitor copies (audit
+                    2026-09-05, F09).
+                  */}
+                  <CopyAddress address={token.address} href={token.explorerUrl} />
                 </p>
               </div>
               <div className="stat" data-reveal style={delay(120)}>
@@ -198,10 +203,16 @@ export default async function Page({ params }: { params: Promise<{ address: stri
                 </div>
                 {token.sinceLaunch ? (
                   <p className="since">
+                    {/*
+                      "1 dividend reconciled, 2 steps unexplained" read as a
+                      fault report to a holder (audit 2026-09-05, F24): neither
+                      word is defined anywhere above it. Say what each count is.
+                    */}
                     +{token.sinceLaunch.growthPct}% shares since launch:{' '}
-                    {token.sinceLaunch.reconciled} dividend{token.sinceLaunch.reconciled === 1 ? '' : 's'} reconciled
+                    {token.sinceLaunch.reconciled} dividend{token.sinceLaunch.reconciled === 1 ? '' : 's'} matched to what the
+                    issuer declared
                     {token.sinceLaunch.unexplained > 0
-                      ? `, ${token.sinceLaunch.unexplained} step${token.sinceLaunch.unexplained === 1 ? '' : 's'} unexplained`
+                      ? `, ${token.sinceLaunch.unexplained} change${token.sinceLaunch.unexplained === 1 ? '' : 's'} with no issuer record`
                       : ''}
                     .
                   </p>

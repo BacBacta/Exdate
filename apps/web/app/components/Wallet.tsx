@@ -81,6 +81,8 @@ type HistoryPhase =
   /** `source` names which node answered, because one of them is not Robinhood's. */
   | { kind: 'done'; history: WalletHistory; requests: number; cached: boolean; source?: 'archive' | 'logs' }
   | { kind: 'refused'; requests: number }
+  /** The visitor chose not to show the address to the archive node; offered again below the holdings. */
+  | { kind: 'skipped' }
   | { kind: 'error'; message: string }
 
 type LogsOutcome = { kind: 'ok'; transfers: Transfer[] } | { kind: 'timeout' } | { kind: 'rejected' } | { kind: 'error'; message: string }
@@ -137,6 +139,8 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
   const [history, setHistory] = useState<HistoryPhase>({ kind: 'idle' })
   const [hasWallet, setHasWallet] = useState(false)
   const [note, setNote] = useState<string | null>(null)
+  /** Whether the history read - the one that shows the address to a third party - is wanted. */
+  const [wantHistory, setWantHistory] = useState(true)
   const request = useRef(0)
 
   // Only after mount: the server does not know whether a wallet is installed.
@@ -321,7 +325,11 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
       const snapshot = await fetchHoldings(address)
       if (id !== request.current) return
       setPhase({ kind: 'done', address, snapshot })
-      void readHistory(address, id)
+      // The archive path shows the address to a node that is not Robinhood's;
+      // it runs only when the visitor left the box ticked. The log replay
+      // stays on Robinhood's node and needs no consent beyond the read itself.
+      if (wantHistory || !archiveRpcUrl) void readHistory(address, id)
+      else setHistory({ kind: 'skipped' })
     } catch (error) {
       if (id === request.current) setPhase({ kind: 'error', address, message: error instanceof Error ? error.message : String(error) })
     }
@@ -379,10 +387,31 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
             </button>
           ) : null}
         </div>
+        {/*
+          Say where the address goes BEFORE it goes there. The page used to
+          promise "the address goes nowhere else" above the form and admit
+          "from a public archive node that is not Robinhood's" under the
+          results (audit 2026-09-05, F22). Same page, that order. Now the two
+          reads are named up front and the second one is a choice.
+        */}
         <p className="finder-hint" id="wallet-hint">
-          Read in your browser, straight from Robinhood Chain&rsquo;s public node. No signature. exdate has no
-          server, so the address goes nowhere else.
+          Read in your browser. No signature, no account, nothing sent to exdate. Your balance is
+          read from Robinhood Chain&rsquo;s own node
+          {archiveRpcUrl
+            ? '; rebuilding what past dividends delivered also asks a public archive node, which is not Robinhood’s, for your balance at each dividend date.'
+            : '; what past dividends delivered is rebuilt from your own transfers, read from the same node.'}
         </p>
+        {archiveRpcUrl ? (
+          <label className="wallet-opt">
+            <input
+              type="checkbox"
+              checked={wantHistory}
+              onChange={(event) => setWantHistory(event.target.checked)}
+              disabled={reading}
+            />
+            <span>Also rebuild what past dividends delivered (sends the address to a public archive node)</span>
+          </label>
+        ) : null}
         {note ? (
           <p className="wallet-status err" role="status">
             {note}
@@ -548,6 +577,15 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
           <p className="wallet-status err">
             This address has too many transfers to rebuild its history in a browser: stopped after {history.requests}{' '}
             requests rather than show a partial total.
+          </p>
+        ) : null}
+        {history.kind === 'skipped' ? (
+          <p className="wallet-status">
+            What past dividends delivered was not read, because that read sends the address to a public
+            archive node that is not Robinhood&rsquo;s.{' '}
+            <button className="linklike" type="button" onClick={() => void readHistory(address, request.current)}>
+              Read it now
+            </button>
           </p>
         ) : null}
         {history.kind === 'error' ? (
