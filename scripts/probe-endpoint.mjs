@@ -38,6 +38,30 @@ const safe = (u) => {
   }
 }
 
+// A URL whose key segment is missing, a placeholder, or truncated by a paste
+// produces an HTTP 401 that reads like a billing problem. Say so before asking.
+{
+  const path = (() => {
+    try {
+      return new URL(url).pathname
+    } catch {
+      return ''
+    }
+  })()
+  const key = path.split('/').filter(Boolean).pop() ?? ''
+  if (/^(YOUR_KEY|VOTRE_CLE|API_KEY|<.*>|\{.*\})$/i.test(key)) {
+    console.error(`The URL still carries the placeholder "${key}". Put your real key there.`)
+    process.exit(1)
+  }
+  if (path.includes('/v2/') && key.length < 20) {
+    console.error(
+      `The key segment of that URL is only ${key.length} characters, which is shorter than any real one —\n` +
+        'the paste was probably truncated. Copy the whole URL from the Alchemy dashboard again.',
+    )
+    process.exit(1)
+  }
+}
+
 const PROBE_TOKEN = '0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9'
 const TOTAL_SUPPLY = '0x18160ddd'
 const UI_MULTIPLIER_UPDATED = '0x2205df4534432b2f60654a3fdb48737ffdaf3e9edb1a498bd985bc026b15b055'
@@ -61,7 +85,12 @@ async function call(method, params, ms = 30_000) {
     try {
       body = JSON.parse(text)
     } catch {
-      return { err: `HTTP ${response.status}, not JSON`, ms: Date.now() - began }
+      // The server's own words, not "not JSON". A 401 says whether the key is
+      // wrong, absent or not entitled to this network, and none of that is a
+      // secret - it is what the endpoint tells anyone who asks. Trimmed and
+      // capped so a stray HTML error page cannot flood the terminal.
+      const said = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)
+      return { err: `HTTP ${response.status}${said ? `: ${said}` : ', empty body'}`, ms: Date.now() - began }
     }
     if (body.error) return { err: String(body.error.message).slice(0, 130), ms: Date.now() - began }
     return { ok: body.result, ms: Date.now() - began }
