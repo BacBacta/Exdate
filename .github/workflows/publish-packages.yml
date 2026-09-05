@@ -18,8 +18,13 @@
 # (OIDC, no token, nothing to renew), configured per package on npmjs.com.
 #
 #   Actions -> publish-packages -> Run workflow
-#     confirm: (empty)   packs, checks the credential, prints what would go
-#     confirm: PUBLISH   publishes
+#     confirm: (empty)        packs, checks the credential, rehearses, publishes nothing
+#     confirm: PUBLISH        publishes with NPM_TOKEN
+#     confirm: PUBLISH-OIDC   publishes with NO token, through trusted publishing
+#
+# The dist-tag is derived from the version rather than typed: a prerelease goes
+# to `next`, so `latest` keeps pointing at the last stable release and nobody
+# installs a rehearsal by accident.
 #
 # A typed word rather than a checkbox, because the checkbox failed quietly: a
 # boolean input compared against `false` in an `if:` is skipped when the value
@@ -137,14 +142,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TOK: ${{ secrets.NPM_TOKEN }}   # matched against npm's printed prefix; never echoed
+          MODE: ${{ inputs.confirm }}
         run: |
           # No token is not an error once trusted publishing is configured on
           # each package: npm exchanges this job's OIDC token for a short-lived
           # credential, and generates provenance itself. So an empty secret
           # means that path, and the publish below proves whether it is - the
           # final step asks the registry rather than trusting either branch.
-          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "No NPM_TOKEN. Publishing will use trusted publishing (OIDC), which requires"
+          if [ "${MODE:-}" = "PUBLISH-OIDC" ] || [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            [ "${MODE:-}" = "PUBLISH-OIDC" ] && echo "PUBLISH-OIDC: the token is deliberately not used."
+            echo "Publishing will use trusted publishing (OIDC), which requires"
             echo "a Trusted Publisher configured on BOTH @exdate/core and @exdate/sdk at"
             echo "npmjs.com, naming repository BacBacta/Exdate and workflow publish-packages.yml."
             echo "If it is not configured, the publish below fails with an authentication error"
@@ -280,7 +287,7 @@ jobs:
       #
       # It never fails the job. It is an experiment, not a gate.
       - name: Rehearse the trusted-publishing path (publishes nothing)
-        if: ${{ inputs.confirm != 'PUBLISH' }}
+        if: ${{ !startsWith(inputs.confirm, 'PUBLISH') }}
         run: |
           if [ -n "${NPM_CONFIG_USERCONFIG:-}" ] && [ -f "$NPM_CONFIG_USERCONFIG" ]; then
             sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG"
@@ -353,9 +360,10 @@ jobs:
         # a row the operator was told "publish done" while nothing had left, and
         # a condition whose failure mode is silence is the wrong condition for an
         # irreversible action. Typing PUBLISH is unambiguous in both directions.
-        if: ${{ inputs.confirm == 'PUBLISH' }}
+        if: ${{ inputs.confirm == 'PUBLISH' || inputs.confirm == 'PUBLISH-OIDC' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          MODE: ${{ inputs.confirm }}
         run: |
           # A 403 "You may not perform that action with these credentials" here
           # would be the token and nothing else - the step above establishes the
@@ -375,9 +383,31 @@ jobs:
           # The tarballs are the ones inspected above, published in order: the
           # sdk's manifest names an exact version of core, so core must exist on
           # the registry first or the sdk installs broken.
+          # PUBLISH-OIDC removes the credential rather than not setting one:
+          # actions/setup-node has already written the auth line into the job's
+          # npmrc, so leaving it would send an empty bearer in preference to
+          # falling through to trusted publishing.
+          PROV=--provenance
+          if [ "$MODE" = "PUBLISH-OIDC" ]; then
+            sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:?}"
+            npm config delete //registry.npmjs.org/:_authToken 2>/dev/null || true
+            echo "PUBLISH-OIDC: auth lines left in the npmrc: $(grep -c authToken "$NPM_CONFIG_USERCONFIG" || true)"
+            # npm's documentation: under trusted publishing "npm automatically
+            # generates and publishes provenance attestations", so the flag is
+            # not passed rather than passed redundantly.
+            PROV=
+          fi
+
+          # The dist-tag comes from the version, not from a second thing to keep
+          # in step with it: a prerelease goes to `next` so `latest` keeps
+          # pointing at the last stable release. npm requires --tag for a
+          # prerelease anyway - measured, it refuses without one.
+          TAG=$(node -p "require('./packages/core/package.json').version.includes('-') ? 'next' : 'latest'")
+          echo "publishing under dist-tag: $TAG"
+
           set -x
-          npm publish /tmp/pack/exdate-core-*.tgz --access public --provenance
-          npm publish /tmp/pack/exdate-sdk-*.tgz  --access public --provenance
+          npm publish /tmp/pack/exdate-core-*.tgz --access public --tag "$TAG" $PROV
+          npm publish /tmp/pack/exdate-sdk-*.tgz  --access public --tag "$TAG" $PROV
 
       # Ask the registry, rather than reporting on the strength of a step having
       # been reached. A publish that was skipped, or one that npm accepted and
@@ -385,31 +415,48 @@ jobs:
       - name: Say what the registry now holds
         run: |
           confirmed='${{ inputs.confirm }}'
-          published=0
+          want=$(node -p "require('./packages/core/package.json').version")
+          echo "this run built version $want"
+          echo
+
+          # Ask for THIS version, not for whatever `latest` happens to be: a
+          # prerelease is published under `next`, so reading dist-tags.latest
+          # would report the previous stable release and call it success.
+          landed=0
           for pkg in @exdate/core @exdate/sdk; do
             enc="${pkg/\//%2f}"
             code=$(curl -s -o /tmp/reg.json -w '%{http_code}' --max-time 30 "https://registry.npmjs.org/$enc" || echo 000)
-            if [ "$code" = "200" ]; then
-              node -e '
-                const d = require("/tmp/reg.json")
-                const v = d["dist-tags"].latest, m = d.versions[v]
-                console.log(`  on the registry: ${d._id}@${v} (${d.time[v]}), ${Math.round(m.dist.unpackedSize / 1024)} KB, provenance ${m.dist.attestations ? "yes" : "no"}`)'
-              published=$((published+1))
-            else
-              echo "  not on the registry: $pkg (HTTP $code)"
+            if [ "$code" != "200" ]; then
+              echo "  not on the registry at all: $pkg (HTTP $code)"
+              continue
             fi
+            WANT="$want" node -e '
+              const d = require("/tmp/reg.json")
+              const want = process.env.WANT
+              const tags = Object.entries(d["dist-tags"]).map(([t, v]) => `${t}=${v}`).join(" ")
+              console.log(`  ${d._id}: ${tags}`)
+              const m = d.versions[want]
+              if (!m) { console.log(`    ${want} is NOT on the registry`); process.exit(1) }
+              console.log(`    ${want} published ${d.time[want]}, ${Math.round(m.dist.unpackedSize / 1024)} KB,` +
+                ` provenance ${m.dist.attestations ? "yes" : "no"}`)
+            ' && landed=$((landed+1))
           done
 
-          if [ "$confirmed" = "PUBLISH" ]; then
-            if [ "$published" -eq 2 ]; then
-              echo "Both packages are live. A version cannot be republished; bump the version for the next release."
-              echo "Now configure trusted publishing on each package at npmjs.com and delete NPM_TOKEN."
-            else
-              echo "The publish step ran but the registry does not hold both packages."
-              exit 1
-            fi
-          else
-            echo "DRY RUN - nothing was published, whatever the tarballs above show."
-            echo "To publish for real: Run workflow again and type PUBLISH in the confirm box."
-            [ "$published" -eq 0 ] || echo "(the packages listed above were published by an earlier run)"
-          fi
+          case "$confirmed" in
+            PUBLISH|PUBLISH-OIDC)
+              if [ "$landed" -eq 2 ]; then
+                echo
+                echo "Both packages serve $want. A version cannot be republished; bump for the next one."
+                [ "$confirmed" = "PUBLISH-OIDC" ] && echo "That was published with NO token, so trusted publishing is configured and working."
+              else
+                echo
+                echo "The publish step ran and the registry does not serve $want on both packages."
+                exit 1
+              fi
+              ;;
+            *)
+              echo
+              echo "DRY RUN - nothing was published, whatever the tarballs above show."
+              echo "To publish: run again with confirm=PUBLISH (token) or confirm=PUBLISH-OIDC (no token)."
+              ;;
+          esac

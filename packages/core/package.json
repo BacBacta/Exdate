@@ -1,6 +1,6 @@
 {
   "name": "@exdate/core",
-  "version": "0.1.0",
+  "version": "0.1.1-oidc.0",
   "description": "Chains, ABIs, WAD maths, reconciliation and the address codecs behind exdate, the corporate-action layer for tokenized stocks. Pure: no I/O.",
   "keywords": [
     "robinhood-chain",
@@ -92,9 +92,9 @@
     "viem": "^2.56.3"
   },
   "devDependencies": {
+    "@types/node": "^22.15.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.11",
     "vite": "^7.1.14",
-    "@types/node": "^22.15.0"
+    "vitest": "^4.1.11"
   }
 }
