@@ -202,7 +202,19 @@ UNIT
   chmod +x "$DIR/deploy/update-api.sh"
   systemctl daemon-reload
   systemctl enable --quiet --now exdate-api-update.timer
-  note "exdate-api-update.timer: $(systemctl show -p NextElapseUSecRealtime --value exdate-api-update.timer 2>/dev/null | head -c 40)"
+  # Read the state back, and read the property that actually exists on THIS kind of
+  # timer. The first version printed NextElapseUSecRealtime, which systemd only sets
+  # on OnCalendar timers, so the line came out as "exdate-api-update.timer:" and
+  # confirmed nothing while looking like a confirmation - the same shape as the
+  # "containers up" check that was true of a run where nothing worked.
+  state="$(systemctl is-active exdate-api-update.timer 2>/dev/null || true)"
+  if [ "$state" = active ]; then
+    note "exdate-api-update.timer is active, checking every 15 minutes"
+    note "next run: $(systemctl list-timers --no-pager exdate-api-update.timer 2>/dev/null | sed -n '2p' | sed 's/  */ /g' | cut -c1-60)"
+  else
+    warn "exdate-api-update.timer is '${state:-unknown}', not active: the API will not follow the branch."
+    warn "  systemctl status exdate-api-update.timer   then   systemctl enable --now exdate-api-update.timer"
+  fi
   note "logs: journalctl -u exdate-api-update -f"
 else
   warn "no systemd here, so the API will not follow the branch by itself; run deploy/update-api.sh from cron instead"
