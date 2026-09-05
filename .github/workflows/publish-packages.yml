@@ -289,25 +289,44 @@ jobs:
           echo "auth lines left in the job's npmrc: $(grep -c authToken "${NPM_CONFIG_USERCONFIG:-/dev/null}" 2>/dev/null || echo 0)"
           echo
 
-          for t in /tmp/pack/exdate-core-*.tgz /tmp/pack/exdate-sdk-*.tgz; do
+          # A published version cannot be rehearsed against: the first attempt
+          # used the real 0.1.0 tarballs and npm answered "You cannot publish
+          # over the previously published versions" - WITHOUT any credential,
+          # which is itself worth knowing (npm checks the version before it
+          # checks who you are, so a collision masks the question being asked).
+          # So pack under a version that has never existed. Nothing is committed
+          # and nothing is published; --dry-run does the whole publish except
+          # the PUT, and the manifests are restored afterwards.
+          mkdir -p /tmp/rehearse
+          trap 'git checkout -- packages/core/package.json packages/sdk/package.json' EXIT
+          for p in core sdk; do
+            ( cd "packages/$p" && npm pkg set version=0.0.0-oidc-rehearsal \
+              && pnpm pack --pack-destination /tmp/rehearse >/dev/null )
+          done
+          ls -1 /tmp/rehearse
+
+          for t in /tmp/rehearse/*.tgz; do
+            echo
             echo "=== npm publish --dry-run $(basename "$t") , no token, OIDC only"
             set +e
             out="$(npm publish "$t" --access public --dry-run 2>&1)"
             status=$?
             set -e
-            printf '%s\n' "$out" | tail -25
+            printf '%s\n' "$out" | grep -vE '^npm notice ' | tail -20
             echo "--- exit $status"
             if printf '%s' "$out" | grep -qiE 'oidc|trusted publish|id.token|exchange'; then
-              echo "VERDICT: npm did reach for OIDC on a dry run - this rehearsal is meaningful."
+              echo "VERDICT: npm reached for OIDC on a dry run, so this rehearsal is meaningful."
+              printf '%s' "$out" | grep -iE 'oidc|trusted publish|id.token|exchange' | head -5
+            elif printf '%s' "$out" | grep -qiE 'ENEEDAUTH|need auth|must be logged in|authentication|EUSAGE.*auth'; then
+              echo "VERDICT: npm refused for want of a credential. With id-token: write present"
+              echo "  that means no Trusted Publisher is configured for this package yet."
             elif [ $status -eq 0 ]; then
-              echo "VERDICT: the dry run succeeded WITHOUT mentioning OIDC, so it most likely"
-              echo "  never authenticated at all. That means a dry run cannot tell you whether"
-              echo "  the Trusted Publisher is configured; only a real publish can."
+              echo "VERDICT: the dry run succeeded with NO credential and never mentioned OIDC,"
+              echo "  so it does not authenticate at all. A dry run therefore cannot tell you"
+              echo "  whether the Trusted Publisher is configured - only a real publish can."
             else
-              echo "VERDICT: npm refused. Read the message above - if it names authentication or"
-              echo "  a trusted publisher, that IS the answer about the configuration."
+              echo "VERDICT: npm refused for some other reason; read the message above."
             fi
-            echo
           done
 
       - name: Publish
