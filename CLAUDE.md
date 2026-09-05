@@ -1342,12 +1342,22 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   prints their answers, with the member roster as the discriminator — unauthenticated
   `/-/org/exdate/user` returns `{}` (checked against `@babel` and `@vercel` too, while a made-up
   scope answers 404 `Scope not found`), authenticated it names each member and role. It settled the
-  question in one line: **`{"bacta16":"owner"}`**, so the account owns the scope and the token is
-  the read-only half — npm's own words being that granting a token an *organization* "does not give
-  the token the right to publish packages managed by the organization", which is a different
-  section of the same form from *Packages and scopes*. The parsing was rehearsed against all six
-  answer shapes before it was pushed, and a refused `PUT` creates nothing, so re-running after
-  fixing the token is free.
+  question in one line: **`{"bacta16":"owner"}`**, so the account owns the scope. A second,
+  freshly created token was refused identically, which is when guessing stopped being the
+  instrument: **`/-/npm/v1/tokens` returns a granular token's own permissions**, and answers 401
+  with no credential, so unlike the check it replaced its success depends on the thing checked.
+  It ended the question: `permissions: [{package, read}, {org, read}]`, `scopes:
+  [{package, null}, {org, "exdate"}]`, `bypass_2fa: true`, `cidr: []`. **Read on packages, and the
+  grant made under *Organizations* rather than *Packages and scopes*** — which is npm's own
+  documented trap: an organization grant "does not give the token the right to publish packages
+  managed by the organization". Not 2FA, not an IP allowlist, not the account. The job now reads
+  that verdict out of the JSON and **fails before attempting the publish**, naming the one setting
+  to change, so a read-only token gives a sentence instead of a 403; rehearsed against seven
+  answer shapes including two tokens, no prefix match, and unparseable JSON (which carries on
+  rather than blocking a publish). Every introspection call prints its status code beside its
+  body, because the three answers to one question are 200 `{}` unauthenticated, 401 with a wrong
+  bearer, and the roster with a good one — a body alone cannot be told from a refusal. A refused
+  `PUT` creates nothing, so re-running after fixing the token is free.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -116,6 +116,7 @@ jobs:
       - name: Check the credential and the scope
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TOK: ${{ secrets.NPM_TOKEN }}   # matched against npm's printed prefix; never echoed
         run: |
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
             echo "NPM_TOKEN is not set on this repository. Add it under Settings -> Secrets and variables -> Actions."
@@ -154,6 +155,45 @@ jobs:
           # the secret itself, and Actions masks it regardless.
           echo "--- what npm says this token is allowed to do"
           api /-/npm/v1/tokens
+          # Read the verdict out of that answer rather than leaving a human to
+          # spot `"action":"read"` in a wall of JSON. npm returns a granular
+          # token as its permissions (package/org x read/write) and the scopes
+          # it was granted; the token in use is matched by the prefix and suffix
+          # npm prints, so a list holding several tokens still names the right
+          # one. Neither half of the secret is echoed - only whether it matched.
+          TOKENS_JSON="$API_BODY" node -e '
+            const list = (JSON.parse(process.env.TOKENS_JSON || "{}").objects) || []
+            const t = process.env.TOK || ""
+            const mine = list.find((o) => {
+              const [a, b] = String(o.token || "").split("...")
+              return a && b && t.startsWith(a) && t.endsWith(b)
+            }) || (list.length === 1 ? list[0] : null)
+            if (!mine) {
+              console.log("could not identify this token among the " + list.length + " npm listed")
+              process.exit(0)
+            }
+            const perm = (n) => (mine.permissions || []).find((p) => p.name === n)?.action ?? "none"
+            const scopes = (mine.scopes || []).map((s) => `${s.type}:${s.name ?? "*"}`).join(", ")
+            console.log(`token "${mine.name}": package=${perm("package")} org=${perm("org")}` +
+              ` scopes=[${scopes}] bypass_2fa=${mine.bypass_2fa} cidr=${(mine.cidr || []).length}` +
+              ` expires ${mine.expiry ?? "never"}`)
+            if (perm("package") !== "write") {
+              console.log("")
+              console.log("This token CANNOT publish. npm reports package=" + perm("package") + ".")
+              console.log("On npmjs.com, Access Tokens -> this token -> Packages and scopes:")
+              console.log("  set Permissions to \"Read and write\", covering @exdate")
+              console.log("  (All packages, or the exdate SCOPE - selecting named packages cannot")
+              console.log("   work, since the scope holds none yet).")
+              console.log("The Organizations section is a different grant: npm states it \"does not")
+              console.log("give the token the right to publish packages managed by the organization\".")
+              process.exit(3)
+            }
+            console.log("This token may publish (package=write).")
+          ' || {
+            status=$?
+            [ "$status" -eq 3 ] && exit 1
+            echo "could not read the token permissions (node exit $status); carrying on"
+          }
 
           echo "--- the account behind it, including its 2FA state"
           api /-/npm/v1/user
