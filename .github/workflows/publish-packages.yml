@@ -14,9 +14,8 @@
 # granting a token access to an organization "does not give the token the right
 # to publish packages managed by the organization". It manages settings, teams
 # and users. A token with only that reads the scope perfectly and 403s on PUT.
-# Once both packages exist, replace it with trusted publishing (OIDC, no token),
-# configured per package on npmjs.com. That path likely wants `npm publish`
-# rather than `pnpm publish`, which documents --provenance but not OIDC.
+# Both packages now exist, so the token can be replaced with trusted publishing
+# (OIDC, no token, nothing to renew), configured per package on npmjs.com.
 #
 #   Actions -> publish-packages -> Run workflow
 #     confirm: (empty)   packs, checks the credential, prints what would go
@@ -80,6 +79,10 @@ jobs:
       - name: Show and check each tarball
         run: |
           mkdir -p /tmp/pack
+          # pnpm pack, not npm pack: it is what rewrites `workspace:*` in the
+          # sdk's manifest to the exact version. These tarballs are the ones
+          # published below - the artifact inspected here is the artifact that
+          # leaves, rather than a second pack nobody looked at.
           for p in core sdk; do
             ( cd "packages/$p" && pnpm pack --pack-destination /tmp/pack )
           done
@@ -240,16 +243,27 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # A 403 "You may not perform that action with these credentials" here,
-          # after the step above has shown this account owning the scope, is the
-          # token and nothing else: read-only rather than read and write, an IP
-          # allowlist that excludes GitHub's runners, or the grant made under
-          # "Organizations" instead of "Packages and scopes". Nothing is created
-          # by a refused PUT, so re-running after fixing the token is safe.
+          # A 403 "You may not perform that action with these credentials" here
+          # would be the token and nothing else - the step above establishes the
+          # account owns the scope, and reads the token's own permissions from
+          # npm. Nothing is created by a refused PUT, so re-running is safe.
           #
-          # core first: the sdk's manifest names an exact version of it.
-          pnpm --filter @exdate/core publish --access public --no-git-checks --provenance
-          pnpm --filter @exdate/sdk  publish --access public --no-git-checks --provenance
+          # npm publish, not pnpm publish, and this is measured rather than
+          # assumed: `pnpm publish --help` on pnpm 10.18.0 does not mention
+          # provenance at all, while `npm publish --help` does. pnpm ACCEPTS
+          # --provenance and silently ignores it, which is how @exdate/core@0.1.0
+          # and @exdate/sdk@0.1.0 went out with `"attestations": null` while this
+          # job's command line said --provenance. A version is immutable, so
+          # those two carry no provenance for good; every version after them
+          # does. The final step reads the registry back, so the claim and the
+          # fact are checked against each other rather than assumed to agree.
+          #
+          # The tarballs are the ones inspected above, published in order: the
+          # sdk's manifest names an exact version of core, so core must exist on
+          # the registry first or the sdk installs broken.
+          set -x
+          npm publish /tmp/pack/exdate-core-*.tgz --access public --provenance
+          npm publish /tmp/pack/exdate-sdk-*.tgz  --access public --provenance
 
       # Ask the registry, rather than reporting on the strength of a step having
       # been reached. A publish that was skipped, or one that npm accepted and

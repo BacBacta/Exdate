@@ -1358,6 +1358,26 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   body, because the three answers to one question are 200 `{}` unauthenticated, 401 with a wrong
   bearer, and the roster with a good one — a body alone cannot be told from a refusal. A refused
   `PUT` creates nothing, so re-running after fixing the token is free.
+- 2026-09-05 — **`@exdate/core` and `@exdate/sdk` are on npm, and the flag that was supposed to
+  prove where they came from did nothing.** The 403 that survived two tokens was read out of npm
+  rather than guessed at: `/-/npm/v1/tokens` returned `permissions: [{package, read}, {org, read}]`
+  with the grant made under *Organizations*, npm's own documented trap. Fixed, the same job printed
+  `package=write org=write` and both packages went out. Verified the way the rest of this project
+  verifies: installed fresh from the registry into an empty directory and run — 194 tokens, 13
+  multiplier logs, `toUnderlyingShares`/`toRawAmount` lossless on SGOV's real 1.005101 multiplier,
+  AAPL's published haircut recomputed at 3600 bps, and a webhook signed and verified through the
+  published SDK, rejected when forged (`signature_mismatch`) and when replayed
+  (`timestamp_outside_tolerance`).
+  What that verification caught is the part worth keeping: the job's command line said
+  `--provenance` and the registry answered `"attestations": null`. **`pnpm publish` accepts
+  `--provenance` and silently ignores it** — measured, not inferred: `pnpm publish --help` on
+  10.18.0 mentions provenance zero times, `npm publish --help` once. So the two 0.1.0 tarballs
+  carry no attestation and, versions being immutable, never will. The fix publishes the **same
+  tarballs that the inspection step already unpacked and checked**, with `npm publish` rather than
+  a second pack nobody looked at. The reporting was never wrong — the final step read the registry
+  back and printed `provenance no` — which is why the gap was visible at all: a step that asks the
+  registry what it holds catches a flag that did nothing, where a step narrating its own command
+  line would have reported success.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -1381,7 +1401,11 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
 - [x] **M5 SDK + docs** — `packages/sdk`: typed client for every route, `ExdateError` with the
       status, and the webhook verifier (`webhookFromRequest`, `parseWebhook`) reusing the sender's
       own function. `docs/api.md` documents every endpoint with a real captured response;
-      `packages/sdk/README.md` documents the client.
+      `packages/sdk/README.md` documents the client. **Both packages are on npm** —
+      `@exdate/core@0.1.0` and `@exdate/sdk@0.1.0`, published 2026-09-05, verified by installing
+      them fresh from the registry and running them: 194 registry tokens, 13 multiplier logs,
+      the WAD round trip lossless, AAPL's haircut recomputed at 3600 bps, and a webhook signature
+      that verifies, is rejected when forged, and is rejected when replayed.
 
 ### Known gaps
 
