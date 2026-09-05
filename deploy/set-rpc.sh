@@ -150,7 +150,7 @@ fi
 say "4. Apply and restart"
 install -o "$USER_NAME" -g "$USER_NAME" -m 600 "$CANDIDATE" "$DIR/.env"
 rm -f "$CANDIDATE"
-note "$DIR/.env now puts $(printf '%s' "$URL" | sed -E 's#(https?://[^/]+/?).*#\1…#') first, Robinhood's endpoint last ($(printf '%s' "$LIST" | tr ',' '\n' | wc -l | tr -d ' ') endpoints)"
+note "$DIR/.env now puts $(printf '%s' "$URL" | sed -E 's#(https?://[^/]+/?).*#\1…#') first, Robinhood's endpoint last ($(printf '%s\n' "$LIST" | tr ',' '\n' | wc -l | tr -d ' ') in the list)"
 if [ "$DO_RESTART" = no ]; then
   note "not restarting (--no-restart); the caller will"
 elif systemctl is-enabled --quiet exdate-watcher 2>/dev/null; then
