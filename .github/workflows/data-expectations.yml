@@ -1,8 +1,17 @@
 # Standing expectations over data/ (see docs/data-audit-2026-09-05.md, section 6.8).
 #
 # Runs on every commit that touches the record - the collectors' as well as a person's -
-# and on demand. It installs the workspace only for viem's EIP-55 checksum, which the
-# script reports as skipped rather than passed when the module is missing.
+# and on demand. It installs the workspace for viem's EIP-55 checksum, which the script
+# reports as skipped rather than passed when the module is missing, and it builds the
+# public site so the checks that compare a published figure against its dataset field
+# have something to read.
+#
+# That build is the point. Those assertions are guarded by
+# existsSync('apps/web/out/index.html') and skip when the site has not been built, so
+# until this job built it they only ever ran on a developer's machine and protected
+# nothing in CI: the site could have rendered a figure that disagreed with data/ and
+# every run would still have been green. Found by reading a status check's own skip
+# count - "0 failed, 1 warnings, 2 skipped".
 name: data-expectations
 
 on:
@@ -25,7 +34,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -38,5 +47,21 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # The static export, so the site checks read the pages a visitor would get: the
+      # home page's three figures against their dataset fields, and calendar.ics for
+      # CRLF, 75-octet folding and unique UIDs.
+      - name: Build the public site
+        run: pnpm --filter @exdate/web build
+
       - name: Check the record against its expectations
         run: node scripts/check-data-expectations.mjs
+
+      # A skip is not a pass. Every check this job can run must actually run, so a
+      # future guard that silently stops one - a renamed output directory, a moved
+      # file - fails here instead of going quiet.
+      - name: No check may be skipped in CI
+        run: |
+          if node scripts/check-data-expectations.mjs | grep '^skip '; then
+            echo "::error::a check was skipped; in CI every check must run"
+            exit 1
+          fi

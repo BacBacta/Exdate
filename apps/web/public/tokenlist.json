@@ -1,10 +1,10 @@
 {
   "name": "exdate Robinhood Stock Tokens",
-  "timestamp": "2026-09-05T20:28:44.563Z",
+  "timestamp": "2026-09-05T21:26:50.008Z",
   "version": {
     "major": 1,
     "minor": 0,
-    "patch": 4
+    "patch": 5
   },
   "keywords": [
     "stock tokens",
@@ -313,7 +313,7 @@
         "underlyingSharesPerToken": "1.000101323251417769",
         "isin": "USN070592100",
         "priceFeed": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
-        "priceFeedCorroboratedBy": null,
+        "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
         "dividendOwedPerToken": null,
         "dividendProcessDate": null,
