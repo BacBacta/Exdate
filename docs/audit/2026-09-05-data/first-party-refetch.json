@@ -1,0 +1,115 @@
+{
+ "fetchedAt": "2026-09-05T19:55:16.676Z",
+ "assets": {
+  "status": 200,
+  "live": 194,
+  "snapshot": 194,
+  "snapshotFetchedAt": "2026-09-02T15:14:00.463Z",
+  "onlyLive": [],
+  "onlySnapshot": [],
+  "multiplierChanged": [
+   {
+    "symbol": "UPS",
+    "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+    "snapshot": "1.000000000000000000",
+    "live": "1.002208724969205741"
+   },
+   {
+    "symbol": "F",
+    "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+    "snapshot": "1.000000000000000000",
+    "live": "1.000145502866134027"
+   }
+  ],
+  "symbolChanged": [],
+  "isinChanged": [],
+  "statusChanged": [],
+  "pendingLive": [],
+  "notAllChain4663": 0,
+  "notAll18Decimals": 0
+ },
+ "corporateActions": {
+  "status": 200,
+  "liveRows": 43,
+  "snapshotRows": 43,
+  "archiveRows": 45,
+  "archiveLastArchivedAt": "2026-09-05T06:38:51.610Z",
+  "liveNotInArchive": [],
+  "liveNotInSnapshot": [
+   {
+    "key": "0x000000000000000000000000000000001bbb45628de84cb2917abd26680c7ab9:2026-09-30",
+    "symbol": "AVGO",
+    "processDate": "2026-09-30",
+    "rate": "0.65",
+    "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS"
+   },
+   {
+    "key": "0x000000000000000000000000000000008f9ceee3a7954365bdd32ff0094d9b0f:2026-09-24",
+    "symbol": "VRT",
+    "processDate": "2026-09-24",
+    "rate": "0.0625",
+    "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS"
+   }
+  ],
+  "snapshotNotInLive": [
+   {
+    "key": "0x00000000000000000000000000000000f6e013126d524981acc9df053b0c19ea:2026-08-05",
+    "symbol": "ASML",
+    "processDate": "2026-08-05"
+   },
+   {
+    "key": "0x000000000000000000000000000000006604af6b5c4a4031a29417ec8c2f8c53:2026-08-05",
+    "symbol": "BND",
+    "processDate": "2026-08-05"
+   }
+  ],
+  "archiveNotInLive": [
+   {
+    "key": "0x00000000000000000000000000000000f6e013126d524981acc9df053b0c19ea:2026-08-05",
+    "symbol": "ASML",
+    "processDate": "2026-08-05",
+    "inWindow": false
+   },
+   {
+    "key": "0x000000000000000000000000000000006604af6b5c4a4031a29417ec8c2f8c53:2026-08-05",
+    "symbol": "BND",
+    "processDate": "2026-08-05",
+    "inWindow": false
+   }
+  ],
+  "statusChangedSinceArchive": [
+   {
+    "symbol": "JBL",
+    "processDate": "2026-09-02",
+    "archive": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+    "live": "CORPORATE_ACTION_STATUS_COMPLETED"
+   }
+  ],
+  "rateChangedSinceArchive": [],
+  "idsSeenMoreThanOnceLive": [
+   {
+    "id": "0x000000000000000000000000000000005f7e82ad6e4c4b60ba76497863fe4a67",
+    "rows": 2
+   },
+   {
+    "id": "0x000000000000000000000000000000009cc71272a7ec45f0adb8a7469632dd4d",
+    "rows": 2
+   }
+  ],
+  "typesLive": {
+   "CORPORATE_ACTION_TYPE_CASH_DIVIDEND": 43
+  },
+  "oldestLiveProcessDate": "2026-08-06",
+  "newestLiveProcessDate": "2026-10-01",
+  "addressesNotInRegistry": []
+ },
+ "chainlink": {
+  "status": 200,
+  "live": 57,
+  "snapshot": 57,
+  "onlyLive": [],
+  "onlySnapshot": [],
+  "equityLive": 35,
+  "fieldChanged": []
+ }
+}

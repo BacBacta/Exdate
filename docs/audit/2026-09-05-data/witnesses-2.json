@@ -1,0 +1,217 @@
+{
+  "ranAt": "2026-09-05T19:43:56.802Z",
+  "stateBX": [
+    {
+      "symbol": "CRWD",
+      "effectiveBlock": 1267585,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "SGOV",
+      "effectiveBlock": 4635248,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "MU",
+      "effectiveBlock": 18245701,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "ORCL",
+      "effectiveBlock": 20829027,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "DELL",
+      "effectiveBlock": 26859241,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "ASML",
+      "effectiveBlock": 29445528,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "SGOV",
+      "effectiveBlock": 30308049,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "COST",
+      "effectiveBlock": 32895477,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "AAPL",
+      "effectiveBlock": 36351132,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "CCL",
+      "effectiveBlock": 50960761,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "SGOV",
+      "effectiveBlock": 51274920,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    },
+    {
+      "symbol": "F",
+      "effectiveBlock": 52671215,
+      "before": null,
+      "at": null,
+      "agrees": false,
+      "answered": false
+    }
+  ],
+  "batch": {
+    "block": 55379946,
+    "answeredBM": 194,
+    "answeredBX": 194,
+    "disagreements": [],
+    "moved": [
+      {
+        "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
+        "chain": "1000063708620124549",
+        "registrySnapshot": "1.000063708620124549",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.000063708620124549\",\"isin\":\"U"
+      },
+      {
+        "token": "0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931",
+        "chain": "4000000000000000000",
+        "registrySnapshot": "4.000000000000000000",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"4\",\"isin\":\"US22788C1053\",\"price"
+      },
+      {
+        "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
+        "chain": "1021486444855206408",
+        "registrySnapshot": "1.021486444855206408",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.021486444855206408\",\"isin\":\"B"
+      },
+      {
+        "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+        "chain": "1002208724969205741",
+        "registrySnapshot": "1.000000000000000000",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1\",\"isin\":\"US9113121068\",\"price"
+      },
+      {
+        "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+        "chain": "1005101770003214918",
+        "registrySnapshot": "1.005101770003214918",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.005101770003214918\",\"isin\":\"U"
+      },
+      {
+        "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
+        "chain": "1000074823219171086",
+        "registrySnapshot": "1.000074823219171086",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.000074823219171086\",\"isin\":\"U"
+      },
+      {
+        "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+        "chain": "1000145502866134027",
+        "registrySnapshot": "1.000000000000000000",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.000145502866134027\",\"isin\":\"U"
+      },
+      {
+        "token": "0xb0992820e760d836549ba69bc7598b4af75dee03",
+        "chain": "1002210914971013375",
+        "registrySnapshot": "1.002210914971013375",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.002210914971013375\",\"isin\":\"U"
+      },
+      {
+        "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
+        "chain": "1000566080061092436",
+        "registrySnapshot": "1.000566080061092436",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.000566080061092436\",\"isin\":\"U"
+      },
+      {
+        "token": "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2",
+        "chain": "1000612040296259656",
+        "registrySnapshot": "1.000612040296259656",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.000612040296259656\",\"isin\":\"U"
+      },
+      {
+        "token": "0x47f93d52cbec7c6d2cfc080e154002370a60daea",
+        "chain": "1000101323251417769",
+        "registrySnapshot": "1.000101323251417769",
+        "tokenlist": "{\"underlyingSharesPerToken\":\"1.000101323251417769\",\"isin\":\"U"
+      }
+    ],
+    "snapshotVsChain": 0
+  },
+  "errors": [
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 1239020dd6e2cd59de553be8d4c3bdf0e378e708dd3217c0e3023d09b43bc5c4 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node c0e16c2f17b4cedf87b199bf9d1327e7e1829aa8b78a7a4a1818a09ce18f946e (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 2fc562e09eed5d13ffc6ffcaf35f012ced7008e3a3c4a23490bc2eedb6d933e0 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node a87c33e65edd1316bf423e1109c5b35a0f11380f1c3c3a72fe4c2c7d7150acc7 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node c35562a2f4ebd8a81cc1ffdfb72e41c98aebc1f95f4beef7c927a0b6a1475c7c (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node d852a0f685bad5d3565045cdf2ff2bc93435c40ff91f4473538f505c5ad9dc79 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 0ae92d6099fbe36d06f4b35be7cca8d3f9d759d15557453503e36544f3562653 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 92118c49e9e0dea9022d06d60f284558e4d3b51633d35f1767bf01d688ef0a5c (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node d608d4a814a2ab38d5a61c2b6fc135188e4bb6a0507eb0d159706ae9811c00ea (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 5179eb5cb388987f2101a0e9e79e96113da4007239d866d439cd69bd511fbfcf (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node c1850495f96ae25f6011b8b72f2a42affacc9b11e5218a44d766239a3f12a065 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 8afc57f17babb572105994830a57d4d4143905587e7ab25ca9e322620ddc4d7b (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node bf371237836b67f30c4571295604cbfa685343a3fa004c7b5f87f756a5f6fff9 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 9643efd99173c8d45bc0f9be6b3b182afad31d42c7605bc34ebc73ae48b687d4 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 657b411eb5531c015564c757c647cf257b1f8e430f017a40849b0617e6d725be (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 2c8162fc27f3b885dd2a6afd57f3dc27f9f8d37b7d3dec260af176f7ee343f85 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 197dcd684a3c37983b8fcc4e1d99d5cc8bf7f5d66252a90c550fe86ad3069b9e (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 1a40ff2e44ce1bc4eb7bf673b7dd5f85b819d441dad781793f026497cab09bbb (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 7ff63929b60a56193ec7c1264bd4fc3789069c534ee700b1ff4ad838b18ea14d (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 2bd90bff5fd42c7f7525cd539702571d4942937bbd0f6f076c5561611d4598db (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 89f35bd2bc75a14f8adb28ebb8b59047e31f9515210130af7cd070dca3d7bace (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 84abf7d4e34e495d66dd370f1b172fe3807c6dea10e3dfc37d3286b60955f597 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node 2367e47e83e682ea8b475f103bf8009b6e09b1e91bc80f783e8517130097d040 (path ) sta",
+    "Error: BX eth_call: {\"code\":-32000,\"message\":\"missing trie node e3cf05ffa6eeec15937097d4777786502f16b8d84882dc4761df022ceed15ffa (path ) sta"
+  ],
+  "summary": {
+    "stateBX": {
+      "agrees": 0,
+      "answered": 0,
+      "total": 12
+    },
+    "batch": {
+      "block": 55379946,
+      "answeredBM": 194,
+      "answeredBX": 194,
+      "disagreements": 0,
+      "moved": 11
+    },
+    "errors": 24
+  }
+}

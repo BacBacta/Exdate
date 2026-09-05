@@ -1622,6 +1622,34 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   the three dividend pages 1 700 → 757 and 25.7 → 8.1; the two market pages 1 911 → 614 and
   29 → 9.7; long paragraphs 27 → 1 across the site; footer 19 → 13 links. The data layer
   (`lib/observed.ts`) did not change: what changed is where the proof sits, not whether it exists.
+- 2026-09-05 — **The data audited against its own brief, and the first S0 was a step nobody had
+  scanned.** `docs/data-audit-prompt.md` is the brief (ISO 25012 dimensions, two-witness rule,
+  P0–P11, S0–S4); `docs/data-audit-2026-09-05.md` the audit, in French, evidence under
+  `docs/audit/2026-09-05-data/`. 92 claims registered, every collector rerun in a clean clone,
+  every first-party source refetched, chain state read on two endpoints without the repository's
+  code. Both published haircuts reproduce by hand (AAPL 3 601.81 bps, the file truncates; SGOV
+  3 378.13). **What was wrong: UPS.** Its step of 2026-09-04 15:10:26 UTC is in the capture
+  record, in the indexer, on two endpoints — and not in `multiplier-events.observed.json`,
+  because the whole-chain scan is a hand-run command and nobody ran it after the 2nd. So the UPS
+  page, badge, token list and calendar said "owed, not on chain, $1.64" about a dividend that had
+  landed. Second: `build-reconciliations.mjs` reads the one-month snapshot, which no collector
+  refreshes, not the archive — VRT and AVGO, declared since the 3rd, are absent from the ledger,
+  the ICS and the feed, and a refreshed snapshot would have turned ASML's anomaly into
+  `unmatched` because its row has already left the window. Third: feed corroboration is a moving
+  majority recomputed hourly and published on four surfaces rebuilt on four schedules; at the
+  audit instant they disagreed on 6 of 35 pairings (DELL fell to 23/38 between the token list's
+  build and the map's), and the hosted API's copy is frozen at deploy because it reads the
+  generated registry compiled into the image. Also: one archive witness left for the state
+  confirmation (ordofi lost it within a day of being named), `verify-feed-map.mjs` without
+  `--cross-check` rewrites the file with `crossChecks: []`, and the licence's "every issuer value
+  carries `source: robinhood:`" is false in the three served files that derive from issuer rows.
+  Nothing in `data/` was changed by the audit. What was added: `scripts/check-data-expectations.mjs`
+  (97 checks: counts, keys, checksums, ISINs, WAD invariants, cross-file joins, cadence, the
+  recomputed share and medians, ICS folding) and `.github/workflows/data-expectations.yml`, which
+  fail today on exactly the UPS step, VRT/AVGO and DELL — the rescan pipeline
+  (`backfill-multiplier-events` → `resolve-effective-blocks` → `verify-multiplier-history` →
+  `build-reconciliations` → `generate-registry` → `build-token-list`) is the owner's first fix, and
+  making it a collector the second.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -1,0 +1,42 @@
+# Standing expectations over data/ (see docs/data-audit-2026-09-05.md, section 6.8).
+#
+# Runs on every commit that touches the record - the collectors' as well as a person's -
+# and on demand. It installs the workspace only for viem's EIP-55 checksum, which the
+# script reports as skipped rather than passed when the module is missing.
+name: data-expectations
+
+on:
+  push:
+    branches: [claude/lance-en5q6j]
+    paths:
+      - 'data/**'
+      - 'scripts/check-data-expectations.mjs'
+      - 'scripts/lib/market-session.mjs'
+      - '.github/workflows/data-expectations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-expectations-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check the record against its expectations
+        run: node scripts/check-data-expectations.mjs
