@@ -1299,6 +1299,19 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   endpoint, received the whole list. Found on the way and fixed: `systemctl enable --now` does
   **not** restart a running service, so three re-installs could update the checkout and never load
   the new code - the installer restarts explicitly now.
+- 2026-09-05 — **A number I invented blocked the fix it was meant to protect.** `set-rpc.sh` refused
+  any key that was not exactly 32 characters, and the probe refused anything under 20, on the
+  strength of "an Alchemy key is 32 characters" - written from memory and never measured. Alchemy's
+  documentation states no length anywhere, and the one example in their quickstart is 20 characters.
+  On the machine the delivered secret carried a 26-character key and was refused **before a single
+  request was made**, so the only authority on whether a credential works never got to speak. Rule 1
+  is about addresses and feed IDs; this is the same failure one level down - an unmeasured constant
+  presented as a fact, doing damage where a measurement would have cost one HTTP call. What survives
+  is only what is certainly wrong and needs no measurement: an empty value, a literal placeholder,
+  and a quote inside the value. Length is reported on a 401 as a hint about where to look, never as
+  a verdict. The gated rehearsal also found the whitespace half of that check unreachable -
+  `tr -d '[:space:]'` had already stripped it three lines earlier - so the repair is announced
+  instead of silent, since a silent repair is how a wrong value gets in looking right.
 - _(append decisions here as they are made)_
 
 ## Status

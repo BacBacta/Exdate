@@ -50,7 +50,12 @@ if [ "$FROM_STDIN" = no ] && ( : </dev/tty ) 2>/dev/null; then
 else
   read -rs RAW || true
 fi
-RAW="$(printf '%s' "$RAW" | tr -d '[:space:]' | sed -e "s/^['\"]*//" -e "s/['\"]*\$//")"
+# Whitespace is stripped, not refused: a wrapped paste arrives with it and the
+# value is otherwise correct. Say so, because a silent repair is how a wrong
+# value gets in looking right.
+CLEAN="$(printf '%s' "$RAW" | tr -d '[:space:]' | sed -e "s/^['\"]*//" -e "s/['\"]*\$//")"
+[ "$CLEAN" = "$RAW" ] || note "removed whitespace or surrounding quotes from what was entered"
+RAW="$CLEAN"
 [ -n "$RAW" ] || die "nothing was entered"
 
 # The value may already be the two-URL form the repository secret carries for
@@ -77,19 +82,21 @@ fi
 LIST="$URL"; [ -n "$REST" ] && LIST="$URL,$REST"
 case ",$LIST," in *",$FALLBACK,"*) ;; *) LIST="$LIST,$FALLBACK";; esac
 
-# The shape checks apply to an Alchemy key - bare, or inside an Alchemy URL.
-# Any other host is taken as given: its path is not a key, and the probe is the
-# judge of whether it works.
-if [ "${URL#https://$ALCHEMY_HOST/}" != "$URL" ]; then
-  if printf '%s' "$KEY" | grep -q '[^A-Za-z0-9_-]'; then
-    die "the key contains a character no key has (a quote, a space, a bracket) - $(printf '%s' "$KEY" | wc -c | tr -d ' ') characters as pasted. Copy it again from the dashboard."
-  fi
-  LEN=$(printf '%s' "$KEY" | wc -c | tr -d ' ')
-  [ "$LEN" -eq 32 ] || die "an Alchemy key is 32 characters; this one is $LEN. Nothing written. Copy the whole key from the Robinhood Mainnet app and run this again."
-  note "shape ok: $LEN characters"
-else
-  note "not an Alchemy URL; taken as given, the probe decides"
+# What is refused here is only what is certainly wrong: nothing at all, a
+# placeholder, or a character that cannot survive in a URL. Length is NOT a
+# gate - "an Alchemy key is 32 characters" was asserted here without ever being
+# measured, Alchemy's documentation states no length, and the check then refused
+# a real key before it could be tried. The probe makes a real request, and that
+# is the only authority on whether a credential works.
+LEN=$(printf '%s' "$KEY" | wc -c | tr -d ' ')
+case "$KEY" in
+  YOUR_KEY|VOTRE_CLE|API_KEY|'<'*|'{'*) die "that is the placeholder, not a key. Nothing written." ;;
+esac
+# A quote inside the value survives the strip above, which only takes the ends.
+if printf '%s' "$KEY" | grep -q "['\"]"; then
+  die "the key carries a quote from the paste - $LEN characters as given. Copy it again and run this."
 fi
+note "key of $LEN characters; the endpoint decides"
 
 say "2. A candidate .env, not yet in place"
 CANDIDATE="$(mktemp)"

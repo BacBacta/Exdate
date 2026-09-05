@@ -103,13 +103,11 @@ const safe = (u) => {
     console.error(`The URL still carries the placeholder "${key}". Put your real key there.`)
     process.exit(1)
   }
-  if (path.includes('/v2/') && key.length < 20) {
-    console.error(
-      `The key segment of that URL is only ${key.length} characters, which is shorter than any real one —\n` +
-        'the paste was probably truncated. Copy the whole URL from the Alchemy dashboard again.',
-    )
-    process.exit(1)
-  }
+  // No length check. There was one, refusing anything under 20 characters as a
+  // truncated paste; the number was invented, the provider documents no length,
+  // and it refused a real key before the endpoint could be asked. A length is
+  // reported below when a request actually comes back 401 - as a hint, never a
+  // verdict.
 }
 
 const PROBE_TOKEN = '0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9'
@@ -177,11 +175,10 @@ if (chain.err) {
     const stray = /[^A-Za-z0-9_-]/.test(key)
     console.log(
       `\n     The endpoint rejected the credential itself. The key segment is ${key.length} characters` +
-        (stray ? ` and contains a character no key has - a quote or space from the paste. Remove it.` : `.`) +
-        (!stray && key.length !== 32 ? ` Alchemy's are 32; check it against the dashboard.` : '') +
-        (!stray && key.length === 32
-          ? ` That is the right shape, so the dashboard no longer accepts this key: copy the current one for the Robinhood Mainnet app.`
-          : ''),
+        (stray
+          ? ' and carries a character no URL path holds - a quote or a space from the paste. Remove it and try again.'
+          : ', which is what was sent. If that is not the length of the key in the dashboard, the paste lost some;' +
+            ' if it is, the dashboard no longer accepts this key - copy the current one for the Robinhood Mainnet app.'),
     )
   }
   process.exit(1)
