@@ -143,10 +143,22 @@ function refuseIfShallow() {
   process.exit(1)
 }
 
-/** Every commit that touched a path, oldest first, with the commit date git recorded. */
+/**
+ * Every commit that touched a path, oldest first, with the commit date as a canonical UTC instant.
+ *
+ * `%ct` - a Unix timestamp - and not `%cI`, because git's ISO-8601 rendering is not stable across
+ * versions: git 2.43 writes `2026-09-04T06:20:53+00:00` where git 2.55 writes
+ * `2026-09-04T06:20:53Z`. Same instant, five bytes apart, on every line. That difference alone made
+ * the index rebuild differently on a runner than on this machine, and "reproducible from git" has
+ * to mean reproducible from any git, not from mine. A timestamp leaves nothing to render.
+ */
 function revisions(path) {
-  const log = git('log', '--reverse', '--format=%H\t%cI', '--', path).trim()
-  return log ? log.split('\n').map((line) => { const [commit, at] = line.split('\t'); return { commit, at } }) : []
+  const log = git('log', '--reverse', '--format=%H\t%ct', '--', path).trim()
+  if (!log) return []
+  return log.split('\n').map((line) => {
+    const [commit, seconds] = line.split('\t')
+    return { commit, at: `${new Date(Number(seconds) * 1000).toISOString().slice(0, 19)}Z` }
+  })
 }
 
 function buildOne(dataset) {
