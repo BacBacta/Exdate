@@ -318,9 +318,12 @@ Per asset: `tokenSymbol`, `tokenName`, `tokenDecimals`, `isin`, `status`, `curre
   file says `sufficient: true` the figure stays the brief's, not an observation. Correctness during
   off-hours windows is a requirement either way, not a nice-to-have.
 
-## Off-hours share — being measured, not yet answered
+## Off-hours share — measured: 74.3 % (57 samples, 2026-09-03 → 09-05)
 
-The one number left in the product that traced back to the brief rather than to a measurement.
+The one number left in the product that traced back to the brief rather than to a measurement,
+now answered: **74.3 % of transfers and 76.4 % of provable trades fall outside the regular
+session**, against the brief's 46 %. Published on the home page under *What we measured* since
+2026-09-05, from `data/session-share.observed.json` and only while it says `sufficient: true`.
 `scripts/measure-session-share.mjs` takes one sample per run — a ~40 s window of `Transfer` logs
 across all 194 tokens, its rate in transfers per second, and the ET market session it fell in — and
 appends it to `data/session-share.observed.json`. `.github/workflows/measure-session-share.yml`
@@ -1498,6 +1501,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   meaningless: the API serves `/v1/*` and its root has no route. Each name is now asked for the
   path that answers on it, because a check that calls a healthy service failing is a check nobody
   reads the day it is right.
+- 2026-09-05 — **The one figure that contradicts a received idea was published nowhere, and the
+  only way back to the site was memory.** Two of the audit's month items (F05, F04). The
+  off-hours share had reached `sufficient: true` in `data/` and appeared on no page: the home page
+  now carries a *What we measured* section — the haircut, the off-hours share, net creation — each
+  dated, with its sample size and one click from how it was read, and a permanent anchor
+  (`/#haircut`, `/#off-hours`, `/#creation`) so a figure can be cited by URL. The share renders only
+  while the file says sufficient, and the number exdate was given to check (46 %) is stated beside
+  the measurement rather than called "widely repeated", which nobody here measured. And three files
+  to subscribe to, generated at build like every page so none can carry a date that is not in git:
+  `/calendar.ics` (every declared dividend as an all-day event on its process date, every observed
+  change as a timed event at `effectiveAt`, UIDs keyed on the issuer's action id and date or the
+  token and instant), `/t/<address>/calendar.ics` for the 44 tokens that have anything to put in
+  one, and `/feed.xml` (the same record newest first, a declaration dated by when the archive first
+  saw it). `DTSTAMP` and `lastBuildDate` are the data's own timestamp, so an unchanged rebuild is
+  byte-identical. Lines are folded at 75 **octets**, not characters, and the built files are
+  checked for that, for CRLF, for escaped commas and semicolons and for one `DTSTART` per event
+  before the commit. Route handlers under `output: 'export'` do produce plain files
+  (`out/calendar.ics`, not a directory), which was the one thing not knowable without building.
+  Found on the way: a measurement script that launched Chromium with the egress proxy set was
+  measuring the proxy's 405 page, not the site — `bypass` did not take, every route "had no
+  overflow" and axe reported the five violations of an empty document. Local pages are now
+  measured with no proxy and axe injected from a local copy.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -1552,10 +1577,9 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   alarm. `/record/` states the measured cadence, the expected catch share and the watcher's
   heartbeat; nothing claims a capture that was not made.
 
-- The off-hours share is being sampled, not yet answered: `data/session-share.observed.json` reads
-  `sufficient: false` until every session has three samples, which takes about a day of the hourly
-  Action. Until then the brief's ~46 % stands unverified, and nothing in the product quotes it as
-  an observation.
+- The off-hours share is answered (74.3 %, see the section above) but on two days of hourly
+  samples covering 56 of 168 weekly hour-slots; the hourly Action keeps sampling, and the page
+  states the sample every time it states the share.
 
 - Base is unblocked but unwired. The registry address, the 13 token addresses and the 13 feed
   proxies are verified on chain; no source module exists, ERC-8056 does not answer there until the

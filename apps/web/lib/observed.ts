@@ -27,6 +27,8 @@ import cadenceJson from '../../../data/capture-cadence.observed.json'
 // The JSON files are cast to the handful of fields the page reads, so a field
 // the page does not use can change shape without touching this module.
 interface ReconciliationRow {
+  /** The issuer's id for the action: a series id, so unique only with processDate. */
+  actionId?: string | null
   symbol: string
   token: string
   processDate: string | null
@@ -74,7 +76,10 @@ interface MultiplierEvent {
   tx: string
 }
 interface ArchivedAction {
+  id?: string
   symbol?: string
+  /** When the archive first saw this (id, processDate): the only date at which "declared" can be said to have happened. */
+  firstSeenAt?: string
   processDate: { year: number; month: number; day: number } | null
   status: string
   details?: { cashDividend?: { rate?: string } }
@@ -156,8 +161,15 @@ const effectiveBlocks = effectiveBlocksJson as unknown as {
 const sessionShare = sessionShareJson as unknown as {
   sampleCount: number
   sufficient: boolean
+  firstSampleAt: string
   lastSampleAt: string
   easternHourOfWeekSlotsCovered: number
+  easternHourOfWeekSlots: number
+  /** Absent until every session has its minimum of samples. */
+  transferShare?: { offHours: number } | null
+  provableTradeShare?: { offHours: number } | null
+  /** The figure exdate was given to check, kept beside the measurement. */
+  briefClaim?: { value: number } | null
 }
 
 const gapData = gapJson as unknown as {
@@ -483,6 +495,16 @@ export type CalendarGroup = 'paid_not_on_chain' | 'overdue' | 'awaiting' | 'upco
  * whether the date has arrived, whether the pairing window has passed, and
  * whether the issuer already calls it paid.
  */
+/** When the archive first saw each declared action, keyed the way the archive keys them. */
+const firstSeenByAction = new Map(
+  archive.actions
+    .filter((action) => action.id && action.processDate && action.firstSeenAt)
+    .map((action) => [
+      `${action.id}:${action.processDate!.year}-${String(action.processDate!.month).padStart(2, '0')}-${String(action.processDate!.day).padStart(2, '0')}`,
+      action.firstSeenAt!,
+    ]),
+)
+
 export const calendar = (() => {
   const rows = reconciliations.rows
     .filter((row) => row.status === 'pending' && row.processDate)
@@ -501,12 +523,17 @@ export const calendar = (() => {
         token: row.token,
         symbol: row.symbol,
         name: nameByAddress.get(key) ?? row.symbol,
+        /** The issuer's own id with the date: what a calendar client keys the event on. */
+        actionId: row.actionId ?? null,
+        /** When exdate's archive first saw the declaration; null if it predates the archive. */
+        firstSeenAt: row.actionId ? (firstSeenByAction.get(`${row.actionId}:${row.processDate}`) ?? null) : null,
         processDate: row.processDate!,
         rate: row.rate,
         declared: fixed(row.rate, 4),
         owedPerToken: row.rate ? fixed(formatWad((parseDecimal(row.rate) * multiplierOf(key)) / WAD, 18), 4) : null,
         daysSince,
         group,
+        issuerCompleted: row.actionStatus === 'CORPORATE_ACTION_STATUS_COMPLETED',
       }
     })
   const pick = (group: CalendarGroup) =>
@@ -613,6 +640,42 @@ export const wallet = (() => {
       : undefined,
     declaredByToken,
   }
+})()
+
+export type ChangeState = 'matched' | 'anomaly' | 'unmatched'
+
+/**
+ * Every multiplier change ever observed, with what the reconciliation says
+ * about it, in one flat list: what the calendar file and the feed publish as
+ * past events. A change with no reconciliation row is `unmatched`, which is a
+ * statement (its declaration is gone from every first-party source), not a gap.
+ */
+export const changes = (() => {
+  const rowByEffect = new Map(
+    reconciliations.rows.filter((row) => row.change).map((row) => [`${row.token.toLowerCase()}:${Date.parse(row.change!.effectiveAt)}`, row]),
+  )
+  return distinctEvents.map((event) => {
+    const key = event.token.toLowerCase()
+    const row = rowByEffect.get(`${key}:${Date.parse(event.effectiveAt)}`) ?? null
+    const state: ChangeState = row?.status === 'matched' || row?.status === 'anomaly' ? row.status : 'unmatched'
+    return {
+      token: key,
+      symbol: event.symbol,
+      name: nameByAddress.get(key) ?? event.symbol,
+      effectiveAt: event.effectiveAt,
+      announcedAt: event.announcedAt,
+      stepBps: event.stepBps,
+      from: formatWad(BigInt(event.oldMultiplier), 6),
+      to: formatWad(BigInt(event.newMultiplier), 6),
+      txUrl: `${EXPLORER}/tx/${event.tx}`,
+      state,
+      processDate: row?.processDate ?? null,
+      declared: fixed(row?.rate, 4),
+      arrived: state === 'matched' || state === 'anomaly' ? fixed(row?.receivedPerShare, 4) : null,
+      haircutBps: state === 'matched' ? (row?.impliedHaircutBps ?? null) : null,
+      hasFeed: Boolean(row?.feed),
+    }
+  })
 })()
 
 /** What the dozen observed changes say about timing. A pattern with its sample size, not a forecast. */
@@ -913,10 +976,26 @@ export const observed = {
     ]!,
   },
   pendingExample,
+  /**
+   * How much of the activity happens outside the US regular session. The share
+   * is published only once every session has been sampled enough times: before
+   * that, a share would describe the sampling schedule and not the chain, so
+   * the fields are null and the page says nothing rather than something.
+   */
   sessionShare: {
     sampleCount: sessionShare.sampleCount,
     sufficient: sessionShare.sufficient,
     slotsCovered: sessionShare.easternHourOfWeekSlotsCovered,
+    slotsTotal: sessionShare.easternHourOfWeekSlots,
+    firstSampleAt: sessionShare.firstSampleAt,
+    lastSampleAt: sessionShare.lastSampleAt,
+    /** Percent, one decimal, of all transfers; null until sufficient. */
+    offHoursPct: sessionShare.sufficient && sessionShare.transferShare ? (sessionShare.transferShare.offHours * 100).toFixed(1) : null,
+    /** The same share over transactions that also moved USDG, i.e. provable trades. */
+    provableOffHoursPct:
+      sessionShare.sufficient && sessionShare.provableTradeShare ? (sessionShare.provableTradeShare.offHours * 100).toFixed(1) : null,
+    /** The number exdate set out to check, as a whole percent, or null if none was recorded. */
+    claimPct: sessionShare.briefClaim ? Math.round(sessionShare.briefClaim.value * 100) : null,
   },
   /**
    * Where exdate looks, and whether there is anything to measure there yet.
@@ -928,6 +1007,12 @@ export const observed = {
     base: { name: 'Base', issuer: 'Coinbase tokenized stocks', tokens: base.summary.tokens, feeds: base.summary.feeds, measured: false, verifiedAt: base.verifiedAt },
   },
   links: {
+    /**
+     * The canonical host, for the few places that need an absolute URL: the
+     * calendar subscription (a webcal: link cannot be relative) and the feeds.
+     * The same default as layout.tsx's metadataBase, overridable the same way.
+     */
+    site: (process.env.NEXT_PUBLIC_EXDATE_SITE_URL || 'https://www.exdate.me').replace(/\/$/, ''),
     /** Set NEXT_PUBLIC_EXDATE_REPO_URL once the repository is public; a link to a private repository is a dead link. */
     github: process.env.NEXT_PUBLIC_EXDATE_REPO_URL ?? null,
     data: '/data/',

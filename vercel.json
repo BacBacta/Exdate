@@ -40,6 +40,27 @@
       ]
     },
     {
+      "source": "/calendar.ics",
+      "headers": [
+        { "key": "content-type", "value": "text/calendar; charset=utf-8" },
+        { "key": "cache-control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/t/(.*)/calendar.ics",
+      "headers": [
+        { "key": "content-type", "value": "text/calendar; charset=utf-8" },
+        { "key": "cache-control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/feed.xml",
+      "headers": [
+        { "key": "content-type", "value": "application/rss+xml; charset=utf-8" },
+        { "key": "cache-control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
       "source": "/data/(.*)\\.json",
       "headers": [
         {

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Footer, LedgerHead, Nav } from '../components/Chrome'
 import { dateLong, delay } from '../../lib/format'
-import { calendar, type CalendarGroup } from '../../lib/observed'
+import { calendar, observed, type CalendarGroup } from '../../lib/observed'
+import { Subscribe } from '../components/Subscribe'
 
 /**
  * Every dividend the issuer has declared that has not produced a multiplier
@@ -63,6 +64,11 @@ export default function Page() {
                 </div>
               </div>
             </div>
+            {/*
+              Something to subscribe to, so the only way back is not memory
+              (audit 2026-09-05, F04). Both files are built with the page.
+            */}
+            <Subscribe icsPath="/calendar.ics" site={observed.links.site} what="every declared dividend and every change on chain" />
           </div>
         </section>
 

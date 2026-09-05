@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Footer, LedgerHead, Nav } from '../../components/Chrome'
 import { CopyAddress } from '../../components/CopyAddress'
+import { Subscribe } from '../../components/Subscribe'
+import { tokensWithCalendar } from '../../../lib/feeds'
 import { dateLong, delay, pctInt } from '../../../lib/format'
 import { observed, tokenPage } from '../../../lib/observed'
 
@@ -222,7 +224,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
           </div>
         </section>
 
-        <section className="block" aria-labelledby="dividends-title">
+        <section className="block" id="dividends" aria-labelledby="dividends-title">
           <div className="wrap">
             <h2 className="small" id="dividends-title" data-reveal>
               {owed.length > 0
@@ -276,6 +278,13 @@ export default async function Page({ params }: { params: Promise<{ address: stri
               no price. <em>Arrived</em> is what the multiplier step actually delivered, priced at the
               moment it took effect.
             </p>
+            {tokensWithCalendar.includes(token.address.toLowerCase()) ? (
+              <Subscribe
+                icsPath={`/t/${token.address.toLowerCase()}/calendar.ics`}
+                site={observed.links.site}
+                what={`${token.symbol}’s declared dividends and every change on chain`}
+              />
+            ) : null}
           </div>
         </section>
 

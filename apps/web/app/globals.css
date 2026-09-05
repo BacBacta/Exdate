@@ -167,6 +167,23 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 .block-head { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: clamp(2.2rem, 5vw, 3.2rem); }
 .block-head p { color: var(--muted); font-size: 1.05rem; max-width: 52ch; text-wrap: pretty; }
 
+/* --- subscribe: a calendar file and a feed, on the pages that have dates --- */
+.subscribe { margin-top: 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; font-size: 15px; }
+.subscribe > a:not(.btn) { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; padding: 0.2rem 0; }
+.subscribe-hint { flex-basis: 100%; color: var(--muted); font-size: 14px; max-width: 72ch; text-wrap: pretty; overflow-wrap: anywhere; }
+.subscribe-hint code { font-family: var(--mono); font-size: 13px; }
+
+/* --- what we measured: three dated figures, each with a permanent anchor -- */
+.measured { padding-top: 0; }
+.figures li { position: relative; display: grid; grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr) 24px; gap: 0.5rem 2rem; align-items: baseline; padding: 1.5rem 0; border-top: 1px solid var(--line); }
+.figures li:last-child { border-bottom: 1px solid var(--line); }
+.figures .fig { font-size: clamp(2rem, 4.2vw, 3.4rem); font-weight: 500; letter-spacing: -0.045em; line-height: 1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.figures p { color: var(--muted); font-size: 1rem; max-width: 56ch; text-wrap: pretty; }
+.figures p strong { color: var(--ink); font-weight: 500; }
+.figures p a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; white-space: nowrap; }
+.figures .anchor { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; align-self: start; font-family: var(--mono); font-size: 14px; color: var(--muted); border-radius: 6px; opacity: 0.6; transition: opacity 0.2s, color 0.2s; }
+.figures li:hover .anchor, .figures .anchor:focus-visible { opacity: 1; color: var(--ink); }
+
 /* --- index: the three things to do, as three doors ------------------------ */
 .index { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 3rem); }
 .index a { display: block; padding-top: 1.2rem; border-top: 1px solid var(--line-2); transition: border-color 0.3s; }
@@ -298,6 +315,10 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 @media (max-width: 900px) {
   .hero { min-height: 0; }
   .hero-grid, .steps, .index, .dev-grid, .token-head { grid-template-columns: 1fr; }
+  .figures li { grid-template-columns: minmax(0, 1fr) 24px; }
+  .figures .fig { grid-column: 1; grid-row: 1; }
+  .figures .anchor { grid-column: 2; grid-row: 1; }
+  .figures li p { grid-column: 1 / -1; grid-row: 2; }
   .index { gap: 0.5rem; }
   .stat { text-align: left; }
   .stat .k, .stat .since { margin-left: 0; }

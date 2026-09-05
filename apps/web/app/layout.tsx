@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     description: 'See what your Stock Tokens actually paid you.',
     type: 'website',
   },
+  // Feed discovery: a reader that is handed any page can find the feed.
+  alternates: {
+    types: { 'application/rss+xml': [{ url: '/feed.xml', title: 'exdate: Stock Token dividends, measured' }] },
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
