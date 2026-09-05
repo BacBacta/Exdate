@@ -53,7 +53,16 @@ function fromEnvFile() {
   return null
 }
 
-const fromArg = process.argv[2]
+/**
+ * --require watcher-span   exit 2 unless that check passes. For scripts that
+ *                          must not apply a setting the probe would refuse.
+ */
+const args = process.argv.slice(2)
+const requireIdx = args.indexOf('--require')
+const required = requireIdx >= 0 ? args[requireIdx + 1] : null
+if (requireIdx >= 0) args.splice(requireIdx, 2)
+const verdicts = {}
+const fromArg = args[0]
 const fromEnv = (process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '').split(',')[0]?.trim()
 const file = fromArg || fromEnv ? null : fromEnvFile()
 const url = (fromArg || fromEnv || file?.value || '').split(',')[0]?.trim()
@@ -150,8 +159,10 @@ async function call(method, params, ms = 30_000) {
  * first reported.
  */
 const start = (name) => process.stdout.write(`  …  ${name.padEnd(22)} asking…`)
-const line = (name, verdict, detail) =>
+const line = (name, verdict, detail) => {
+  verdicts[name.replace(/\s+/g, '-')] = verdict
   process.stdout.write(`\r${verdict ? ' ok ' : 'NO  '} ${name.padEnd(22)} ${detail}\u001b[K\n`)
+}
 console.log(`Probing ${safe(url)}\n`)
 
 start('chain')
@@ -234,3 +245,7 @@ Where this endpoint can go, from the above:
   oldest step ok         -> put it in RHC_RPC_URL_ARCHIVE
   neither                -> leave the defaults alone; this endpoint adds nothing here
 Never paste the URL itself anywhere. This output contains no key.`)
+if (required && !verdicts[required]) {
+  console.log(`\nRequired check "${required}" did not pass.`)
+  process.exit(2)
+}

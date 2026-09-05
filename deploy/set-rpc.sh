@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# Point the watcher at a keyed RPC endpoint without ever typing the URL.
+#
+#   curl -fsSL https://raw.githubusercontent.com/BacBacta/Exdate/HEAD/deploy/set-rpc.sh | bash
+#
+# It asks for the key alone - or a full URL, if that is what the clipboard
+# holds - with echo off, so nothing lands in the terminal or its scrollback.
+# Then, in this order: the key's shape is checked (an Alchemy key is 32
+# characters; a paste that wrapped is shorter, one that dragged a quote along is
+# longer), the candidate .env is written to a temporary file, the probe runs
+# against THAT file and must pass the watcher's own scan, and only then is the
+# real .env replaced and the service restarted. A refusal at any step changes
+# nothing on the machine.
+#
+# Why this exists: the same key answered one afternoon and was refused all
+# evening, and every refusal was the same 130-character line being truncated or
+# decorated on its way through a phone keyboard. The fix is to never type it.
+set -euo pipefail
+
+DIR="${EXDATE_DIR:-/opt/exdate}"
+USER_NAME="${EXDATE_USER:-exdate}"
+ALCHEMY_HOST="robinhood-mainnet.g.alchemy.com"
+FALLBACK="https://rpc.mainnet.chain.robinhood.com"
+
+say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
+note() { printf '  %s\n' "$*"; }
+die() { printf '\n\033[31mstopped:\033[0m %s\n' "$*" >&2; exit 1; }
+
+main() {
+[ "$(id -u)" -eq 0 ] || die "run this as root: it writes $DIR/.env and restarts the service"
+[ -f "$DIR/scripts/probe-endpoint.mjs" ] || die "$DIR has no probe; run deploy/install.sh first to update the checkout"
+command -v node >/dev/null || die "node is not installed here"
+
+say "1. The key"
+note "Paste the Alchemy API key - or the whole URL, either is fine - then press Enter."
+note "Nothing you type is shown, and nothing is written yet."
+# /dev/tty, not stdin: under `curl | bash` stdin is the script itself. When
+# there is no terminal - a rehearsal, or a here-string - stdin is all there is.
+if ( : </dev/tty ) 2>/dev/null; then
+  read -rs -p '  > ' RAW </dev/tty; printf '\n'
+else
+  read -rs RAW || true
+fi
+RAW="$(printf '%s' "$RAW" | tr -d '[:space:]' | sed -e "s/^['\"]*//" -e "s/['\"]*\$//")"
+[ -n "$RAW" ] || die "nothing was entered"
+
+if printf '%s' "$RAW" | grep -q '://'; then
+  # A full URL. Keep it as given, but read its key segment for the shape check.
+  URL="$RAW"
+  KEY="${RAW##*/}"
+  case "$URL" in https://*) ;; *) die "the URL must start with https://";; esac
+else
+  KEY="$RAW"
+  URL="https://$ALCHEMY_HOST/v2/$KEY"
+fi
+
+if printf '%s' "$KEY" | grep -q '[^A-Za-z0-9_-]'; then
+  die "the key contains a character no key has (a quote, a space, a bracket) - $(printf '%s' "$KEY" | wc -c | tr -d ' ') characters as pasted. Copy it again from the dashboard."
+fi
+LEN=$(printf '%s' "$KEY" | wc -c | tr -d ' ')
+if [ "${URL#https://$ALCHEMY_HOST/}" != "$URL" ] && [ "$LEN" -ne 32 ]; then
+  die "an Alchemy key is 32 characters; this one is $LEN. Nothing written. Copy the whole key from the Robinhood Mainnet app and run this again."
+fi
+note "shape ok: $LEN characters"
+
+say "2. A candidate .env, not yet in place"
+CANDIDATE="$(mktemp)"
+# 600, and owned by the account that will probe it - root's private temp file
+# is unreadable to the service account otherwise.
+chmod 600 "$CANDIDATE"; chown "$USER_NAME" "$CANDIDATE"
+# Everything the current .env has, minus the two lines this script owns.
+if [ -f "$DIR/.env" ]; then grep -vE '^\s*(RHC_RPC_URLS|RHC_RPC_URL_ARCHIVE)\s*=' "$DIR/.env" > "$CANDIDATE" || true; fi
+{
+  printf 'RHC_RPC_URLS=%s,%s\n' "$URL" "$FALLBACK"
+  printf 'RHC_RPC_URL_ARCHIVE=%s\n' "$URL"
+} >> "$CANDIDATE"
+note "written to a temporary file; $DIR/.env is untouched so far"
+
+say "3. Does the endpoint do the watcher's job?"
+# Run as the service account, against the candidate file, and require the one
+# check that decides whether this endpoint may go first.
+if ! sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" EXDATE_ENV_FILE="$CANDIDATE" \
+     node "$DIR/scripts/probe-endpoint.mjs" --require watcher-span; then
+  rm -f "$CANDIDATE"
+  die "the probe refused this endpoint, so nothing was changed. Read the lines above: a 401 is the key, a refused span is the plan."
+fi
+
+say "4. Apply and restart"
+install -o "$USER_NAME" -g "$USER_NAME" -m 600 "$CANDIDATE" "$DIR/.env"
+rm -f "$CANDIDATE"
+note "$DIR/.env now puts $(printf '%s' "$URL" | sed -E 's#(https://[^/]+/).*#\1…#') first, Robinhood's endpoint last"
+if systemctl is-enabled --quiet exdate-watcher 2>/dev/null; then
+  systemctl restart exdate-watcher
+  sleep 4
+  systemctl is-active --quiet exdate-watcher && note "exdate-watcher restarted and running" || die "the service did not come back: journalctl -u exdate-watcher -n 20"
+  journalctl -u exdate-watcher -n 3 --no-pager -o cat | sed 's/^/  /'
+else
+  note "no exdate-watcher service here; the .env is in place for whatever reads it"
+fi
+
+cat <<EOF
+
+  Done. The key was never shown and is stored only in $DIR/.env (mode 600).
+
+  The GitHub collectors can use the same endpoint: add the repository secret
+  RHC_RPC_URLS with the same two-URL value at
+    https://github.com/BacBacta/Exdate/settings/secrets/actions/new
+
+EOF
+}
+
+main "$@"
