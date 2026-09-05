@@ -1,0 +1,45 @@
+{
+  "note": "What the record claimed, and when. Derived from git rather than captured: every entry is a change between two commits of a file in data/, so this index cannot drift from the record and can be rebuilt and checked. Replay it with: node scripts/build-history.mjs --as-of <iso> --dataset <name>",
+  "generatedFrom": "git history of the files below; nothing here is written by hand",
+  "reproduce": "node scripts/build-history.mjs --check",
+  "datasets": [
+    {
+      "name": "reconciliations",
+      "indexes": "data/reconciliations.observed.json",
+      "file": "data/history/reconciliations.jsonl",
+      "issuerFields": [
+        "rate"
+      ]
+    },
+    {
+      "name": "multiplier-events",
+      "indexes": "data/multiplier-events.observed.json",
+      "file": "data/history/multiplier-events.jsonl",
+      "issuerFields": []
+    },
+    {
+      "name": "token-feed-map",
+      "indexes": "data/token-feed-map.json",
+      "file": "data/history/token-feed-map.jsonl",
+      "issuerFields": []
+    },
+    {
+      "name": "multiplier-state-verification",
+      "indexes": "data/multiplier-state-verification.json",
+      "file": "data/history/multiplier-state-verification.jsonl",
+      "issuerFields": []
+    },
+    {
+      "name": "session-share",
+      "indexes": "data/session-share.observed.json",
+      "file": "data/history/session-share.jsonl",
+      "issuerFields": []
+    },
+    {
+      "name": "primary-flows",
+      "indexes": "data/primary-flows.observed.json",
+      "file": "data/history/primary-flows.jsonl",
+      "issuerFields": []
+    }
+  ]
+}

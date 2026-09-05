@@ -53,6 +53,13 @@ jobs:
       - name: Build the public site
         run: pnpm --filter @exdate/web build
 
+      # The point-in-time index is derived from git, never appended to by hand, so the test that
+      # matters is that it is still exactly what git yields - and that replaying it returns what
+      # each file actually held, at every revision. An index that had drifted would answer "what
+      # did you publish at time T" with something nobody ever published.
+      - name: Is the history index still what git says?
+        run: node scripts/build-history.mjs --check
+
       - name: Check the record against its expectations
         run: node scripts/check-data-expectations.mjs
 

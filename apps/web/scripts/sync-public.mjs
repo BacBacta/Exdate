@@ -36,6 +36,23 @@ for (const name of readdirSync(source)) {
 console.log(`public/data: ${n} files, ${skipped} issuer file(s) left in the repository`)
 
 /**
+ * The point-in-time index, so "what did exdate publish at time T" can be answered by anyone
+ * holding the file rather than only by someone with the repository. It is derived from git and
+ * carries the same carve-out as the files it indexes: data/history/index.json names, per dataset,
+ * which fields are the issuer's.
+ */
+const history = new URL('../../../data/history/', import.meta.url)
+const historyTarget = new URL('../public/data/history/', import.meta.url)
+mkdirSync(historyTarget, { recursive: true })
+let h = 0
+for (const name of readdirSync(history)) {
+  if (!name.endsWith('.jsonl') && name !== 'index.json') continue
+  copyFileSync(join(history.pathname, name), join(historyTarget.pathname, name))
+  h++
+}
+console.log(`public/data/history: ${h} files`)
+
+/**
  * The token list also gets a clean path at the site root. A token list is imported by
  * URL into a wallet or an aggregator, and that URL is quoted, bookmarked and cached by
  * consumers - so it should read like an address and not like an implementation detail
