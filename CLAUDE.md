@@ -1585,6 +1585,21 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   store (5) and in the SDK (3); the contract assert caught the first version leaking `secret` into
   the plain view type, which is what it is for. **Not live yet**: `api.exdate.me` runs the checkout
   the installer last reset, and only the owner can run `deploy/install-api.sh` on the machine.
+- 2026-09-05 — **The docs were not what made the site dense; they had no navigation of their own.**
+  Asked whether to move the documentation to GitBook to lighten the site, the measurement said no:
+  `/docs/api/` weighs 118 KB against 129 KB for `/gap/`, the home page is 514 words, and the docs
+  sit behind one header item. What was broken was inside the docs — 18 sections on one page, not
+  one heading with an `id` (so no route could be linked to), no search. GitBook would have fixed
+  that at the price of a bidirectional Git sync, which is write access to the repository holding
+  the archive, a GitHub App install on `BacBacta` that already blocks Vercel, and a fourth
+  third-party dependency in three days of losing three. Fixed in the repository instead, at build:
+  every h2/h3 carries an id and a permanent link (route headings get the route's literal segments,
+  `#tokens-pending`, `#webhooks-events`); a sticky sidebar built from the headings marks the
+  section in view; a search box over every section of the three documents, from one static index
+  fetched on first use; a copy button on each code block; and each document served as Markdown at
+  `/docs/api.md`, `/docs/sdk.md`, `/docs/changelog.md`, for a reader who wants the source or a
+  tool that reads text. Under 900 px the sections fold under one line. Measured: no overflow at
+  320 or 360, axe clean, the search answers "pending" with the route first.
 - _(append decisions here as they are made)_
 
 ## Status

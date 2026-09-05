@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Footer, Nav } from '../../components/Chrome'
+import { DocPage } from '../../components/DocPage'
 import { renderDoc } from '../../../lib/docs'
 
 export const metadata: Metadata = {
@@ -8,16 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  const doc = renderDoc('docs/api.md')
-  return (
-    <>
-      <Nav current="developers" />
-      <main id="main">
-        <div className="wrap">
-          <article className="prose" dangerouslySetInnerHTML={{ __html: doc.html }} />
-        </div>
-      </main>
-      <Footer />
-    </>
-  )
+  return <DocPage doc={renderDoc('docs/api.md')} current="/docs/api/" />
 }
