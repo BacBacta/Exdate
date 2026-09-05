@@ -21,17 +21,32 @@
 # what the rest costs - effective 15:10:26, first sampled 15:16:15, unrecoverable.
 #
 # The answer is scripts/watch-effective-prices.mjs on a machine that is simply always
-# there, and since 2026-09-04 one runs. Set the repository variable
-# EXDATE_CAPTURE_MODE to `watchdog` and this job stops capturing on its own: it checks
-# the watcher's heartbeat instead, captures in its place only while that heartbeat is
-# stale, and says so through the alert sinks on each transition. Until it is set both
-# capture - harmless, since they share one file and merge steps by key, but nothing
-# then notices if the machine dies.
+# there, and since 2026-09-04 one runs. The repository variable EXDATE_CAPTURE_MODE
+# defaults to `watchdog`, in which this job stops capturing on its own: it checks the
+# watcher's heartbeat, captures in its place only while that heartbeat is stale, and
+# says so through the alert sinks on each transition. Setting it to `capture` turns
+# this job back into the capturer if the machine is ever retired.
+#
+# So the cadence is now sized for the job it actually does. Every five minutes was
+# right when this WAS the capturer, chasing a nine-minute lead. In watchdog mode it
+# reads a heartbeat the watcher writes every six hours and calls stale after seven,
+# so */5 was 288 runs a day to watch a number that moves four times - and GitHub
+# rounds each job up to a minute, measured from its own billing (435 minutes implied
+# by the September gross against 197 minutes of actual run time), so a 14-second job
+# costs a minute and the run COUNT is the cost. Every twenty minutes: 72 runs a day,
+# a quarter of the bill, and a dead machine is still noticed within the same hour.
+#
+# What that trades away is named rather than glossed: if the watcher dies, this job
+# becomes the capturer again at a 20-minute cadence instead of 5, so its chance of
+# catching a step inside the nine-minute lead drops. That is the right trade - the
+# fallback only matters once the machine is already dead, and a degraded capture that
+# raises the alarm beats a good one nobody is told about. Set EXDATE_CAPTURE_MODE to
+# `capture` and restore */5 below if the watcher is retired for good.
 name: capture-effective-prices
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/20 * * * *'
   workflow_dispatch:
 
 permissions:
