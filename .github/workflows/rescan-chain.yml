@@ -70,10 +70,19 @@ jobs:
       - name: Commit only if the chain moved
         run: |
           paths="data/multiplier-events.observed.json data/effective-blocks.json data/multiplier-state-verification.json data/reconciliations.observed.json data/exdate.tokenlist.json packages/core/src/generated/registry.ts"
-          # The two verification files restate their own observedAt on every run, so a
-          # commit is worth making only when the events themselves moved. Otherwise this
-          # would push four times a day to say nothing.
-          if git diff --quiet -- data/multiplier-events.observed.json; then
+          # Not `git diff --quiet` on the file: the scan restates scannedThroughBlock and
+          # scannedAt every run, and the state verification its observedAt, so any diff is
+          # always non-empty and the first version of this pushed 14 lines of timestamps
+          # for a run that found nothing. What is worth committing is an event.
+          git show HEAD:data/multiplier-events.observed.json > /tmp/events-before.json
+          moved=$(node -e "
+            const key = (e) => e.token.toLowerCase() + ':' + e.effectiveAt + ':' + e.newMultiplier
+            const before = new Set(require('/tmp/events-before.json').events.map(key))
+            const after = new Set(require('./data/multiplier-events.observed.json').events.map(key))
+            const same = before.size === after.size && [...after].every((k) => before.has(k))
+            process.stdout.write(same ? '' : 'yes')
+          ")
+          if [ -z "$moved" ]; then
             echo "no new multiplier event"
             git checkout -- $paths
             exit 0

@@ -383,7 +383,7 @@ for (const row of rows) {
   if (spot && row.impliedReinvestPrice) {
     row.issuerSpotToday = {
       ...spot,
-      note: 'price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input',
+      note: "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
       impliedOverSpot: Number((Number(row.impliedReinvestPrice) / Number(spot.mid)).toFixed(3)),
     }
   }
@@ -515,7 +515,7 @@ if (previous && !process.argv.includes('--allow-fewer-matched')) {
   }
 }
 
-await writeFile(new URL('data/reconciliations.observed.json', root), JSON.stringify({
+const payload = {
   note: 'Issuer corporate actions paired with the multiplier steps they produced, priced at the Chainlink round in force at effectiveAt. Every input is first-party or on-chain; nothing is estimated. Rebuild with: node scripts/build-reconciliations.mjs',
   builtAt: new Date().toISOString(),
   chainId: CHAIN_ID,
@@ -568,6 +568,31 @@ await writeFile(new URL('data/reconciliations.observed.json', root), JSON.string
     unsupportedActionType: tally('unsupported_action_type'),
   },
   rows,
-}, null, 2) + '\n')
+}
+
+/**
+ * Nothing but timestamps changed - leave the file alone.
+ *
+ * `builtAt` and every `issuerSpotToday` move on every run by construction, so a
+ * scheduled rebuild would rewrite the file each time to say nothing, and through
+ * the site's data/** deploy trigger republish the whole record for it. The
+ * repository has the same rule for the generated archive and for the issuer
+ * registry snapshot: a commit means the data moved, not that a job ran.
+ *
+ * The spot price is the only thing lost by skipping, and it is a plausibility
+ * check that is never a reconciliation input; each one carries its own
+ * `generatedAt`, so an older one is dated rather than misleading, and it is
+ * refreshed the moment anything substantive does change.
+ */
+const MOVES_EVERY_RUN = new Set(['builtAt', 'bid', 'ask', 'mid', 'generatedAt', 'impliedOverSpot'])
+const substance = (value) => JSON.stringify(value, (key, inner) => (MOVES_EVERY_RUN.has(key) ? undefined : inner))
+if (previous && substance(previous) === substance(payload)) {
+  console.error(
+    `# unchanged since ${previous.builtAt ?? 'the last build'} apart from timestamps and today's spot - not rewritten`,
+  )
+  process.exit(0)
+}
+
+await writeFile(new URL('data/reconciliations.observed.json', root), JSON.stringify(payload, null, 2) + '\n')
 
 console.error(`# matched=${tally('matched')} anomaly=${tally('anomaly')} pending=${tally('pending')} unmatched=${tally('unmatched')} -> data/reconciliations.observed.json`)

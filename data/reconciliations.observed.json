@@ -1,6 +1,6 @@
 {
   "note": "Issuer corporate actions paired with the multiplier steps they produced, priced at the Chainlink round in force at effectiveAt. Every input is first-party or on-chain; nothing is estimated. Rebuild with: node scripts/build-reconciliations.mjs",
-  "builtAt": "2026-09-05T20:50:12.059Z",
+  "builtAt": "2026-09-05T20:52:58.636Z",
   "chainId": 4663,
   "rounding": "impliedHaircutBps is truncated toward zero; impliedHaircutBpsExact carries the same figure to two decimals. price.answer and price.answerDecimals are the aggregator's own integer answer; price.value and price.underlying are that answer in full precision, not a display rounding.",
   "matchWindowDays": 4,
@@ -235,8 +235,8 @@
         "bid": "1699",
         "ask": "1714.87",
         "mid": "1706.9350",
-        "generatedAt": "2026-09-05T20:49:53.474520429Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:33.458721667Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 10.506
       },
       "price": {
@@ -309,8 +309,8 @@
         "bid": "100.42",
         "ask": "100.5",
         "mid": "100.4600",
-        "generatedAt": "2026-09-05T20:50:03.522203794Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:36.241247878Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.51
       },
       "price": {
@@ -390,8 +390,8 @@
         "bid": "911.33",
         "ask": "921.07",
         "mid": "916.2000",
-        "generatedAt": "2026-09-05T20:49:51.000138952Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:51.551994905Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 2.621
       },
       "status": "anomaly",
@@ -431,8 +431,8 @@
         "bid": "300",
         "ask": "320.1",
         "mid": "310.0500",
-        "generatedAt": "2026-09-05T20:50:01.184766028Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:45.242879337Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.538
       },
       "price": {
@@ -544,8 +544,8 @@
         "bid": "23.27",
         "ask": "23.81",
         "mid": "23.5400",
-        "generatedAt": "2026-09-05T20:50:08.544341490Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:53.542151557Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 0.297
       },
       "status": "anomaly",
@@ -578,8 +578,8 @@
         "bid": "14.42",
         "ask": "15",
         "mid": "14.7100",
-        "generatedAt": "2026-09-05T20:50:05.094995861Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:57.476143495Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 70.082
       },
       "status": "anomaly",
@@ -692,8 +692,8 @@
         "bid": "101.56",
         "ask": "103.11",
         "mid": "102.3350",
-        "generatedAt": "2026-09-05T20:50:05.590178265Z",
-        "note": "price today, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
+        "generatedAt": "2026-09-05T20:52:56.720688115Z",
+        "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 7.256
       },
       "status": "anomaly",
