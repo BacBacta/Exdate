@@ -1754,6 +1754,44 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   already cross-checked against the announcement log, whose old and new multipliers must match and
   which comes from a different endpoint. The risk is that when `blockmachine` goes the way of
   `pocket` and `ordofi`, a step landing tomorrow cannot be confirmed at all.
+- 2026-09-05 — **"What did we publish at time T" was already answered by git, and the index that
+  exposes it took three rounds to make reproducible.** A brief asked for a point-in-time archive as
+  something that had to be captured going forward or lost. It did not: `data/` has been committed on
+  every change since 2026-09-02, and `git show <commit>:data/reconciliations.observed.json` returns
+  the AAPL haircut as the record held it a day earlier — 3601 bps at price `305.1711`, the rounding
+  from before that afternoon's fix. So `scripts/build-history.mjs` **derives** rather than captures:
+  325 entries over six datasets, published claims only, and a derived index cannot drift from the
+  record the way a parallel write path can. Its first run found unaided what the data audit had
+  found by hand hours earlier — AAPL's price moving at the commit that fixed it, DELL losing its
+  corroboration at 09:28, the off-hours share crossing into sufficient. `--as-of` is the reference
+  reader and deliberately **not** an API route: the hosted API compiles its data in at image build,
+  so a route reading this file would answer about the recent past with whatever the last deploy
+  carried.
+  **Then CI went red three times, and the check was right every time — the diagnosis was mine.**
+  First a shallow checkout: `actions/checkout` clones at depth 1, `git log` sees one commit, and the
+  index rebuilds truncated; the script refuses on `--is-shallow-repository` now rather than
+  reporting it as drift. Then a run that never started, because the workflow's path filter named
+  neither script the job runs — a job that cannot fail on its own subject looks green from outside.
+  Then the real one, and it took **printing the first differing line** to see it: git's strict-ISO
+  `%cI` renders UTC as `+00:00` in 2.43 and as `Z` in 2.55, five bytes a line, exactly the 380-byte
+  deficit. The index was reproducible from *my* git. It reads `%ct` and formats the instant itself
+  now. The lesson is the one this repository keeps paying for in a new costume: a check that reports
+  how much differs sends you to guess, and guessing cost two rounds; the one that reports **what**
+  differs settled it in one.
+- 2026-09-05 — **The methodology note is generated from the constants it describes.** A note written
+  beside the code drifts from it, and this project measured that four times in a day — 22
+  corroborated pairings where the file said 20, an endpoint count true the day before, a licence
+  clause describing a `source` field the served files did not carry, an API reference pointing at a
+  field only one route served. A document invited to be cited cannot be the fifth. So
+  `docs/methodology.md` imports every parameter from the module that defines it and `--check`
+  regenerates and diffs, in CI, on every commit touching code or data — rehearsed by moving
+  `CONFIDENCE_MIN_EVENTS_MEDIUM` from 3 to 4 and watching it fail. Doing it honestly rather than by
+  transcription forced two constants into the open: the confidence ladder's thresholds were unnamed
+  literals inside `reconcile.ts` and the plausible band a private const there, so both moved to
+  `packages/core/src/method.ts`, which imports nothing — `reconcile.ts` cannot be loaded by a plain
+  script, its own imports using `.js` specifiers only a bundler resolves. The ladder now reads by
+  name rather than by number. The version is a fingerprint of the constants and not a date: a
+  citation has to survive the next hourly collector commit.
 - _(append decisions here as they are made)_
 
 ## Status
