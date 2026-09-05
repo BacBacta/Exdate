@@ -130,26 +130,41 @@ jobs:
           }
           echo "npm accepts the token as: $who"
 
-          # Authenticated, so a wrong or read-only credential answers differently
-          # from a correct one. The roster endpoint returns {} unauthenticated
-          # (measured against @babel and @vercel too), and the member list with
-          # roles when the caller is a member.
+          # Authenticated introspection. Every call prints its status code as
+          # well as its body, because a body alone cannot be told apart from a
+          # refusal: /-/npm/v1/user and /-/npm/v1/tokens both answer 401 with no
+          # credential (measured), and /-/org/<scope>/user answers 200 {} - so a
+          # silent empty body was being read as "nothing to report" when it may
+          # have been "not allowed to ask".
           api() {
-            curl -sS --max-time 30 -w '\n%{http_code}' \
+            local body code
+            body="$(curl -sS --max-time 30 -w '\n%{http_code}' \
               -H "authorization: Bearer $NODE_AUTH_TOKEN" \
-              "https://registry.npmjs.org$1"
+              "https://registry.npmjs.org$1")"
+            code="$(printf '%s' "$body" | tail -1)"
+            API_BODY="$(printf '%s' "$body" | sed '$d')"
+            echo "GET $1 -> HTTP $code"
+            printf '  %s\n' "$(printf '%s' "$API_BODY" | head -c 600)"
           }
 
-          echo "--- who this token is, according to npm"
-          api /-/npm/v1/user | sed '$d' | head -c 400; echo
+          # The token's own permissions, straight from npm. This is the field
+          # that decides a 403 on PUT and it has been guessed at twice; a
+          # granular token appears here with its access level and the packages
+          # or scopes it was granted. Only metadata is returned - npm truncates
+          # the secret itself, and Actions masks it regardless.
+          echo "--- what npm says this token is allowed to do"
+          api /-/npm/v1/tokens
 
+          echo "--- the account behind it, including its 2FA state"
+          api /-/npm/v1/user
+
+          # Unauthenticated this returns {} (checked against @babel and @vercel
+          # as well); with a member's credential it names each member and role.
           echo "--- members of the exdate scope, as this token sees them"
-          roster="$(api /-/org/exdate/user)"
-          code="$(printf '%s' "$roster" | tail -1)"
-          body="$(printf '%s' "$roster" | sed '$d')"
-          echo "HTTP $code: $(printf '%s' "$body" | head -c 400)"
+          api /-/org/exdate/user
+          roster="$API_BODY"
 
-          role="$(printf '%s' "$body" | node -e '
+          role="$(printf '%s' "$roster" | node -e '
             let d = ""
             process.stdin.on("data", (c) => (d += c)).on("end", () => {
               let j = {}
@@ -160,7 +175,7 @@ jobs:
           if [ -n "$role" ]; then
             echo "$who is a member of the exdate scope with the role: $role"
             case "$role" in
-              owner|admin|developer) echo "That role may publish. A 403 below is then the TOKEN, not the account." ;;
+              owner|admin|developer) echo "That role may publish, so a 403 on PUT is not the account." ;;
               *) echo "That role may NOT publish to the scope." ;;
             esac
           else
@@ -170,8 +185,8 @@ jobs:
             echo "  there and the package needs a different scope."
           fi
 
-          echo "--- what the scope already holds, as this token sees it"
-          api /-/org/exdate/package | sed '$d' | head -c 400; echo
+          echo "--- what the scope already holds"
+          api /-/org/exdate/package
 
       - name: Publish
         # An exact string, not a boolean. A `type: boolean` input reaches an
