@@ -6,6 +6,14 @@
 # unpublish is limited to 72 hours), so this never runs on a push: it is
 # dispatched by hand and DRY RUN BY DEFAULT.
 #
+# NPM_TOKEN must be a GRANULAR access token - npm removed classic and Automation
+# tokens in November 2025 - with "Read and write" on the @exdate SCOPE, and
+# Bypass 2FA on. Granting the token access to the organization is not the same
+# thing and does not permit publishing; npm's documentation says so explicitly.
+# Once both packages exist, replace it with trusted publishing (OIDC, no token),
+# configured per package on npmjs.com. That path likely wants `npm publish`
+# rather than `pnpm publish`, which documents --provenance but not OIDC.
+#
 #   Actions -> publish-packages -> Run workflow
 #     dry_run: true   (default) packs and prints exactly what would be published
 #     dry_run: false            publishes

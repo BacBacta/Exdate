@@ -266,10 +266,29 @@ a published version cannot be republished.
    packages. A scoped name like `@exdate/core` needs either an org of that name or an account
    *named* `exdate`; checked on 2026-09-05, `@exdate/core` and `@exdate/sdk` are both free, and the
    unscoped `exdate` is taken by an unrelated date library, which is why the scope exists.
-2. **Repository secret `NPM_TOKEN`** — an npm **Automation** token (Access Tokens → Generate →
-   Automation; it bypasses 2FA, which a CI publish needs). Add it at
-   <https://github.com/BacBacta/Exdate/settings/secrets/actions/new>. Deliberately *not* in
-   `deliver-secrets.yml`: the watcher machine publishes nothing and must never hold it.
+2. **Repository secret `NPM_TOKEN`** — read from npm's own documentation on 2026-09-05, because
+   the obvious answer is out of date: **classic and Automation tokens were removed in November
+   2025**; only *granular access tokens* exist now. Create one at Access Tokens → Generate New
+   Token → Granular, with:
+
+   | Field | Value | Why |
+   |---|---|---|
+   | Permissions | **Read and write** | read-only cannot publish |
+   | Packages and scopes | **the `@exdate` scope**, not a package | the packages do not exist yet, so there is nothing to select by name; a scope covers what it will contain |
+   | Organizations | leave empty | npm is explicit: organization access *"does not give the token the right to publish packages managed by the organization"* — a real trap, since granting the org looks like the generous choice and grants nothing here |
+   | Bypass 2FA | **on**, if your account has 2FA | off by default, and a CI publish has nobody to answer the prompt |
+   | Expiration | as short as you will tolerate | it is deletable the moment the first publish succeeds — see below |
+
+   Add it at <https://github.com/BacBacta/Exdate/settings/secrets/actions/new>. Deliberately *not*
+   in `deliver-secrets.yml`: the watcher machine publishes nothing and must never hold it.
+
+   **Then delete it.** Once each package exists, npm supports *trusted publishing*: OIDC from
+   GitHub Actions, no long-lived token at all, configured per package under its settings on
+   npmjs.com (Organization / Repository / Workflow filename). npm's own guidance is to prefer it
+   over a bypass-2FA token for CI. It cannot be set up before the first publish — the package
+   settings page does not exist yet — which is the only reason a token is needed at all. Note for
+   that day: `pnpm publish` documents `--provenance` but not OIDC, so the workflow will likely need
+   `npm publish` for the trusted-publishing path.
 
 **Then:** Actions → publish-packages → Run workflow, `dry_run` **ticked**. It typechecks, tests,
 builds, packs, prints every file that would leave and the rewritten manifest, and fails if a tarball
