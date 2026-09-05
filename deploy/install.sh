@@ -164,16 +164,28 @@ fi
 
 say "4. Repository at $DIR"
 if [ -d "$DIR/.git" ]; then
-  # Re-assert ownership before touching git. The service account owns this
-  # checkout and pushes from it, but a single `git` run as root - a pull, a
-  # status, anything that writes - leaves root-owned files under .git/objects,
-  # and every later `sudo -u $USER_NAME git fetch` then dies with "insufficient
-  # permission for adding an object to repository database". Cheap, idempotent,
-  # and it repairs the machine instead of explaining the error.
-  if [ -n "$(find "$DIR/.git" ! -user "$USER_NAME" -print -quit 2>/dev/null)" ]; then
-    note "some files under $DIR are not owned by $USER_NAME; repairing"
+  # Can the service account actually write into the object store? That is the
+  # question, so it is the thing tested - by writing. A single `git` run as root
+  # in this checkout (a pull, anything that writes) leaves files or directories
+  # there that the account cannot add to, and every later `sudo -u $USER_NAME git
+  # fetch` dies with "insufficient permission for adding an object to repository
+  # database". Testing ownership instead was a proxy for this and missed it on a
+  # real machine: the mode can be wrong while the owner is right, and a directory
+  # deeper than .git/objects can be the one that refuses.
+  probe="$DIR/.git/objects/.exdate-write-probe"
+  if ! sudo -u "$USER_NAME" sh -c ": > '$probe'" 2>/dev/null; then
+    note "$USER_NAME cannot write to $DIR/.git/objects; repairing owner and mode"
     chown -R "$USER_NAME:$USER_NAME" "$DIR"
+    # u+rwX: files readable and writable by the owner, directories also
+    # traversable. X is capital on purpose - it does not make a plain file
+    # executable.
+    chmod -R u+rwX "$DIR/.git"
+    sudo -u "$USER_NAME" sh -c ": > '$probe'" 2>/dev/null \
+      || die "$USER_NAME still cannot write to $DIR/.git/objects after repair.
+  Look at: ls -ld $DIR/.git/objects && df -h $DIR
+  A full disk reports the same way."
   fi
+  rm -f "$probe"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" fetch --quiet origin "$BRANCH"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" checkout --quiet "$BRANCH"
   sudo -u "$USER_NAME" "$GIT" -C "$DIR" reset --quiet --hard "origin/$BRANCH"
