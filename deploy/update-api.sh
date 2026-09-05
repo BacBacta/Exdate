@@ -73,49 +73,64 @@ recover_ponder_schema() {
   return 0
 }
 
-[ "$DIR" != "$WATCHER_DIR" ] || die "EXDATE_DIR must not be the watcher's checkout ($WATCHER_DIR)"
-[ -d "$DIR/.git" ] || die "$DIR is not a checkout; run deploy/install-api.sh first"
-cd "$DIR"
+# Everything below runs inside main(), called at the end.
+#
+# Not style: this script rewrites its own file. `git reset --hard` a few lines down
+# replaces deploy/update-api.sh with the branch's version while bash is executing
+# it, and bash reads a script lazily by byte offset - so a file that changes length
+# underneath it resumes at the wrong place and runs whatever happens to be there.
+# Defining the body as a function first makes bash parse the whole thing before a
+# single line of it runs. deploy/install.sh carries the same shape for the cousin of
+# this trap, where `curl | bash` made the script bash's own stdin.
+main() {
 
-git fetch --quiet origin "$BRANCH" </dev/null || die "could not fetch origin/$BRANCH"
-before="$(git rev-parse HEAD)"
-after="$(git rev-parse "origin/$BRANCH")"
+  [ "$DIR" != "$WATCHER_DIR" ] || die "EXDATE_DIR must not be the watcher's checkout ($WATCHER_DIR)"
+  [ -d "$DIR/.git" ] || die "$DIR is not a checkout; run deploy/install-api.sh first"
+  cd "$DIR"
 
-if [ "$before" = "$after" ] && [ "${1:-}" != "--force" ]; then
-  log "already at ${after:0:7}"
-  exit 0
-fi
+  git fetch --quiet origin "$BRANCH" </dev/null || die "could not fetch origin/$BRANCH"
+  before="$(git rev-parse HEAD)"
+  after="$(git rev-parse "origin/$BRANCH")"
 
-changed="$(git diff --name-only "$before" "$after" || true)"
-if [ "${1:-}" != "--force" ] && [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qE "$IMAGE_INPUTS"; then
-  # Move the checkout forward anyway, so the next comparison is against the tip
-  # rather than replaying the same skipped commits for ever.
-  git reset --quiet --hard "$after" </dev/null
-  log "${before:0:7} -> ${after:0:7}: nothing the image contains changed, not rebuilding"
-  exit 0
-fi
-
-git reset --quiet --hard "$after" </dev/null
-log "${before:0:7} -> ${after:0:7}: rebuilding"
-docker compose --profile public up -d --build </dev/null
-
-# Assert the shape, not that a command returned zero: "containers up" was true of
-# the install run that started a duplicate watcher and no proxy at all.
-running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
-for want in db indexer status caddy; do
-  case " $running " in *" $want "*) ;; *) die "$want is not running after the rebuild; got: ${running:-none}";; esac
-done
-case " $running " in
-  *" watcher "*) die "the watcher came up here; this machine runs it under systemd and two would race on one committed file";;
-esac
-
-if ! api_healthy 30; then
-  if recover_ponder_schema; then
-    api_healthy 30 || die "the API still does not answer after dropping the schema: docker compose logs indexer"
-    log "recovered: the schema was rebuilt from scratch, and the poller refills it within one interval"
-  else
-    die "the API did not answer on 127.0.0.1:42069 within two minutes, and it is not the Ponder schema: docker compose logs indexer"
+  if [ "$before" = "$after" ] && [ "${1:-}" != "--force" ]; then
+    log "already at ${after:0:7}"
+    exit 0
   fi
-fi
 
-log "up at ${after:0:7}: $(curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health)"
+  changed="$(git diff --name-only "$before" "$after" || true)"
+  if [ "${1:-}" != "--force" ] && [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qE "$IMAGE_INPUTS"; then
+    # Move the checkout forward anyway, so the next comparison is against the tip
+    # rather than replaying the same skipped commits for ever.
+    git reset --quiet --hard "$after" </dev/null
+    log "${before:0:7} -> ${after:0:7}: nothing the image contains changed, not rebuilding"
+    exit 0
+  fi
+
+  git reset --quiet --hard "$after" </dev/null
+  log "${before:0:7} -> ${after:0:7}: rebuilding"
+  docker compose --profile public up -d --build </dev/null
+
+  # Assert the shape, not that a command returned zero: "containers up" was true of
+  # the install run that started a duplicate watcher and no proxy at all.
+  running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
+  for want in db indexer status caddy; do
+    case " $running " in *" $want "*) ;; *) die "$want is not running after the rebuild; got: ${running:-none}";; esac
+  done
+  case " $running " in
+    *" watcher "*) die "the watcher came up here; this machine runs it under systemd and two would race on one committed file";;
+  esac
+
+  if ! api_healthy 30; then
+    if recover_ponder_schema; then
+      api_healthy 30 || die "the API still does not answer after dropping the schema: docker compose logs indexer"
+      log "recovered: the schema was rebuilt from scratch, and the poller refills it within one interval"
+    else
+      die "the API did not answer on 127.0.0.1:42069 within two minutes, and it is not the Ponder schema: docker compose logs indexer"
+    fi
+  fi
+
+  log "up at ${after:0:7}: $(curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health)"
+
+}
+
+main "$@" </dev/null
