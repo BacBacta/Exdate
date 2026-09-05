@@ -23,11 +23,52 @@
 import { readFileSync } from 'node:fs'
 
 const root = new URL('../', import.meta.url)
-const url = process.argv[2] || (process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '').split(',')[0]?.trim()
+
+/**
+ * Where the URL comes from, in order: an argument, the environment, then the
+ * .env file beside this checkout.
+ *
+ * The last one exists because pasting a keyed URL onto a command line is where
+ * this goes wrong. A phone terminal wraps it, the wrap arrives as a newline, the
+ * shell takes the first half as the command and the rest as another line - and
+ * the endpoint answers 401 for a truncated key, which reads exactly like a
+ * billing problem. Editing .env once in an editor has no such failure, and the
+ * URL then lives only where the watcher already needs it.
+ */
+function fromEnvFile() {
+  for (const path of [process.env.EXDATE_ENV_FILE, new URL('.env', root).pathname]) {
+    if (!path) continue
+    let text
+    try {
+      text = readFileSync(path, 'utf8')
+    } catch {
+      continue
+    }
+    for (const name of ['RHC_RPC_URLS', 'RHC_RPC_URL_ARCHIVE', 'RHC_RPC_URL']) {
+      const match = text.match(new RegExp(`^\\s*${name}\\s*=\\s*(.+)$`, 'm'))
+      const value = match?.[1]?.trim().replace(/^["']|["']$/g, '')
+      if (value) return { value, from: `${name} in ${path}` }
+    }
+  }
+  return null
+}
+
+const fromArg = process.argv[2]
+const fromEnv = (process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '').split(',')[0]?.trim()
+const file = fromArg || fromEnv ? null : fromEnvFile()
+const url = (fromArg || fromEnv || file?.value || '').split(',')[0]?.trim()
 if (!url) {
-  console.error('Give the endpoint as an argument or in RHC_RPC_URLS.')
+  console.error(`No endpoint to probe. Either:
+
+  put it in ${new URL('.env', root).pathname} as
+      RHC_RPC_URLS=https://…,https://rpc.mainnet.chain.robinhood.com
+  and run this with no arguments — no pasting onto a command line, which is
+  where a wrapped URL gets truncated and answers 401;
+
+  or pass it as an argument, in single quotes.`)
   process.exit(1)
 }
+if (file) console.log(`Taking the endpoint from ${file.from}`)
 /** Host only. The path is where a key lives, so it never reaches the output. */
 const safe = (u) => {
   try {
