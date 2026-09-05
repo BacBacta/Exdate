@@ -4313,5 +4313,5 @@ export const ARCHIVED_CORPORATE_ACTIONS: readonly ArchivedCorporateAction[] = [
 ] as const
 
 export const SCAN_FROM_BLOCK = 900000
-export const SCAN_THROUGH_BLOCK = 55405015
-export const SCANNED_AT = "2026-09-05T20:26:39.248Z"
+export const SCAN_THROUGH_BLOCK = 55417664
+export const SCANNED_AT = "2026-09-05T20:47:38.809Z"

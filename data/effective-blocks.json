@@ -1,5 +1,5 @@
 {
-  "resolvedAt": "2026-09-05T20:26:47.221Z",
+  "resolvedAt": "2026-09-05T20:47:38.957Z",
   "method": "first block whose timestamp >= effectiveAt, bisection over eth_getBlockByNumber headers from the announcement block; a balance \"at the step\" is the balance after all transfers in blocks < effectiveBlock",
   "source": "data/multiplier-events.observed.json",
   "blocks": [
