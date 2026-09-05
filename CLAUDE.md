@@ -1600,6 +1600,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `/docs/api.md`, `/docs/sdk.md`, `/docs/changelog.md`, for a reader who wants the source or a
   tool that reads text. Under 900 px the sections fold under one line. Measured: no overflow at
   320 or 360, axe clean, the search answers "pending" with the route first.
+- 2026-09-05 — **The site rebuilt around six surfaces, figures first, prose behind a disclosure.**
+  The owner's verdict after the audit's three lists had shipped: still dense, still badly arranged,
+  a reader does not know what to read or do. Measured on the build rather than argued: `/gap/` was
+  1 232 words and 16 screens on a phone with a 141-word paragraph, three pages spoke about
+  dividends from three angles (`/dividends/`, `/calendar/`, `/record/`), two about the market, two
+  about exdate, and every page explained its own method in the reading flow. That last habit is
+  this file's ethos — date every number, state every sample, refuse every estimate with a reason —
+  applied where it does not belong: the qualifiers must be **available**, not **displayed**.
+  `docs/ia-rebuild-2026-09-05.md` carries the inventory, the diagnosis per page and the rules.
+  Five rules: a page answers one question, named in its title, with figures and a table in the
+  first screen; one sentence per section, twenty words at most; one *How this is measured*
+  disclosure per page; six surfaces instead of eleven; a table is a `<table>` — a header on a wide
+  screen, two-line cards on a narrow one. Four components carry every page (`Stats`, `Table`,
+  `Chip`, `Method`, in `components/Ui.tsx`). Header: Tokens · Dividends · Wallet · Market · Docs.
+  `/dividends/` merges the three dividend pages (six figures, *Coming* and *Landed* as two lists
+  with one shown at a time, the old `/record/` as the disclosure); `/market/` merges `/gap/` and
+  `/flows/`; `/about/` absorbs `/how/`; the token page opens on the answer, then four tiles, then
+  one table, with the multiplier history and the feed closed. Old addresses 308 at the edge
+  (`vercel.json` `redirects`). Measured: the token page 684 → 211 open words and 6.5 → 3.5 screens;
+  the three dividend pages 1 700 → 757 and 25.7 → 8.1; the two market pages 1 911 → 614 and
+  29 → 9.7; long paragraphs 27 → 1 across the site; footer 19 → 13 links. The data layer
+  (`lib/observed.ts`) did not change: what changed is where the proof sits, not whether it exists.
 - _(append decisions here as they are made)_
 
 ## Status

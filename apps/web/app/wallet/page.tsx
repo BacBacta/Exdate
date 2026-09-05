@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Footer, Nav } from '../components/Chrome'
 import { Wallet } from '../components/Wallet'
-import { delay } from '../../lib/format'
 import { observed, wallet } from '../../lib/observed'
 
 /**
@@ -22,15 +21,8 @@ export default function Page() {
       <main id="main">
         <section className="hero token-hero" aria-labelledby="wallet-title">
           <div className="wrap">
-            <div data-reveal>
-              <p className="token-kind">Any Robinhood Chain address</p>
-              <h1 id="wallet-title">What your wallet holds. What it is owed.</h1>
-            </div>
-            <p className="lede" data-reveal style={delay(120)}>
-              Paste an address. Your browser reads every Robinhood Stock Token it holds, straight from
-              the chain, and states what each declared dividend would owe it. No signature, no account,
-              nothing sent to exdate.
-            </p>
+            <p className="token-kind">Any Robinhood Chain address</p>
+            <h1 id="wallet-title">What your wallet holds. What it is owed.</h1>
           </div>
         </section>
 

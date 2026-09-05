@@ -411,11 +411,7 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
           reads are named up front and the second one is a choice.
         */}
         <p className="finder-hint" id="wallet-hint">
-          Read in your browser. No signature, no account, nothing sent to exdate. Your balance is
-          read from Robinhood Chain&rsquo;s own node
-          {archiveRpcUrl
-            ? '; rebuilding what past dividends delivered also asks a public archive node, which is not Robinhood’s, for your balance at each dividend date.'
-            : '; what past dividends delivered is rebuilt from your own transfers, read from the same node.'}
+          Read in your browser from Robinhood Chain&rsquo;s own node. No signature, no account, nothing sent to exdate.
         </p>
         {archiveRpcUrl ? (
           <label className="wallet-opt">
@@ -425,7 +421,7 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
               onChange={(event) => setWantHistory(event.target.checked)}
               disabled={reading}
             />
-            <span>Also rebuild what past dividends delivered (sends the address to a public archive node)</span>
+            <span>Also rebuild what past dividends delivered (asks a public archive node, not Robinhood&rsquo;s)</span>
           </label>
         ) : null}
         {note ? (

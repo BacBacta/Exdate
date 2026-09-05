@@ -38,3 +38,14 @@ export const tokenCount = (value: string | number, sign = false) => {
   const text = Math.abs(n).toLocaleString('en-US')
   return n < 0 ? `−${text}` : sign && n > 0 ? `+${text}` : text
 }
+
+/** "2026-08-14T15:12:46Z" -> "14 Aug 2026": for a table cell. */
+export const dateShort = (iso: string | null | undefined) =>
+  iso
+    ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(
+        new Date(iso.length === 10 ? `${iso}T00:00:00Z` : iso),
+      )
+    : ''
+
+/** "$0.2032" from "0.2032"; "—" when nothing was observed. */
+export const usd = (value: string | null | undefined) => (value === null || value === undefined ? '—' : `$${value}`)

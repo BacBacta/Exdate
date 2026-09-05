@@ -1,4 +1,4 @@
-import { changes, observed } from './observed'
+import { observed } from './observed'
 
 /**
  * The measured ledger in the order both the home page excerpt and the full
@@ -12,6 +12,3 @@ export const ledgerRows = [...observed.reconciled].sort((a, b) => {
 })
 
 export const ledgerMatched = ledgerRows.filter((row) => row.status === 'matched')
-
-/** Multiplier changes whose declaration is gone from every first-party source, newest first. */
-export const unexplainedChanges = changes.filter((change) => change.state === 'unmatched').reverse()

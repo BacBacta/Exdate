@@ -16,9 +16,11 @@ export function GapControls({ listId, total }: { listId: string; total: number }
   const [shown, setShown] = useState(total)
 
   useEffect(() => {
-    const list = document.getElementById(listId)
-    if (!list) return
-    const rows = [...list.querySelectorAll<HTMLElement>('li[data-token]')]
+    const found = document.getElementById(listId)
+    if (!found) return
+    // A table's rows live in its body; a list's in the list itself.
+    const list = found instanceof HTMLTableElement ? (found.tBodies[0] ?? found) : found
+    const rows = [...list.querySelectorAll<HTMLElement>('[data-token]')]
     const q = query.trim().toLowerCase()
     const key = (row: HTMLElement) => Number(row.dataset[sort === 'gap' ? 'gap' : sort === 'age' ? 'age' : 'pool'] ?? 0)
     const ordered = [...rows].sort((a, b) =>

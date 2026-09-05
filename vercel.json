@@ -8,6 +8,18 @@
   "github": {
     "silent": true
   },
+  "redirects": [
+    { "source": "/calendar", "destination": "/dividends/", "permanent": true },
+    { "source": "/calendar/", "destination": "/dividends/", "permanent": true },
+    { "source": "/record", "destination": "/dividends/", "permanent": true },
+    { "source": "/record/", "destination": "/dividends/", "permanent": true },
+    { "source": "/gap", "destination": "/market/", "permanent": true },
+    { "source": "/gap/", "destination": "/market/", "permanent": true },
+    { "source": "/flows", "destination": "/market/#creation", "permanent": true },
+    { "source": "/flows/", "destination": "/market/#creation", "permanent": true },
+    { "source": "/how", "destination": "/about/", "permanent": true },
+    { "source": "/how/", "destination": "/about/", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/opengraph-image",
