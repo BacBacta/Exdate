@@ -46,13 +46,22 @@ export default function Page() {
               steps={wallet.steps}
               scan={wallet.scan}
             />
-            <p className="note-box">
-              <em>Shares represented</em> is the balance times the multiplier in force, read at the
-              same block. <em>Owed</em> is the issuer&rsquo;s declared rate times those shares: what a
-              full payment would deliver, with no price involved. What actually arrives is measured on
-              each token&rsquo;s page once the step lands. Below the holdings, what past dividends delivered to
-              this address is rebuilt from its own transfers.
-            </p>
+            {/* The method, one click away rather than under the results (F13). */}
+            <details className="method">
+              <summary>How this is read</summary>
+              <p>
+                <em>Shares represented</em> is the balance times the multiplier in force, read at the
+                same block. <em>Owed</em> is the issuer&rsquo;s declared rate times those shares: what a
+                full payment would deliver, with no price involved. What actually arrives is measured on
+                each token&rsquo;s page once the step lands.
+              </p>
+              <p>
+                Below the holdings, what past dividends delivered to this address is read at the block each
+                change took effect: from a public archive node when one qualifies, otherwise rebuilt from the
+                address&rsquo;s own transfers on Robinhood&rsquo;s node. Tokens held inside a protocol at the
+                time are not seen.
+              </p>
+            </details>
           </div>
         </section>
       </main>

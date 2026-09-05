@@ -142,6 +142,22 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
   /** Whether the history read - the one that shows the address to a third party - is wanted. */
   const [wantHistory, setWantHistory] = useState(true)
   const request = useRef(0)
+  /**
+   * After Read, something must visibly happen: on a phone the results began
+   * two screens below the form and the page looked idle (audit 2026-09-05,
+   * F13). Focus and scroll go to the results heading once a reading lands.
+   */
+  const resultHeading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    if (phase.kind !== 'done') return
+    const heading = resultHeading.current
+    if (!heading) return
+    heading.focus({ preventScroll: true })
+    heading.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    })
+  }, [phase])
 
   // Only after mount: the server does not know whether a wallet is installed.
   useEffect(() => {
@@ -445,9 +461,9 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
       <div className="wallet-result">
         <div className="wallet-head">
           <div>
-            <p className="wallet-count">
+            <h2 className="wallet-count" tabIndex={-1} ref={resultHeading}>
               {count === 0 ? 'No Robinhood Stock Token at this address' : `${count} Stock Token${count === 1 ? '' : 's'} held`}
-            </p>
+            </h2>
             <p className="wallet-meta">
               {short(address)} · block {snapshot.blockNumber.toLocaleString('en-US')} · {blockTime(snapshot.timestamp)}
             </p>
@@ -499,6 +515,8 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
                   <div className="amt">
                     <span className="k">Shares represented</span>
                     <span className="v">{amount(line.holding.underlyingShares)}</span>
+                    {/* The definition sat five screens down; the arithmetic is one line (F13). */}
+                    <span className="sub">= tokens × {formatWad(line.holding.uiMultiplier, 6)}</span>
                   </div>
                   <div className="gap">
                     <span className={`state${state.on ? ' on' : ''}`}>{state.text}</span>
@@ -532,6 +550,13 @@ export function Wallet({ tokens, declaredByToken, rpcUrl, archiveRpcUrl, multica
           <p className="wallet-status">
             {snapshot.unreadable.length} token{snapshot.unreadable.length === 1 ? '' : 's'} could not be read this
             time and {snapshot.unreadable.length === 1 ? 'is' : 'are'} not counted.
+          </p>
+        ) : null}
+        {count > 0 ? (
+          <p className="wallet-links">
+            <a href={`/calendar/?tokens=${view.lines.map((line) => line.holding.token.toLowerCase()).join(',')}`}>
+              These tokens in the calendar
+            </a>
           </p>
         ) : null}
 

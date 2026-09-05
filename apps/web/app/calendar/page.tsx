@@ -3,6 +3,7 @@ import { Footer, LedgerHead, Nav } from '../components/Chrome'
 import { dateLong, delay } from '../../lib/format'
 import { calendar, observed, type CalendarGroup } from '../../lib/observed'
 import { Subscribe } from '../components/Subscribe'
+import { CalendarFilter } from '../components/CalendarFilter'
 
 /**
  * Every dividend the issuer has declared that has not produced a multiplier
@@ -69,6 +70,7 @@ export default function Page() {
               (audit 2026-09-05, F04). Both files are built with the page.
             */}
             <Subscribe icsPath="/calendar.ics" site={observed.links.site} what="every declared dividend and every change on chain" />
+            <CalendarFilter total={calendar.total} />
           </div>
         </section>
 
@@ -80,7 +82,7 @@ export default function Page() {
               ]
               if (rows.length === 0) return null
               return (
-                <div className="cal-group" key={group.key}>
+                <div className="cal-group" key={group.key} data-group={group.key}>
                   <h2 className="small" data-reveal>
                     {group.title}
                   </h2>
@@ -90,7 +92,7 @@ export default function Page() {
                   <LedgerHead cols={['Token', 'Declared per share', 'Owed per token', 'When']} />
                   <ul className="ledger">
                     {rows.map((row, index) => (
-                      <li key={`${row.token}:${row.processDate}`} data-reveal style={delay(Math.min(index, 8) * 40)}>
+                      <li key={`${row.token}:${row.processDate}`} data-token={row.token.toLowerCase()} data-reveal style={delay(Math.min(index, 8) * 40)}>
                         <div className="who">
                           <a className="name" href={`/t/${row.token.toLowerCase()}/`}>
                             {row.name}
@@ -105,7 +107,14 @@ export default function Page() {
                         </div>
                         <div className="amt">
                           <span className="k">Owed per token</span>
-                          <span className="v">{row.owedPerToken ? `$${row.owedPerToken}` : '—'}</span>
+                          {/*
+                            For a token whose multiplier is still 1.0 the two amounts are
+                            identical, and a row repeating one figure twice reads as an
+                            error (audit 2026-09-05, F12). Say "same" instead.
+                          */}
+                          <span className={row.owedPerToken && row.owedPerToken === row.declared ? 'v same' : 'v'}>
+                            {row.owedPerToken ? (row.owedPerToken === row.declared ? 'same' : `$${row.owedPerToken}`) : '—'}
+                          </span>
                         </div>
                         <div className="gap">
                           <span className={`when${group.late ? ' late' : ''}`}>{when(row.daysSince)}</span>

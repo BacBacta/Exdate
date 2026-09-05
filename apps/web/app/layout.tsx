@@ -1,8 +1,22 @@
 import type { Metadata } from 'next'
-import { GeistMono } from 'geist/font/mono'
+import localFont from 'next/font/local'
 import { GeistSans } from 'geist/font/sans'
 import { Motion } from './components/Motion'
 import './globals.css'
+
+/**
+ * The same file the `geist` package ships, declared here rather than through
+ * its wrapper so it can opt out of preloading: the package preloads 71 KB of
+ * mono on every page, and above the fold the mono face sets a ticker and a
+ * date. Sans stays preloaded, since it is what the LCP element is set in.
+ */
+const GeistMono = localFont({
+  src: '../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2',
+  variable: '--font-geist-mono',
+  display: 'swap',
+  preload: false,
+  fallback: ['ui-monospace', 'SF Mono', 'Menlo', 'Consolas', 'monospace'],
+})
 
 export const metadata: Metadata = {
   title: 'exdate — see what your Stock Tokens actually paid you',

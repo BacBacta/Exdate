@@ -66,6 +66,11 @@ html[data-js] [data-reveal] {
   transition-delay: var(--d, 0ms);
 }
 html[data-js] [data-reveal].in { opacity: 1; transform: none; }
+/* The hero is the largest paint on every page and was hidden until the
+   observer ran after hydration: LCP at 3.3 s on a static page (audit
+   2026-09-05, F10). Nothing above the fold waits for JavaScript now; the ring
+   still draws, since that transition is keyed on `.in` and not on opacity. */
+html[data-js] .hero [data-reveal] { opacity: 1; transform: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
   html[data-js] [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
@@ -218,6 +223,7 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 .amt .k { font-size: 13px; color: var(--muted); }
 .ledger:not(.labelled) .amt .k { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .amt .v { font-size: 1.05rem; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.amt .v.same { color: var(--muted); font-size: 1rem; }
 .gap { text-align: right; }
 .gap .big { font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 500; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
 .gap .note, .state, .when, .tag { font-size: 15px; color: var(--muted); }
@@ -348,7 +354,17 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 .wallet-history { margin-top: clamp(3rem, 6vw, 4.5rem); }
 .wallet-history .lead { color: var(--muted); font-size: 15.5px; max-width: 60ch; text-wrap: pretty; margin-bottom: 1.4rem; }
 .wallet-history .lead strong { color: var(--ink); font-weight: 500; }
-.gap .sub { display: block; font-size: 13px; color: var(--muted); font-weight: 400; margin-top: 0.15rem; }
+.gap .sub, .amt .sub { display: block; font-size: 13px; color: var(--muted); font-weight: 400; margin-top: 0.15rem; }
+.amt .sub { font-family: var(--mono); font-size: 12px; }
+.wallet-count:focus { outline: none; }
+.method { margin-top: 1.4rem; color: var(--muted); font-size: 15px; max-width: 64ch; }
+.method summary { cursor: pointer; list-style: none; display: inline-block; color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+.method summary::-webkit-details-marker { display: none; }
+.method p { margin-top: 0.8rem; text-wrap: pretty; }
+.cal-filter { margin-top: 1.2rem; font-size: 15px; color: var(--muted); }
+.cal-filter a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+.wallet-links { margin-top: 1rem; font-size: 15px; }
+.wallet-links a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
 
 /* --- rendered documents and the data index -------------------------------- */
 .prose { max-width: 72ch; padding: clamp(2.5rem, 6vh, 4.5rem) 0 clamp(3rem, 6vh, 5rem); }
