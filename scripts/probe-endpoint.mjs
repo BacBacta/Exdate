@@ -70,9 +70,18 @@ async function call(method, params, ms = 30_000) {
   }
 }
 
-const line = (name, verdict, detail) => console.log(`${verdict ? ' ok ' : 'NO  '} ${name.padEnd(22)} ${detail}`)
+/**
+ * Says what it is about to do before doing it, then overwrites that with the
+ * answer. The widest check asks for 900 000 blocks of logs and can sit there for
+ * a minute or more; without this the whole probe looks dead, which is how it was
+ * first reported.
+ */
+const start = (name) => process.stdout.write(`  …  ${name.padEnd(22)} asking…`)
+const line = (name, verdict, detail) =>
+  process.stdout.write(`\r${verdict ? ' ok ' : 'NO  '} ${name.padEnd(22)} ${detail}\u001b[K\n`)
 console.log(`Probing ${safe(url)}\n`)
 
+start('chain')
 const chain = await call('eth_chainId', [])
 if (chain.err) {
   line('reachable', false, chain.err)
@@ -82,6 +91,7 @@ const chainId = parseInt(chain.ok, 16)
 line('chain', chainId === 4663, `chainId ${chainId}${chainId === 4663 ? '' : ' — not Robinhood Chain'} (${chain.ms} ms)`)
 if (chainId !== 4663) process.exit(1)
 
+start('head')
 const headCall = await call('eth_blockNumber', [])
 const head = Number(headCall.ok)
 if (!Number.isFinite(head) || head < 1) {
@@ -90,10 +100,12 @@ if (!Number.isFinite(head) || head < 1) {
 }
 line('head', true, `block ${head.toLocaleString()} (${headCall.ms} ms)`)
 
+start('state at head')
 const latest = await call('eth_call', [{ to: PROBE_TOKEN, data: TOTAL_SUPPLY }, 'latest'])
 const latestSupply = latest.ok ? BigInt(latest.ok).toString() : null
 line('state at head', Boolean(latestSupply), latestSupply ? `read in ${latest.ms} ms` : (latest.err ?? 'no answer'))
 
+start('watcher span')
 const logs = await call('eth_getLogs', [
   { fromBlock: hex(Math.max(1, head - WATCHER_SPAN)), toBlock: hex(head), topics: [UI_MULTIPLIER_UPDATED] },
 ])
@@ -105,6 +117,7 @@ line(
     : `${WATCHER_SPAN.toLocaleString()} blocks refused: ${logs.err} — do NOT put this first in RHC_RPC_URLS`,
 )
 
+start('oldest step')
 const oldest = await call('eth_call', [{ to: PROBE_TOKEN, data: TOTAL_SUPPLY }, hex(OLDEST_STEP_BLOCK)])
 const reachesOldest = Boolean(oldest.ok) && BigInt(oldest.ok).toString() !== latestSupply
 line(
@@ -117,6 +130,7 @@ line(
       : `block ${OLDEST_STEP_BLOCK.toLocaleString()} answered, but with head state — not a real archive`,
 )
 
+start('browsers')
 const cors = await fetch(url, {
   method: 'POST',
   headers: { 'content-type': 'application/json', origin: 'https://www.exdate.me' },
