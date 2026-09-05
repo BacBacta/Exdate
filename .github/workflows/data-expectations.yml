@@ -20,7 +20,15 @@ on:
     paths:
       - 'data/**'
       - 'scripts/check-data-expectations.mjs'
+      - 'scripts/build-history.mjs'
+      - 'scripts/build-methodology.mjs'
       - 'scripts/lib/market-session.mjs'
+      - 'docs/methodology.md'
+      # The methodology note is generated from these, so a constant moving here has to re-run the
+      # check that compares the two. Everything this job runs must be able to trigger it: a filter
+      # that omits a script the job runs means the job cannot fail on that script's own change -
+      # found by pushing a fix to build-history.mjs and waiting for a run that never started.
+      - 'packages/core/src/**'
       - '.github/workflows/data-expectations.yml'
   workflow_dispatch:
 
