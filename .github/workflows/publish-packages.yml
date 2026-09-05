@@ -91,6 +91,41 @@ jobs:
             fi
           done
 
+      # A dry run that never talks to the registry cannot tell you the two things
+      # that actually fail a first publish: a token that is not accepted, and a
+      # scope that is not yours. Both are checked here, in BOTH modes, so the
+      # dry run is a real rehearsal rather than a local pack.
+      - name: Check the credential and the scope
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "NPM_TOKEN is not set on this repository. Add it under Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+          npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
+
+          who=$(npm whoami --registry=https://registry.npmjs.org 2>&1) || {
+            echo "npm rejected the token: $who"
+            echo "It must be a GRANULAR access token with Read and write on the @exdate scope."
+            exit 1
+          }
+          echo "npm accepts the token as: $who"
+
+          # Can this credential write to the @exdate scope? `npm access` answers
+          # for a scope even before it holds any package. A failure here is the
+          # org missing, or the token scoped to the organization rather than to
+          # the scope - which npm documents as not granting publish rights.
+          if npm access list packages @exdate --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "the @exdate scope is visible to this token"
+          else
+            echo "WARNING: could not list @exdate packages with this token."
+            echo "  If the scope is empty this can be normal; if the first publish then fails with"
+            echo "  403, the cause is one of: the exdate organisation does not exist, the token has"
+            echo "  no Read and write on the @exdate SCOPE, or it was granted the organisation"
+            echo "  instead - which npm states does not permit publishing."
+          fi
+
       - name: Publish
         if: ${{ inputs.dry_run == false }}
         env:
