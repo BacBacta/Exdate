@@ -2,6 +2,18 @@
   "name": "@exdate/core",
   "version": "0.1.0",
   "description": "Chains, ABIs, WAD maths, reconciliation and the address codecs behind exdate, the corporate-action layer for tokenized stocks. Pure: no I/O.",
+  "keywords": [
+    "robinhood-chain",
+    "stock-tokens",
+    "erc-8056",
+    "corporate-actions",
+    "dividends",
+    "chainlink",
+    "ethereum",
+    "defi"
+  ],
+  "homepage": "https://www.exdate.me",
+  "author": "BacBacta",
   "license": "MIT",
   "repository": {
     "type": "git",

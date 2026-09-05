@@ -1,0 +1,103 @@
+# Publish @exdate/core and @exdate/sdk to npm, from here rather than from anyone's laptop.
+#
+# The token stays a repository secret and never reaches a terminal - the same
+# reason the RPC key goes through deliver-secrets.yml rather than being typed on
+# a machine. A publish is irreversible (npm forbids republishing a version, and
+# unpublish is limited to 72 hours), so this never runs on a push: it is
+# dispatched by hand and DRY RUN BY DEFAULT.
+#
+#   Actions -> publish-packages -> Run workflow
+#     dry_run: true   (default) packs and prints exactly what would be published
+#     dry_run: false            publishes
+#
+# Order matters: @exdate/sdk depends on @exdate/core, and pnpm rewrites
+# `workspace:*` to the exact version at pack time, so core must exist on the
+# registry first or the sdk installs broken.
+name: publish-packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Pack and report only; publish nothing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write   # npm provenance: ties each tarball to this workflow run
+
+concurrency:
+  group: publish-packages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # A broken package is worse than an unpublished one, and a version cannot
+      # be taken back. Everything the repository knows how to check runs first.
+      - name: Typecheck and test
+        run: |
+          pnpm typecheck
+          pnpm test
+
+      - name: Build both packages
+        run: |
+          pnpm --filter @exdate/core build
+          pnpm --filter @exdate/sdk build
+
+      # What would actually leave: the file list and the rewritten manifest.
+      # A tarball carrying uncompiled sources, or an sdk still asking for
+      # `workspace:*`, fails the job here rather than reaching the registry.
+      - name: Show and check each tarball
+        run: |
+          mkdir -p /tmp/pack
+          for p in core sdk; do
+            ( cd "packages/$p" && pnpm pack --pack-destination /tmp/pack )
+          done
+          for t in /tmp/pack/*.tgz; do
+            echo "=== $t ($(du -h "$t" | cut -f1)) ==="
+            tar tzf "$t" | sed 's|^package/||' | sort
+            tar xzOf "$t" package/package.json | node -e '
+              let d = ""
+              process.stdin.on("data", (c) => (d += c)).on("end", () => {
+                const j = JSON.parse(d)
+                console.log(`--- ${j.name}@${j.version} main=${j.main} types=${j.types}`)
+                console.log(`--- dependencies ${JSON.stringify(j.dependencies ?? {})}`)
+                const bad = Object.entries(j.dependencies ?? {}).filter(([, v]) => String(v).startsWith("workspace:"))
+                if (bad.length) { console.error(`workspace: protocol left in ${j.name}: ${JSON.stringify(bad)}`); process.exit(1) }
+              })'
+            if tar tzf "$t" | grep -q '^package/src/'; then
+              echo "uncompiled sources in $t"; exit 1
+            fi
+          done
+
+      - name: Publish
+        if: ${{ inputs.dry_run == false }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # core first: the sdk's manifest names an exact version of it.
+          pnpm --filter @exdate/core publish --access public --no-git-checks --provenance
+          pnpm --filter @exdate/sdk  publish --access public --no-git-checks --provenance
+
+      - name: What happened
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Dry run: nothing was published. The tarballs above are what would go."
+            echo "Re-run with dry_run unchecked to publish."
+          else
+            echo "Published. Check https://www.npmjs.com/package/@exdate/core and /@exdate/sdk"
+            echo "A version cannot be republished; bump the version in package.json for the next release."
+          fi

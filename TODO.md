@@ -253,18 +253,39 @@ The canonical host is a fact, so it is written down.
 Two subdomains are reserved by this choice and are not live yet: `api.exdate.me` and
 `status.exdate.me`, both waiting on item 4.
 
-## 6. Publish the packages
+## 6. Publish the packages — one workflow run, and one thing to create first
 
-Both are prepared: `publishConfig` swaps `main`, `types` and `exports` to a `dist/` that
-`tsconfig.build.json` emits at publish time, checked with `pnpm pack`; the workspace keeps
-consuming TypeScript source. With an npm account:
+`.github/workflows/publish-packages.yml` publishes both packages from CI, so the npm token stays a
+repository secret and never reaches a terminal — the same reason the RPC key travels encrypted
+rather than being typed on the machine. It is **dispatched by hand and dry-run by default**, because
+a published version cannot be republished.
 
-```bash
-pnpm --filter @exdate/core publish
-pnpm --filter @exdate/sdk publish   # pnpm rewrites the workspace: range
-```
+**Before the first run, two things only you can do:**
 
-`packages/sdk/README.md` currently states that they are not published; update it after.
+1. **Create the `exdate` organisation on npm** — <https://www.npmjs.com/org/create>, free for public
+   packages. A scoped name like `@exdate/core` needs either an org of that name or an account
+   *named* `exdate`; checked on 2026-09-05, `@exdate/core` and `@exdate/sdk` are both free, and the
+   unscoped `exdate` is taken by an unrelated date library, which is why the scope exists.
+2. **Repository secret `NPM_TOKEN`** — an npm **Automation** token (Access Tokens → Generate →
+   Automation; it bypasses 2FA, which a CI publish needs). Add it at
+   <https://github.com/BacBacta/Exdate/settings/secrets/actions/new>. Deliberately *not* in
+   `deliver-secrets.yml`: the watcher machine publishes nothing and must never hold it.
+
+**Then:** Actions → publish-packages → Run workflow, `dry_run` **ticked**. It typechecks, tests,
+builds, packs, prints every file that would leave and the rewritten manifest, and fails if a tarball
+carries uncompiled sources or an unresolved `workspace:` range. Read that output, then re-run with
+`dry_run` unticked.
+
+Order is not a preference: `@exdate/sdk` depends on `@exdate/core`, and pnpm rewrites `workspace:*`
+to the exact version at pack time, so core must reach the registry first. The workflow does that.
+
+Verified locally on 2026-09-05: core packs to 116 KB and sdk to 16 KB, `dist/` and `README.md` and
+`LICENSE` only, no `.ts` sources, and the sdk's manifest correctly asks for `@exdate/core@0.1.0`.
+Both carry a description, keywords, homepage, author, repository and licence, and `--provenance`
+ties each tarball to the workflow run that built it.
+
+After the first publish, `packages/sdk/README.md` still says "Until the package is on npm, add it
+from the workspace" — delete that sentence.
 
 ## 7. Have counsel read the issuer's terms — the reading is done, the questions are written
 

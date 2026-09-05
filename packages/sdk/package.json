@@ -2,6 +2,17 @@
   "name": "@exdate/sdk",
   "version": "0.1.0",
   "description": "Typed client and webhook verifier for the exdate API: multipliers, pending dividends, reconciled haircuts for tokenized stocks.",
+  "keywords": [
+    "robinhood-chain",
+    "stock-tokens",
+    "erc-8056",
+    "dividends",
+    "api-client",
+    "webhooks",
+    "sdk"
+  ],
+  "homepage": "https://www.exdate.me",
+  "author": "BacBacta",
   "license": "MIT",
   "repository": {
     "type": "git",
