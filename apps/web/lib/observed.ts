@@ -904,7 +904,26 @@ export const gap = (() => {
     ...gapData.summary,
     medianFeedAgeMinutes:
       gapData.summary.medianFeedAgeSeconds === null ? null : Math.round(gapData.summary.medianFeedAgeSeconds / 60),
-    measured: gapData.tokens.filter((row) => row.deviationBps !== null),
+    /**
+     * Each row says what backs its token's feed pairing, because "how far from
+     * the oracle" is only worth reading if the oracle is the right one: a step
+     * that moved the feed (causal), a traded price closest to it (identifies
+     * the underlying), or a ticker match alone (audit 2026-09-05, F07).
+     */
+    measured: gapData.tokens
+      .filter((row) => row.deviationBps !== null)
+      .map((row) => {
+        const by = feedByToken.get(row.token.toLowerCase())?.corroboratedBy ?? []
+        const pairing: 'step+price' | 'step' | 'price' | 'ticker' =
+          by.includes('multiplier-step') && by.includes('traded-price')
+            ? 'step+price'
+            : by.includes('multiplier-step')
+              ? 'step'
+              : by.includes('traded-price')
+                ? 'price'
+                : 'ticker'
+        return { ...row, pairing }
+      }),
     unpriced: gapData.tokens.filter((row) => row.deviationBps === null),
     samples: gapData.history.length,
     sessions,

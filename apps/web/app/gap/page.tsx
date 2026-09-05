@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Footer, LedgerHead, Nav } from '../components/Chrome'
 import { delay } from '../../lib/format'
 import { gap } from '../../lib/observed'
+import { GapControls } from '../components/GapControls'
 
 /**
  * The one figure a lending-market curator has to know and cannot get anywhere: how far
@@ -39,6 +40,14 @@ const ageWords = (minutes: number | null | undefined) => {
 /** Whole dollars: the pool's size is context for the gap, not a figure to the cent. */
 const money = (value: string | undefined) =>
   value === undefined ? null : `$${Math.round(Number(value)).toLocaleString('en-US')}`
+
+/** The pairing, in a reader's words; the strong evidence is named before the weak one. */
+const PAIRING: Record<(typeof gap.measured)[number]['pairing'], { text: string; on: boolean }> = {
+  'step+price': { text: 'pairing: step + price', on: true },
+  step: { text: 'pairing: step', on: true },
+  price: { text: 'pairing: price', on: false },
+  ticker: { text: 'pairing: ticker only', on: false },
+}
 
 const when = (iso: string) =>
   new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(
@@ -86,10 +95,27 @@ export default function Page() {
             <h2 className="small" id="tokens-title" data-reveal>
               Every token that trades and has a feed
             </h2>
+            {/*
+              Search and sort over 26 rows, and a pairing chip on each, so the
+              third half of a curator's question - can the pairing be trusted -
+              does not need a visit per token (audit 2026-09-05, F07). The
+              controls reorder the static rows in the browser; without
+              JavaScript the list stands as built, widest gap first.
+            */}
+            <GapControls listId="gap-ledger" total={gap.measured.length} />
             <LedgerHead cols={['Token', 'Traded', 'Oracle', 'Gap']} />
-            <ul className="ledger">
+            <ul className="ledger" id="gap-ledger">
               {gap.measured.map((row, index) => (
-                <li key={row.token} data-reveal style={delay(Math.min(index, 8) * 50)}>
+                <li
+                  key={row.token}
+                  data-reveal
+                  style={delay(Math.min(index, 8) * 50)}
+                  data-token={row.token.toLowerCase()}
+                  data-name={`${row.name} ${row.symbol}`.toLowerCase()}
+                  data-gap={Math.abs(row.deviationBps!)}
+                  data-age={row.feedAgeSeconds ?? -1}
+                  data-pool={row.poolValueUsd ?? 0}
+                >
                   <div className="who">
                     <a className="name" href={`/t/${row.token.toLowerCase()}/`}>
                       {row.name}
@@ -97,6 +123,8 @@ export default function Page() {
                     <span className="sym">
                       {row.symbol} · oracle {age(row.feedAgeSeconds)}
                       {money(row.poolValueUsd) ? ` · pool ${money(row.poolValueUsd)}` : ''}
+                      {' · '}
+                      <span className={`chip${PAIRING[row.pairing].on ? ' on' : ''}`}>{PAIRING[row.pairing].text}</span>
                     </span>
                   </div>
                   <div className="amt">
@@ -120,7 +148,10 @@ export default function Page() {
               Both sides quote the token itself, which already includes the multiplier, so
               neither is adjusted. Each row states what its pool holds, because a wide gap on a
               pool with a few hundred dollars in it is a price nobody can trade, and a wide gap
-              on a deep one is a dislocation.
+              on a deep one is a dislocation. <em>Pairing</em> says what backs the token-to-feed
+              match: <em>step</em>, the token&rsquo;s own dividend step was seen moving this feed;{' '}
+              <em>price</em>, its traded price sits closer to this feed than to any other, over
+              repeated readings; <em>ticker only</em>, nothing yet beyond the name.
             </p>
           </div>
         </section>

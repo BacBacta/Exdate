@@ -187,6 +187,16 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 .subscribe-hint { flex-basis: 100%; color: var(--muted); font-size: 14px; max-width: 72ch; text-wrap: pretty; overflow-wrap: anywhere; }
 .subscribe-hint code { font-family: var(--mono); font-size: 13px; }
 
+/* --- controls over a static ledger: search, sort, a count ------------------ */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem 1.2rem; margin-bottom: 1.4rem; font-size: 14.5px; }
+.controls label { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--muted); }
+.controls input, .controls select { min-height: 40px; padding: 0 0.9rem; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); font: inherit; font-size: 14.5px; }
+.controls input { width: 15rem; max-width: 100%; }
+.controls input:focus-visible, .controls select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
+.controls-count { color: var(--muted); font-variant-numeric: tabular-nums; }
+.chip { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px; border: 1px solid var(--line-2); color: var(--muted); font-size: 12px; font-family: var(--sans); letter-spacing: 0; vertical-align: 0.1em; }
+.chip.on { color: var(--ink); border-color: var(--ink-2); }
+
 /* --- one-line sections: a heading, a sentence, a link ---------------------- */
 .oneline { padding-top: 0; }
 .oneline .line { color: var(--muted); font-size: 1.02rem; max-width: 64ch; text-wrap: pretty; }
@@ -384,6 +394,8 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 .method summary { cursor: pointer; list-style: none; display: inline-block; color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 .method summary::-webkit-details-marker { display: none; }
 .method p { margin-top: 0.8rem; text-wrap: pretty; }
+.embed pre { margin-top: 0.6rem; padding: 0.7rem 0.9rem; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink-2); overflow-x: auto; white-space: pre; }
+.embed .badge { display: inline-block; height: 20px; }
 .cal-filter { margin-top: 1.2rem; font-size: 15px; color: var(--muted); }
 .cal-filter a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 .wallet-links { margin-top: 1rem; font-size: 15px; }
