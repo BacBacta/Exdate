@@ -260,6 +260,7 @@ function replayMatchesGit(dataset) {
 
 const check = process.argv.includes('--check')
 refuseIfShallow()
+if (check) console.error(`# ${git('--version').trim()}, HEAD ${git('rev-parse', '--short', 'HEAD').trim()}`)
 let drift = 0
 for (const dataset of DATASETS) {
   const out = new URL(`data/history/${dataset.name}.jsonl`, `file://${root}`).pathname
@@ -268,7 +269,17 @@ for (const dataset of DATASETS) {
   if (check) {
     const held = existsSync(out) ? readFileSync(out, 'utf8') : ''
     if (held !== built) {
-      console.error(`FAIL ${dataset.name}: the committed index is not what git yields (${held.length} bytes held, ${built.length} rebuilt)`)
+      // Say WHAT differs, not that something does. A byte count sends a reader to guess, and the
+      // guess has been wrong twice on this check already: a shallow checkout the first time, and
+      // something still unidentified on the runner the second - while a full clone of the same
+      // commit rebuilt it byte for byte. The first differing line names the cause in one run.
+      const a = held.split('\n')
+      const b = built.split('\n')
+      const at = a.findIndex((line, index) => line !== b[index])
+      console.error(`FAIL ${dataset.name}: the committed index is not what git yields (${a.length - 1} lines held, ${b.length - 1} rebuilt, ${revisions(dataset.path).length} revisions seen)`)
+      console.error(`       first difference at line ${at + 1}`)
+      console.error(`         held:    ${(a[at] ?? '(end of file)').slice(0, 200)}`)
+      console.error(`         rebuilt: ${(b[at] ?? '(end of file)').slice(0, 200)}`)
       drift++
       continue
     }
