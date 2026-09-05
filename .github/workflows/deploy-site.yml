@@ -1,0 +1,145 @@
+# Deploy the public site, because nothing else does any more.
+#
+# The site used to deploy itself: the Vercel project was connected to this
+# repository, and a push built it. On 2026-09-05 that stopped being true twice
+# over. First Vercel refused a deployment - "Deployment rate limited, retry in
+# 24 hours" - because the collectors had spent the day's 100 deployments on
+# commits to data/. Then, looking at the project, it turned out to have been
+# deleted outright: www.exdate.me was answering 404 DEPLOYMENT_NOT_FOUND and
+# the last production deployment 410 Gone.
+#
+# The site now serves from a second Vercel account, and that project CANNOT be
+# connected to this repository: Vercel answers `repo_no_access` because the
+# GitHub identity on that account is not the one that owns BacBacta/Exdate.
+# Connecting it needs a GitHub App installation, which is a browser
+# authorisation no API can stand in for. So the deployment comes from here.
+#
+# What it needs: a VERCEL_TOKEN repository secret (vercel.com -> Account
+# Settings -> Tokens, scoped to the team below). The two ids are not secrets -
+# they identify a project, they do not authorise anything - so they are in the
+# open here rather than in three more secrets to keep in step.
+#
+# Without the token this job says exactly what is missing and exits 0. It does
+# not fail: a red run every time a collector commits would be noise about a
+# thing the workflow cannot fix by itself.
+name: deploy-site
+
+on:
+  push:
+    branches: [claude/lance-en5q6j]
+    paths:
+      - 'data/**'
+      - 'apps/web/**'
+      - 'packages/core/**'
+      - 'vercel.json'
+      - 'scripts/vercel-ignore.sh'
+      - '.github/workflows/deploy-site.yml'
+  workflow_dispatch:
+  schedule:
+    # A safety net: if a push slipped through the paths filter, or a deployment
+    # failed, the site is never more than six hours behind the record.
+    - cron: '0 */6 * * *'
+
+permissions:
+  contents: read
+
+# One at a time, and let a newer commit win: the site is a snapshot of the
+# whole of data/ at build time, so an older deployment finishing last would
+# publish older pages.
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: team_zE5m7D2OYawyE95SpJwB2LT4
+  VERCEL_PROJECT_ID: prj_jhD59pmRJWMHnyU4af3leV0QyA11
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # `secrets` is not available in a step-level `if`, which is how the
+      # previous version of this file silently ran every step regardless.
+      # Lifting it into the job's env is the documented way round it.
+      - name: Is there a token to deploy with?
+        id: gate
+        env:
+          HAVE_TOKEN: ${{ secrets.VERCEL_TOKEN != '' }}
+        run: |
+          if [ "$HAVE_TOKEN" != "true" ]; then
+            echo "No VERCEL_TOKEN. The site will not be deployed by this workflow."
+            echo "Add one at vercel.com -> Account Settings -> Tokens, scoped to"
+            echo "lebbuilder16-5581s-projects, then save it as the VERCEL_TOKEN"
+            echo "repository secret. Nothing else is needed: the org and project"
+            echo "ids are in this file."
+            echo "go=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=yes" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.go == 'yes'
+        with:
+          # deploy-web.sh uploads a copy without .git, but vercel-ignore.sh
+          # needs the previous commit to decide whether this one is the first
+          # collector commit of its hour.
+          fetch-depth: 2
+
+      # The same rule the Vercel project itself would apply through
+      # `ignoreCommand`: a person's or the agent's commit always deploys, a
+      # collector's only when it is the first of its UTC hour. Deploying from
+      # here rather than from Vercel does not make the quota disappear.
+      - name: Should this commit deploy?
+        if: steps.gate.outputs.go == 'yes'
+        id: worth
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          # The hourly rule applies to pushes only. On a schedule or a manual
+          # dispatch the tip is usually a collector commit that the rule would
+          # skip - and those two events exist precisely to catch up when the
+          # push path did not deploy, so applying it there would disable the
+          # safety net exactly when it is needed.
+          if [ "$EVENT" != "push" ]; then
+            echo "$EVENT: deploying whatever the tip is."
+            echo "skip=no" >> "$GITHUB_OUTPUT"
+          elif bash scripts/vercel-ignore.sh; then
+            echo "skip=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=no" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/action-setup@v4
+        if: steps.gate.outputs.go == 'yes' && steps.worth.outputs.skip == 'no'
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.go == 'yes' && steps.worth.outputs.skip == 'no'
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Deploy
+        if: steps.gate.outputs.go == 'yes' && steps.worth.outputs.skip == 'no'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npm i -g vercel@latest
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}\n' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+          bash scripts/deploy-web.sh
+
+      # Ask the site what it serves, rather than trusting that a step ran. The
+      # marker is a string the current build contains and older ones do not.
+      - name: What does the site serve now?
+        if: steps.gate.outputs.go == 'yes' && steps.worth.outputs.skip == 'no'
+        run: |
+          sleep 10
+          for name in www.exdate.me exdate.me api.exdate.me status.exdate.me; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "https://$name/" || echo 000)
+            echo "  https://$name/ -> $code"
+          done
+          if curl -s --max-time 30 https://www.exdate.me/ | grep -q 'CC BY 4.0'; then
+            echo "www.exdate.me serves a build carrying the licence line."
+          else
+            echo "::warning::www.exdate.me answered, but not with the expected build."
+          fi
