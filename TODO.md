@@ -222,6 +222,28 @@ beside the systemd one. The script now refuses `EXDATE_DIR` pointing at the watc
 stops anything still running out of it, and **asserts what came up**: `db`, `indexer`, `status` and
 `caddy` running, `watcher` not. "Containers up" was true of the run that got it wrong.
 
+**Re-running that one command is the upgrade**, and since 2026-09-05 it is also the last one you
+have to run: the installer registers `exdate-api-update.timer`, which every quarter of an hour asks
+whether the branch moved and rebuilds when a commit changed what the image contains. That filter is
+the point — the API compiles the generated registry INTO its image, so the corroboration of every
+token → feed pairing is code as far as the container is concerned, and an API deployed on Tuesday
+serves Tuesday's corroboration for as long as it runs. The data audit measured exactly that: a
+registry three days old and `feedCorroboratedBy: []` on rows every other surface called
+corroborated. A rebuild on *every* commit would be the other failure — the collectors push up to two
+dozen times a day and each rebuild costs the indexer a reconnect — so `data/`-only commits are
+skipped, which is safe because nothing the container runs reads `data/` (checked, not assumed).
+
+```bash
+journalctl -u exdate-api-update -f      # what the timer is doing
+/opt/exdate-api/deploy/update-api.sh --force   # rebuild now
+```
+
+`deploy/update-api.sh` was rehearsed against a real git repository with `docker` and `curl` stubbed:
+nothing new → says so and exits; a `data/`-only commit → moves the checkout forward without
+rebuilding; a commit touching `packages/` → rebuilds; and it dies rather than reporting success when
+a service is missing, when the watcher comes up beside the systemd one, when the API never answers,
+when `EXDATE_DIR` points at the watcher's checkout, and when there is no checkout at all.
+
 **Live since 2026-09-04**: `https://api.exdate.me` and `https://status.exdate.me`, on the same
 Hetzner machine as the watcher, which is untouched and still under systemd. Verified from outside:
 `/v1/health` 200 over HTTP/2, CORS open, the three `X-RateLimit-*` headers present, plain HTTP 308s
