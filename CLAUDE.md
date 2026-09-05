@@ -1482,6 +1482,22 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   team `team_zE5m7D2OYawyE95SpJwB2LT4` (`lebbuilder16-5581s-projects`), project
   `prj_jhD59pmRJWMHnyU4af3leV0QyA11` (`exdate-site`). `ssoProtection` had to be set to null — Vercel
   gives a new project `all_except_custom_domains`, which answered 302 to everyone.
+  **Resolved the same evening by not needing the link at all**: `.github/workflows/deploy-site.yml`
+  runs `scripts/deploy-web.sh` on a push touching `data/`, `apps/web/`, `packages/core/` or
+  `vercel.json`, six-hourly as a net, on one `VERCEL_TOKEN` repository secret — the org and project
+  ids sit in the file, since they identify a project rather than authorise anything. Verified end
+  to end: dispatched, deployed, and the site answers with the current build. Two things it gets
+  right that the file it replaces did not. The token check is a job-level `env`, because the
+  `secrets` context is unavailable in a step's `if` — which is how the previous `deploy-site.yml`
+  ran every step whether or not it had a token. And the one-collector-build-per-hour rule applies
+  to **pushes only**: on a schedule or a dispatch the branch tip is usually a collector commit the
+  rule would skip, and those two events exist to catch up when the push path did not deploy, so
+  applying it there would disable the safety net in exactly the case it is for — caught by
+  rehearsing the decision for all three event names before committing. The first live run also
+  caught the closing health check reporting `api.exdate.me/ -> 404`, which is correct and
+  meaningless: the API serves `/v1/*` and its root has no route. Each name is now asked for the
+  path that answers on it, because a check that calls a healthy service failing is a check nobody
+  reads the day it is right.
 - _(append decisions here as they are made)_
 
 ## Status

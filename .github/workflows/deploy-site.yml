@@ -134,9 +134,15 @@ jobs:
         if: steps.gate.outputs.go == 'yes' && steps.worth.outputs.skip == 'no'
         run: |
           sleep 10
-          for name in www.exdate.me exdate.me api.exdate.me status.exdate.me; do
-            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "https://$name/" || echo 000)
-            echo "  https://$name/ -> $code"
+          # Each name gets the path that actually answers on it. The first run
+          # of this step asked api.exdate.me for "/" and reported 404, which is
+          # correct and means nothing: the API serves /v1/*, and its root has
+          # no route. A check that reports a healthy service as failing is a
+          # check that will be ignored the day it is right.
+          for pair in "www.exdate.me:/" "exdate.me:/" "api.exdate.me:/v1/health" "status.exdate.me:/"; do
+            name="${pair%%:*}"; path="${pair#*:}"
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "https://$name$path" || echo 000)
+            echo "  https://$name$path -> $code"
           done
           if curl -s --max-time 30 https://www.exdate.me/ | grep -q 'CC BY 4.0'; then
             echo "www.exdate.me serves a build carrying the licence line."
