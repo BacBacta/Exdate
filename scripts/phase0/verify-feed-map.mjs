@@ -24,7 +24,7 @@
 //   - each aggregator's own on-chain description() matches the directory name
 //     the map was built from, so the mapping does not rest on a JSON file alone.
 
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { rpc, SELECTOR, decodeLatestRoundData } from './rpc.mjs'
 
 const OUT = process.argv.includes('--out')
@@ -242,8 +242,23 @@ console.log(
 // A feed jumping by the right amount only means something if the OTHER feeds do
 // not. For each decisive step, the same measurement is run against all 35
 // mapped feeds; the assigned one should be the unique closest match.
-const crossChecks = []
+/**
+ * The negative control, and why it is preserved rather than recomputed.
+ *
+ * A feed jumping by the right amount only means something if the OTHER feeds do not,
+ * so each decisive step is measured against all 35 mapped feeds. That is ~35 binary
+ * searches over round history per step, which is why it is behind a flag - and the
+ * 2026-09-05 audit found the consequence: the documented command, without the flag,
+ * rewrote the file with `crossChecks: []` and silently deleted the only evidence that
+ * SGOV's feed was uniquely closest (F05). A block that was measured is kept unless
+ * this run measures it again.
+ */
+const previous = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : null
+let crossChecks = previous?.crossChecks ?? []
+let crossChecksCarriedOver = crossChecks.length > 0
 if (process.argv.includes('--cross-check')) {
+  crossChecks = []
+  crossChecksCarriedOver = false
   for (const row of decisive) {
     console.log(`\n# cross-check: every mapped feed at ${row.symbol}'s step of ${row.effectiveAt}`)
     const target = BigInt(Math.floor(Date.parse(row.effectiveAt) / 1000))
@@ -292,6 +307,8 @@ const output = {
   descriptions,
   steps: results,
   crossChecks,
+  /** True when crossChecks was measured by an earlier run and carried forward, not by this one. */
+  crossChecksCarriedOver,
 }
 writeFileSync(OUT, `${JSON.stringify(output, null, 2)}\n`)
 console.log(`\nwrote ${OUT}`)

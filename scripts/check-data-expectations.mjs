@@ -59,7 +59,7 @@ const STATUSES = new Set(['CORPORATE_ACTION_STATUS_IN_PROGRESS', 'CORPORATE_ACTI
   const rows = caSnap.corpActions
   check('corporate-actions snapshot: unique (id, processDate)', new Set(rows.map(caKey)).size === rows.length, `${rows.length} rows`)
   check('corporate-actions snapshot: every address in the registry', rows.every((r) => r.deployments.every((d) => registry.has(low(d.contractAddress)))))
-  warn('corporate-actions snapshot: carries its own fetchedAt', typeof caSnap.fetchedAt === 'string', 'no top-level timestamp in the file')
+  check('corporate-actions snapshot: carries its own fetchedAt and source', typeof caSnap.fetchedAt === 'string' && typeof caSnap.source === 'string')
   const A = new Map(archive.actions.map((r) => [caKey(r), r]))
   check('archive: unique (id, processDate)', A.size === archive.actions.length, `${archive.actions.length} rows`)
   check('archive: archivedRows equals the row count', archive.archivedRows === archive.actions.length, `${archive.archivedRows} vs ${archive.actions.length}`)
@@ -75,7 +75,7 @@ const feedByProxy = new Map((Array.isArray(feeds) ? feeds : feeds.feeds).map((f)
 {
   const rows = Array.isArray(feeds) ? feeds : feeds.feeds
   check('chainlink snapshot: unique proxy addresses', feedByProxy.size === rows.length, `${rows.length} feeds`)
-  warn('chainlink snapshot: carries its own fetchedAt', !Array.isArray(feeds) && typeof feeds.fetchedAt === 'string', 'the file is a bare array with no timestamp')
+  check('chainlink snapshot: carries its own fetchedAt and source', !Array.isArray(feeds) && typeof feeds.fetchedAt === 'string' && typeof feeds.source === 'string')
 }
 
 // ---------------------------------------------------------------- B. observations
@@ -113,6 +113,12 @@ const state = read('data/multiplier-state-verification.json')
   check('state-verification: every transition observed', state.steps.every((s) => s.transitionObserved === true && s.beforeMatches === true && s.afterMatches === true))
   check('state-verification: summary equals the recount', state.summary.transitionConfirmed === state.steps.filter((s) => s.transitionObserved).length && state.summary.steps === state.steps.length)
   check('state-verification: states equal the declared multipliers', state.steps.every((s) => s.stateBefore === s.declaredOldMultiplier && s.stateAfter === s.declaredNewMultiplier))
+  check('state-verification: no two archive endpoints read different state at one block', state.steps.every((s) => s.witnessesDisagree !== true))
+  check('state-verification: every step has at least one witness that answered', state.steps.every((s) => (s.witnessesAnswering ?? 1) >= 1))
+  // Not a failure: how many third parties serve archive state is outside this project's
+  // control and has been 1 for days at a time. It is reported so a one-witness record is
+  // visible rather than implied (audit 2026-09-05, F04).
+  warn('state-verification: at least two independent witnesses per step', (state.summary.minWitnessesPerStep ?? 0) >= 2, `${state.summary.minWitnessesPerStep ?? '?'} endpoint(s) answered for the least-witnessed step, of ${state.summary.endpointsAsked ?? '?'} asked`)
 }
 
 const prices = read('data/effective-prices.observed.json')
@@ -145,8 +151,10 @@ const rec = read('data/reconciliations.observed.json')
   const landedTokens = new Set(rows.filter((r) => r.change && r.actionId).map((r) => `${r.actionId}:${r.processDate}`))
   const absent = [...A.values()].filter((r) => r.inWindow && !declared.some((d) => `${d.actionId}:${d.processDate}` === caKey(r))).map((r) => `${r.tokenSymbol}@${iso(r.processDate)}`)
   check('reconciliations: every in-window archive row is present (else rebuild from the archive: node scripts/build-reconciliations.mjs)', absent.length === 0, absent.join(' '))
-  warn('reconciliations: carries its own timestamp', typeof (rec.builtAt ?? rec.generatedAt) === 'string', 'no top-level timestamp in the file')
-  warn('reconciliations: built from the archive rather than the one-month snapshot', rec.builtFrom?.corporateActions === 'data/corporate-actions.archive.json', `builtFrom.corporateActions = ${rec.builtFrom?.corporateActions}`)
+  check('reconciliations: carries its own timestamp', typeof (rec.builtAt ?? rec.generatedAt) === 'string')
+  check('reconciliations: built from the archive rather than the one-month snapshot', rec.builtFrom?.corporateActions === 'data/corporate-actions.archive.json', `builtFrom.corporateActions = ${rec.builtFrom?.corporateActions}`)
+  check('reconciliations: every priced Chainlink row keeps the aggregator\'s own answer', rows.filter((r) => r.price?.source === 'chainlink:getRoundData').every((r) => /^\d+$/.test(String(r.price.answer)) && Number.isInteger(r.price.answerDecimals)))
+  check('reconciliations: the stored price equals the raw answer at its decimals', rows.filter((r) => r.price?.answer).every((r) => dec(r.price.value, 18) === BigInt(r.price.answer) * 10n ** BigInt(18 - r.price.answerDecimals)))
 }
 
 // ---------------------------------------------------------------- C. derived

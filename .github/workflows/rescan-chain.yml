@@ -1,0 +1,93 @@
+# Rescan the chain for multiplier steps, and rebuild everything that follows from one.
+#
+# This workflow exists because of what the 2026-09-05 data audit found (F01). UPS paid a
+# dividend on 4 September at 15:10:26 UTC. The log was on chain, the capture watcher had
+# it, the hosted indexer had it - and data/ did not, because the whole-chain scan was a
+# command someone had to remember to run, and nobody had run it since the 2nd. So for two
+# days the token page, its badge, the token list and the calendar all told holders that
+# $1.6400 per token was still owed. Every other collector here is scheduled; the one that
+# finds the events everything else is built on was not.
+#
+# Every six hours, because a step lands about ten minutes after its announcement at any
+# hour - SGOV's was at 00:00 UTC, most are at 15:10 - and the cost is a rounding error:
+# 26 wide eth_getLogs for the scan, a bisection only for steps that are new, and four
+# reads per step per archive endpoint.
+name: rescan-chain
+
+on:
+  schedule:
+    # :47 to sit clear of the other schedules, which share this branch.
+    - cron: '47 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rescan-chain
+  cancel-in-progress: false
+
+jobs:
+  rescan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # 26 wide eth_getLogs across all 194 addresses. Robinhood's own endpoint is the
+      # only one that takes a 2 000 000-block range, so this is one of the few reads
+      # that cannot move off it.
+      - name: Scan the whole chain for UIMultiplierUpdated
+        env:
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
+        run: node scripts/backfill-multiplier-events.mjs
+
+      # Bisection over block headers, and only for steps that do not already have a
+      # block: a past block never moves.
+      - name: Resolve the block each new step took effect at
+        env:
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
+        run: node scripts/resolve-effective-blocks.mjs
+
+      # ERC-8056 emits nothing when a change takes effect, so this is the only thing
+      # that turns "the log said it would" into "the state says it did".
+      - name: Confirm every step in the chain's own state
+        env:
+          RHC_RPC_URLS_ARCHIVE: ${{ secrets.RHC_RPC_URLS_ARCHIVE }}
+        run: node scripts/verify-multiplier-history.mjs
+
+      - name: Rebuild everything derived from the record
+        env:
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
+        run: node scripts/rebuild-record.mjs
+
+      - name: Check the record against its expectations
+        run: node scripts/check-data-expectations.mjs
+
+      - name: Commit only if the chain moved
+        run: |
+          paths="data/multiplier-events.observed.json data/effective-blocks.json data/multiplier-state-verification.json data/reconciliations.observed.json data/exdate.tokenlist.json packages/core/src/generated/registry.ts"
+          # The two verification files restate their own observedAt on every run, so a
+          # commit is worth making only when the events themselves moved. Otherwise this
+          # would push four times a day to say nothing.
+          if git diff --quiet -- data/multiplier-events.observed.json; then
+            echo "no new multiplier event"
+            git checkout -- $paths
+            exit 0
+          fi
+          summary=$(node -e "const e=require('./data/multiplier-events.observed.json');const k=new Set(e.events.map(x=>x.token.toLowerCase()+':'+x.effectiveAt));process.stdout.write(k.size+' changes across '+new Set(e.events.map(x=>x.token)).size+' tokens, scanned through block '+e.scannedThroughBlock)")
+          git config user.name 'exdate-scan'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add $paths
+          git commit -m "Rescan the chain for multiplier steps: $summary"
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

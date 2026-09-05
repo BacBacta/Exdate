@@ -28,5 +28,8 @@ for (const [id, row] of after) {
   if (old.status !== row.status) console.log(`STATUS     ${row.symbol} ${old.status} -> ${row.status}`)
 }
 
-await writeSnapshot(payload)
-console.log(`\nsnapshot written: ${current.length} deployments, ${(payload.assets ?? []).length} assets`)
+const wrote = await writeSnapshot(payload)
+console.log(
+  `\nsnapshot ${wrote.written ? 'written' : 'unchanged since ' + wrote.fetchedAt}: ` +
+    `${current.length} deployments, ${(payload.assets ?? []).length} assets`,
+)

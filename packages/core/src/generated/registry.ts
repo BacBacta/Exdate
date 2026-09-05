@@ -3392,7 +3392,7 @@ export const REGISTRY_TOKENS: readonly RegistryToken[] = [
   }
 ] as const
 
-export const REGISTRY_GENERATED_AT = "2026-09-02T15:14:00.463Z"
+export const REGISTRY_GENERATED_AT = "2026-09-05T20:38:22.531Z"
 
 /**
  * Every UIMultiplierUpdated log on chain, found by

@@ -25,7 +25,21 @@ try {
   const res = await fetch(ENDPOINT, { headers: { accept: 'application/json' } })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   payload = await res.json()
-  await writeFile(SNAPSHOT, JSON.stringify(payload, null, 2) + '\n')
+  // fetchedAt and source alongside the rows, so the file can say how old it is
+  // (audit 2026-09-05, F07). Additive: every reader takes payload.corpActions.
+  await writeFile(
+    SNAPSHOT,
+    JSON.stringify(
+      {
+        fetchedAt: new Date().toISOString(),
+        source: ENDPOINT,
+        note: "The issuer's corporate-action window, copied verbatim. It is about a month deep with no pagination and no date filter, so a row that falls out is unrecoverable - data/corporate-actions.archive.json is the cumulative record and is what everything derived reads.",
+        ...payload,
+      },
+      null,
+      2,
+    ) + '\n',
+  )
 } catch (error) {
   console.error(`# live fetch failed (${error.message}), falling back to snapshot`)
   payload = JSON.parse(await readFile(SNAPSHOT, 'utf8'))

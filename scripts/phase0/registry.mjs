@@ -22,8 +22,27 @@ export async function writeSnapshot(payload) {
   // generated registry copies it rather than stamping its own run: regenerating
   // from unchanged data must produce an unchanged file, or CI cannot tell drift
   // from a rebuild.
-  const dated = { fetchedAt: new Date().toISOString(), ...payload }
-  await writeFile(SNAPSHOT_PATH, JSON.stringify(dated, null, 2) + '\n')
+  //
+  // Unchanged content is left alone entirely, timestamp included, which is what
+  // lets this run on a schedule at all: the registry moves only when the issuer
+  // moves something, and re-stamping a date daily would rewrite the file - and
+  // through REGISTRY_GENERATED_AT the generated module too - to say nothing. The
+  // 2026-09-05 audit found the opposite failure, a snapshot three days behind two
+  // real multiplier changes because nothing refreshed it (F12); this makes a daily
+  // refresh free, so there is no reason not to schedule one.
+  let previous = null
+  try {
+    previous = JSON.parse(await readFile(SNAPSHOT_PATH, 'utf8'))
+  } catch {
+    // No snapshot yet is not a reason to refuse to write the first one.
+  }
+  if (previous) {
+    const { fetchedAt, ...content } = previous
+    if (JSON.stringify(content) === JSON.stringify(payload)) return { written: false, fetchedAt }
+  }
+  const fetchedAt = new Date().toISOString()
+  await writeFile(SNAPSHOT_PATH, JSON.stringify({ fetchedAt, ...payload }, null, 2) + '\n')
+  return { written: true, fetchedAt }
 }
 
 /** Flatten the registry into one row per (asset, deployment). */

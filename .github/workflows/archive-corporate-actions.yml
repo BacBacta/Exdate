@@ -43,27 +43,44 @@ jobs:
           RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
         run: node scripts/archive-corporate-actions.mjs
 
-      # The typed module the poller seeds from is generated, and CI checks it
-      # against its sources - so an archive commit that skipped this would make
-      # the very next CI run fail on drift.
-      - name: Regenerate the typed registry
-        run: node scripts/generate-registry.mjs
+      # The registry moves when the issuer applies a multiplier, and nothing refreshed
+      # it: the 2026-09-05 audit found it three days behind UPS and F (F12). Free to
+      # run daily because the snapshot is left untouched when the content is unchanged,
+      # so this commits only when the issuer actually changed something.
+      - name: Refresh the issuer registry
+        run: node scripts/phase0/snapshot-registry.mjs
 
-      # The list carries what each token represents in shares and what it is owed, both of
-      # which move with the archive, so it is rebuilt here rather than on its own schedule.
-      # It refuses to write an invalid list: a consumer would silently ignore one.
-      - name: Rebuild the token list
-        run: node --experimental-strip-types --no-warnings scripts/build-token-list.mjs
+      # Everything downstream of the archive, in dependency order and in one place:
+      # the reconciliations (which read the archive directly since the 2026-09-05
+      # audit), the typed registry CI checks against its sources, and the token
+      # list, which carries what each token represents in shares and what it is
+      # owed. Rebuilding them separately, on separate schedules, is what let four
+      # surfaces disagree about the same pairing (F03).
+      - name: Rebuild everything derived from the record
+        env:
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
+        run: node scripts/rebuild-record.mjs
+
+      - name: Check the record against its expectations
+        run: node scripts/check-data-expectations.mjs
 
       - name: Commit only if something actually changed
         run: |
-          if git diff --quiet -- data/corporate-actions.archive.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json; then
+          paths="data/corporate-actions.archive.json data/robinhood-assets.snapshot.json data/reconciliations.observed.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json"
+          if git diff --quiet -- $paths; then
             echo "nothing changed"
             exit 0
           fi
           summary=$(node -e "const a=require('./data/corporate-actions.archive.json');process.stdout.write(a.archivedRows+' rows, '+a.beyondWindow+' beyond the window')")
           git config user.name 'exdate-archive'
           git config user.email 'noreply@users.noreply.github.com'
-          git add data/corporate-actions.archive.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json
+          git add $paths
           git commit -m "Archive corporate actions: $summary"
-          git push
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

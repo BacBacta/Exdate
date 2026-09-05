@@ -12,10 +12,17 @@ try {
   const res = await fetch(FEEDS_URL)
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   feeds = await res.json()
-  await writeFile(SNAPSHOT, JSON.stringify(feeds, null, 2) + '\n')
+  // Enveloped rather than dumped as a bare array: a served file that cannot say when
+  // it was taken or where from is a figure without a date (audit 2026-09-05, F07).
+  // Readers take `.feeds ?? the file`, so an older checkout still loads.
+  await writeFile(
+    SNAPSHOT,
+    JSON.stringify({ fetchedAt: new Date().toISOString(), source: FEEDS_URL, note: "Chainlink's own reference-data-directory for Robinhood Chain, as docs.chain.link renders it. Copied verbatim; exdate measures nothing here.", feeds }, null, 2) + '\n',
+  )
 } catch (error) {
   console.error(`# live fetch failed (${error.message}), falling back to snapshot`)
-  feeds = JSON.parse(await readFile(SNAPSHOT, 'utf8'))
+  const snapshot = JSON.parse(await readFile(SNAPSHOT, 'utf8'))
+  feeds = snapshot.feeds ?? snapshot
 }
 
 const equity = feeds.filter((f) => f.docs?.marketHours === 'us_equities_24/5')

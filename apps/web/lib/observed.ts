@@ -108,7 +108,9 @@ const rpcProbe = rpcProbeJson as unknown as {
   }[]
 }
 
-const feeds = feedsJson as unknown as { name: string }[]
+// The snapshot gained an envelope on 2026-09-05 (F07); accept either shape.
+const feedsSnapshot = feedsJson as unknown as { feeds?: { name: string }[] } | { name: string }[]
+const feeds = (Array.isArray(feedsSnapshot) ? feedsSnapshot : (feedsSnapshot.feeds ?? [])) as { name: string }[]
 const feedMap = feedMapJson as unknown as {
   generatedAt: string
   pairs: {

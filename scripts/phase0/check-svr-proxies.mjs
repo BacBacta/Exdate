@@ -23,9 +23,9 @@ const OUT = process.argv.includes('--out')
   : 'data/svr-proxy-check.json'
 
 const AGGREGATOR = '0x245a7bfc' // aggregator()
-const feeds = JSON.parse(readFileSync('data/chainlink-feeds.snapshot.json', 'utf8')).filter((feed) =>
-  /^Robinhood /.test(feed.name),
-)
+const feedsSnapshot = JSON.parse(readFileSync('data/chainlink-feeds.snapshot.json', 'utf8'))
+// The snapshot gained an envelope on 2026-09-05 (F07); accept either shape.
+const feeds = (feedsSnapshot.feeds ?? feedsSnapshot).filter((feed) => /^Robinhood /.test(feed.name))
 
 const call = (to, data) => rpc('eth_call', [{ to, data }, 'latest'])
 

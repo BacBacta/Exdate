@@ -1,0 +1,66 @@
+# Which public RPC endpoints answer for this chain today, and how deep each one reads.
+#
+# Daily, because the set is not stable and the project has been wrong about it twice:
+# pocket.network served archive state one morning and had lost it by that evening, and
+# ordofi gained it the same day and had lost it again a day later. The 2026-09-05 data
+# audit found data/rpc-endpoints.observed.json still naming two endpoints reaching the
+# oldest multiplier step when only one did (F04) - a claim about corroboration resting
+# on a memory rather than a reading.
+#
+# scripts/verify-multiplier-history.mjs takes its candidate endpoints from this file, so
+# keeping it current is what lets the witness count per step be a measurement.
+name: probe-rpc-endpoints
+
+on:
+  schedule:
+    - cron: '52 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-rpc-endpoints
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Probe every endpoint the registries list
+        run: node scripts/probe-rpc-endpoints.mjs
+
+      # The file restates observedAt on every run, so committing on any diff would push
+      # daily to say nothing. What is worth recording is a capability that moved.
+      - name: Commit only if a capability changed
+        run: |
+          changed=$(git show HEAD:data/rpc-endpoints.observed.json > /tmp/rpc-before.json 2>/dev/null && node -e "
+            const before = require('/tmp/rpc-before.json')
+            const after = require('./data/rpc-endpoints.observed.json')
+            const strip = (o) => JSON.stringify({ summary: o.summary, crossChecks: o.crossChecks })
+            process.stdout.write(strip(before) === strip(after) ? '' : 'yes')
+          " || echo yes)
+          if [ -z "$changed" ]; then
+            echo "same capabilities as yesterday"
+            git checkout -- data/rpc-endpoints.observed.json
+            exit 0
+          fi
+          summary=$(node -e "const p=require('./data/rpc-endpoints.observed.json');const s=p.summary;process.stdout.write(s.reachable+'/'+s.discovered+' answer, '+s.servingArchive+' serve archive state, '+s.reachingOldestStep+' reach the oldest step')")
+          git config user.name 'exdate-rpc-probe'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/rpc-endpoints.observed.json
+          git commit -m "Probe the public RPC endpoints: $summary"
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

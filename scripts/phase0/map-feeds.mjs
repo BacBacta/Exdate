@@ -22,7 +22,9 @@ const tickerOf = (feedName) =>
     .trim()
     .toUpperCase()
 
-const feeds = JSON.parse(await readFile(FEEDS_SNAPSHOT, 'utf8'))
+const feedsSnapshot = JSON.parse(await readFile(FEEDS_SNAPSHOT, 'utf8'))
+// The snapshot gained an envelope on 2026-09-05 (F07); accept either shape.
+const feeds = feedsSnapshot.feeds ?? feedsSnapshot
 const equityFeeds = feeds.filter((f) => f.docs?.marketHours === 'us_equities_24/5')
 const byTicker = new Map(equityFeeds.map((f) => [tickerOf(f.name), f]))
 

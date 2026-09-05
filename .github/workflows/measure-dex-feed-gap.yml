@@ -54,14 +54,19 @@ jobs:
       - name: Corroborate the feed map from the readings so far
         run: node scripts/corroborate-feed-map.mjs
 
-      # The corroboration is an input to the confidence a haircut is published
-      # with, and the indexer and the API read it from the generated registry
-      # rather than from the map. Regenerating here is what keeps the two from
-      # disagreeing - CI checks that they match, and the first time a pairing
-      # crossed its threshold it turned the build red until this ran by hand.
-      # No dependencies: it is plain node over committed JSON.
-      - name: Regenerate the registry the map feeds
-        run: node scripts/generate-registry.mjs
+      # The corroboration this just recomputed is a moving majority, and it reaches
+      # four surfaces: this map, the generated registry the indexer and the API
+      # compile in, the published token list, and each reconciliation's feed block.
+      # Rebuilding them here, together, is what stops them disagreeing - measured on
+      # 2026-09-05, when they differed about 6 pairings of 35 and DELL read
+      # "traded-price" on the token list while its own page said "ticker only" (F03).
+      # --offline: no network, so an hourly run cannot rewrite a published haircut
+      # from a failed price read; the full rebuild runs daily beside the archive.
+      - name: Rebuild everything the map feeds
+        run: node scripts/rebuild-record.mjs --offline
+
+      - name: Check the record against its expectations
+        run: node scripts/check-data-expectations.mjs
 
       - name: Commit only if a sample was appended
         run: |
@@ -72,7 +77,7 @@ jobs:
           summary=$(node -e "const d=require('./data/dex-feed-gap.observed.json');const m=require('./data/token-feed-map.json');const s=d.summary;process.stdout.write(d.session+', median '+s.medianAbsDeviationBps+' bps, widest '+s.maxAbsDeviationBps+' bps across '+s.withFeed+' tokens, '+m.corroborated+'/'+m.pairs.length+' pairings corroborated')")
           git config user.name 'exdate-gap'
           git config user.email 'noreply@users.noreply.github.com'
-          git add data/dex-feed-gap.observed.json data/token-feed-map.json packages/core/src/generated/registry.ts
+          git add data/dex-feed-gap.observed.json data/token-feed-map.json data/reconciliations.observed.json data/exdate.tokenlist.json packages/core/src/generated/registry.ts
           git commit -m "Measure the DEX-to-feed gap: $summary"
 
           for attempt in 1 2 3 4; do

@@ -132,6 +132,49 @@ function formatWad(value) {
 
 const feedForToken = new Map(feedMap.pairs.map((pair) => [pair.token.toLowerCase(), pair]))
 
+/**
+ * `--stamp`: re-derive each row's `feed` block from the map and write nothing else.
+ *
+ * The corroboration of a token -> feed pairing is a moving majority, recomputed every
+ * hour by scripts/corroborate-feed-map.mjs. It reaches four surfaces - this file, the
+ * generated registry, the token list and the map itself - and until the 2026-09-05
+ * audit each was rebuilt on its own schedule, so they disagreed about 6 pairings of 35
+ * and a reader had no way to tell which was current (F03).
+ *
+ * The registry and the token list are pure functions of committed data, so the hourly
+ * job can simply rebuild them. This file is not: a full rebuild re-reads historical
+ * Chainlink rounds and today's issuer quotes, which is both wasteful hourly and a way
+ * for a transient read failure to rewrite a `matched` row as an anomaly. So the hourly
+ * job stamps instead - offline, touching only the field that moved - and the full
+ * rebuild stays on the daily and post-rescan runs.
+ */
+if (process.argv.includes('--stamp')) {
+  const OUT = new URL('data/reconciliations.observed.json', root)
+  const existing = await read('data/reconciliations.observed.json')
+  let changed = 0
+  for (const row of existing.rows) {
+    const pair = feedForToken.get(row.token.toLowerCase())
+    const next = pair
+      ? {
+          proxy: pair.feedProxy,
+          verified: pair.verified,
+          corroborated: pair.corroborated ?? false,
+          corroboratedBy: pair.corroboratedBy ?? [],
+        }
+      : null
+    if (JSON.stringify(row.feed ?? null) !== JSON.stringify(next)) changed++
+    row.feed = next
+  }
+  if (changed === 0) {
+    console.error('# --stamp: every row already carries the map\'s corroboration, nothing written')
+    process.exit(0)
+  }
+  existing.stampedAt = new Date().toISOString()
+  await writeFile(OUT, JSON.stringify(existing, null, 2) + '\n')
+  console.error(`# --stamp: ${changed} row(s) restamped from data/token-feed-map.json -> data/reconciliations.observed.json`)
+  process.exit(0)
+}
+
 const parseDecimal = (value, decimals) => {
   const trimmed = String(value).trim()
   if (!/^-?\d*(\.\d*)?$/.test(trimmed) || trimmed === '' || trimmed === '.') throw new Error(`not a decimal: ${value}`)
@@ -448,6 +491,30 @@ for (const row of rows) {
 rows.sort((a, b) => (a.processDate ?? a.change?.effectiveAt ?? '').localeCompare(b.processDate ?? b.change?.effectiveAt ?? ''))
 
 const tally = (status) => rows.filter((row) => row.status === status).length
+
+/**
+ * A rebuild that loses a measurement is a read failure, not a finding.
+ *
+ * Every priced row depends on a historical Chainlink round and, where one was
+ * captured, an issuer quote. A round that cannot be read is written as an anomaly with
+ * a reason - correct for a first build, wrong for a rebuild, where it would silently
+ * downgrade a haircut that has already been published and checked. So a run that would
+ * publish fewer `matched` rows than the file already holds refuses to write and says
+ * which ones it lost. `--allow-fewer-matched` is the deliberate override, for the day a
+ * row genuinely stops reconciling.
+ */
+const previous = await read('data/reconciliations.observed.json').catch(() => null)
+if (previous && !process.argv.includes('--allow-fewer-matched')) {
+  const was = new Set(previous.rows.filter((row) => row.status === 'matched').map((row) => `${row.token.toLowerCase()}:${row.change?.effectiveAt ?? row.processDate}`))
+  const now = new Set(rows.filter((row) => row.status === 'matched').map((row) => `${row.token.toLowerCase()}:${row.change?.effectiveAt ?? row.processDate}`))
+  const lost = [...was].filter((key) => !now.has(key))
+  if (lost.length > 0) {
+    console.error(`# refusing to write: ${lost.length} row(s) that reconciled before do not now - ${lost.join(', ')}`)
+    console.error('# this is almost always a failed price read. Re-run; pass --allow-fewer-matched only if the loss is real.')
+    process.exit(1)
+  }
+}
+
 await writeFile(new URL('data/reconciliations.observed.json', root), JSON.stringify({
   note: 'Issuer corporate actions paired with the multiplier steps they produced, priced at the Chainlink round in force at effectiveAt. Every input is first-party or on-chain; nothing is estimated. Rebuild with: node scripts/build-reconciliations.mjs',
   builtAt: new Date().toISOString(),
