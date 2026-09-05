@@ -99,9 +99,15 @@ fi
 note "key of $LEN characters; the endpoint decides"
 
 say "2. A candidate .env, not yet in place"
-CANDIDATE="$(mktemp)"
-# 600, and owned by the account that will probe it - root's private temp file
-# is unreadable to the service account otherwise.
+# Beside the real .env, not in /tmp. The candidate must be readable by the
+# service account (which runs the probe) and writable by root (which builds it),
+# and a file in /tmp that root chowns to someone else is writable by NEITHER on a
+# stock Ubuntu: fs.protected_regular=2 stops root writing to a file it does not
+# own in a world-writable sticky directory. $DIR is owned by the service account
+# and is not sticky, so both can do their part.
+CANDIDATE="$DIR/.env.candidate.$$"
+trap 'rm -f "$CANDIDATE"' EXIT
+: > "$CANDIDATE"
 chmod 600 "$CANDIDATE"; chown "$USER_NAME" "$CANDIDATE"
 # Everything the current .env has, minus the two lines this script owns.
 if [ -f "$DIR/.env" ]; then grep -vE '^\s*(RHC_RPC_URLS|RHC_RPC_URL_ARCHIVE)\s*=' "$DIR/.env" > "$CANDIDATE" || true; fi
@@ -121,7 +127,16 @@ say "3. Does the endpoint do the watcher's job?"
 # else is.
 passthrough=()
 for v in HTTPS_PROXY HTTP_PROXY NO_PROXY https_proxy http_proxy no_proxy NODE_EXTRA_CA_CERTS SSL_CERT_FILE; do
-  [ -n "${!v:-}" ] && passthrough+=("$v=${!v}")
+  value="${!v:-}"
+  [ -n "$value" ] || continue
+  # A CA bundle the service account cannot read is worse than none: node warns
+  # on every run and uses the system store anyway. Pass it only if it is
+  # actually readable by the account that will use it.
+  case "$v" in
+    NODE_EXTRA_CA_CERTS|SSL_CERT_FILE)
+      sudo -u "$USER_NAME" test -r "$value" 2>/dev/null || continue ;;
+  esac
+  passthrough+=("$v=$value")
 done
 if ! sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" EXDATE_ENV_FILE="$CANDIDATE" "${passthrough[@]}" \
      node "$DIR/scripts/probe-endpoint.mjs" --require watcher-span; then

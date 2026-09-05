@@ -1312,6 +1312,20 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   a verdict. The gated rehearsal also found the whitespace half of that check unreachable -
   `tr -d '[:space:]'` had already stripped it three lines earlier - so the repair is announced
   instead of silent, since a silent repair is how a wrong value gets in looking right.
+- 2026-09-05 — **The rehearsal ran under a kinder kernel than the machine, and hid a bug for two
+  rounds.** `set-rpc.sh` built its candidate `.env` with `mktemp` and chowned it to the service
+  account so the probe could read it. On a stock Ubuntu that file is then writable by **neither**:
+  `fs.protected_regular=2` stops root writing to a file it does not own inside a world-writable
+  sticky directory, which `/tmp` is. The machine said `Permission denied` on a temp file root had
+  just created, twice, and the delivered secret was refused for a reason that had nothing to do with
+  the secret. This sandbox ships `fs.protected_regular=0`, so every rehearsal passed. The candidate
+  now lives beside the real `.env` inside the checkout - owned by the service account, not sticky,
+  so root can write it and the account can read it - with a `trap` removing it on any exit. The
+  harness sets `fs.protected_regular=2` before it runs, because a rehearsal on a more permissive
+  kernel than the target proves less than it appears to. Also fixed while reading that output: the
+  proxy passthrough handed the service account a CA bundle under `/root` it cannot read, so node
+  warned on every run and fell back to the system store anyway - a CA is now forwarded only if the
+  account can actually read it.
 - _(append decisions here as they are made)_
 
 ## Status
