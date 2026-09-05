@@ -34,11 +34,33 @@ const DEFAULT_RPC_URLS = [
   // The operator's own endpoint, fallback only.
   'https://rpc.mainnet.chain.robinhood.com',
 ]
+/**
+ * Only entries that are actually http(s) URLs survive. A bare API key pasted
+ * here instead of a full URL is the plausible mistake - set-rpc.sh accepts one
+ * and builds the URL around it, so the same value can look correct on a machine
+ * and be useless to a collector - and without this it produced "Invalid URL" on
+ * every call with no fallback, quietly breaking five scheduled jobs. A rejected
+ * entry is named on stderr; if nothing survives, the built-in order is used.
+ */
 const configured = (process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '')
   .split(',')
   .map((u) => u.trim())
   .filter(Boolean)
-const RPC_URLS = configured.length ? configured : DEFAULT_RPC_URLS
+const usable = configured.filter((u) => {
+  try {
+    const { protocol, host } = new URL(u)
+    if ((protocol === 'http:' || protocol === 'https:') && host) return true
+  } catch {
+    /* not a URL at all */
+  }
+  // The host is safe to print; a key lives in the path, so nothing else is.
+  console.error(`# RHC_RPC_URLS: ignoring an entry that is not an http(s) URL (${u.length} characters). A bare API key is not an endpoint - give the whole https://… URL.`)
+  return false
+})
+if (configured.length > 0 && usable.length === 0) {
+  console.error('# RHC_RPC_URLS held nothing usable; falling back to the built-in endpoints')
+}
+const RPC_URLS = usable.length ? usable : DEFAULT_RPC_URLS
 const RPC_URL = RPC_URLS[0]
 /** A request that hangs would block the failover behind it, so none may. Wide scans measured under 5 s. */
 const REQUEST_TIMEOUT_MS = Number(process.env.RHC_RPC_TIMEOUT_MS || 25_000)
