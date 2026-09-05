@@ -1,7 +1,7 @@
 {
   "note": "Creations and redemptions per Stock Token, from the chain: mint is a Transfer from address(0), burn is a Transfer to it. Mint minus burn is net creation, the signal an ETF publishes as net flow and that nobody publishes for these tokens. Amounts are raw tokens, 18 decimals; underlying shares are these times the multiplier in force.",
   "method": "Each run reads from the block after the last window to the current head, so windows are contiguous and disjoint. A range the node times out on is halved; one that still fails at the floor is listed in unreadRanges and the window is marked incomplete rather than published as if those logs were zero.",
-  "lastRunAt": "2026-09-04T06:20:10.600Z",
+  "lastRunAt": "2026-09-05T05:20:09.519Z",
   "windows": [
     {
       "fromBlock": 53846857,
@@ -577,6 +577,1719 @@
           "minted": "16.927",
           "burned": "16.927",
           "net": "0",
+          "mints": 1,
+          "burns": 1
+        }
+      ]
+    },
+    {
+      "fromBlock": 54046858,
+      "toBlock": 54865977,
+      "fromTime": "2026-09-04T06:20:07.000Z",
+      "toTime": "2026-09-05T05:20:02.000Z",
+      "hours": 23,
+      "readAt": "2026-09-05T05:20:09.519Z",
+      "requests": 18,
+      "readMs": 6449,
+      "incomplete": false,
+      "unreadRanges": [],
+      "precededByGap": false,
+      "tokensWithFlow": 188,
+      "mints": 3203,
+      "burns": 513,
+      "totalMinted": "3138135.36577043",
+      "totalBurned": "453022.12672968",
+      "netCreated": "2685113.23904075",
+      "tokens": [
+        {
+          "token": "0x05a3d1cd21d0c88145e82600e62e7e496e0f222b",
+          "symbol": "AMC",
+          "minted": "2331452.923",
+          "burned": "293063.727",
+          "net": "2038389.196",
+          "mints": 124,
+          "burns": 26
+        },
+        {
+          "token": "0x1d11f0496982706c5e14a514d4e79f2e6bde4516",
+          "symbol": "DJT",
+          "minted": "160401.597",
+          "burned": "18339.061",
+          "net": "142062.536",
+          "mints": 58,
+          "burns": 4
+        },
+        {
+          "token": "0xf6589f11bc40b669e584073f428b05562f568733",
+          "symbol": "SNAP",
+          "minted": "156745.304",
+          "burned": "20291.427",
+          "net": "136453.877",
+          "mints": 14,
+          "burns": 7
+        },
+        {
+          "token": "0x1b0e319c6a659f002271b69db8a7df2f911c153e",
+          "symbol": "GME",
+          "minted": "122731.423",
+          "burned": "27248.43",
+          "net": "95482.993",
+          "mints": 405,
+          "burns": 28
+        },
+        {
+          "token": "0x48e39e56acdba37b09020c0b734a613c9a2f100a",
+          "symbol": "BB",
+          "minted": "49277.681",
+          "burned": "14696.26",
+          "net": "34581.421",
+          "mints": 50,
+          "burns": 15
+        },
+        {
+          "token": "0xccee82fe024c36fa15e1005ede3e9e4787e23d09",
+          "symbol": "HIMS",
+          "minted": "33833.527",
+          "burned": "2868.58",
+          "net": "30964.947",
+          "mints": 17,
+          "burns": 1
+        },
+        {
+          "token": "0xcef9027c7d6985b85f0ba431125073529a947a68",
+          "symbol": "BULL",
+          "minted": "24343.27",
+          "burned": "1200",
+          "net": "23143.27",
+          "mints": 11,
+          "burns": 1
+        },
+        {
+          "token": "0xb1bf26c1d20ff267a4f93550d1e0d06ac40a114b",
+          "symbol": "RIVN",
+          "minted": "22771.706",
+          "burned": "1221.381",
+          "net": "21550.325",
+          "mints": 79,
+          "burns": 4
+        },
+        {
+          "token": "0x59818904ab4ce163b3ce4ffb64f2d6ca02c434b4",
+          "symbol": "QUBT",
+          "minted": "15418.469",
+          "burned": "1984.853",
+          "net": "13433.616",
+          "mints": 10,
+          "burns": 5
+        },
+        {
+          "token": "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+          "symbol": "SPCX",
+          "minted": "12442.201",
+          "burned": "0",
+          "net": "12442.201",
+          "mints": 36,
+          "burns": 0
+        },
+        {
+          "token": "0xd917b029c761d264c6a312bbbcda868658ef86a6",
+          "symbol": "USAR",
+          "minted": "13195.268",
+          "burned": "2962.983",
+          "net": "10232.285",
+          "mints": 8,
+          "burns": 5
+        },
+        {
+          "token": "0x25c288e6d899b9bc30160965ad9644c67e73be0c",
+          "symbol": "F",
+          "minted": "14400.62166822",
+          "burned": "5116.33555851",
+          "net": "9284.28610971",
+          "mints": 63,
+          "burns": 5
+        },
+        {
+          "token": "0x41f4267525a8aff329540ef24fd83d9044758b33",
+          "symbol": "FIG",
+          "minted": "12727.358",
+          "burned": "4097.691",
+          "net": "8629.667",
+          "mints": 49,
+          "burns": 9
+        },
+        {
+          "token": "0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f",
+          "symbol": "SLV",
+          "minted": "12257.239",
+          "burned": "4023.155",
+          "net": "8234.084",
+          "mints": 17,
+          "burns": 4
+        },
+        {
+          "token": "0xe0444ef8bf4ed74f74fd73686e2ddf4c1c5591e8",
+          "symbol": "NFLX",
+          "minted": "7887.453",
+          "burned": "361.855",
+          "net": "7525.598",
+          "mints": 101,
+          "burns": 7
+        },
+        {
+          "token": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+          "symbol": "SGOV",
+          "minted": "7336.15661625",
+          "burned": "797.98983937",
+          "net": "6538.16677688",
+          "mints": 14,
+          "burns": 1
+        },
+        {
+          "token": "0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5",
+          "symbol": "CRCL",
+          "minted": "7426.703",
+          "burned": "1094.02",
+          "net": "6332.683",
+          "mints": 18,
+          "burns": 2
+        },
+        {
+          "token": "0xec262a75e413fafd0df80480274532c79d42da09",
+          "symbol": "MSTR",
+          "minted": "7339.872",
+          "burned": "2398.367",
+          "net": "4941.505",
+          "mints": 50,
+          "burns": 7
+        },
+        {
+          "token": "0x4e62068525ab11fe768e29dfd00ef909b9803016",
+          "symbol": "LULU",
+          "minted": "9264.068",
+          "burned": "4888.581",
+          "net": "4375.487",
+          "mints": 78,
+          "burns": 14
+        },
+        {
+          "token": "0xc9a981fee1f9dec688bb123ccdecc63d0debfc4e",
+          "symbol": "GLD",
+          "minted": "4362.694",
+          "burned": "208.273",
+          "net": "4154.421",
+          "mints": 102,
+          "burns": 7
+        },
+        {
+          "token": "0x117cc2133c37b721f49de2a7a74833232b3b4c0c",
+          "symbol": "SPY",
+          "minted": "3987.557",
+          "burned": "0",
+          "net": "3987.557",
+          "mints": 34,
+          "burns": 0
+        },
+        {
+          "token": "0x7f0abef0c07280f82c6a08ead09ded6bae2c13fc",
+          "symbol": "EWY",
+          "minted": "3609.053",
+          "burned": "0",
+          "net": "3609.053",
+          "mints": 218,
+          "burns": 0
+        },
+        {
+          "token": "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+          "symbol": "NVDA",
+          "minted": "4065.928",
+          "burned": "566",
+          "net": "3499.928",
+          "mints": 10,
+          "burns": 1
+        },
+        {
+          "token": "0x322f0929c4625ed5bad873c95208d54e1c003b2d",
+          "symbol": "TSLA",
+          "minted": "3377.591",
+          "burned": "0",
+          "net": "3377.591",
+          "mints": 18,
+          "burns": 0
+        },
+        {
+          "token": "0x2d427692e928fa156ec22acfabafa0447c5805b7",
+          "symbol": "GLXY",
+          "minted": "3397.056",
+          "burned": "295.469",
+          "net": "3101.587",
+          "mints": 67,
+          "burns": 6
+        },
+        {
+          "token": "0x408c14038a04f7bd235329e26d2bf569ee20e250",
+          "symbol": "NU",
+          "minted": "4331.01",
+          "burned": "1383.746",
+          "net": "2947.264",
+          "mints": 28,
+          "burns": 3
+        },
+        {
+          "token": "0xf0c4bf4c582cb3836e98394b1d4e7b7281101be8",
+          "symbol": "RBLX",
+          "minted": "3076.538",
+          "burned": "6001.259",
+          "net": "-2924.721",
+          "mints": 6,
+          "burns": 7
+        },
+        {
+          "token": "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9",
+          "symbol": "AAPL",
+          "minted": "3057.43224856",
+          "burned": "171.8587142",
+          "net": "2885.57353436",
+          "mints": 17,
+          "burns": 2
+        },
+        {
+          "token": "0xc72b96e0e48ecd4dc75e1e45396e26300bc39681",
+          "symbol": "INTC",
+          "minted": "3800",
+          "burned": "1141.07",
+          "net": "2658.93",
+          "mints": 3,
+          "burns": 3
+        },
+        {
+          "token": "0xad25ac6c84d497db898fa1e8387bf6af3532a1c4",
+          "symbol": "BABA",
+          "minted": "3189.478",
+          "burned": "602.785",
+          "net": "2586.693",
+          "mints": 31,
+          "burns": 13
+        },
+        {
+          "token": "0x43b07d15ce533bec5476d70c22a78a1b2b662155",
+          "symbol": "MRNA",
+          "minted": "3337.925",
+          "burned": "806.79",
+          "net": "2531.135",
+          "mints": 36,
+          "burns": 4
+        },
+        {
+          "token": "0x12f190a9f9d7d37a250758b26824b97ce941bf54",
+          "symbol": "AMZN",
+          "minted": "2521.658",
+          "burned": "155",
+          "net": "2366.658",
+          "mints": 12,
+          "burns": 1
+        },
+        {
+          "token": "0x756bc80af765c82da966a788858d65adf14f3793",
+          "symbol": "RUN",
+          "minted": "1275.039",
+          "burned": "3487.232",
+          "net": "-2212.193",
+          "mints": 8,
+          "burns": 11
+        },
+        {
+          "token": "0xfde6b5d9bb419b10c23268c74e369abff39c0460",
+          "symbol": "RCAT",
+          "minted": "7006.488",
+          "burned": "4909.097",
+          "net": "2097.391",
+          "mints": 8,
+          "burns": 3
+        },
+        {
+          "token": "0x9e7abd3c9139d14e4c86dce0e455aab7a0c2fb3e",
+          "symbol": "WYFI",
+          "minted": "4400",
+          "burned": "2362",
+          "net": "2038",
+          "mints": 5,
+          "burns": 3
+        },
+        {
+          "token": "0xf23250dac154d05bb671cb0d0ebef3c635c79ce2",
+          "symbol": "UPS",
+          "minted": "3541.74039214",
+          "burned": "1578.81638831",
+          "net": "1962.92400383",
+          "mints": 39,
+          "burns": 8
+        },
+        {
+          "token": "0x6330d8c3178a418788df01a47479c0ce7ccf450b",
+          "symbol": "COIN",
+          "minted": "2079.072",
+          "burned": "162",
+          "net": "1917.072",
+          "mints": 6,
+          "burns": 1
+        },
+        {
+          "token": "0x05b37fb53a299a1b874a619e1c4c404d52c36f4c",
+          "symbol": "RDDT",
+          "minted": "2307.93",
+          "burned": "448.164",
+          "net": "1859.766",
+          "mints": 14,
+          "burns": 3
+        },
+        {
+          "token": "0x8005d266423c7ea827372c9c864491e5786600ea",
+          "symbol": "LLY",
+          "minted": "1798.73",
+          "burned": "58.903",
+          "net": "1739.827",
+          "mints": 20,
+          "burns": 4
+        },
+        {
+          "token": "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
+          "symbol": "GOOGL",
+          "minted": "1661.417",
+          "burned": "290.476",
+          "net": "1370.941",
+          "mints": 8,
+          "burns": 3
+        },
+        {
+          "token": "0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3",
+          "symbol": "CRWV",
+          "minted": "2247.772",
+          "burned": "881.019",
+          "net": "1366.753",
+          "mints": 4,
+          "burns": 2
+        },
+        {
+          "token": "0xa4f319104089fe321dc8093c6e707d4fe190a988",
+          "symbol": "CVNA",
+          "minted": "1355.492",
+          "burned": "0",
+          "net": "1355.492",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a",
+          "symbol": "PLTR",
+          "minted": "1969.432",
+          "burned": "685",
+          "net": "1284.432",
+          "mints": 4,
+          "burns": 2
+        },
+        {
+          "token": "0x980dcf6766fa79f5cf0c4aadb3ab477ff15a9619",
+          "symbol": "IBM",
+          "minted": "1829.606",
+          "burned": "739.323",
+          "net": "1090.283",
+          "mints": 171,
+          "burns": 6
+        },
+        {
+          "token": "0x373c06c4f7bde527d7dae4ba169e42b55e393ced",
+          "symbol": "AUR",
+          "minted": "1089.021",
+          "burned": "0",
+          "net": "1089.021",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0xb0992820e760d836549ba69bc7598b4af75dee03",
+          "symbol": "ORCL",
+          "minted": "1247.53480662",
+          "burned": "189.99992632",
+          "net": "1057.5348803",
+          "mints": 3,
+          "burns": 1
+        },
+        {
+          "token": "0x9b23573b156b52565012f5ce02cdf60afbaa70be",
+          "symbol": "PENG",
+          "minted": "2005.196",
+          "burned": "1057.229",
+          "net": "947.967",
+          "mints": 4,
+          "burns": 26
+        },
+        {
+          "token": "0xc01aa1fecec0605b13bc84874ff7256c0f5f562a",
+          "symbol": "SMCI",
+          "minted": "933.715",
+          "burned": "27.356",
+          "net": "906.359",
+          "mints": 58,
+          "burns": 1
+        },
+        {
+          "token": "0xe93237c50d904957cf27e7b1133b510c669c2e74",
+          "symbol": "MSFT",
+          "minted": "879.19",
+          "burned": "0",
+          "net": "879.19",
+          "mints": 9,
+          "burns": 0
+        },
+        {
+          "token": "0xcf6b2d875361be807eafa57458c80f28521f9333",
+          "symbol": "POET",
+          "minted": "788.41",
+          "burned": "0",
+          "net": "788.41",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0x1eebee7f74517e0279dfb09d25b0407beec3fdd6",
+          "symbol": "SMR",
+          "minted": "754.536",
+          "burned": "0",
+          "net": "754.536",
+          "mints": 7,
+          "burns": 0
+        },
+        {
+          "token": "0x822cc93ffd030293e9842c30bbd678f530701867",
+          "symbol": "BE",
+          "minted": "1873.07",
+          "burned": "1152.721",
+          "net": "720.349",
+          "mints": 13,
+          "burns": 6
+        },
+        {
+          "token": "0x92ef19e82bd8ff36661de838d5eae7e5cef0effe",
+          "symbol": "RDW",
+          "minted": "710.151",
+          "burned": "0",
+          "net": "710.151",
+          "mints": 5,
+          "burns": 0
+        },
+        {
+          "token": "0x5e81213613b6b86eab4c6c50d718d34359459786",
+          "symbol": "TTWO",
+          "minted": "739.064",
+          "burned": "1444.43",
+          "net": "-705.366",
+          "mints": 7,
+          "burns": 15
+        },
+        {
+          "token": "0xc0d6457c16cc70d6790dd43521c899c87ce02f35",
+          "symbol": "META",
+          "minted": "762.926",
+          "burned": "111.891",
+          "net": "651.035",
+          "mints": 7,
+          "burns": 2
+        },
+        {
+          "token": "0x4d21483a44bf67a86b77e3da301411880797d452",
+          "symbol": "BA",
+          "minted": "824.797",
+          "burned": "220",
+          "net": "604.797",
+          "mints": 70,
+          "burns": 2
+        },
+        {
+          "token": "0x98e75885157c80992a8d41b696d8c9c6fb30a926",
+          "symbol": "SOFI",
+          "minted": "579.277",
+          "burned": "0",
+          "net": "579.277",
+          "mints": 15,
+          "burns": 0
+        },
+        {
+          "token": "0xb334c5ce741b80b5b671f47f5c269cb193fe8e24",
+          "symbol": "JOBY",
+          "minted": "558.169",
+          "burned": "0",
+          "net": "558.169",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0x0e6e67ba88e7b5d9b67636a215c76779b948de79",
+          "symbol": "UMC",
+          "minted": "701.015",
+          "burned": "205.301",
+          "net": "495.714",
+          "mints": 8,
+          "burns": 4
+        },
+        {
+          "token": "0x116f00968269b7bfbad4109ce591d6e74c0601d4",
+          "symbol": "NET",
+          "minted": "1070.72",
+          "burned": "618.658",
+          "net": "452.062",
+          "mints": 80,
+          "burns": 11
+        },
+        {
+          "token": "0x6e3dfd9f7e1649baa14d25cac18c94d62db10a54",
+          "symbol": "SOUN",
+          "minted": "312.509",
+          "burned": "762.052",
+          "net": "-449.543",
+          "mints": 2,
+          "burns": 4
+        },
+        {
+          "token": "0xacef2e09adb47ad6abebad9ff06689e60615c2b6",
+          "symbol": "INDA",
+          "minted": "168.742",
+          "burned": "615.334",
+          "net": "-446.592",
+          "mints": 11,
+          "burns": 14
+        },
+        {
+          "token": "0x348be1a8663f15edde5cdf8a96bb69078f7ab6fd",
+          "symbol": "WULF",
+          "minted": "411.3",
+          "burned": "0",
+          "net": "411.3",
+          "mints": 9,
+          "burns": 0
+        },
+        {
+          "token": "0xa8eb3bccbf2017ee7cbfb652eb51cf2e1b153289",
+          "symbol": "XNDU",
+          "minted": "403",
+          "burned": "0",
+          "net": "403",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x59dd09d4900c2e4b5f75b7c0d4e6796fcc234cb1",
+          "symbol": "HPE",
+          "minted": "529.522",
+          "burned": "146.1",
+          "net": "383.422",
+          "mints": 26,
+          "burns": 7
+        },
+        {
+          "token": "0x62fd0668e10d8b72339be2dcf7643001688ff13b",
+          "symbol": "MRVL",
+          "minted": "1001.843",
+          "burned": "620.29519",
+          "net": "381.54781",
+          "mints": 8,
+          "burns": 6
+        },
+        {
+          "token": "0xba0cab75495255d0cb58e22b648bfed4ecd1f47e",
+          "symbol": "SNOW",
+          "minted": "461.239",
+          "burned": "83.638",
+          "net": "377.601",
+          "mints": 22,
+          "burns": 7
+        },
+        {
+          "token": "0x58ffe4a942d3885baa22d7520691f611ef09e7aa",
+          "symbol": "TSM",
+          "minted": "588.784",
+          "burned": "961.6303",
+          "net": "-372.8463",
+          "mints": 5,
+          "burns": 9
+        },
+        {
+          "token": "0xbe6702d7b70315376dc48a3293f24f0982f86386",
+          "symbol": "NVTS",
+          "minted": "360.493",
+          "burned": "0",
+          "net": "360.493",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x0b5fb4031cae9163db10b169ee72685f0edc8545",
+          "symbol": "TTD",
+          "minted": "699.799",
+          "burned": "350",
+          "net": "349.799",
+          "mints": 22,
+          "burns": 1
+        },
+        {
+          "token": "0x9d9c6684f596f66a64c030b93a886d51fd4d7931",
+          "symbol": "NBIS",
+          "minted": "345.001",
+          "burned": "0",
+          "net": "345.001",
+          "mints": 59,
+          "burns": 0
+        },
+        {
+          "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
+          "symbol": "CCL",
+          "minted": "337.37305252",
+          "burned": "0",
+          "net": "337.37305252",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0xf53f66751b1eff985311b693531e3290f600c410",
+          "symbol": "SHOP",
+          "minted": "464.529",
+          "burned": "156.321",
+          "net": "308.208",
+          "mints": 32,
+          "burns": 5
+        },
+        {
+          "token": "0xc583c60aef9dc401da72cec1b404743a93cea1cc",
+          "symbol": "QBTS",
+          "minted": "305.854",
+          "burned": "0",
+          "net": "305.854",
+          "mints": 6,
+          "burns": 0
+        },
+        {
+          "token": "0x84cab63bc87912e71ad199ff14a0ba45de68fef8",
+          "symbol": "SKHY",
+          "minted": "908",
+          "burned": "603",
+          "net": "305",
+          "mints": 3,
+          "burns": 2
+        },
+        {
+          "token": "0x4189f0c66ebbb0bfef1c31f763131361ef32f77c",
+          "symbol": "PR",
+          "minted": "336.02",
+          "burned": "44.098",
+          "net": "291.922",
+          "mints": 7,
+          "burns": 1
+        },
+        {
+          "token": "0xb853bc83a753342a4f8320ea680b4b1e84118d21",
+          "symbol": "INFQ",
+          "minted": "291.675",
+          "burned": "0",
+          "net": "291.675",
+          "mints": 6,
+          "burns": 0
+        },
+        {
+          "token": "0x284358abc07f9359f19f4b5b4ac91901be2597ba",
+          "symbol": "RGTI",
+          "minted": "268.659",
+          "burned": "0",
+          "net": "268.659",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0xfb2664f07b6aadd29ea7a59d8859b1aeb8645cda",
+          "symbol": "PATH",
+          "minted": "449.523",
+          "burned": "181.998",
+          "net": "267.525",
+          "mints": 6,
+          "burns": 1
+        },
+        {
+          "token": "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd",
+          "symbol": "DELL",
+          "minted": "366.98761972",
+          "burned": "101.50053354",
+          "net": "265.48708618",
+          "mints": 4,
+          "burns": 1
+        },
+        {
+          "token": "0xbef75684c43c4ea7bd18dd532a2244674ee8b926",
+          "symbol": "NNE",
+          "minted": "382.105",
+          "burned": "123.354",
+          "net": "258.751",
+          "mints": 6,
+          "burns": 2
+        },
+        {
+          "token": "0x7c148f74ac7445d1f28366b7fcdc6792a9fcd0cf",
+          "symbol": "IBRX",
+          "minted": "246.99",
+          "burned": "0",
+          "net": "246.99",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xb1969f6604ca1ae7a2cd3f1827876e914594ca2d",
+          "symbol": "TE",
+          "minted": "0",
+          "burned": "239.33",
+          "net": "-239.33",
+          "mints": 0,
+          "burns": 1
+        },
+        {
+          "token": "0x62200915e7deab1ec7f79fb246dadbb80eacddd0",
+          "symbol": "CLOV",
+          "minted": "233.525",
+          "burned": "0",
+          "net": "233.525",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xaa4d64474c172010ab57719cb9951e6142a100d3",
+          "symbol": "PL",
+          "minted": "348.376",
+          "burned": "121.816",
+          "net": "226.56",
+          "mints": 8,
+          "burns": 2
+        },
+        {
+          "token": "0xbbd09f72b025360fee5c928053dca6248d35be54",
+          "symbol": "ON",
+          "minted": "543.338",
+          "burned": "324.354",
+          "net": "218.984",
+          "mints": 15,
+          "burns": 6
+        },
+        {
+          "token": "0x86923f96303d656e4aa86d9d42d1e57ad2023fdc",
+          "symbol": "AMD",
+          "minted": "634.592",
+          "burned": "427.147",
+          "net": "207.445",
+          "mints": 3,
+          "burns": 4
+        },
+        {
+          "token": "0x156e175dd063a8ce274c50654ef40e0032b3fbcf",
+          "symbol": "AVGO",
+          "minted": "226.386",
+          "burned": "21.064",
+          "net": "205.322",
+          "mints": 34,
+          "burns": 7
+        },
+        {
+          "token": "0x12e3c047bf9aecaf9ddc98c05c31bfd1dd043993",
+          "symbol": "KSS",
+          "minted": "205.212",
+          "burned": "0",
+          "net": "205.212",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x39ec44bee4f6a116c6f9b8de566848a985c53c60",
+          "symbol": "ELF",
+          "minted": "210.034",
+          "burned": "9.547",
+          "net": "200.487",
+          "mints": 9,
+          "burns": 1
+        },
+        {
+          "token": "0x27c99fbde9d0d2aa4f4bfb4943f237843ddf6958",
+          "symbol": "DDOG",
+          "minted": "200",
+          "burned": "0",
+          "net": "200",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344",
+          "symbol": "USO",
+          "minted": "2718.62",
+          "burned": "2535.021",
+          "net": "183.599",
+          "mints": 4,
+          "burns": 6
+        },
+        {
+          "token": "0x8cf07c5a878945185d327aaa6e33faa95f95e7bf",
+          "symbol": "CELH",
+          "minted": "180.64",
+          "burned": "0",
+          "net": "180.64",
+          "mints": 6,
+          "burns": 0
+        },
+        {
+          "token": "0x285b231728c7e4333799183df1094d775246a535",
+          "symbol": "SLS",
+          "minted": "180",
+          "burned": "0",
+          "net": "180",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x7066a64c24e4206cd62e83bf198c1e7eb361f51e",
+          "symbol": "PFE",
+          "minted": "702.49",
+          "burned": "869.964",
+          "net": "-167.474",
+          "mints": 2,
+          "burns": 2
+        },
+        {
+          "token": "0x4ea005168d7f09a7a0ba9d1def21a479950e44c2",
+          "symbol": "COST",
+          "minted": "209.62070368",
+          "burned": "61.08361436",
+          "net": "148.53708932",
+          "mints": 5,
+          "burns": 2
+        },
+        {
+          "token": "0x8ef20885f94e3d9bc7eb3080279188bd5ed7c08c",
+          "symbol": "LITE",
+          "minted": "199.187",
+          "burned": "60",
+          "net": "139.187",
+          "mints": 8,
+          "burns": 1
+        },
+        {
+          "token": "0x1af6446f07eb1d97c546afc8c9544cbdf3ad5137",
+          "symbol": "ASTS",
+          "minted": "182.729",
+          "burned": "46.987",
+          "net": "135.742",
+          "mints": 7,
+          "burns": 2
+        },
+        {
+          "token": "0xa5d4968421ba94814be3b136b15cf422101ac1a3",
+          "symbol": "LUNR",
+          "minted": "201.992",
+          "burned": "69.859",
+          "net": "132.133",
+          "mints": 4,
+          "burns": 1
+        },
+        {
+          "token": "0xeb30663bdff0622ef4e4e5cbb4e975f19f33f51d",
+          "symbol": "FUTU",
+          "minted": "126.885",
+          "burned": "0",
+          "net": "126.885",
+          "mints": 9,
+          "burns": 0
+        },
+        {
+          "token": "0xf1953dab6fad537488d5a022361ffaa8b4c95ec6",
+          "symbol": "INOD",
+          "minted": "125.921",
+          "burned": "0",
+          "net": "125.921",
+          "mints": 8,
+          "burns": 0
+        },
+        {
+          "token": "0x3b14c39e89d60d627b42a1a4ca45b5bb45fc12e2",
+          "symbol": "RKLB",
+          "minted": "124.141",
+          "burned": "0",
+          "net": "124.141",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x40e7a279850e443f582059ae5dc1c3b6563e6395",
+          "symbol": "OUST",
+          "minted": "116.015",
+          "burned": "0",
+          "net": "116.015",
+          "mints": 5,
+          "burns": 0
+        },
+        {
+          "token": "0x36046893810a7e7fce501229d57dc3fc8c8716d0",
+          "symbol": "AMAT",
+          "minted": "114.29",
+          "burned": "0",
+          "net": "114.29",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0xf9b46d3d1b22199d4d1025a9cedb540a33f1a2d5",
+          "symbol": "XOM",
+          "minted": "15.534",
+          "burned": "125.569",
+          "net": "-110.035",
+          "mints": 2,
+          "burns": 2
+        },
+        {
+          "token": "0xb90a19ff0af67f7779aff50a882a9cff42446400",
+          "symbol": "SNDK",
+          "minted": "139",
+          "burned": "246.945",
+          "net": "-107.945",
+          "mints": 2,
+          "burns": 5
+        },
+        {
+          "token": "0x1cdad396db64bda184d5182a97dd9b3c62100b7d",
+          "symbol": "P",
+          "minted": "0",
+          "burned": "101.79",
+          "net": "-101.79",
+          "mints": 0,
+          "burns": 1
+        },
+        {
+          "token": "0x3139d77ace0cbaa5bdfd38bd1f1911a794af0b0e",
+          "symbol": "ABCL",
+          "minted": "2352.501",
+          "burned": "2250.866",
+          "net": "101.635",
+          "mints": 29,
+          "burns": 20
+        },
+        {
+          "token": "0x63d5a3b6939a33f1e75d8bcd85759858239600db",
+          "symbol": "CTSH",
+          "minted": "99.625",
+          "burned": "0",
+          "net": "99.625",
+          "mints": 12,
+          "burns": 0
+        },
+        {
+          "token": "0x072f979c2cac8e1391b0162a87fee094bf8744a0",
+          "symbol": "SMH",
+          "minted": "98.696",
+          "burned": "0",
+          "net": "98.696",
+          "mints": 9,
+          "burns": 0
+        },
+        {
+          "token": "0x282e87451e10fa6679bc7d76c69be44cd3fc777c",
+          "symbol": "FLNC",
+          "minted": "97.467",
+          "burned": "0",
+          "net": "97.467",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x44c4f142009036cf477ed2d09932051843137cf1",
+          "symbol": "ZM",
+          "minted": "4.883",
+          "burned": "100.5",
+          "net": "-95.617",
+          "mints": 1,
+          "burns": 1
+        },
+        {
+          "token": "0x9ece29a4a2397c0a35fb5fa8ee2b9509130a98cc",
+          "symbol": "FISV",
+          "minted": "95.337",
+          "burned": "0",
+          "net": "95.337",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x0c3260af4b8f13a69c4c2dfb84fd667890cdfa14",
+          "symbol": "NOW",
+          "minted": "106.857",
+          "burned": "14.586",
+          "net": "92.271",
+          "mints": 15,
+          "burns": 1
+        },
+        {
+          "token": "0x558378e000d634a36593e338ebacdd6207640efe",
+          "symbol": "IONQ",
+          "minted": "128.358",
+          "burned": "49.213",
+          "net": "79.145",
+          "mints": 4,
+          "burns": 1
+        },
+        {
+          "token": "0x8b2f88497f15a18e9d4ffa1a8ffb8538399ae774",
+          "symbol": "OKLO",
+          "minted": "74.505",
+          "burned": "0",
+          "net": "74.505",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xf0ab0c93be6f41369d302e55db1a96b3c430212d",
+          "symbol": "IREN",
+          "minted": "70.002",
+          "burned": "0",
+          "net": "70.002",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x15cd20759ce7f3285c29a319de2d1a2e098c6f43",
+          "symbol": "XLK",
+          "minted": "66.819",
+          "burned": "0",
+          "net": "66.819",
+          "mints": 9,
+          "burns": 0
+        },
+        {
+          "token": "0x48961813349333209994750ffa89b3c5c22ec969",
+          "symbol": "MXL",
+          "minted": "63.702",
+          "burned": "0",
+          "net": "63.702",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x75742c18bc1f1c5c5f448f4c9d9c6f66dafaaa38",
+          "symbol": "SOXX",
+          "minted": "72.26",
+          "burned": "130.611",
+          "net": "-58.351",
+          "mints": 9,
+          "burns": 4
+        },
+        {
+          "token": "0x141eea040c2250eec0314e336975e81f85f6585e",
+          "symbol": "AXTI",
+          "minted": "56.533",
+          "burned": "0",
+          "net": "56.533",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0x7c04e6a3368f2a1de3874f0e80d2e0a1a9915da6",
+          "symbol": "GLW",
+          "minted": "55.063",
+          "burned": "0",
+          "net": "55.063",
+          "mints": 13,
+          "burns": 0
+        },
+        {
+          "token": "0xd5f3879160bc7c32ebb4dc785f8a4f505888de68",
+          "symbol": "QQQ",
+          "minted": "592.485",
+          "burned": "647.196",
+          "net": "-54.711",
+          "mints": 3,
+          "burns": 25
+        },
+        {
+          "token": "0xd95b44124e475743a7589e68f3d74008a5536d44",
+          "symbol": "CRM",
+          "minted": "51.792",
+          "burned": "4.042",
+          "net": "47.75",
+          "mints": 25,
+          "burns": 1
+        },
+        {
+          "token": "0xf543967eebb6f1917992ef0e68de63ab07a5a0da",
+          "symbol": "CSCO",
+          "minted": "47.288",
+          "burned": "0",
+          "net": "47.288",
+          "mints": 7,
+          "burns": 0
+        },
+        {
+          "token": "0xf7181b63fdb858558a74ba96bc42732684cd7965",
+          "symbol": "NAVN",
+          "minted": "47.207",
+          "burned": "0",
+          "net": "47.207",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x99d9d8663545151603863c5acbd6fc3218899009",
+          "symbol": "AMBA",
+          "minted": "48.897",
+          "burned": "2",
+          "net": "46.897",
+          "mints": 3,
+          "burns": 1
+        },
+        {
+          "token": "0xdd356aa38f40a7b7076755ac854b6fbb1f0d305b",
+          "symbol": "AMKR",
+          "minted": "46.295",
+          "burned": "0",
+          "net": "46.295",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x03bc731ffb162cdd7b98d3c6542bfc291126075d",
+          "symbol": "FLY",
+          "minted": "0",
+          "burned": "46.17",
+          "net": "-46.17",
+          "mints": 0,
+          "burns": 1
+        },
+        {
+          "token": "0x82da4646242e1d962e96e932269dc644c94a9caa",
+          "symbol": "WDAY",
+          "minted": "301.934",
+          "burned": "258.673",
+          "net": "43.261",
+          "mints": 26,
+          "burns": 9
+        },
+        {
+          "token": "0x48d60243c66437c6ac3c2495be94747aed5dfe25",
+          "symbol": "LHX",
+          "minted": "39.485",
+          "burned": "0",
+          "net": "39.485",
+          "mints": 21,
+          "burns": 0
+        },
+        {
+          "token": "0x521cf887e6531c6f667b5bc4d896e5d9bfe8eb2e",
+          "symbol": "AAOI",
+          "minted": "38.861",
+          "burned": "0",
+          "net": "38.861",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0xcf364ea52787e289de6f32077834056e3e70d6a8",
+          "symbol": "UNH",
+          "minted": "53.202",
+          "burned": "15.328",
+          "net": "37.874",
+          "mints": 13,
+          "burns": 2
+        },
+        {
+          "token": "0x7fd06a4d81ccfa3f351394e144d5191874c31313",
+          "symbol": "KTOS",
+          "minted": "37.472",
+          "burned": "0",
+          "net": "37.472",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xd63abb2c13d7a8421a8017a712802053568e3c1d",
+          "symbol": "SCHD",
+          "minted": "0",
+          "burned": "29.948",
+          "net": "-29.948",
+          "mints": 0,
+          "burns": 1
+        },
+        {
+          "token": "0x0f17206447090e464c277571124dd2688e48aea9",
+          "symbol": "QCOM",
+          "minted": "27.485",
+          "burned": "0",
+          "net": "27.485",
+          "mints": 10,
+          "burns": 0
+        },
+        {
+          "token": "0x6006ed4b2f94110851ff7509d97d034f0eed9226",
+          "symbol": "VICR",
+          "minted": "27.36",
+          "burned": "0",
+          "net": "27.36",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0x7dc013eb55e436f30d7ed1afe4e36d6e45e3c3f7",
+          "symbol": "ZS",
+          "minted": "26.302",
+          "burned": "0",
+          "net": "26.302",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x4d67253bc223e6b0e104f1084c1fb2b669ddc41b",
+          "symbol": "CRDO",
+          "minted": "26.223",
+          "burned": "0",
+          "net": "26.223",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x3fb8976980d486084b2eb4a404bd12e72823958f",
+          "symbol": "FTNT",
+          "minted": "25.366",
+          "burned": "0",
+          "net": "25.366",
+          "mints": 11,
+          "burns": 0
+        },
+        {
+          "token": "0xc93f4d80e268ab922e871bd169156c3cc41894e6",
+          "symbol": "MTSI",
+          "minted": "25.09",
+          "burned": "0",
+          "net": "25.09",
+          "mints": 13,
+          "burns": 0
+        },
+        {
+          "token": "0x28babd556b60e53663b8615036479a29c2cdd1bf",
+          "symbol": "ANET",
+          "minted": "24.745",
+          "burned": "0",
+          "net": "24.745",
+          "mints": 6,
+          "burns": 0
+        },
+        {
+          "token": "0x56d23bee5f41a7120170b0c603dae30128e460e9",
+          "symbol": "INTU",
+          "minted": "23.8",
+          "burned": "0",
+          "net": "23.8",
+          "mints": 7,
+          "burns": 0
+        },
+        {
+          "token": "0xbe274710bf3d9567e1b290ef6a5f9f90ca016fd8",
+          "symbol": "SHY",
+          "minted": "36.594",
+          "burned": "12.853",
+          "net": "23.741",
+          "mints": 4,
+          "burns": 1
+        },
+        {
+          "token": "0xa249baf1063af884807c1e1400aef7784836917e",
+          "symbol": "APP",
+          "minted": "23.428",
+          "burned": "0",
+          "net": "23.428",
+          "mints": 12,
+          "burns": 0
+        },
+        {
+          "token": "0x47f93d52cbec7c6d2cfc080e154002370a60daea",
+          "symbol": "ASML",
+          "minted": "32.07075047",
+          "burned": "8.78910946",
+          "net": "23.28164101",
+          "mints": 6,
+          "burns": 1
+        },
+        {
+          "token": "0x03dfbbe0ac4e7bcdafd08ed41a400326b77d8c80",
+          "symbol": "JNJ",
+          "minted": "369.986",
+          "burned": "348.272",
+          "net": "21.714",
+          "mints": 7,
+          "burns": 6
+        },
+        {
+          "token": "0xc02f12b9fe9e707079ec0d546f3050d3f6c1f8bd",
+          "symbol": "DOCN",
+          "minted": "17.824",
+          "burned": "0",
+          "net": "17.824",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x57b0030166db0c31690d1a5aa167e2e26e2c29a4",
+          "symbol": "LRCX",
+          "minted": "17.286",
+          "burned": "0",
+          "net": "17.286",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0x1c690498150252222c275a5ced69d3a6b1f52d5e",
+          "symbol": "EWT",
+          "minted": "37.721",
+          "burned": "21.741",
+          "net": "15.98",
+          "mints": 5,
+          "burns": 1
+        },
+        {
+          "token": "0x232b8ed6377be97813853b0ac104c4cda8378d1b",
+          "symbol": "ADBE",
+          "minted": "27.43",
+          "burned": "11.78",
+          "net": "15.65",
+          "mints": 13,
+          "burns": 2
+        },
+        {
+          "token": "0x5b97476b922f3305131b8f0b9d333172e87f4aae",
+          "symbol": "TEAM",
+          "minted": "15.371",
+          "burned": "0",
+          "net": "15.371",
+          "mints": 4,
+          "burns": 0
+        },
+        {
+          "token": "0x92f9f459f1a9a5ad266b182be7bffd1c6c666894",
+          "symbol": "COHR",
+          "minted": "14.074",
+          "burned": "0",
+          "net": "14.074",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0xeb61c0ed490a367d4e3631ccf8a74b3bfc7e775d",
+          "symbol": "HII",
+          "minted": "13.975",
+          "burned": "0",
+          "net": "13.975",
+          "mints": 5,
+          "burns": 0
+        },
+        {
+          "token": "0x89776d4cd68193597a2fc132cfac1fde36ccea8a",
+          "symbol": "TSEM",
+          "minted": "13.81",
+          "burned": "0",
+          "net": "13.81",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xf6290b5e7c26502e2da514c31509849718ea76a5",
+          "symbol": "AVAV",
+          "minted": "20.643",
+          "burned": "7.369",
+          "net": "13.274",
+          "mints": 3,
+          "burns": 1
+        },
+        {
+          "token": "0x5f604fba1162193a4388a5dfa56f556f3e133cc2",
+          "symbol": "AEHR",
+          "minted": "11.676",
+          "burned": "0",
+          "net": "11.676",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xc6cbad1016b38b797610c25e1dc7d95988b1f362",
+          "symbol": "MOD",
+          "minted": "15.591",
+          "burned": "4.497",
+          "net": "11.094",
+          "mints": 3,
+          "burns": 1
+        },
+        {
+          "token": "0xcbb95bbf36099d34da091dc6fa6f49efa257cee3",
+          "symbol": "CLSK",
+          "minted": "10.799",
+          "burned": "0",
+          "net": "10.799",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xaea445c5f3db1a462998ccc422a875a361ee5d99",
+          "symbol": "HWM",
+          "minted": "10.029",
+          "burned": "0",
+          "net": "10.029",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x0594134df3f171a354d9c85ebd65b7a6148f6d09",
+          "symbol": "VTI",
+          "minted": "9.521",
+          "burned": "0",
+          "net": "9.521",
+          "mints": 10,
+          "burns": 0
+        },
+        {
+          "token": "0x748c32c3ca24edf31ea597db1f3d330a7a6da3dc",
+          "symbol": "ALAB",
+          "minted": "9.448",
+          "burned": "0",
+          "net": "9.448",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xff080c8ce2e5feadaca0da81314ae59d232d4afd",
+          "symbol": "MU",
+          "minted": "402.11791225",
+          "burned": "393.51955561",
+          "net": "8.59835664",
+          "mints": 6,
+          "burns": 10
+        },
+        {
+          "token": "0x94b8aae43a1ccc08aa64b7d1f29b4d920af4a0c9",
+          "symbol": "GEV",
+          "minted": "8.158",
+          "burned": "0",
+          "net": "8.158",
+          "mints": 15,
+          "burns": 0
+        },
+        {
+          "token": "0x96b933c74ecb4a0926b9210cef7b743ef46be2e9",
+          "symbol": "KLAC",
+          "minted": "8.032",
+          "burned": "0",
+          "net": "8.032",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x77e655e37f4d913fb9540e0d541d824171a60e81",
+          "symbol": "SIMO",
+          "minted": "7.884",
+          "burned": "0",
+          "net": "7.884",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0xc27dbd474af5181c5a8777903690d8d262d12648",
+          "symbol": "AXON",
+          "minted": "9.619",
+          "burned": "1.968",
+          "net": "7.651",
+          "mints": 3,
+          "burns": 1
+        },
+        {
+          "token": "0xf52597345a8edf418bc4071b4a35112472277d3e",
+          "symbol": "WDC",
+          "minted": "7.559",
+          "burned": "0",
+          "net": "7.559",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x63b814ddbd6bf339f25fed8c36158a008d5b373e",
+          "symbol": "GE",
+          "minted": "14.567",
+          "burned": "7.067",
+          "net": "7.5",
+          "mints": 6,
+          "burns": 2
+        },
+        {
+          "token": "0xfa78c12e6488814a0262e4e802749a4a737d5fb7",
+          "symbol": "VRT",
+          "minted": "7.195",
+          "burned": "0",
+          "net": "7.195",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0xad622320e520de39e72d41ef07438c3fd3354875",
+          "symbol": "SPMO",
+          "minted": "13.6",
+          "burned": "7.128",
+          "net": "6.472",
+          "mints": 3,
+          "burns": 1
+        },
+        {
+          "token": "0xddf2266b79abf0b48898959b0ed6e6adf512be74",
+          "symbol": "MDB",
+          "minted": "11.619",
+          "burned": "5.621",
+          "net": "5.998",
+          "mints": 6,
+          "burns": 2
+        },
+        {
+          "token": "0x237c16d66590f67b886d978acd362eaead8b18c7",
+          "symbol": "POWL",
+          "minted": "5.532",
+          "burned": "0",
+          "net": "5.532",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x2778c5024d5ca2cdb0f8ead671ffc69963adcd9c",
+          "symbol": "TER",
+          "minted": "4.198",
+          "burned": "0",
+          "net": "4.198",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xae517a2903e68bd929dfd15be875f8369d53e94a",
+          "symbol": "CEG",
+          "minted": "3.339",
+          "burned": "0",
+          "net": "3.339",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xeaf2512dfc1beac608f8794b3793cd4e02894aa6",
+          "symbol": "JBL",
+          "minted": "3.224",
+          "burned": "0",
+          "net": "3.224",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x44f6d488021f8233b9416294d1fe9b1fee28382d",
+          "symbol": "CIEN",
+          "minted": "3.212",
+          "burned": "0",
+          "net": "3.212",
+          "mints": 5,
+          "burns": 0
+        },
+        {
+          "token": "0xbf449977089c718c004a66c554b26b94ef3ad4de",
+          "symbol": "CLS",
+          "minted": "3.185",
+          "burned": "0",
+          "net": "3.185",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xb039597ed45cba7b6e2fb9e8be51802969cee5be",
+          "symbol": "PANW",
+          "minted": "2.994",
+          "burned": "0",
+          "net": "2.994",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x329fcaceb9ad6f9580dd5f643fed0646900d043c",
+          "symbol": "LMT",
+          "minted": "2.463",
+          "burned": "0",
+          "net": "2.463",
+          "mints": 2,
+          "burns": 0
+        },
+        {
+          "token": "0x5c90450bbb4273d7b2f17cf6917aeb237a569679",
+          "symbol": "CBRS",
+          "minted": "3.273",
+          "burned": "5.732",
+          "net": "-2.459",
+          "mints": 2,
+          "burns": 1
+        },
+        {
+          "token": "0x9ab02ead789b6903c3c44d0ed32f9c707cdf12fd",
+          "symbol": "PWR",
+          "minted": "2.032",
+          "burned": "0",
+          "net": "2.032",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0x52d50d0280ad1054b43f052bd70a49a212a1b128",
+          "symbol": "MPWR",
+          "minted": "1.694",
+          "burned": "0",
+          "net": "1.694",
+          "mints": 3,
+          "burns": 0
+        },
+        {
+          "token": "0xa48f22a46c0f1c46ca7d111cb6c137c271987180",
+          "symbol": "FICO",
+          "minted": "6.764",
+          "burned": "5.212",
+          "net": "1.552",
+          "mints": 9,
+          "burns": 5
+        },
+        {
+          "token": "0xb1cc0ec7db69cf43539119814df40071b9d61793",
+          "symbol": "TEM",
+          "minted": "1.535",
+          "burned": "0",
+          "net": "1.535",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0x93dbb1d2dc5d63f4abacff30485273f538df68ac",
+          "symbol": "FIX",
+          "minted": "1.735",
+          "burned": "1.27",
+          "net": "0.465",
+          "mints": 2,
+          "burns": 1
+        },
+        {
+          "token": "0x8ff63eaeee3fe54ba450c4f5538064ec5a893aef",
+          "symbol": "ONTO",
+          "minted": "0.371",
+          "burned": "0",
+          "net": "0.371",
+          "mints": 1,
+          "burns": 0
+        },
+        {
+          "token": "0xfaf9cb261b5fcc1f404bb10cd39c5c6c1974e612",
+          "symbol": "AEIS",
+          "minted": "3.544",
+          "burned": "3.814",
+          "net": "-0.27",
           "mints": 1,
           "burns": 1
         }
