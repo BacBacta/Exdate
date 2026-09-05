@@ -283,16 +283,15 @@ if sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" "$NODE_BIN" "$DIR/scripts/ch
   Nothing else is required: the scheduled job already defaults to watchdog mode,
   so it checks this machine's heartbeat instead of capturing alongside it.
 
-  Two things would make it better, both on GitHub:
+  Secrets reach this machine from the repository's settings, encrypted to the
+  key published in step 5 - nothing is typed here. Two would make it better:
 
-    an alert sink, so the nine-minute announcement lead reaches someone rather
-    than only the file - a webhook or the Telegram pair, as repository secrets
-    AND in $DIR/.env, then: systemctl restart exdate-watcher
+    RHC_RPC_URLS              a keyed RPC endpoint, primary first, Robinhood's last
+    EXDATE_ALERT_WEBHOOK_URL  (or the Telegram pair) so the nine-minute lead reaches someone
 
-    the repository secret RHC_RPC_URLS, so the scheduled collectors read the
-    chain through the same endpoint this machine does
-
-    https://github.com/BacBacta/Exdate/settings/secrets/actions/new
+  Add them at https://github.com/BacBacta/Exdate/settings/secrets/actions/new,
+  run Actions -> deliver-secrets -> Run workflow, then run this script again:
+  step 7 decrypts, probes, applies and step 9 restarts.
 
 EOF
 else
