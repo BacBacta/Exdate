@@ -300,7 +300,7 @@ jobs:
           mkdir -p /tmp/rehearse
           trap 'git checkout -- packages/core/package.json packages/sdk/package.json' EXIT
           for p in core sdk; do
-            ( cd "packages/$p" && npm pkg set version=0.0.0-oidc-rehearsal \
+            ( cd "packages/$p" && npm pkg set version=0.0.0-rehearsal.0 \
               && pnpm pack --pack-destination /tmp/rehearse >/dev/null )
           done
           ls -1 /tmp/rehearse
@@ -310,7 +310,7 @@ jobs:
             echo "=== npm publish --dry-run $(basename "$t") , no token, OIDC only"
             set +e
             # --tag, because npm gates on that too before it gets to who you
-            # are: 0.0.0-oidc-rehearsal is a prerelease, and npm answered "You
+            # are: 0.0.0-rehearsal.0 is a prerelease, and npm answered "You
             # must specify a tag using --tag when publishing a prerelease
             # version". That is the third pre-authentication check found this
             # way - version collision, then prerelease tag - each of which will
@@ -320,16 +320,26 @@ jobs:
             set -e
             printf '%s\n' "$out" | grep -vE '^npm notice ' | tail -20
             echo "--- exit $status"
-            if printf '%s' "$out" | grep -qiE 'oidc|trusted publish|id.token|exchange'; then
-              echo "VERDICT: npm reached for OIDC on a dry run, so this rehearsal is meaningful."
-              printf '%s' "$out" | grep -iE 'oidc|trusted publish|id.token|exchange' | head -5
-            elif printf '%s' "$out" | grep -qiE 'ENEEDAUTH|need auth|must be logged in|authentication|EUSAGE.*auth'; then
+
+            # Order matters, and so does what is searched. The first version of
+            # this reported "npm reached for OIDC" because it grepped the whole
+            # output for `oidc` and the rehearsal version was named
+            # 0.0.0-oidc-rehearsal - the probe matched its own filename. The
+            # version carries no such word now, `npm notice` lines (which echo
+            # the package name) are stripped before searching, and the OUTCOME
+            # is decided first: a dry run that succeeds with no credential
+            # settles the question whatever any string says.
+            evidence="$(printf '%s\n' "$out" | grep -vE '^npm notice ')"
+            if [ $status -eq 0 ]; then
+              echo "VERDICT: the dry run SUCCEEDED with no credential at all, so it never"
+              echo "  authenticated. A dry run therefore cannot tell you whether a Trusted"
+              echo "  Publisher is configured - only a real publish can. Nothing was published."
+            elif printf '%s' "$evidence" | grep -qiE 'ENEEDAUTH|need auth|must be logged in|authenticat'; then
               echo "VERDICT: npm refused for want of a credential. With id-token: write present"
               echo "  that means no Trusted Publisher is configured for this package yet."
-            elif [ $status -eq 0 ]; then
-              echo "VERDICT: the dry run succeeded with NO credential and never mentioned OIDC,"
-              echo "  so it does not authenticate at all. A dry run therefore cannot tell you"
-              echo "  whether the Trusted Publisher is configured - only a real publish can."
+            elif printf '%s' "$evidence" | grep -qiE 'trusted publish|id.token|token exchange|OIDC'; then
+              echo "VERDICT: npm named trusted publishing in a refusal - that IS the answer:"
+              printf '%s' "$evidence" | grep -iE 'trusted publish|id.token|token exchange|OIDC' | head -5
             else
               echo "VERDICT: npm refused for some other reason; read the message above."
             fi

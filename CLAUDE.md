@@ -1378,6 +1378,25 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   back and printed `provenance no` — which is why the gap was visible at all: a step that asks the
   registry what it holds catches a flag that did nothing, where a step narrating its own command
   line would have reported success.
+- 2026-09-05 — **Whether trusted publishing is configured cannot be read, and the probe that
+  said it could was matching its own name.** npm publishes no endpoint for it — four candidate
+  paths all 404 — and says why: *"npm does not verify your trusted publisher configuration when
+  you save it"*, *"errors will only appear when you attempt to publish"*. So the question was put
+  to `npm publish --dry-run` with the token stripped from the job's npmrc, and three runs found
+  three checks that fire **before** authentication: a version collision (*"You cannot publish over
+  the previously published versions"* — answered with no credential at all, so a published version
+  can never rehearse the auth step), then a prerelease tag (*"You must specify a tag using --tag"*),
+  and then **nothing**: the dry run exits 0 with no credential. A dry run does not authenticate, so
+  it cannot answer the question; only a real publish can. On the way the rehearsal reported the
+  opposite — *"npm reached for OIDC"* — because it grepped npm's output for `oidc` and the version
+  it had packed was named `0.0.0-oidc-rehearsal`. **The probe matched its own filename**, the third
+  time this shape has cost real time here after the `.git/objects` write test and `npm access list`
+  answering without a credential. Fixed at the mechanism rather than the string: the outcome is
+  decided first (exit 0 with no credential settles it whatever any text says), `npm notice` lines
+  that echo the package name are stripped before searching, and the rehearsal version carries no
+  word the search looks for. What is checkable on this side was checked against npm's own list and
+  matches: bare workflow filename, `repository` equal to the canonical `BacBacta/Exdate`,
+  `id-token: write`, npm gated at 11.5.1 (the runner installs 12.0.2 over the 10.x Node 22 ships).
 - _(append decisions here as they are made)_
 
 ## Status
