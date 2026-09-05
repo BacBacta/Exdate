@@ -36,7 +36,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      # The whole history, not the default depth of one: scripts/build-history.mjs derives the
+      # point-in-time index from `git log`, and a shallow checkout rebuilds it as a truncated
+      # version of itself. The script refuses outright on a shallow clone rather than reporting the
+      # difference as drift, which is what the first run of it did.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 

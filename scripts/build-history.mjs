@@ -127,6 +127,22 @@ const DATASETS = [
   },
 ]
 
+/**
+ * A shallow checkout cannot answer this, and must say so.
+ *
+ * `actions/checkout` clones at depth 1 by default, so `git log` sees one commit and the index
+ * rebuilds as a truncated version of itself. The first CI run of this check reported "the committed
+ * index is not what git yields", which is true and useless: it sends a reader hunting for drift
+ * that does not exist. A check has to fail for the reason that is actually true - the same lesson
+ * as the probe that answered without a credential and the one that matched its own filename.
+ */
+function refuseIfShallow() {
+  if (git('rev-parse', '--is-shallow-repository').trim() !== 'true') return
+  console.error('# this is a shallow checkout: git log sees one commit, so the index cannot be rebuilt or checked.')
+  console.error('# in CI, give actions/checkout `with: { fetch-depth: 0 }`; locally, `git fetch --unshallow`.')
+  process.exit(1)
+}
+
 /** Every commit that touched a path, oldest first, with the commit date git recorded. */
 function revisions(path) {
   const log = git('log', '--reverse', '--format=%H\t%cI', '--', path).trim()
@@ -243,6 +259,7 @@ function replayMatchesGit(dataset) {
 }
 
 const check = process.argv.includes('--check')
+refuseIfShallow()
 let drift = 0
 for (const dataset of DATASETS) {
   const out = new URL(`data/history/${dataset.name}.jsonl`, `file://${root}`).pathname
