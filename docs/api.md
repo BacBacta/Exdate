@@ -20,6 +20,57 @@ Every response that carries a price says so in `answerIncludesMultiplier` / `inc
 
 ---
 
+## First call in 30 seconds
+
+No key, no signup. Ask what a token is owed - SGOV here - and the answer comes back priced from
+nothing but the issuer's declared rate and the multiplier read on chain:
+
+```bash
+curl https://api.exdate.me/v1/robinhood/tokens/0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5/pending
+```
+
+Captured 2026-09-05 15:50 UTC, the `declared` entry cut to what a first reader needs (`projection`
+is in the full route reference below):
+
+```json
+{
+  "chainId": 4663,
+  "observedAt": "2026-09-05T15:50:35.000Z",
+  "token": { "address": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5", "symbol": "SGOV", "decimals": 18, "issuer": "Robinhood Assets (Jersey) Limited" },
+  "multiplier": { "current": "1005101770003214918", "currentDecimal": "1.005101770003214918", "sampledAt": "2026-09-05T15:49:46.000Z" },
+  "scheduled": null,
+  "declared": [
+    {
+      "key": "0x000000000000000000000000000000005f7e82ad6e4c4b60ba76497863fe4a67:2026-09-04",
+      "state": "awaiting",
+      "processDate": "2026-09-04",
+      "daysSinceProcessDate": 1,
+      "grossPerUnderlyingShare": "0.307098",
+      "grossPerToken": "0.308664743364447294",
+      "note": "declared by the issuer, still inside the observed next-business-day window",
+      "source": "robinhood:/rhj/corporate-actions"
+    }
+  ],
+  "summary": { "scheduledOnChain": 0, "declaredUpcoming": 0, "declaredAwaiting": 1, "declaredOverdue": 0, "declaredCompleteNotOnChain": 0, "longestOverdueDays": null, "nothingPending": false },
+  "history": { "reconciledDividends": 1, "lastObservedHaircutBps": 3378 }
+}
+```
+
+Three things to read off it: `grossPerToken` is `rate × multiplier` and needs no price; `state` says
+where the dividend is between declaration and chain (`upcoming`, `awaiting`, `overdue`,
+`declared_complete_not_on_chain`); `history.lastObservedHaircutBps` is what the previous one lost on
+the way, measured. The same in TypeScript:
+
+```ts
+import { createClient } from '@exdate/sdk' // npm, with provenance
+
+const exdate = createClient({ baseUrl: 'https://api.exdate.me' })
+const owed = await exdate.pending('0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5')
+owed.declared[0]?.grossPerToken // '0.308664743364447294'
+```
+
+Every other route is below; the 60-a-minute anonymous quota is enough to read all of them.
+
 ## Keys and quotas
 
 Every route but `/v1/health` is counted. Without a key a caller shares an anonymous quota per client
@@ -301,6 +352,21 @@ tolerance), the header names, the retry schedule, and `endpointsConfigured` — 
 operator whether silence means "nothing happened" or "nobody is listening". Each event states what
 exdate *observed* to send it; `multiplier.applied` says outright that it is a poller observation,
 because no log fires when a change takes effect.
+
+The seven event types, as the catalogue states them:
+
+| Type | Sent when |
+|---|---|
+| `multiplier.scheduled` | A `UIMultiplierUpdated` log whose `effectiveAt` is still in the future. The observed lead is about nine minutes. |
+| `multiplier.applied` | `uiMultiplier()` differs from the previous poll. Nothing is emitted on chain when a change takes effect, so this is the poller's observation, not a log. |
+| `feed.stale` | The age of a feed's latest round crossed the 86 400 s heartbeat between two polls. |
+| `feed.resumed` | A fresh round arrived for a feed that was stale. |
+| `pause.changed` | `oraclePaused()` differs from the previous poll. A token already paused at first observation is a baseline and is not sent. |
+| `dividend.pending` | A new row in the issuer's corporate-action feed with no multiplier step paired to it. On a fresh database the whole outstanding backlog arrives at once, flagged `backlog: true`. |
+| `dividend.reconciled` | A reconciliation row reached `matched` or `anomaly`, carrying the observed haircut. |
+
+Retries after a non-2xx: 30 s, 2 min, 10 min, 30 min, 2 h, 6 h, 12 h - eight attempts in all, then
+`failed` and kept.
 
 ## `GET /v1/:chain/webhooks/events`
 

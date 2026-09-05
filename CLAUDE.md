@@ -1523,6 +1523,21 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   measuring the proxy's 405 page, not the site — `bypass` did not take, every route "had no
   overflow" and axe reported the five violations of an empty document. Local pages are now
   measured with no proxy and axe injected from a local copy.
+- 2026-09-05 — **The audit's month list, second half: the page answers before it explains.** F03:
+  the token page opened on the multiplier and reached "34 % never arrived" two and a half screens
+  down; it now opens on the state of the token's dividends in plain words (owed and not on chain,
+  last measured with its gap, a move with nothing declared), and that lead is **data in
+  `tokenPage()`** so the head and the new per-token link preview (F14, 194 images at build) cannot
+  disagree. F13: after *Read* the wallet moves focus to its results, shows the arithmetic under
+  "shares represented", and links to the calendar filtered to the tokens it holds (F12: `?tokens=`,
+  applied in the browser, saying what it hid; a row whose owed equals declared says "same" rather
+  than printing a figure twice). F10: the largest element on every page was hidden until the reveal
+  observer ran after hydration, which is where a 3.3 s LCP on a static page came from — the hero is
+  never hidden now, and the mono face is no longer preloaded on every page; the LCP element paints
+  at 48–132 ms on the built output locally, where it previously waited for hydration. F28: the API
+  reference opens on a first call with a response captured from the live API, and the seven
+  webhook types are a table. Still open from the month list: F06/F17/F18, the information
+  architecture and a shorter home page.
 - _(append decisions here as they are made)_
 
 ## Status
