@@ -238,6 +238,45 @@ journalctl -u exdate-api-update -f      # what the timer is doing
 /opt/exdate-api/deploy/update-api.sh --force   # rebuild now
 ```
 
+### A second archive witness
+
+The state confirmation of every multiplier step — the thing that closed this project's oldest
+limitation, ERC-8056 emitting nothing when a change takes effect — rests on **one** third-party
+endpoint today. Measured 2026-09-05: of nine public endpoints, six answer, and only
+`blockmachine.io` reads state at the oldest step. `pocket.network` had archive that morning and not
+that evening; `ordofi.network` gained it and lost it inside a day. `publicnode.com` has it and gates
+it behind a free personal token.
+
+The bar is high for a structural reason: the chain makes ten blocks a second, so the oldest step —
+CRWD, 2 July, block 1 267 585 — sits **54 million blocks** behind a head that is only nine weeks
+old. An operator who prunes by block count loses it in days.
+
+What a second witness buys is **continuity, not accuracy**: the state read is already cross-checked
+against the announcement log, whose `oldMultiplier` and `newMultiplier` must match, and those logs
+come from a different endpoint. The risk is that when `blockmachine` goes the way of the other two, a
+step landing tomorrow cannot be confirmed at all and the record has to say `unreadable`.
+
+**To add one, set the repository secret `RHC_RPC_URLS_ARCHIVE`** (comma-separated) and re-run
+`rescan-chain`. Nothing else: the workflow already passes it, and since 2026-09-05 a configured
+endpoint is *added* to the probed ones rather than replacing them — replacing them would have left
+the count at one and changed nothing, which is what the first version did.
+
+The recommendation is an **Alchemy key on the free tier**. This role needs only `eth_call` at a
+height — 13 steps × 4 reads, four times a day — and the probe run on the machine measured Alchemy
+serving state at the oldest step in **49 ms**, better than either public endpoint; its ten-block
+`eth_getLogs` cap, which makes the free tier useless for the watcher, does not touch this. The same
+key upgraded to Pay As You Go (~$3/month, sized above) is also what moves the watcher and the
+collectors off Robinhood's endpoint, which `docs/terms-review.md` §2.4(a) asks for — so one signup
+closes two items. `publicnode`'s free token would work too, but "free archive at a provider that
+gates it" is the exact profile that has already failed twice here.
+
+**The key must never reach a committed file.** `verify-multiplier-history.mjs` names every endpoint
+by host — plus `(keyed)` when the URL carries a path, a query or userinfo — and, before writing,
+searches the serialised output for each configured URL and each of its path segments and refuses to
+write if it finds one. Rehearsed both ways with a fake key: with the redaction the file holds zero
+occurrences of it; with the redaction removed the run exits 1, names the offending string and writes
+nothing.
+
 **What a code deploy costs.** Ponder refuses to reuse a schema written by a different build of the
 app, and the indexer then crashloops with *"Schema exdate was previously used by a different Ponder
 app"* while Caddy answers 502 — which is what the 2026-09-05 redeploy did.

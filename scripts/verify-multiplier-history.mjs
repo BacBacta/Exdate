@@ -25,7 +25,11 @@
 // ever contradicted the log, that would be the most important row in the file.
 //
 //   node scripts/verify-multiplier-history.mjs
-//   RHC_RPC_URL_ARCHIVE=https://… node scripts/verify-multiplier-history.mjs
+//   RHC_RPC_URLS_ARCHIVE=https://…,https://… node scripts/verify-multiplier-history.mjs
+//
+// A configured endpoint is ADDED to the ones the probe found, not substituted for
+// them, and is never named in the output by its URL - see archiveCandidates() and
+// hostOf() below for why both of those matter.
 import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 import { makeRpc, SELECTOR, hex } from './phase0/rpc.mjs'
@@ -50,13 +54,22 @@ const OUT = process.env.EXDATE_HISTORY_OUT || 'data/multiplier-state-verificatio
  *
  * Candidates come from data/rpc-endpoints.observed.json - the ones the probe found
  * reaching the oldest step - with blockmachine appended because it is the one that
- * has answered throughout. Override with RHC_RPC_URLS_ARCHIVE (comma-separated) or
- * the older single-valued RHC_RPC_URL_ARCHIVE.
+ * has answered throughout.
+ *
+ * RHC_RPC_URLS_ARCHIVE (comma-separated; the older RHC_RPC_URL_ARCHIVE still works)
+ * ADDS to that list rather than replacing it, which is the whole point of naming a
+ * keyed endpoint here: on 2026-09-05 exactly one public endpoint reached the oldest
+ * step, so a configured one that replaced the list would leave the count at one and
+ * change nothing. Set RHC_RPC_URLS_ARCHIVE_EXCLUSIVE=true to use only what you name -
+ * for a machine where the public endpoints are slow enough to be worth skipping.
  */
 const KNOWN_ARCHIVE = 'https://rpc-robinhood.blockmachine.io'
 function archiveCandidates() {
-  const configured = process.env.RHC_RPC_URLS_ARCHIVE || process.env.RHC_RPC_URL_ARCHIVE
-  if (configured) return [...new Set(configured.split(',').map((url) => url.trim()).filter(Boolean))]
+  const configured = (process.env.RHC_RPC_URLS_ARCHIVE || process.env.RHC_RPC_URL_ARCHIVE || '')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean)
+  if (configured.length && process.env.RHC_RPC_URLS_ARCHIVE_EXCLUSIVE === 'true') return [...new Set(configured)]
   let probed = []
   try {
     const observed = read('data/rpc-endpoints.observed.json')
@@ -65,11 +78,29 @@ function archiveCandidates() {
   } catch {
     // No probe on disk is not a reason to read nothing.
   }
-  return [...new Set([...probed, KNOWN_ARCHIVE])]
+  return [...new Set([...configured, ...probed, KNOWN_ARCHIVE])]
 }
 
 const ARCHIVES = archiveCandidates()
-const hostOf = (url) => new URL(url).host
+
+/**
+ * How an endpoint is named in the committed file. NEVER the URL.
+ *
+ * A keyed endpoint carries its credential in the path - Alchemy and Infura both do -
+ * and this file is committed to a public repository on every rescan. The first
+ * version of it published `archiveEndpoint: ARCHIVES[0]` verbatim, so naming a keyed
+ * endpoint in RHC_RPC_URLS_ARCHIVE would have pushed the key to GitHub. Found by
+ * reading this code to recommend setting that secret, before recommending it.
+ *
+ * The host alone for a bare public endpoint; the host plus `(keyed)` when there is a
+ * path, a query or userinfo, so a reader can tell an authenticated witness from a
+ * public one without being shown the credential.
+ */
+const hostOf = (url) => {
+  const parsed = new URL(url)
+  const keyed = (parsed.pathname !== '' && parsed.pathname !== '/') || parsed.search !== '' || parsed.username !== ''
+  return keyed ? `${parsed.host} (keyed)` : parsed.host
+}
 const rpcFor = new Map(ARCHIVES.map((url) => [url, makeRpc(url, { minGap: 220, tries: 4 })]))
 
 const wad = (v) => BigInt(v).toString()
@@ -170,7 +201,8 @@ const result = {
   method:
     'Four eth_call reads per step per endpoint: the two straddling blocks, plus two at the announcement block to observe the scheduled-but-not-applied state. Every archive endpoint that answers is asked and recorded under witnesses[]; a step reads `unreadable` only when none answered, and `witnessesDisagree` when two of them read different state at one block. Blocks come from data/effective-blocks.json, resolved by bisection over block headers.',
   archiveEndpoints: ARCHIVES.map(hostOf),
-  archiveEndpoint: ARCHIVES[0],
+  /** The first endpoint asked, named the same redacted way - never its URL. */
+  archiveEndpoint: hostOf(ARCHIVES[0]),
   archiveIsThirdParty: ARCHIVES.every((url) => !/robinhood\.com/.test(url)),
   observedAt: new Date().toISOString(),
   summary: {
@@ -187,7 +219,24 @@ const result = {
   steps,
 }
 
-await writeFile(new URL(OUT, root), JSON.stringify(result, null, 2) + '\n')
+// Assert it, do not trust it. A redaction that quietly stops redacting - a new field,
+// an error message that echoes the URL it failed on - would publish a credential, and
+// the failure would be silent. So the serialised file is searched for every configured
+// URL and for each of its path segments before it is written.
+const serialised = JSON.stringify(result, null, 2)
+const secretish = ARCHIVES.flatMap((url) => {
+  const parsed = new URL(url)
+  const parts = [url, parsed.href, parsed.pathname, parsed.search, parsed.username, parsed.password]
+  return [...parts, ...parsed.pathname.split('/')].map((part) => part.trim()).filter((part) => part.length >= 8)
+})
+const leaked = secretish.find((needle) => serialised.includes(needle))
+if (leaked) {
+  console.error(`# refusing to write ${OUT}: it contains "${leaked.slice(0, 12)}…" from a configured endpoint URL.`)
+  console.error('# every endpoint must be named by hostOf(), never by its URL: a keyed one carries its credential in the path.')
+  process.exit(1)
+}
+
+await writeFile(new URL(OUT, root), serialised + '\n')
 console.error(
   `# wrote ${OUT}: ${confirmed.length}/${steps.length} transitions confirmed in state, ` +
     `${result.summary.pendingStateConfirmed} pending states observed at announcement` +

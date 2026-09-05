@@ -1731,6 +1731,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   confirmation line read `NextElapseUSecRealtime`, which systemd only sets on `OnCalendar` timers,
   so it printed an empty value and confirmed nothing — the same shape as the "containers up" check
   that was once true of a run where nothing worked.
+- 2026-09-05 — **"Nothing to code" was wrong, and reading the code before recommending it is what
+  caught a credential leak.** Asked which route to a second archive witness, the answer was an
+  Alchemy key in `RHC_RPC_URLS_ARCHIVE` — the role needs only `eth_call` at a height, and the probe
+  on the machine had measured Alchemy serving state at the oldest step in 49 ms, so even the free
+  tier does it; the same key on Pay As You Go is also what moves the watcher off Robinhood's
+  endpoint for the terms reason, so one signup closes two items. Implementing it found two defects,
+  both of which would have made the recommendation harmful. `verify-multiplier-history.mjs`
+  published `archiveEndpoint: ARCHIVES[0]` **verbatim** into a file committed to a public
+  repository, so naming a keyed endpoint would have pushed the key to GitHub on the next rescan.
+  And the variable **replaced** the probed candidates instead of adding to them, so setting it would
+  have swapped `blockmachine` for Alchemy and left the count at one — defeating the entire purpose.
+  Both fixed: endpoints are named by host, plus `(keyed)` when the URL carries a path, a query or
+  userinfo; configured endpoints are added, with `RHC_RPC_URLS_ARCHIVE_EXCLUSIVE=true` to opt out;
+  and the serialised output is searched for every configured URL and each of its path segments
+  before writing, refusing rather than publishing. Rehearsed both directions with a fake key — the
+  written file holds zero occurrences of it, and with the redaction removed the run exits 1, names
+  the offending string and writes nothing. The rehearsal itself needed correcting first: run from
+  outside the repository the script failed on a missing data file, which looked like the guard
+  firing and was not.
+  Also worth keeping: **what a second witness buys is continuity, not accuracy.** The state read is
+  already cross-checked against the announcement log, whose old and new multipliers must match and
+  which comes from a different endpoint. The risk is that when `blockmachine` goes the way of
+  `pocket` and `ordofi`, a step landing tomorrow cannot be confirmed at all.
 - _(append decisions here as they are made)_
 
 ## Status

@@ -4,9 +4,9 @@
   "archiveEndpoints": [
     "rpc-robinhood.blockmachine.io"
   ],
-  "archiveEndpoint": "https://rpc-robinhood.blockmachine.io",
+  "archiveEndpoint": "rpc-robinhood.blockmachine.io",
   "archiveIsThirdParty": true,
-  "observedAt": "2026-09-05T20:47:47.684Z",
+  "observedAt": "2026-09-05T22:40:35.491Z",
   "summary": {
     "steps": 13,
     "transitionConfirmed": 13,
