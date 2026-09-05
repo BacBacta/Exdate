@@ -155,6 +155,21 @@ start('chain')
 const chain = await call('eth_chainId', [])
 if (chain.err) {
   line('reachable', false, chain.err)
+  if (/^HTTP 401/.test(chain.err)) {
+    // The key's LENGTH, never the key. An Alchemy key is 32 characters; 33 means
+    // a stray quote or space rode along with the paste, and that is a different
+    // fix from a key the dashboard no longer recognises.
+    const key = new URL(url).pathname.split('/').filter(Boolean).pop() ?? ''
+    const stray = /[^A-Za-z0-9_-]/.test(key)
+    console.log(
+      `\n     The endpoint rejected the credential itself. The key segment is ${key.length} characters` +
+        (stray ? ` and contains a character no key has - a quote or space from the paste. Remove it.` : `.`) +
+        (!stray && key.length !== 32 ? ` Alchemy's are 32; check it against the dashboard.` : '') +
+        (!stray && key.length === 32
+          ? ` That is the right shape, so the dashboard no longer accepts this key: copy the current one for the Robinhood Mainnet app.`
+          : ''),
+    )
+  }
   process.exit(1)
 }
 const chainId = parseInt(chain.ok, 16)
