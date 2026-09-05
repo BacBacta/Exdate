@@ -309,7 +309,13 @@ jobs:
             echo
             echo "=== npm publish --dry-run $(basename "$t") , no token, OIDC only"
             set +e
-            out="$(npm publish "$t" --access public --dry-run 2>&1)"
+            # --tag, because npm gates on that too before it gets to who you
+            # are: 0.0.0-oidc-rehearsal is a prerelease, and npm answered "You
+            # must specify a tag using --tag when publishing a prerelease
+            # version". That is the third pre-authentication check found this
+            # way - version collision, then prerelease tag - each of which will
+            # mask the question if it is left to fire.
+            out="$(npm publish "$t" --access public --tag rehearsal --dry-run 2>&1)"
             status=$?
             set -e
             printf '%s\n' "$out" | grep -vE '^npm notice ' | tail -20
