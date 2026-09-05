@@ -238,14 +238,22 @@ journalctl -u exdate-api-update -f      # what the timer is doing
 /opt/exdate-api/deploy/update-api.sh --force   # rebuild now
 ```
 
-**What a redeploy costs, and why it is unavoidable here.** Ponder refuses to reuse a schema written
-by a different build of the app, and its build id is
-`sha256(version + config + schema + indexing functions)` — where the indexing functions include
-everything they import, **the generated registry among them**. So every upgrade that carries a new
-record changes it, and the indexer crashloops with *"Schema exdate was previously used by a
-different Ponder app"* while Caddy answers 502. Measured on the 2026-09-05 redeploy, which is the
-only reason the recovery exists: the first version of the timer would have taken the API down on
-every tick that mattered.
+**What a code deploy costs.** Ponder refuses to reuse a schema written by a different build of the
+app, and the indexer then crashloops with *"Schema exdate was previously used by a different Ponder
+app"* while Caddy answers 502 — which is what the 2026-09-05 redeploy did.
+
+Its build id is `sha256(version + config + schema + indexing)`, and each part covers less than
+"everything that changed" — read out of `ponder/dist/esm/build/index.js` after this file first
+claimed otherwise. **config** hashes `{ordering, contracts, accounts, blocks}` only, so the token
+address list and the chain config rather than the whole registry; **schema** hashes
+`ponder.schema.ts`; **indexing** hashes the contents of the indexing files themselves, `src/**`
+minus `api/` and tests, and Ponder's own comment says *"we are only hashing the file contents, not
+the exports"* — so a module they import, the generated registry among them, does not count.
+
+So a **code** deploy invalidates the schema and a rebuild carrying only a new record does not, which
+is the difference between the two runs that evening: the 21:23 deploy changed `ponder.schema.ts` and
+three indexing files and Ponder refused; the timer's 21:38 run carried a registry change and it did
+not.
 
 Both scripts now recover, and the trigger is Ponder's own refusal in the log rather than a guess
 about which commits change a hash — so it never fires when Ponder is content. Recovery is

@@ -47,13 +47,28 @@ api_healthy() {
   return 1
 }
 
-# Ponder refuses to reuse a schema written by a different build of the app, and its
-# build id is sha256(version + config + schema + indexing functions) - where the
-# indexing functions include everything they import, the GENERATED REGISTRY among
-# them. So every rebuild worth making changes it, and the indexer crashloops with
-# "Schema ... was previously used by a different Ponder app" while Caddy answers
-# 502. Measured on the 2026-09-05 redeploy, which is the only reason this exists:
-# the first version of this script would have taken the API down on every tick.
+# Ponder refuses to reuse a schema written by a different build of the app, and the
+# indexer then crashloops with "Schema ... was previously used by a different Ponder
+# app" while Caddy answers 502 - which is what the 2026-09-05 redeploy did, and the
+# only reason this recovery exists.
+#
+# Ponder's build id is sha256(version + config + schema + indexing), and each of the
+# three covers less than "everything that changed" - read out of
+# ponder/dist/esm/build/index.js, and corrected there after claiming otherwise:
+#
+#   config     superjson of {ordering, contracts, accounts, blocks} only, so the
+#              token address list and the chain config - not the whole registry
+#   schema     the contents of ponder.schema.ts
+#   indexing   the contents of the indexing files themselves, src/** minus api and
+#              tests. Ponder's own comment: "we are only hashing the file contents,
+#              not the exports" - so a module they IMPORT does not count, and the
+#              generated registry is one of those.
+#
+# So the schema is invalidated by a code deploy - the schema, an indexing file, or
+# the set of contracts - and NOT by a rebuild that merely carries a new record.
+# Measured on 2026-09-05: the 21:23 deploy changed ponder.schema.ts and three
+# indexing files and Ponder refused; the timer's 21:38 run carried a registry
+# change and it did not.
 #
 # Recovery is dropping the schema, and it is driven by Ponder's own refusal rather
 # than by guessing which commits change a hash: the log line is the trigger, so it

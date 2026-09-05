@@ -1708,15 +1708,22 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   what the image contains (`data/`-only commits move the checkout forward without a rebuild, which
   is safe because nothing the container runs reads `data/`; checked, not assumed).
   **Then the redeploy itself proved that timer would have taken the API down on every tick.**
-  Ponder refuses a schema written by a different build, and the build id it compares is
-  `sha256(version + config + schema + indexing functions)` — read out of
-  `ponder/dist/esm/build/index.js`, not guessed — where the indexing functions include everything
-  they import, **the generated registry among them**. So every upgrade worth making invalidates the
-  schema, the indexer crashloops on `MigrationError`, and Caddy answers 502 while the status page
-  correctly says it has nothing to show. Both deploy scripts now recover, triggered by **Ponder's
+  Ponder refuses a schema written by a different build: the indexer crashloops on
+  `MigrationError`, Caddy answers 502, and the status page correctly says it has nothing to show.
+  **What changes that build id was then claimed here from a half-reading and corrected by the next
+  run.** It is `sha256(version + config + schema + indexing)`, and each part covers less than
+  "everything that changed": `config` hashes `{ordering, contracts, accounts, blocks}` only,
+  `schema` hashes `ponder.schema.ts`, and `indexing` hashes the contents of the indexing files
+  themselves — `src/**` minus `api/` and tests — with Ponder's own comment saying *"we are only
+  hashing the file contents, not the exports"*, so a module they import, **the generated registry
+  among them, does not count**. A code deploy invalidates the schema; a rebuild carrying only a new
+  record does not. The two runs that evening are the measurement: 21:23 changed `ponder.schema.ts`
+  and three indexing files and Ponder refused; the timer's 21:38 run carried a registry change and
+  it did not. Both deploy scripts now recover, triggered by **Ponder's
   own refusal in the log** rather than by predicting which commits change a hash, so it cannot fire
   when Ponder is content; the negative case dies with "it is not the Ponder schema" instead of
-  dropping anything. What a drop costs is only derived tables — the poller rewrites token states,
+  dropping anything. Which is also why the recovery had to be reactive rather than predictive: the
+  first version of this entry predicted the wrong commits. What a drop costs is only derived tables — the poller rewrites token states,
   reconciliations and the seeded events within one interval, `feed_rounds` is an observation log
   whose prices are re-readable from `getRoundData`, and the self-service subscriptions are a file
   on a volume, not a table. Two smaller things the same run caught: the Termux guard printed

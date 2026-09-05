@@ -231,11 +231,14 @@ api_healthy() {
   return 1
 }
 if ! api_healthy; then
-  # Ponder refuses a schema written by a different build of the app, and its build
-  # id hashes the indexing functions - which import the generated registry - so an
-  # upgrade that changes the record changes it. That is what this run hits, not a
+  # Ponder refuses a schema written by a different build of the app - the schema
+  # itself, an indexing file under src/ (api and tests excluded), or the set of
+  # contracts. That is what this run hits when it carries a code change, not a
   # broken deployment: measured on 2026-09-05, where the indexer crashlooped with
-  # "previously used by a different Ponder app" while Caddy answered 502.
+  # "previously used by a different Ponder app" while Caddy answered 502. A rebuild
+  # that only carries a new record leaves the schema alone - Ponder hashes the
+  # indexing files' own contents, "not the exports", so a module they import (the
+  # generated registry among them) does not count.
   #
   # Dropping loses only derived tables: the poller rewrites token states,
   # reconciliations and the seeded multiplier events within one interval,
