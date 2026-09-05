@@ -89,6 +89,15 @@ html[data-js] .hero [data-reveal] { opacity: 1; transform: none; transition: non
 .mark { display: block; flex: none; }
 .wordmark { font-weight: 600; letter-spacing: -0.02em; font-size: 17px; }
 .nav nav { display: flex; align-items: center; gap: clamp(18px, 3vw, 36px); font-size: 15px; }
+/* Five items do not fit beside the mark under 600px: the row moves under the
+   brand and scrolls sideways inside its own box. The page never widens. */
+@media (max-width: 600px) {
+  .nav .wrap { flex-wrap: wrap; height: auto; padding-top: 0.7rem; padding-bottom: 0.2rem; row-gap: 0.1rem; }
+  .nav nav { flex-basis: 100%; overflow-x: auto; white-space: nowrap; gap: 18px; font-size: 14.5px; padding-bottom: 0.4rem; scrollbar-width: none; }
+  .nav nav a::after { display: none; }
+  .nav nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.35em; text-decoration-thickness: 1px; }
+  .nav nav::-webkit-scrollbar { display: none; }
+}
 .nav nav a { position: relative; padding: 0.35rem 0; color: var(--muted); transition: color 0.2s; }
 .nav nav a:hover, .nav nav a[aria-current="page"] { color: var(--ink); }
 .nav nav a::after {
@@ -177,6 +186,19 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 .subscribe > a:not(.btn) { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; padding: 0.2rem 0; }
 .subscribe-hint { flex-basis: 100%; color: var(--muted); font-size: 14px; max-width: 72ch; text-wrap: pretty; overflow-wrap: anywhere; }
 .subscribe-hint code { font-family: var(--mono); font-size: 13px; }
+
+/* --- one-line sections: a heading, a sentence, a link ---------------------- */
+.oneline { padding-top: 0; }
+.oneline .line { color: var(--muted); font-size: 1.02rem; max-width: 64ch; text-wrap: pretty; }
+.oneline .line a, .oneline .links a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+.oneline .links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; margin-top: 1rem; font-size: 15px; }
+.doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem 2rem; }
+.doors a { display: block; padding-top: 1rem; border-top: 1px solid var(--line-2); transition: border-color 0.3s; }
+.doors a:hover { border-color: var(--ink); }
+.doors h2 { font-size: 1.15rem; letter-spacing: -0.015em; font-weight: 500; margin: 0; max-width: none; }
+.doors p { margin-top: 0.4rem; color: var(--muted); font-size: 15px; max-width: 34ch; text-wrap: pretty; }
+.doors code, .lede code { font-family: var(--mono); font-size: 0.92em; }
+.step-title { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-bottom: 0.5rem; max-width: none; }
 
 /* --- what we measured: three dated figures, each with a permanent anchor -- */
 .measured { padding-top: 0; }
@@ -300,7 +322,7 @@ h3 { font-size: 1.2rem; letter-spacing: -0.015em; font-weight: 500; margin-botto
 
 /* --- footer --------------------------------------------------------------- */
 footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
-.foot { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem 3rem; align-items: start; }
+.foot { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem 2.5rem; align-items: start; }
 .foot > div > p { color: var(--muted); font-size: 15px; margin-top: 0.5rem; max-width: 28ch; }
 .foot h4 { font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
 .foot nav { display: flex; flex-direction: column; gap: 0.45rem; font-size: 15px; }
@@ -344,9 +366,10 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
   .wallet-total { text-align: left; }
   .foot { grid-template-columns: 1fr 1fr; }
   .foot > div:first-child { grid-column: 1 / -1; }
+  .doors { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
-  .nav nav { gap: 16px; font-size: 14px; }
+  .nav nav { gap: 15px; font-size: 14px; }
   .wordmark { font-size: 16px; }
 }
 

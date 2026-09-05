@@ -1,4 +1,4 @@
-import { observed } from '../../lib/observed'
+import { calendar, observed } from '../../lib/observed'
 
 const { counts, links, lastObservedAt } = observed
 
@@ -21,12 +21,15 @@ export function Mark({ size = 20 }: { size?: number }) {
   )
 }
 
-export type NavCurrent = 'tokens' | 'wallet' | 'calendar'
+export type NavCurrent = 'tokens' | 'wallet' | 'calendar' | 'oracle' | 'developers'
 
 /**
- * Three destinations, which are the three things a visitor does here. The
- * explanatory sections of the home page are reachable from the footer and by
- * scrolling; they are not destinations.
+ * Five destinations, one per reader: a holder finds a token or reads a
+ * wallet, anyone watches the calendar, a curator comes for the oracle gap,
+ * a developer for the docs. The oracle page was reachable only from the
+ * footer, and the header repeated sections of the home page instead
+ * (audit 2026-09-05, F06). On a narrow screen the row scrolls sideways
+ * inside its own box rather than widening the page.
  */
 export function Nav({ current }: { current?: NavCurrent }) {
   const item = (key: NavCurrent, href: string, label: string) => (
@@ -45,6 +48,8 @@ export function Nav({ current }: { current?: NavCurrent }) {
           {item('tokens', '/#find', 'Tokens')}
           {item('wallet', '/wallet/', 'Wallet')}
           {item('calendar', '/calendar/', 'Calendar')}
+          {item('oracle', '/gap/', 'Oracle')}
+          {item('developers', '/docs/', 'Docs')}
         </nav>
       </div>
     </header>
@@ -62,6 +67,11 @@ export function LedgerHead({ cols }: { cols: readonly [string, string, string, s
   )
 }
 
+/**
+ * Three columns named by what a reader does there, instead of one "About"
+ * column of eleven links that mixed product pages, anchors and developer
+ * links (audit 2026-09-05, F18).
+ */
 export function Footer() {
   const observedDay = new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
@@ -80,28 +90,38 @@ export function Footer() {
           <p>The corporate-action layer for Stock Tokens.</p>
         </div>
         <div>
-          <h2>Use</h2>
-          <nav aria-label="Tools">
+          <h2>Look up</h2>
+          <nav aria-label="Look up">
             <a href="/#find">Find your token</a>
             <a href="/wallet/">Your wallet</a>
-            <a href="/calendar/">Calendar</a>
-            {links.status ? <a href={links.status}>Live status</a> : null}
+            <a href="/calendar/">Calendar ({calendar.total} declared)</a>
+            <a href="/calendar.ics">Subscribe (.ics)</a>
+            <a href="/feed.xml">RSS</a>
           </nav>
         </div>
         <div>
-          <h2>About</h2>
-          <nav aria-label="About">
-            <a href="/#how">How it works</a>
-            <a href="/#proof">Proof</a>
-            <a href="/record/">Delivery record</a>
-            <a href="/flows/">Creations</a>
+          <h2>What we measured</h2>
+          <nav aria-label="What we measured">
+            <a href="/dividends/">Every dividend</a>
+            <a href="/#off-hours">Off-hours share</a>
+            <a href="/flows/">Net creation</a>
             <a href="/gap/">Oracle gap</a>
-            <a href="/#coverage">Coverage</a>
-            <a href="/#developers">Developers</a>
-            <a href={links.apiDocs}>API</a>
+            <a href="/record/">Delivery record</a>
+            <a href="/how/">How it works</a>
+            <a href="/how/#coverage">Coverage</a>
+          </nav>
+        </div>
+        <div>
+          <h2>Build on it</h2>
+          <nav aria-label="Build on it">
+            <a href="/docs/">Developers</a>
+            <a href={links.apiDocs}>API reference</a>
+            {links.api ? <a href={`${links.api}/v1/health`}>Live API</a> : null}
             <a href={links.sdkDocs}>SDK</a>
-            <a href={links.data}>Data</a>
-            {links.github ? <a href={links.github}>GitHub</a> : null}
+            <a href="/tokenlist.json">Token list</a>
+            <a href={links.data}>Data (CC BY 4.0)</a>
+            {links.status ? <a href={links.status}>Live status</a> : null}
+            {links.github ? <a href={links.github}>Source</a> : null}
           </nav>
         </div>
         <p className="fine">

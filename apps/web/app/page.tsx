@@ -3,20 +3,25 @@ import { CountUp } from './components/CountUp'
 import { Footer, LedgerHead, Nav } from './components/Chrome'
 import { Finder } from './components/Finder'
 import { dateLong, dateRange, delay, pctInt, tokenCount } from '../lib/format'
-import { calendar, cents, flows, observed, timing } from '../lib/observed'
+import { ledgerMatched, ledgerRows } from '../lib/ledger'
+import { calendar, cents, flows, observed } from '../lib/observed'
 
-const { hero, reconciled, chains, links, sessionShare } = observed
+const { hero, chains, links, sessionShare } = observed
 
 const RING_RADIUS = 140
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
 
-/** Reconciled dividends first, newest first; the rest after, newest first. */
-const rows = [...reconciled].sort((a, b) => {
-  const aClean = a.status === 'matched' ? 0 : 1
-  const bClean = b.status === 'matched' ? 0 : 1
-  return aClean - bClean || (b.processDate ?? '').localeCompare(a.processDate ?? '')
-})
-const matched = rows.filter((row) => row.status === 'matched')
+/**
+ * The home page's job is to make a reader look up a token. It held eight
+ * screens on a phone - doors that repeated the header, three steps, six
+ * ledger rows, a principle band, a coverage table and a code block (audit
+ * 2026-09-05, F17). What stays: the hero and the finder, the figure, what
+ * was measured, three dividends with a link to all of them, and one line
+ * each for coverage and developers. The steps live at /how/, the full
+ * ledger at /dividends/, the code at /docs/.
+ */
+const EXCERPT = 3
+const excerpt = ledgerRows.slice(0, EXCERPT)
 const heroPct = pctInt(hero.haircutBps)!
 
 export default function Page() {
@@ -76,39 +81,11 @@ export default function Page() {
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="block tight" aria-labelledby="index-title">
-          {/* A heading for the three doors: their h3s followed the hero's h1
-              directly, which every audit tool reads as a skipped level. */}
-          <h2 className="sr-only" id="index-title">
-            What you can do here
-          </h2>
-          <div className="wrap index">
-            <a href="#find" data-reveal>
-              <h3>Find your token</h3>
-              <p>What it represents today, what it was paid, what it is still owed.</p>
-            </a>
-            <a href="/wallet/" data-reveal style={delay(90)}>
-              <h3>Read your wallet</h3>
-              <p>What an address holds and is owed. No signature, nothing sent to us.</p>
-            </a>
-            <a href="/calendar/" data-reveal style={delay(180)}>
-              <h3>Calendar</h3>
-              <p>
-                {calendar.total} dividends declared and not yet on chain
-                {calendar.paidNotOnChain.length > 0 ? `, ${calendar.paidNotOnChain.length} already called paid.` : '.'}
-              </p>
-            </a>
-          </div>
-        </section>
-
-        {/* ---------------------------------------------------------------- */}
         {/*
           The three figures nobody else publishes, each with its date, its sample
-          and its method one click away. The off-hours share sat in data/ with
-          `sufficient: true` and appeared on no page at all (audit 2026-09-05,
-          F05); it renders here only while the file says sufficient, and says
-          nothing otherwise. Each row has a permanent anchor so a figure can be
-          cited by URL.
+          and its method one click away (audit 2026-09-05, F05). The off-hours
+          share renders only while the file says sufficient. Each row has a
+          permanent anchor so a figure can be cited by URL.
         */}
         <section className="block measured" id="measured" aria-labelledby="measured-title">
           <div className="wrap">
@@ -164,53 +141,19 @@ export default function Page() {
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="block" id="how" aria-labelledby="how-title">
-          <div className="wrap">
-            <h2 id="how-title" data-reveal>
-              How a dividend reaches a token
-            </h2>
-            <ol className="steps">
-              <li data-reveal style={delay(0)}>
-                <span className="step-n">01</span>
-                <h3>A dividend is declared</h3>
-                <p>The issuer states what each share pays, and on which day.</p>
-              </li>
-              <li data-reveal style={delay(110)}>
-                <span className="step-n">02</span>
-                <h3>The token adjusts</h3>
-                <p>
-                  No cash lands. The token&rsquo;s multiplier rises: your balance is unchanged,
-                  what it represents grows.
-                </p>
-              </li>
-              <li data-reveal style={delay(220)}>
-                <span className="step-n">03</span>
-                <h3>exdate measures the gap</h3>
-                <p>What was declared, against what really arrived, priced at the moment it happened.</p>
-              </li>
-            </ol>
-            <p className="steps-note" data-reveal>
-              Measured so far: the announcement comes about {timing.medianLeadMinutes} minutes
-              before the change, and the change lands one business day after the issuer&rsquo;s
-              date in {timing.lagOneDay} of {timing.lagCases} measured cases.
-            </p>
-          </div>
-        </section>
-
-        {/* ---------------------------------------------------------------- */}
         <section className="block" id="proof" aria-labelledby="proof-title">
           <div className="wrap">
             <div className="block-head" data-reveal>
               <h2 id="proof-title">Every dividend so far, measured.</h2>
               <p>
-                {matched.length} reconcile cleanly. {rows.length - matched.length} don&rsquo;t, and
-                we say so rather than guess.
+                {ledgerMatched.length} reconcile cleanly. {ledgerRows.length - ledgerMatched.length} don&rsquo;t, and
+                we say so rather than guess. The {EXCERPT} most recent:
               </p>
             </div>
 
             <LedgerHead cols={['Token', 'Declared', 'Arrived', 'Never arrived']} />
             <ul className="ledger">
-              {rows.map((row, index) => (
+              {excerpt.map((row, index) => (
                 <li key={`${row.token}:${row.processDate}`} data-reveal style={delay(index * 60)}>
                   <div className="who">
                     <a className="name" href={`/t/${row.token.toLowerCase()}/`}>
@@ -238,130 +181,44 @@ export default function Page() {
             </ul>
 
             <p className="after" data-reveal>
-              Priced at the moment each step took effect. Where a token has no price feed, no gap
-              is claimed.{' '}
-              <a href="/calendar/">{calendar.total} more dividends are declared and not yet on chain</a>.
+              <a href="/dividends/">All {ledgerRows.length} measured dividends, and every change with no issuer record</a>.{' '}
+              <a href="/calendar/">{calendar.total} more are declared and not yet on chain</a>.
             </p>
           </div>
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="statement" aria-label="Principle">
+        <section className="block oneline" id="coverage" aria-labelledby="coverage-title">
           <div className="wrap">
-            <p className="statement-text" data-reveal>
-              Every number here was read from the blockchain and dated. Nothing is estimated,
-              modelled or annualised.
+            <h2 className="small" id="coverage-title" data-reveal>
+              Where it looks
+            </h2>
+            <p className="line" data-reveal>
+              {chains.robinhood.name}: {chains.robinhood.tokens} Stock Tokens and {chains.robinhood.feeds} price feeds, measured
+              live. {chains.base.name}: {chains.base.tokens} Coinbase tokens verified on chain, nothing to measure until a
+              multiplier moves there. Every number is read from the chain and dated; nothing is estimated, modelled or
+              annualised. <a href="/how/">How a dividend reaches a token</a>
             </p>
           </div>
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        <section className="block" id="coverage" aria-labelledby="coverage-title">
+        <section className="block oneline" id="developers" aria-labelledby="dev-title">
           <div className="wrap">
-            <div className="block-head" data-reveal>
-              <h2 id="coverage-title">Where it looks today</h2>
-              <p>Built for every issuer of tokenized real-world assets such as Stock Tokens. Measured wherever there is something real to measure.</p>
-            </div>
-            <LedgerHead cols={['Chain', 'Tokens', 'Price feeds', '']} />
-            <ul className="ledger">
-              <li data-reveal>
-                <div className="who">
-                  <span className="name">{chains.robinhood.name}</span>
-                  <span className="sym">{chains.robinhood.issuer}</span>
-                </div>
-                <div className="amt">
-                  <span className="k">Tokens</span>
-                  <span className="v">{chains.robinhood.tokens}</span>
-                </div>
-                <div className="amt">
-                  <span className="k">Price feeds</span>
-                  <span className="v">{chains.robinhood.feeds}</span>
-                </div>
-                <div className="gap">
-                  <span className="tag on">measured live</span>
-                </div>
-              </li>
-              <li data-reveal style={delay(90)}>
-                <div className="who">
-                  <span className="name">{chains.base.name}</span>
-                  <span className="sym">{chains.base.issuer}</span>
-                </div>
-                <div className="amt">
-                  <span className="k">Tokens</span>
-                  <span className="v">{chains.base.tokens}</span>
-                </div>
-                <div className="amt">
-                  <span className="k">Price feeds</span>
-                  <span className="v">{chains.base.feeds}</span>
-                </div>
-                <div className="gap">
-                  <span className="tag">verified, nothing to measure yet</span>
-                </div>
-              </li>
-            </ul>
-            <p className="after" data-reveal>
-              On Base no dividend has moved a token yet. The moment one does, the same measurement
-              applies.
+            <h2 className="small" id="dev-title" data-reveal>
+              Built to integrate
+            </h2>
+            <p className="line" data-reveal>
+              A REST API, a typed SDK and signed webhooks over the same records; a token list that imports the whole
+              registry into a wallet in one URL. Every value exact, anything not observed null.
             </p>
-          </div>
-        </section>
-
-        {/* ---------------------------------------------------------------- */}
-        <section className="block dev" id="developers" aria-labelledby="dev-title">
-          <div className="wrap dev-grid">
-            <div data-reveal>
-              <h2 id="dev-title">Built to integrate.</h2>
-              <p>
-                A REST API, a typed SDK and signed webhooks over the same records. Every value is
-                exact; anything not observed is null, never zero. The token list imports the whole
-                registry into a wallet in one URL, carrying what each token represents in shares
-                and what it is owed.
-              </p>
-              <p className="links">
-                <a href={links.apiDocs}>API reference</a>
-                {links.api ? <a href={`${links.api}/v1/health`}>Live API</a> : null}
-                <a href={links.sdkDocs}>SDK</a>
-                <a href="/tokenlist.json">Token list</a>
-                <a href={links.data}>Data</a>
-                {links.github ? <a href={links.github}>Source</a> : null}
-              </p>
-              {/*
-                What a wallet PM asks before importing anything: under what
-                licence, and whom to ask. Both were a page deep or absent
-                (audit 2026-09-05, F19). The issues link renders only when the
-                repository URL is configured, like every other link here.
-              */}
-              <p className="licence">
-                exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT.
-                {links.github ? (
-                  <>
-                    {' '}
-                    Questions and bugs: <a href={`${links.github}/issues`}>GitHub issues</a>.
-                  </>
-                ) : null}
-              </p>
-            </div>
-            {/*
-              tabIndex, role and a name: a code block that scrolls sideways is a
-              scrollable region, and one that cannot take focus cannot be scrolled
-              from a keyboard (WCAG 2.1.1; axe scrollable-region-focusable).
-            */}
-            <pre
-              className="code"
-              data-reveal
-              style={delay(120)}
-              tabIndex={0}
-              role="region"
-              aria-label="Example: reading what a token is owed with the SDK"
-            >
-              <code>
-                {`const owed = await exdate.pending(token)\n\n`}
-                {`owed.declared[0].grossPerToken\n`}
-                <span className="c">{`// what is owed per token, no price needed`}</span>
-                {`\n\nowed.notComputed\n`}
-                <span className="c">{`// what it refuses to estimate, and why`}</span>
-              </code>
-            </pre>
+            <p className="links" data-reveal>
+              <a href="/docs/">Developers</a>
+              <a href={links.apiDocs}>API reference</a>
+              <a href={links.sdkDocs}>SDK</a>
+              <a href="/tokenlist.json">Token list</a>
+              <a href={links.data}>Data</a>
+            </p>
           </div>
         </section>
       </main>

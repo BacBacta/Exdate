@@ -1536,8 +1536,21 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   never hidden now, and the mono face is no longer preloaded on every page; the LCP element paints
   at 48–132 ms on the built output locally, where it previously waited for hydration. F28: the API
   reference opens on a first call with a response captured from the live API, and the seven
-  webhook types are a table. Still open from the month list: F06/F17/F18, the information
-  architecture and a shorter home page.
+  webhook types are a table.
+- 2026-09-05 — **The month list closed: a header that leads where a reader goes, and a home page
+  that excerpts instead of containing.** F06/F17/F18. Header: Tokens · Wallet · Calendar · Oracle ·
+  Docs — the oracle page was reachable only from the footer, and the header named sections of the
+  home page. Five items do not fit beside the mark under 600 px, so the row moves under the brand
+  and, if it ever has to, scrolls inside its own box; at 320 and 360 it fits (measured: `scrollWidth
+  == clientWidth`). Footer: three columns named by what one does there — *Look up*, *What we
+  measured*, *Build on it* — instead of an *About* column of eleven links. Home: hero and finder,
+  the figure, *What we measured*, three dividends with a link to all of them, one line for
+  coverage, one for developers; the three steps and the principle moved to **`/how/`** (with the
+  coverage table), the full ledger and the six changes with no issuer record to **`/dividends/`**,
+  the code sample and the developer doors to **`/docs/`**. Height at 360 px: 4 605 px from ~6 300
+  (the audit counted eight screens); 469 visible words against 451, because the three measured
+  figures carry their dates and sample sizes and those are not cut. All fourteen routes: no
+  overflow at 320 or 360, axe clean.
 - _(append decisions here as they are made)_
 
 ## Status

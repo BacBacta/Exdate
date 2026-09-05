@@ -11,7 +11,7 @@ export default function Page() {
   const doc = renderDoc('packages/sdk/README.md')
   return (
     <>
-      <Nav />
+      <Nav current="developers" />
       <main id="main">
         <div className="wrap">
           <article className="prose" dangerouslySetInnerHTML={{ __html: doc.html }} />

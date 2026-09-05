@@ -48,7 +48,7 @@ const when = (iso: string) =>
 export default function Page() {
   return (
     <>
-      <Nav />
+      <Nav current="oracle" />
       <main id="main">
         <section className="hero token-hero" aria-labelledby="gap-title">
           <div className="wrap">

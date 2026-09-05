@@ -21,7 +21,7 @@ export default function Page() {
   const github = observed.links.github
   return (
     <>
-      <Nav />
+      <Nav current="developers" />
       <main id="main">
         <section className="hero token-hero" aria-labelledby="data-title">
           <div className="wrap">
