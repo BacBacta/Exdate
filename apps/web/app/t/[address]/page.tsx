@@ -72,34 +72,29 @@ function stateOf(dividend: Dividend): { text: string; on: boolean } {
  * Every sentence here is one of the ledger's own states, restated; nothing is
  * computed that the rows below do not show, and the link leads to them.
  */
-function Answer({ token, owed }: { token: Token; owed: Dividend[] }) {
+function Answer({ token }: { token: Token }) {
   const lines: React.ReactNode[] = []
-  const upcoming = token.dividends.filter((d) => d.state === 'pending' && d.upcoming)
-  const measured = token.dividends.find((d) => d.state === 'matched' || d.state === 'anomaly') ?? null
-  const moved = token.dividends.find((d) => d.state === 'unmatched') ?? null
+  const { lead, lastMeasured: measured, lastMoved: moved } = token
 
-  if (owed.length === 1) {
-    const one = owed[0]!
+  if (lead.kind === 'owed' && lead.count === 1) {
     lines.push(
       <>
-        <strong>One dividend is owed and not yet on chain</strong>: declared for {dateLong(one.processDate)}, ${one.owedPerToken} per
-        token{one.issuerCompleted ? ', and the issuer already calls it paid' : ''}.
+        <strong>One dividend is owed and not yet on chain</strong>: declared for {dateLong(lead.processDate)}, ${lead.owedPerToken} per
+        token{lead.issuerCompleted ? ', and the issuer already calls it paid' : ''}.
       </>,
     )
-  } else if (owed.length > 1) {
-    const oldest = owed[owed.length - 1]!
+  } else if (lead.kind === 'owed') {
     lines.push(
       <>
-        <strong>{owed.length} dividends are owed and not yet on chain</strong>, the oldest declared for {dateLong(oldest.processDate)}
-        {owed.some((d) => d.issuerCompleted) ? '; the issuer already calls some of them paid' : ''}.
+        <strong>{lead.count} dividends are owed and not yet on chain</strong>, the oldest declared for {dateLong(lead.oldestProcessDate)}
+        {lead.anyIssuerCompleted ? '; the issuer already calls some of them paid' : ''}.
       </>,
     )
-  } else if (upcoming.length > 0) {
-    const next = upcoming[upcoming.length - 1]!
+  } else if (lead.kind === 'next') {
     lines.push(
       <>
-        <strong>Next dividend declared for {dateLong(next.processDate)}</strong>: ${next.declared} per share
-        {next.owedPerToken && next.owedPerToken !== next.declared ? `, $${next.owedPerToken} per token if it arrives in full` : ''}.
+        <strong>Next dividend declared for {dateLong(lead.processDate)}</strong>: ${lead.declared} per share
+        {lead.owedPerToken && lead.owedPerToken !== lead.declared ? `, $${lead.owedPerToken} per token if it arrives in full` : ''}.
         Nothing is owed yet.
       </>,
     )
@@ -268,7 +263,7 @@ export default async function Page({ params }: { params: Promise<{ address: stri
               <div data-reveal>
                 <p className="token-kind">Robinhood Stock Token · {token.symbol}</p>
                 <h1 id="token-title">{token.name}</h1>
-                <Answer token={token} owed={owed} />
+                <Answer token={token} />
                 <p className="token-meta">
                   {token.isin ? <span>ISIN {token.isin}</span> : null}
                   {/*

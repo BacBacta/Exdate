@@ -447,6 +447,42 @@ export function tokenPage(address: string) {
     }))
     .reverse()
 
+  /**
+   * The answer to "did I get my dividend?", as data, so the page head and the
+   * link preview say the same thing. Priority: what is owed and not on chain,
+   * else the next declared date, else the last dividend measured on chain,
+   * else a multiplier that moved with nothing declared, else nothing. The
+   * last measured dividend and the last unexplained move are exposed beside
+   * it, because a token can carry all three at once (SGOV does).
+   */
+  const owedRows = dividends.filter((d) => d.state === 'pending' && !d.upcoming && d.owedPerToken)
+  const upcomingRows = dividends.filter((d) => d.state === 'pending' && d.upcoming)
+  const lastMeasured = dividends.find((d) => d.state === 'matched' || d.state === 'anomaly') ?? null
+  const lastMoved = dividends.find((d) => d.state === 'unmatched') ?? null
+  const lead: TokenLead =
+    owedRows.length > 0
+      ? {
+          kind: 'owed',
+          count: owedRows.length,
+          processDate: owedRows[0]!.processDate!,
+          oldestProcessDate: owedRows[owedRows.length - 1]!.processDate!,
+          owedPerToken: owedRows[0]!.owedPerToken!,
+          issuerCompleted: owedRows[0]!.issuerCompleted,
+          anyIssuerCompleted: owedRows.some((d) => d.issuerCompleted),
+        }
+      : upcomingRows.length > 0
+        ? {
+            kind: 'next',
+            processDate: upcomingRows[upcomingRows.length - 1]!.processDate!,
+            declared: upcomingRows[upcomingRows.length - 1]!.declared,
+            owedPerToken: upcomingRows[upcomingRows.length - 1]!.owedPerToken,
+          }
+        : lastMeasured
+          ? { kind: 'measured' }
+          : lastMoved
+            ? { kind: 'moved' }
+            : { kind: 'none' }
+
   /** Growth in shares per token since launch, and what explains it. Observed, never annualised. */
   const sinceLaunch =
     lastStep === null
@@ -482,10 +518,28 @@ export function tokenPage(address: string) {
         }
       : null,
     dividends,
+    lead,
+    lastMeasured,
+    lastMoved,
     steps,
     observedAt: observedDay,
   }
 }
+
+export type TokenLead =
+  | {
+      kind: 'owed'
+      count: number
+      processDate: string
+      oldestProcessDate: string
+      owedPerToken: string
+      issuerCompleted: boolean
+      anyIssuerCompleted: boolean
+    }
+  | { kind: 'next'; processDate: string; declared: string | null; owedPerToken: string | null }
+  | { kind: 'measured' }
+  | { kind: 'moved' }
+  | { kind: 'none' }
 
 export type CalendarGroup = 'paid_not_on_chain' | 'overdue' | 'awaiting' | 'upcoming'
 

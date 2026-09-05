@@ -40,6 +40,13 @@
       ]
     },
     {
+      "source": "/t/(.*)/opengraph-image(.*)",
+      "headers": [
+        { "key": "content-type", "value": "image/png" },
+        { "key": "cache-control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
       "source": "/calendar.ics",
       "headers": [
         { "key": "content-type", "value": "text/calendar; charset=utf-8" },
