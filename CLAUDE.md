@@ -1449,6 +1449,39 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   on the answer (F03), the wallet's post-read flow (F13), ICS and RSS (F04), a "what we measured"
   section carrying the 73.9 % (F05), per-token share cards (F14), the IA and a shorter home
   (F06/F17), the LCP (F10).
+- 2026-09-05 — **The site was not late, it was down, and the audit's fixes are what brought it back.**
+  Vercel refused the fixes' deployment with *"Deployment rate limited — retry in 24 hours"*, so the
+  owner opened a second Vercel account and asked to deploy there. Looking properly at the old one
+  found something worse than a quota: `www.exdate.me` and `exdate.me` answered **404
+  `DEPLOYMENT_NOT_FOUND`**, the last production deployment answered **410 Gone**, and the team held
+  **18 projects with no `exdate` among them** — the project had been deleted. `api.exdate.me` and
+  `status.exdate.me` were untouched throughout, because they resolve to the Hetzner machine and not
+  to Vercel.
+  The move itself is worth writing down, because the obvious route is not the one that worked.
+  `PATCH /v4/domains/exdate.me {op: move-out}` answers `{"moved": false, token}` — Vercel wants an
+  email confirmation, which is a person's step with unknown latency. The shorter and less invasive
+  route is to leave the domain where it is and **prove ownership**: add `exdate.me` and
+  `www.exdate.me` to the new project, which returns two `_vercel.exdate.me` TXT challenges, then
+  create those records with the OLD account's DNS API, which still held the zone. Verified in one
+  pass, apex → www 308 restored, and the zone followed intact — the two `A` records for `api` and
+  `status` never moved, which is what the whole operation had to protect. The zone was backed up
+  before anything was touched; it was not needed.
+  **Device-flow lesson, twice.** `vercel login` dies on this container's dropped connections, so the
+  OAuth device flow is driven directly against `api.vercel.com/login/oauth/*` with the CLI's own
+  public client id (`VERCEL_CLI_CLIENT_ID`, read out of the installed bundle, scope
+  `openid offline_access`). The page authorises **whatever account the browser's cookie holds**,
+  not the account the app is signed into: the first code came back as the old account, and after
+  the owner switched, a code meant for the old account came back as the new one. So the poller now
+  prints the username, the email and the teams the token reaches, and tests it against the target
+  domain, rather than discovering the wrong account at the moment of the operation.
+  **What is not fixed: the site no longer deploys itself.** The new project was created by API and
+  is deployed from here by `scripts/deploy-web.sh`; linking it to the repository is refused with
+  `repo_no_access`, because the GitHub identity on the new Vercel account is `lebbuilder16` and the
+  repository is `BacBacta/Exdate`. Until the Vercel GitHub App is installed on `BacBacta` from the
+  new account, a collector's commit changes `data/` without changing the pages. New coordinates:
+  team `team_zE5m7D2OYawyE95SpJwB2LT4` (`lebbuilder16-5581s-projects`), project
+  `prj_jhD59pmRJWMHnyU4af3leV0QyA11` (`exdate-site`). `ssoProtection` had to be set to null — Vercel
+  gives a new project `all_except_custom_domains`, which answered 302 to everyone.
 - _(append decisions here as they are made)_
 
 ## Status
