@@ -3868,7 +3868,7 @@ export const ARCHIVED_CORPORATE_ACTIONS: readonly ArchivedCorporateAction[] = [
     "symbol": "JBL",
     "underlyingSymbol": "JBL",
     "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
-    "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+    "status": "CORPORATE_ACTION_STATUS_COMPLETED",
     "processDate": "2026-09-02",
     "rate": "0.08",
     "oldRate": null,

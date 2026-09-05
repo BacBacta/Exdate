@@ -2,7 +2,7 @@
   "note": "Every corporate action the issuer has published while exdate was watching. GET /rhj/corporate-actions is a window about a month deep with no pagination and no date filter, so a row that falls out of it is unrecoverable from any first-party source. Keyed on (issuer id, processDate): the id alone names a monthly series. Refresh with node scripts/archive-corporate-actions.mjs.",
   "source": "robinhood:/rhj/corporate-actions",
   "firstArchivedAt": "2026-09-02T21:09:52.283Z",
-  "lastArchivedAt": "2026-09-05T06:38:51.610Z",
+  "lastArchivedAt": "2026-09-05T20:49:58.784Z",
   "windowRows": 43,
   "archivedRows": 45,
   "beyondWindow": 2,
@@ -91,8 +91,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -120,8 +120,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -149,8 +149,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -178,8 +178,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -207,8 +207,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -236,8 +236,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -265,8 +265,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -294,8 +294,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -323,8 +323,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -352,8 +352,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -381,8 +381,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [
         {
           "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
@@ -415,8 +415,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [
         {
           "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
@@ -449,8 +449,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [
         {
           "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
@@ -462,7 +462,7 @@
     {
       "id": "0x00000000000000000000000000000000aad6874f8eba489d8a46fe1cbddc8db4",
       "type": "CORPORATE_ACTION_TYPE_CASH_DIVIDEND",
-      "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+      "status": "CORPORATE_ACTION_STATUS_COMPLETED",
       "processDate": {
         "year": 2026,
         "month": 9,
@@ -483,9 +483,14 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
-      "statusHistory": [],
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
+      "statusHistory": [
+        {
+          "status": "CORPORATE_ACTION_STATUS_IN_PROGRESS",
+          "until": "2026-09-05T20:49:58.784Z"
+        }
+      ],
       "inWindow": true
     },
     {
@@ -512,8 +517,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -541,8 +546,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -570,8 +575,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -599,8 +604,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -628,8 +633,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -657,8 +662,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -686,8 +691,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -715,8 +720,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -744,8 +749,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -773,8 +778,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -802,8 +807,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -831,8 +836,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -860,8 +865,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -889,8 +894,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -918,8 +923,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -947,8 +952,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -976,8 +981,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1005,8 +1010,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1034,8 +1039,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1063,8 +1068,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1092,8 +1097,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1121,8 +1126,8 @@
         }
       },
       "firstSeenAt": "2026-09-03T06:44:28.191Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 3,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 4,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1150,8 +1155,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1179,8 +1184,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1208,8 +1213,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1237,8 +1242,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1266,8 +1271,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1295,8 +1300,8 @@
         }
       },
       "firstSeenAt": "2026-09-04T06:43:45.574Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 2,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 3,
       "statusHistory": [],
       "inWindow": true
     },
@@ -1324,8 +1329,8 @@
         }
       },
       "firstSeenAt": "2026-09-02T14:21:22.355Z",
-      "lastSeenAt": "2026-09-05T06:38:51.610Z",
-      "seenCount": 5,
+      "lastSeenAt": "2026-09-05T20:49:58.784Z",
+      "seenCount": 6,
       "statusHistory": [],
       "inWindow": true
     }
