@@ -249,11 +249,19 @@ if sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" "$NODE_BIN" "$DIR/scripts/ch
     journalctl -u exdate-watcher -f      what it is doing
     systemctl restart exdate-watcher     after editing $DIR/.env
 
-  One thing left, on GitHub rather than here: set the repository variable
-  EXDATE_CAPTURE_MODE to "watchdog", so the scheduled job stops capturing on its
-  own and starts checking this machine's heartbeat instead.
+  Nothing else is required: the scheduled job already defaults to watchdog mode,
+  so it checks this machine's heartbeat instead of capturing alongside it.
 
-    https://github.com/BacBacta/Exdate/settings/variables/actions/new
+  Two things would make it better, both on GitHub:
+
+    an alert sink, so the nine-minute announcement lead reaches someone rather
+    than only the file - a webhook or the Telegram pair, as repository secrets
+    AND in $DIR/.env, then: systemctl restart exdate-watcher
+
+    the repository secret RHC_RPC_URLS, so the scheduled collectors read the
+    chain through the same endpoint this machine does
+
+    https://github.com/BacBacta/Exdate/settings/secrets/actions/new
 
 EOF
 else
