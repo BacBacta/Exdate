@@ -65,6 +65,8 @@ jobs:
           # back into the capturer if that machine is ever retired.
           EXDATE_CAPTURE_MODE: ${{ vars.EXDATE_CAPTURE_MODE || 'watchdog' }}
           EXDATE_CAPTURE_BUDGET_MS: ${{ vars.EXDATE_CAPTURE_BUDGET_MS }}
+          # Optional; empty falls back to the built-in endpoint order.
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
           EXDATE_ALERT_WEBHOOK_URL: ${{ secrets.EXDATE_ALERT_WEBHOOK_URL }}
           EXDATE_TELEGRAM_BOT_TOKEN: ${{ secrets.EXDATE_TELEGRAM_BOT_TOKEN }}
           EXDATE_TELEGRAM_CHAT_ID: ${{ secrets.EXDATE_TELEGRAM_CHAT_ID }}

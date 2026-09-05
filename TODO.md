@@ -133,8 +133,17 @@ RHC_RPC_URL_ARCHIVE=https://robinhood-mainnet.g.alchemy.com/v2/YOUR_KEY
 ```
 
 then `systemctl restart exdate-watcher`. Robinhood's endpoint stays last so a provider outage
-cannot lose a capture. **Before upgrading, change nothing**: on the free tier Alchemy cannot serve
-the watcher's scan, and setting only the archive variable changes nothing that runs on a schedule.
+cannot lose a capture.
+
+The GitHub collectors read the chain too — about 1.5 M compute units a month between them — and
+every workflow that touches it now passes the **repository secret `RHC_RPC_URLS`**. Set it to the
+same comma-separated pair at
+<https://github.com/BacBacta/Exdate/settings/secrets/actions/new>. With the secret unset the
+workflows keep the built-in order, verified: an empty value falls through to
+`pocket.network → Robinhood`, so wiring it changed nothing until there is something to wire.
+
+The indexer is the one deliberate exception, at 102.6 M CU a month (~$41). It stays on the public
+failover in `/opt/exdate-api/.env` unless that is worth paying for; the same two lines move it.
 
 The indexer would add 102.6 M CU a month, about $41 — leave it on the public failover unless that
 is worth paying for.

@@ -39,6 +39,14 @@ jobs:
       # Throws on a bad read and exits without writing on an overlapping window,
       # so the committed file only ever grows by real, disjoint observations.
       - name: Take one sample
+        # Optional. With the repository secret unset this is an empty string and
+        # scripts/phase0/rpc.mjs falls back to its built-in order, so nothing
+        # breaks; with it set, the collectors read the chain through an endpoint
+        # exdate pays for rather than through Robinhood's, which is what
+        # docs/terms-review.md asks for. Every collector together is ~1.5 M
+        # compute units a month, measured.
+        env:
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
         run: node scripts/measure-session-share.mjs
 
       - name: Commit only if a sample was actually appended

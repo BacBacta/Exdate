@@ -37,6 +37,14 @@ jobs:
       # Exits without writing when no block is new; marks a window incomplete rather
       # than publishing a partial count as if the unread logs were zero.
       - name: Read one window of creations and redemptions
+        # Optional. With the repository secret unset this is an empty string and
+        # scripts/phase0/rpc.mjs falls back to its built-in order, so nothing
+        # breaks; with it set, the collectors read the chain through an endpoint
+        # exdate pays for rather than through Robinhood's, which is what
+        # docs/terms-review.md asks for. Every collector together is ~1.5 M
+        # compute units a month, measured.
+        env:
+          RHC_RPC_URLS: ${{ secrets.RHC_RPC_URLS }}
         run: node scripts/measure-primary-flows.mjs
 
       - name: Commit only if a window was appended
