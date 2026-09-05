@@ -1281,6 +1281,24 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   directory owned by root — where the second probe passes and repairs nothing while the third
   detects and fixes it. The operating rule is in `TODO.md`: that checkout is updated with the
   installer, never with `git` by hand as root.
+- 2026-09-05 — **Secrets reach the machine through git, encrypted to the machine's own deploy key,
+  and nobody types them anywhere.** An evening of applying one Alchemy key by hand from a phone
+  produced three different corruptions - 20 characters where 32 belong, a quote riding along, half
+  the URL echoed as its own command - and every one answered 401 exactly like a bad key. The
+  channel: the value goes into a repository secret once, through a browser form that cannot wrap a
+  line; `deliver-secrets.yml` encrypts it with `age` to every `deploy/keys/*.pub` (age takes
+  ssh-ed25519 recipients as they are) and commits the ciphertext to `deploy/secrets/`; the
+  installer, which now publishes the machine's public key on every run, decrypts with the private
+  half that never left the machine and applies - an RPC endpoint through the same probe gate as
+  `set-rpc.sh`, so a value that cannot serve the watcher's scan is never written, the rest straight
+  into `.env`. Rehearsed end to end with a real ssh-ed25519 pair and a real service account, the
+  commit gated on it, and the gate refused three times before it passed: twice on the harness (a
+  root-run `git` in the service account's checkout, then an origin under a path the account could
+  not traverse - both faults this file already documents), once on a real defect: a delivered
+  two-URL value had its fallback appended a second time and the archive variable, which takes one
+  endpoint, received the whole list. Found on the way and fixed: `systemctl enable --now` does
+  **not** restart a running service, so three re-installs could update the checkout and never load
+  the new code - the installer restarts explicitly now.
 - _(append decisions here as they are made)_
 
 ## Status

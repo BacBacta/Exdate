@@ -206,7 +206,27 @@ fi
 sudo -u "$USER_NAME" "$GIT" -C "$DIR" config user.name 'exdate-watcher'
 sudo -u "$USER_NAME" "$GIT" -C "$DIR" config user.email 'noreply@users.noreply.github.com'
 
-say "5. Settings"
+say "5. This machine's public key, in the repository"
+# So that secrets can be encrypted TO this machine (deploy/keys/README.md).
+# Public half only; the private half stays in $KEY. Committed and pushed from the
+# service account's own checkout, the way the watcher commits its captures.
+PUB="$DIR/deploy/keys/$(hostname).pub"
+install -d -o "$USER_NAME" -g "$USER_NAME" "$DIR/deploy/keys"
+if cmp -s "$KEY.pub" "$PUB"; then
+  note "already published as deploy/keys/$(hostname).pub"
+else
+  install -o "$USER_NAME" -g "$USER_NAME" -m 644 "$KEY.pub" "$PUB"
+  sudo -u "$USER_NAME" "$GIT" -C "$DIR" add "deploy/keys/$(hostname).pub"
+  sudo -u "$USER_NAME" "$GIT" -C "$DIR" -c user.name=exdate-watcher -c user.email=noreply@users.noreply.github.com \
+    commit -q -m "Publish $(hostname)'s deploy key, so secrets can be encrypted to it" </dev/null
+  if sudo -u "$USER_NAME" "$GIT" -C "$DIR" push -q origin "HEAD:$BRANCH" </dev/null; then
+    note "published deploy/keys/$(hostname).pub - deliver-secrets will encrypt to it"
+  else
+    note "committed locally; the push failed and will be retried on the next run"
+  fi
+fi
+
+say "6. Settings"
 if [ ! -f "$DIR/.env" ]; then
   cat > "$DIR/.env" <<'EOF'
 # Where the announcement and the applied notice go. With none set the watcher
@@ -221,7 +241,13 @@ else
   note "$DIR/.env kept as it is"
 fi
 
-say "6. Service"
+say "7. Delivered secrets"
+# Whatever deliver-secrets.yml encrypted to this machine: decrypted with the key
+# above, an RPC endpoint gated by the probe, the rest written to .env. The
+# service is restarted below in any case.
+bash "$DIR/deploy/pull-secrets.sh" || note "one or more delivered values were refused; see above"
+
+say "8. Service"
 # The unit ships with the defaults baked in; substitute whatever this run used,
 # or a non-default EXDATE_USER/EXDATE_DIR would install a unit pointing at a
 # path that does not exist. node's path is resolved too rather than assumed to
@@ -237,9 +263,14 @@ chmod 644 /etc/systemd/system/exdate-watcher.service
 systemctl daemon-reload
 note "installed exdate-watcher.service (user $USER_NAME, dir $DIR, node $NODE_BIN)"
 
-say "7. Preflight"
+say "9. Preflight"
 if sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" "$NODE_BIN" "$DIR/scripts/check-watcher.mjs"; then
-  systemctl enable --now exdate-watcher
+  # enable + restart, not `enable --now`: the latter leaves an already-running
+  # service untouched, so three re-installs in a row could update the checkout
+  # and never load the new code. A restart is the only way the code on disk
+  # becomes the code that runs.
+  systemctl enable --quiet exdate-watcher
+  systemctl restart exdate-watcher
   sleep 3
   systemctl is-active --quiet exdate-watcher && note "running" || die "service failed to start: journalctl -u exdate-watcher"
   cat <<EOF

@@ -16,15 +16,16 @@ with nobody told (fails), watcher silent with a notice delivered (does not fail)
 
 **The nine-minute lead still reaches nobody.** exdate learns of a multiplier change about nine
 minutes before it takes effect, and that is the perishable one. Add repository secrets under
-**Settings → Secrets and variables → Actions**, either:
+**Settings → Secrets and variables → Actions** - and that is the only place: since 2026-09-05 the
+machine gets them from there, encrypted to its own deploy key by `deliver-secrets.yml` and applied
+by the installer (`deploy/keys/README.md`). Nothing is typed into the machine. Either:
 
 - `EXDATE_ALERT_WEBHOOK_URL` — a Discord or Slack incoming webhook, or any endpoint that
   accepts `{ content, text }`; or
 - `EXDATE_TELEGRAM_BOT_TOKEN` **and** `EXDATE_TELEGRAM_CHAT_ID`.
 
-Put the same value in `/opt/exdate/.env` on the watcher machine and `systemctl restart
-exdate-watcher`, or the machine that is actually watching stays mute. An alert that lives only on
-that machine also cannot announce that machine's death, which is why both places matter.
+Then **Actions → deliver-secrets → Run workflow**, and on the machine
+`curl … install.sh | bash` once more: it decrypts what was delivered, writes `.env` and restarts.
 `node scripts/check-watcher.mjs --send-test-alert` proves delivery rather than assuming it.
 
 Optionally set the repository *variable* `EXDATE_SITE_URL` so the notices link to the right
@@ -131,15 +132,24 @@ The rest of the free-tier probe was good: it answers `eth_call` at the oldest mu
 49 ms, which beats the third-party archive endpoints, and it has no wildcard CORS, which is right
 for a keyed URL and costs nothing here because only servers use it.
 
-Once upgraded, on the watcher machine in `/opt/exdate/.env`:
+**Applying the key - the URL is never typed into a terminal.** Three attempts at that on a phone
+produced three different corruptions (20 characters where 32 belong, a quote riding along, half the
+line echoed as a command) and every one answered 401 like a bad key. So the key goes into a browser
+form once, and the machine fetches it:
 
-```
-RHC_RPC_URLS=https://robinhood-mainnet.g.alchemy.com/v2/YOUR_KEY,https://rpc.mainnet.chain.robinhood.com
-RHC_RPC_URL_ARCHIVE=https://robinhood-mainnet.g.alchemy.com/v2/YOUR_KEY
-```
+1. Repository secret `RHC_RPC_URLS` =
+   `https://robinhood-mainnet.g.alchemy.com/v2/YOUR_KEY,https://rpc.mainnet.chain.robinhood.com`
+   at <https://github.com/BacBacta/Exdate/settings/secrets/actions/new>.
+2. On the machine, `curl … install.sh | bash` - it publishes the machine's public key to
+   `deploy/keys/`, which triggers `deliver-secrets.yml` to encrypt the secret to it and commit the
+   ciphertext.
+3. About a minute later, the same command again: it decrypts, **probes the endpoint against the
+   watcher's own scan**, writes both `RHC_RPC_URLS` and `RHC_RPC_URL_ARCHIVE` only if that passes,
+   and restarts. A refused value leaves `.env` untouched and says why.
 
-then `systemctl restart exdate-watcher`. Robinhood's endpoint stays last so a provider outage
-cannot lose a capture.
+The same secret feeds the GitHub collectors directly. Robinhood's endpoint stays last in the list
+so a provider outage cannot lose a capture. `deploy/set-rpc.sh` remains for a machine without the
+channel: it asks for the key with echo off and applies the same gate.
 
 The GitHub collectors read the chain too — about 1.5 M compute units a month between them — and
 every workflow that touches it now passes the **repository secret `RHC_RPC_URLS`**. Set it to the

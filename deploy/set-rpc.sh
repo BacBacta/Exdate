@@ -26,6 +26,15 @@ say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 note() { printf '  %s\n' "$*"; }
 die() { printf '\n\033[31mstopped:\033[0m %s\n' "$*" >&2; exit 1; }
 
+FROM_STDIN=no; DO_RESTART=yes
+for arg in "$@"; do
+  case "$arg" in
+    --stdin) FROM_STDIN=yes ;;        # read the key from stdin even when a terminal exists (pull-secrets)
+    --no-restart) DO_RESTART=no ;;    # write .env, leave the restart to the caller
+    *) die "unknown option $arg" ;;
+  esac
+done
+
 main() {
 [ "$(id -u)" -eq 0 ] || die "run this as root: it writes $DIR/.env and restarts the service"
 [ -f "$DIR/scripts/probe-endpoint.mjs" ] || die "$DIR has no probe; run deploy/install.sh first to update the checkout"
@@ -36,7 +45,7 @@ note "Paste the Alchemy API key - or the whole URL, either is fine - then press 
 note "Nothing you type is shown, and nothing is written yet."
 # /dev/tty, not stdin: under `curl | bash` stdin is the script itself. When
 # there is no terminal - a rehearsal, or a here-string - stdin is all there is.
-if ( : </dev/tty ) 2>/dev/null; then
+if [ "$FROM_STDIN" = no ] && ( : </dev/tty ) 2>/dev/null; then
   read -rs -p '  > ' RAW </dev/tty; printf '\n'
 else
   read -rs RAW || true
@@ -44,17 +53,29 @@ fi
 RAW="$(printf '%s' "$RAW" | tr -d '[:space:]' | sed -e "s/^['\"]*//" -e "s/['\"]*\$//")"
 [ -n "$RAW" ] || die "nothing was entered"
 
-if printf '%s' "$RAW" | grep -q '://'; then
+# The value may already be the two-URL form the repository secret carries for
+# the collectors - "primary,fallback". The first entry is the endpoint under
+# test; whatever follows is the operator's own fallback list and is kept as
+# given. Without this the fallback was appended a second time and the archive
+# variable, which takes ONE endpoint, received the whole list.
+PRIMARY="${RAW%%,*}"
+REST=""; [ "$PRIMARY" != "$RAW" ] && REST="${RAW#*,}"
+if printf '%s' "$PRIMARY" | grep -q '://'; then
   # A full URL. Keep it as given, but read its key segment for the shape check.
-  URL="$RAW"
-  KEY="${RAW##*/}"
+  URL="$PRIMARY"
+  KEY="${PRIMARY##*/}"
   # https, or plain http to this machine only - a node of your own on the same
   # host is a legitimate endpoint, and a key sent in clear anywhere else is not.
   case "$URL" in https://*|http://127.0.0.1:*|http://localhost:*) ;; *) die "the URL must start with https:// (plain http is allowed only to 127.0.0.1 or localhost)";; esac
 else
-  KEY="$RAW"
+  KEY="$PRIMARY"
   URL="https://$ALCHEMY_HOST/v2/$KEY"
 fi
+# The list to write: the endpoint under test, then the operator's own fallbacks,
+# then Robinhood's endpoint last unless it is already there - a provider outage
+# must never cost a capture.
+LIST="$URL"; [ -n "$REST" ] && LIST="$URL,$REST"
+case ",$LIST," in *",$FALLBACK,"*) ;; *) LIST="$LIST,$FALLBACK";; esac
 
 # The shape checks apply to an Alchemy key - bare, or inside an Alchemy URL.
 # Any other host is taken as given: its path is not a key, and the probe is the
@@ -78,7 +99,7 @@ chmod 600 "$CANDIDATE"; chown "$USER_NAME" "$CANDIDATE"
 # Everything the current .env has, minus the two lines this script owns.
 if [ -f "$DIR/.env" ]; then grep -vE '^\s*(RHC_RPC_URLS|RHC_RPC_URL_ARCHIVE)\s*=' "$DIR/.env" > "$CANDIDATE" || true; fi
 {
-  printf 'RHC_RPC_URLS=%s,%s\n' "$URL" "$FALLBACK"
+  printf 'RHC_RPC_URLS=%s\n' "$LIST"
   printf 'RHC_RPC_URL_ARCHIVE=%s\n' "$URL"
 } >> "$CANDIDATE"
 note "written to a temporary file; $DIR/.env is untouched so far"
@@ -107,8 +128,10 @@ fi
 say "4. Apply and restart"
 install -o "$USER_NAME" -g "$USER_NAME" -m 600 "$CANDIDATE" "$DIR/.env"
 rm -f "$CANDIDATE"
-note "$DIR/.env now puts $(printf '%s' "$URL" | sed -E 's#(https://[^/]+/).*#\1…#') first, Robinhood's endpoint last"
-if systemctl is-enabled --quiet exdate-watcher 2>/dev/null; then
+note "$DIR/.env now puts $(printf '%s' "$URL" | sed -E 's#(https?://[^/]+/?).*#\1…#') first, Robinhood's endpoint last ($(printf '%s' "$LIST" | tr ',' '\n' | wc -l | tr -d ' ') endpoints)"
+if [ "$DO_RESTART" = no ]; then
+  note "not restarting (--no-restart); the caller will"
+elif systemctl is-enabled --quiet exdate-watcher 2>/dev/null; then
   systemctl restart exdate-watcher
   sleep 4
   systemctl is-active --quiet exdate-watcher && note "exdate-watcher restarted and running" || die "the service did not come back: journalctl -u exdate-watcher -n 20"
