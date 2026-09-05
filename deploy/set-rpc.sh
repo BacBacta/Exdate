@@ -48,20 +48,27 @@ if printf '%s' "$RAW" | grep -q '://'; then
   # A full URL. Keep it as given, but read its key segment for the shape check.
   URL="$RAW"
   KEY="${RAW##*/}"
-  case "$URL" in https://*) ;; *) die "the URL must start with https://";; esac
+  # https, or plain http to this machine only - a node of your own on the same
+  # host is a legitimate endpoint, and a key sent in clear anywhere else is not.
+  case "$URL" in https://*|http://127.0.0.1:*|http://localhost:*) ;; *) die "the URL must start with https:// (plain http is allowed only to 127.0.0.1 or localhost)";; esac
 else
   KEY="$RAW"
   URL="https://$ALCHEMY_HOST/v2/$KEY"
 fi
 
-if printf '%s' "$KEY" | grep -q '[^A-Za-z0-9_-]'; then
-  die "the key contains a character no key has (a quote, a space, a bracket) - $(printf '%s' "$KEY" | wc -c | tr -d ' ') characters as pasted. Copy it again from the dashboard."
+# The shape checks apply to an Alchemy key - bare, or inside an Alchemy URL.
+# Any other host is taken as given: its path is not a key, and the probe is the
+# judge of whether it works.
+if [ "${URL#https://$ALCHEMY_HOST/}" != "$URL" ]; then
+  if printf '%s' "$KEY" | grep -q '[^A-Za-z0-9_-]'; then
+    die "the key contains a character no key has (a quote, a space, a bracket) - $(printf '%s' "$KEY" | wc -c | tr -d ' ') characters as pasted. Copy it again from the dashboard."
+  fi
+  LEN=$(printf '%s' "$KEY" | wc -c | tr -d ' ')
+  [ "$LEN" -eq 32 ] || die "an Alchemy key is 32 characters; this one is $LEN. Nothing written. Copy the whole key from the Robinhood Mainnet app and run this again."
+  note "shape ok: $LEN characters"
+else
+  note "not an Alchemy URL; taken as given, the probe decides"
 fi
-LEN=$(printf '%s' "$KEY" | wc -c | tr -d ' ')
-if [ "${URL#https://$ALCHEMY_HOST/}" != "$URL" ] && [ "$LEN" -ne 32 ]; then
-  die "an Alchemy key is 32 characters; this one is $LEN. Nothing written. Copy the whole key from the Robinhood Mainnet app and run this again."
-fi
-note "shape ok: $LEN characters"
 
 say "2. A candidate .env, not yet in place"
 CANDIDATE="$(mktemp)"
@@ -79,10 +86,22 @@ note "written to a temporary file; $DIR/.env is untouched so far"
 say "3. Does the endpoint do the watcher's job?"
 # Run as the service account, against the candidate file, and require the one
 # check that decides whether this endpoint may go first.
-if ! sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" EXDATE_ENV_FILE="$CANDIDATE" \
+# sudo starts the service account with a clean environment. On a machine that
+# reaches the internet through a proxy, that clean environment has no proxy and
+# every request fails as "fetch failed" - which looks like a bad endpoint and is
+# not. Whatever proxy settings this shell has are handed through, and nothing
+# else is.
+passthrough=()
+for v in HTTPS_PROXY HTTP_PROXY NO_PROXY https_proxy http_proxy no_proxy NODE_EXTRA_CA_CERTS SSL_CERT_FILE; do
+  [ -n "${!v:-}" ] && passthrough+=("$v=${!v}")
+done
+if ! sudo -u "$USER_NAME" env HOME="/home/$USER_NAME" EXDATE_ENV_FILE="$CANDIDATE" "${passthrough[@]}" \
      node "$DIR/scripts/probe-endpoint.mjs" --require watcher-span; then
   rm -f "$CANDIDATE"
-  die "the probe refused this endpoint, so nothing was changed. Read the lines above: a 401 is the key, a refused span is the plan."
+  die "the probe refused this endpoint, so nothing was changed. Read the lines above:
+  'Must be authenticated'  the key - copy it again from the dashboard
+  'watcher span' refused   the plan - this endpoint cannot serve the scan
+  'fetch failed'           the network - this machine could not reach the endpoint at all"
 fi
 
 say "4. Apply and restart"
