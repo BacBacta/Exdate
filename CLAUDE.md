@@ -1326,6 +1326,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   proxy passthrough handed the service account a CA bundle under `/root` it cannot read, so node
   warned on every run and fell back to the system store anyway - a CA is now forwarded only if the
   account can actually read it.
+- 2026-09-05 — **A check that answers yes without a credential, one line before a 403.** Two
+  dispatches of the publish workflow were reported back as "publish done" while npm still served
+  404 for both packages: a `type: boolean` input compared as `inputs.dry_run == false` is skipped
+  whenever the value reaches the expression as the string `"false"`, and the run still reports
+  success. A condition whose failure mode is silence is the wrong condition for an irreversible
+  action, so the input is a string and publishing requires typing `PUBLISH`; the last step stopped
+  narrating which branch it took and asks `registry.npmjs.org` what it actually holds. Run three
+  then published for real and npm refused: `403 … PUT /@exdate%2fcore — You may not perform that
+  action with these credentials`. The line printed immediately before it read *the @exdate scope is
+  visible to this token* — worthless, because `npm access list packages @exdate` exits 0 with **no
+  credential at all** (measured with an empty `HOME`: exit 0, no output). It said yes to everyone
+  and said it right before the refusal. Same shape as the `.git/objects` probe: the thing probed
+  was not the thing that had to be true. What replaced it asks endpoints that require the token and
+  prints their answers, with the member roster as the discriminator — unauthenticated
+  `/-/org/exdate/user` returns `{}` (checked against `@babel` and `@vercel` too, while a made-up
+  scope answers 404 `Scope not found`), authenticated it names each member and role. It settled the
+  question in one line: **`{"bacta16":"owner"}`**, so the account owns the scope and the token is
+  the read-only half — npm's own words being that granting a token an *organization* "does not give
+  the token the right to publish packages managed by the organization", which is a different
+  section of the same form from *Packages and scopes*. The parsing was rehearsed against all six
+  answer shapes before it was pushed, and a refused `PUT` creates nothing, so re-running after
+  fixing the token is free.
 - _(append decisions here as they are made)_
 
 ## Status

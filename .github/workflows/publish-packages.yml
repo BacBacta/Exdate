@@ -7,9 +7,13 @@
 # dispatched by hand and DRY RUN BY DEFAULT.
 #
 # NPM_TOKEN must be a GRANULAR access token - npm removed classic and Automation
-# tokens in November 2025 - with "Read and write" on the @exdate SCOPE, and
-# Bypass 2FA on. Granting the token access to the organization is not the same
-# thing and does not permit publishing; npm's documentation says so explicitly.
+# tokens in November 2025 - with "Read and write" under "Packages and scopes",
+# covering @exdate, and Bypass 2FA on.
+#
+# The "Organizations" section of the same form is NOT that. npm's own words:
+# granting a token access to an organization "does not give the token the right
+# to publish packages managed by the organization". It manages settings, teams
+# and users. A token with only that reads the scope perfectly and 403s on PUT.
 # Once both packages exist, replace it with trusted publishing (OIDC, no token),
 # configured per package on npmjs.com. That path likely wants `npm publish`
 # rather than `pnpm publish`, which documents --provenance but not OIDC.
@@ -161,9 +165,9 @@ jobs:
             esac
           else
             echo "This token does not see $who as a member of the exdate scope."
-            echo "  Either the scope belongs to another account, or the token was granted"
-            echo "  the ORGANISATION rather than the scope - npm states that organisation"
-            echo "  access does not confer publish rights on packages."
+            echo "  The scope resolves on npm - a made-up one answers 404 \"Scope not found\" -"
+            echo "  so it belongs to somebody. If not to this account, no token will publish"
+            echo "  there and the package needs a different scope."
           fi
 
           echo "--- what the scope already holds, as this token sees it"
@@ -181,6 +185,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          # A 403 "You may not perform that action with these credentials" here,
+          # after the step above has shown this account owning the scope, is the
+          # token and nothing else: read-only rather than read and write, an IP
+          # allowlist that excludes GitHub's runners, or the grant made under
+          # "Organizations" instead of "Packages and scopes". Nothing is created
+          # by a refused PUT, so re-running after fixing the token is safe.
+          #
           # core first: the sdk's manifest names an exact version of it.
           pnpm --filter @exdate/core publish --access public --no-git-checks --provenance
           pnpm --filter @exdate/sdk  publish --access public --no-git-checks --provenance
