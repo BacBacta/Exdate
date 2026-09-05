@@ -131,10 +131,13 @@ async function call(method, params, ms = 30_000) {
       // secret - it is what the endpoint tells anyone who asks. Trimmed and
       // capped so a stray HTML error page cannot flood the terminal.
       const said = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)
-      return { err: `HTTP ${response.status}${said ? `: ${said}` : ', empty body'}`, ms: Date.now() - began }
+      return { err: `HTTP ${response.status}${said ? `: ${said}` : ', empty body'}`, status: response.status, ms: Date.now() - began }
     }
-    if (body.error) return { err: String(body.error.message).slice(0, 130), ms: Date.now() - began }
-    return { ok: body.result, ms: Date.now() - began }
+    // A 401 can arrive as well-formed JSON-RPC - Alchemy's does - so the HTTP
+    // status travels separately from the message, or a credential problem
+    // would be indistinguishable from any other RPC error.
+    if (body.error) return { err: String(body.error.message).slice(0, 130), status: response.status, ms: Date.now() - began }
+    return { ok: body.result, status: response.status, ms: Date.now() - began }
   } catch (error) {
     return { err: error.name === 'TimeoutError' ? 'timeout' : String(error.message).slice(0, 90), ms: Date.now() - began }
   }
@@ -155,7 +158,7 @@ start('chain')
 const chain = await call('eth_chainId', [])
 if (chain.err) {
   line('reachable', false, chain.err)
-  if (/^HTTP 401/.test(chain.err)) {
+  if (chain.status === 401 || chain.status === 403) {
     // The key's LENGTH, never the key. An Alchemy key is 32 characters; 33 means
     // a stray quote or space rode along with the paste, and that is a different
     // fix from a key the dashboard no longer recognises.
