@@ -223,12 +223,37 @@ fi
 say "7. Does it answer?"
 # Locally first: a failure here is the indexer, not TLS. Then publicly, which is
 # the only proof that the certificate was issued and the proxy is wired.
-ok=no
-for attempt in $(seq 1 30); do
-  if curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health >/dev/null 2>&1; then ok=yes; break; fi
-  sleep 4
-done
-[ "$ok" = yes ] || die "the API did not answer on 127.0.0.1:42069 within two minutes: docker compose logs indexer"
+api_healthy() {
+  for _ in $(seq 1 30); do
+    curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health >/dev/null 2>&1 && return 0
+    sleep 4
+  done
+  return 1
+}
+if ! api_healthy; then
+  # Ponder refuses a schema written by a different build of the app, and its build
+  # id hashes the indexing functions - which import the generated registry - so an
+  # upgrade that changes the record changes it. That is what this run hits, not a
+  # broken deployment: measured on 2026-09-05, where the indexer crashlooped with
+  # "previously used by a different Ponder app" while Caddy answered 502.
+  #
+  # Dropping loses only derived tables: the poller rewrites token states,
+  # reconciliations and the seeded multiplier events within one interval,
+  # feed_rounds is an observation log whose prices are re-readable from the
+  # aggregator, and the self-service subscriptions live on a volume, not in
+  # Postgres. The schema, user and database names are fixed in docker-compose.yml.
+  if docker compose logs --tail=80 indexer 2>/dev/null | grep -q 'previously used by a different Ponder app'; then
+    warn "Ponder refuses the existing schema because this build differs; dropping \"exdate\" and rebuilding it"
+    docker compose exec -T db psql -v ON_ERROR_STOP=1 -U exdate -d exdate \
+      -c 'DROP SCHEMA IF EXISTS "exdate" CASCADE' >/dev/null </dev/null \
+      || die "could not drop the schema: docker compose exec db psql -U exdate -d exdate"
+    docker compose up -d --force-recreate indexer </dev/null
+    api_healthy || die "the API still does not answer after dropping the schema: docker compose logs indexer"
+    note "schema rebuilt; the poller refills it within one interval"
+  else
+    die "the API did not answer on 127.0.0.1:42069 within two minutes: docker compose logs indexer"
+  fi
+fi
 note "API answers locally: $(curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health)"
 
 # A certificate takes a few seconds on a first run. Not fatal: the containers

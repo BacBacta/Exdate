@@ -238,11 +238,30 @@ journalctl -u exdate-api-update -f      # what the timer is doing
 /opt/exdate-api/deploy/update-api.sh --force   # rebuild now
 ```
 
+**What a redeploy costs, and why it is unavoidable here.** Ponder refuses to reuse a schema written
+by a different build of the app, and its build id is
+`sha256(version + config + schema + indexing functions)` — where the indexing functions include
+everything they import, **the generated registry among them**. So every upgrade that carries a new
+record changes it, and the indexer crashloops with *"Schema exdate was previously used by a
+different Ponder app"* while Caddy answers 502. Measured on the 2026-09-05 redeploy, which is the
+only reason the recovery exists: the first version of the timer would have taken the API down on
+every tick that mattered.
+
+Both scripts now recover, and the trigger is Ponder's own refusal in the log rather than a guess
+about which commits change a hash — so it never fires when Ponder is content. Recovery is
+`DROP SCHEMA exdate CASCADE` and a recreate, and what that costs is only derived tables: the poller
+rewrites token states, reconciliations and the multiplier events it seeds from the committed
+registry within one poll interval; `feed_rounds` is an observation log whose prices are re-readable
+from the aggregator with `getRoundData`; the webhook outbox holds deliveries already made. The
+self-service subscriptions are **not** in Postgres — they are a file on a volume — so they survive.
+
 `deploy/update-api.sh` was rehearsed against a real git repository with `docker` and `curl` stubbed:
 nothing new → says so and exits; a `data/`-only commit → moves the checkout forward without
 rebuilding; a commit touching `packages/` → rebuilds; and it dies rather than reporting success when
 a service is missing, when the watcher comes up beside the systemd one, when the API never answers,
-when `EXDATE_DIR` points at the watcher's checkout, and when there is no checkout at all.
+when `EXDATE_DIR` points at the watcher's checkout, and when there is no checkout at all. The
+recovery has its own two: an unhealthy indexer whose log carries Ponder's refusal is dropped and
+recreated, and an unhealthy indexer whose log does not is left alone and reported.
 
 **Live since 2026-09-04**: `https://api.exdate.me` and `https://status.exdate.me`, on the same
 Hetzner machine as the watcher, which is untouched and still under systemd. Verified from outside:

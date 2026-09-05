@@ -33,6 +33,46 @@ IMAGE_INPUTS='^(packages/|apps/status/|Dockerfile$|deploy/status.Dockerfile$|dep
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
 die() { log "stopped: $*" >&2; exit 1; }
 
+# The schema, user and database are fixed in docker-compose.yml (DATABASE_SCHEMA,
+# POSTGRES_USER, POSTGRES_DB), not substituted from the environment.
+DB_SCHEMA=exdate
+DB_USER=exdate
+DB_NAME=exdate
+
+api_healthy() {
+  for _ in $(seq 1 "${1:-30}"); do
+    curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health >/dev/null 2>&1 && return 0
+    sleep 4
+  done
+  return 1
+}
+
+# Ponder refuses to reuse a schema written by a different build of the app, and its
+# build id is sha256(version + config + schema + indexing functions) - where the
+# indexing functions include everything they import, the GENERATED REGISTRY among
+# them. So every rebuild worth making changes it, and the indexer crashloops with
+# "Schema ... was previously used by a different Ponder app" while Caddy answers
+# 502. Measured on the 2026-09-05 redeploy, which is the only reason this exists:
+# the first version of this script would have taken the API down on every tick.
+#
+# Recovery is dropping the schema, and it is driven by Ponder's own refusal rather
+# than by guessing which commits change a hash: the log line is the trigger, so it
+# never fires when Ponder is content. What that costs is the derived tables, and
+# they are derived: the poller rewrites token states, reconciliations and the
+# multiplier events it seeds from the committed registry within one poll interval,
+# feed_rounds is an observation log whose prices are re-readable from the
+# aggregator with getRoundData, and the webhook outbox holds deliveries already
+# made. The self-service subscriptions are NOT in Postgres - they are a file on a
+# volume - so they survive.
+recover_ponder_schema() {
+  docker compose logs --tail=80 indexer 2>/dev/null | grep -q 'previously used by a different Ponder app' || return 1
+  log "Ponder refuses the existing schema: its build id changed. Dropping \"$DB_SCHEMA\" and letting it rebuild."
+  docker compose exec -T db psql -v ON_ERROR_STOP=1 -U "$DB_USER" -d "$DB_NAME" \
+    -c "DROP SCHEMA IF EXISTS \"$DB_SCHEMA\" CASCADE" >/dev/null </dev/null || return 1
+  docker compose up -d --force-recreate indexer </dev/null
+  return 0
+}
+
 [ "$DIR" != "$WATCHER_DIR" ] || die "EXDATE_DIR must not be the watcher's checkout ($WATCHER_DIR)"
 [ -d "$DIR/.git" ] || die "$DIR is not a checkout; run deploy/install-api.sh first"
 cd "$DIR"
@@ -69,11 +109,13 @@ case " $running " in
   *" watcher "*) die "the watcher came up here; this machine runs it under systemd and two would race on one committed file";;
 esac
 
-ok=no
-for _ in $(seq 1 30); do
-  if curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health >/dev/null 2>&1; then ok=yes; break; fi
-  sleep 4
-done
-[ "$ok" = yes ] || die "the API did not answer on 127.0.0.1:42069 within two minutes: docker compose logs indexer"
+if ! api_healthy 30; then
+  if recover_ponder_schema; then
+    api_healthy 30 || die "the API still does not answer after dropping the schema: docker compose logs indexer"
+    log "recovered: the schema was rebuilt from scratch, and the poller refills it within one interval"
+  else
+    die "the API did not answer on 127.0.0.1:42069 within two minutes, and it is not the Ponder schema: docker compose logs indexer"
+  fi
+fi
 
 log "up at ${after:0:7}: $(curl -fsS --max-time 5 http://127.0.0.1:42069/v1/health)"
