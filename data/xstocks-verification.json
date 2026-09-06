@@ -1,0 +1,730 @@
+{
+  "note": "xStocks (Backed) read back on chain from the issuer’s own address-keyed registry. Every selector is computed from its signature; every address comes from api.xstocks.fi and is confirmed to hold code. A sample per chain, not a census, because the claim under test is about one shared implementation.",
+  "source": {
+    "registry": "https://api.xstocks.fi/api/v2/public/assets",
+    "documentation": "https://docs.xstocks.fi/developers/multipliers"
+  },
+  "observedAt": "2026-09-06T01:06:33.839Z",
+  "issuer": "Backed Finance (xStocks)",
+  "registry": {
+    "assets": 726,
+    "deploymentsByNetwork": {
+      "Ethereum": 726,
+      "BinanceSmartChain": 726,
+      "Arbitrum": 697,
+      "Solana": 726,
+      "Ton": 726,
+      "Mantle": 718,
+      "HyperEVM": 698,
+      "Ink": 726,
+      "XLayer": 726,
+      "Optimism": 726,
+      "Tron": 74
+    }
+  },
+  "selectors": {
+    "getCurrentMultiplier": "0x2b63c300",
+    "sharesOf": "0xf5eb42dc",
+    "symbol": "0x95d89b41",
+    "decimals": "0x313ce567",
+    "totalSupply": "0x18160ddd",
+    "balanceOf": "0x70a08231",
+    "lastTimeFeeApplied": "0x3dfa34cd",
+    "feePerPeriod": "0xf00c1dff",
+    "periodLength": "0xd2ca2115",
+    "uiMultiplier": "0xa60bf13d",
+    "balanceOfUI": "0x437a9958",
+    "multiplier": "0x1b3ed722"
+  },
+  "chains": {
+    "Ethereum": {
+      "chainId": 1,
+      "endpoint": "ethereum-rpc.publicnode.com",
+      "endpointConfirmedBy": "eth_chainId",
+      "deployments": 726,
+      "sampled": 6,
+      "tokens": [
+        {
+          "symbol": "AAPLx",
+          "underlyingSymbol": "AAPL",
+          "isin": "CH1436219187",
+          "address": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+          "explorer": "https://etherscan.io/address/0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+          "codeBytes": 2138,
+          "onChainSymbol": "AAPLx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "74144718747903202410949",
+          "multiplierWad": "1003269012539818700",
+          "multiplierDecimal": "1.0032690125398187",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "5"
+          ],
+          "plainMultiplierWad": "1003269012539818700",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "SPYx",
+          "underlyingSymbol": "SPY",
+          "isin": "CH1436219716",
+          "address": "0x90a2a4c76b5d8c0bc892a69ea28aa775a8f2dd48",
+          "explorer": "https://etherscan.io/address/0x90a2a4c76b5d8c0bc892a69ea28aa775a8f2dd48",
+          "codeBytes": 2138,
+          "onChainSymbol": "SPYx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "30151354243335401773820",
+          "multiplierWad": "1005714560286254000",
+          "multiplierDecimal": "1.005714560286254",
+          "getCurrentMultiplierExtraWords": [
+            "0",
+            "4"
+          ],
+          "plainMultiplierWad": "1005714560286254000",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788652800
+        },
+        {
+          "symbol": "NVDAx",
+          "underlyingSymbol": "NVDA",
+          "isin": "CH1436219195",
+          "address": "0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
+          "explorer": "https://etherscan.io/address/0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
+          "codeBytes": 2138,
+          "onChainSymbol": "NVDAx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "110094400550734465768153",
+          "multiplierWad": "1000918075849099600",
+          "multiplierDecimal": "1.0009180758490996",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "4"
+          ],
+          "plainMultiplierWad": "1000918075849099600",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "TSLAx",
+          "underlyingSymbol": "TSLA",
+          "isin": "CH1436219252",
+          "address": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
+          "explorer": "https://etherscan.io/address/0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
+          "codeBytes": 2138,
+          "onChainSymbol": "TSLAx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "45000000000000000000000",
+          "multiplierWad": "1000000000000000000",
+          "multiplierDecimal": "1",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "0"
+          ],
+          "plainMultiplierWad": "1000000000000000000",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "MSTRx",
+          "underlyingSymbol": "MSTR",
+          "isin": "CH1436219633",
+          "address": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
+          "explorer": "https://etherscan.io/address/0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
+          "codeBytes": 2138,
+          "onChainSymbol": "MSTRx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "133000000000000000000000",
+          "multiplierWad": "1000000000000000000",
+          "multiplierDecimal": "1",
+          "getCurrentMultiplierExtraWords": [
+            "0",
+            "0"
+          ],
+          "plainMultiplierWad": "1000000000000000000",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788652800
+        },
+        {
+          "symbol": "KOx",
+          "underlyingSymbol": "KO",
+          "isin": "CH1436219419",
+          "address": "0xdcc1a2699441079da889b1f49e12b69cc791129b",
+          "explorer": "https://etherscan.io/address/0xdcc1a2699441079da889b1f49e12b69cc791129b",
+          "codeBytes": 2138,
+          "onChainSymbol": "KOx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "146437767081560838608609",
+          "multiplierWad": "1018331796738689800",
+          "multiplierDecimal": "1.0183317967386898",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "4"
+          ],
+          "plainMultiplierWad": "1018331796738689800",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        }
+      ]
+    },
+    "BinanceSmartChain": {
+      "chainId": 56,
+      "endpoint": "bsc-rpc.publicnode.com",
+      "endpointConfirmedBy": "eth_chainId",
+      "deployments": 726,
+      "sampled": 6,
+      "tokens": [
+        {
+          "symbol": "AAPLx",
+          "underlyingSymbol": "AAPL",
+          "isin": "CH1436219187",
+          "address": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+          "explorer": "https://bscscan.com/address/0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+          "codeBytes": 2138,
+          "onChainSymbol": "AAPLx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "10024852143472694160207",
+          "multiplierWad": "1003269012539818700",
+          "multiplierDecimal": "1.0032690125398187",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "5"
+          ],
+          "plainMultiplierWad": "1003269012539818700",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "SPYx",
+          "underlyingSymbol": "SPY",
+          "isin": "CH1436219716",
+          "address": "0x90a2a4c76b5d8c0bc892a69ea28aa775a8f2dd48",
+          "explorer": "https://bscscan.com/address/0x90a2a4c76b5d8c0bc892a69ea28aa775a8f2dd48",
+          "codeBytes": 2138,
+          "onChainSymbol": "SPYx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "10057145602862540000000",
+          "multiplierWad": "1005714560286254000",
+          "multiplierDecimal": "1.005714560286254",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "4"
+          ],
+          "plainMultiplierWad": "1005714560286254000",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "NVDAx",
+          "underlyingSymbol": "NVDA",
+          "isin": "CH1436219195",
+          "address": "0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
+          "explorer": "https://bscscan.com/address/0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
+          "codeBytes": 2138,
+          "onChainSymbol": "NVDAx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "41161399012988697772597",
+          "multiplierWad": "1000918075849099600",
+          "multiplierDecimal": "1.0009180758490996",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "4"
+          ],
+          "plainMultiplierWad": "1000918075849099600",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "TSLAx",
+          "underlyingSymbol": "TSLA",
+          "isin": "CH1436219252",
+          "address": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
+          "explorer": "https://bscscan.com/address/0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
+          "codeBytes": 2138,
+          "onChainSymbol": "TSLAx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "20000000000000000000000",
+          "multiplierWad": "1000000000000000000",
+          "multiplierDecimal": "1",
+          "getCurrentMultiplierExtraWords": [
+            "0",
+            "0"
+          ],
+          "plainMultiplierWad": "1000000000000000000",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788652800
+        },
+        {
+          "symbol": "MSTRx",
+          "underlyingSymbol": "MSTR",
+          "isin": "CH1436219633",
+          "address": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
+          "explorer": "https://bscscan.com/address/0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
+          "codeBytes": 2138,
+          "onChainSymbol": "MSTRx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "30946962827468499022000",
+          "multiplierWad": "1000000000000000000",
+          "multiplierDecimal": "1",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "0"
+          ],
+          "plainMultiplierWad": "1000000000000000000",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        },
+        {
+          "symbol": "KOx",
+          "underlyingSymbol": "KO",
+          "isin": "CH1436219419",
+          "address": "0xdcc1a2699441079da889b1f49e12b69cc791129b",
+          "explorer": "https://bscscan.com/address/0xdcc1a2699441079da889b1f49e12b69cc791129b",
+          "codeBytes": 2138,
+          "onChainSymbol": "KOx",
+          "symbolMatches": true,
+          "decimals": 18,
+          "totalSupply": "34272899265907593053999",
+          "multiplierWad": "1018331796738689800",
+          "multiplierDecimal": "1.0183317967386898",
+          "getCurrentMultiplierExtraWords": [
+            "1",
+            "4"
+          ],
+          "plainMultiplierWad": "1018331796738689800",
+          "plainMultiplierAgrees": true,
+          "answers": {
+            "getCurrentMultiplier": true,
+            "sharesOf": true,
+            "symbol": true,
+            "decimals": true,
+            "totalSupply": true,
+            "balanceOf": true,
+            "lastTimeFeeApplied": true,
+            "feePerPeriod": true,
+            "periodLength": true,
+            "uiMultiplier": false,
+            "balanceOfUI": false,
+            "multiplier": true
+          },
+          "feePerPeriod": "0",
+          "periodLengthSeconds": 604800,
+          "lastTimeFeeApplied": 1788048000
+        }
+      ]
+    }
+  },
+  "apiVersusChain": [
+    {
+      "symbol": "AAPLx",
+      "apiMultiplier": 1.0032690125398187,
+      "chainMultiplier": 1.0032690125398187,
+      "agreesTo1e15": true,
+      "pending": null
+    },
+    {
+      "symbol": "SPYx",
+      "apiMultiplier": 1.005714560286254,
+      "chainMultiplier": 1.005714560286254,
+      "agreesTo1e15": true,
+      "pending": null
+    },
+    {
+      "symbol": "NVDAx",
+      "apiMultiplier": 1.0009180758490996,
+      "chainMultiplier": 1.0009180758490996,
+      "agreesTo1e15": true,
+      "pending": null
+    },
+    {
+      "symbol": "TSLAx",
+      "apiMultiplier": 1,
+      "chainMultiplier": 1,
+      "agreesTo1e15": true,
+      "pending": null
+    },
+    {
+      "symbol": "MSTRx",
+      "apiMultiplier": 1,
+      "chainMultiplier": 1,
+      "agreesTo1e15": true,
+      "pending": null
+    },
+    {
+      "symbol": "KOx",
+      "apiMultiplier": 1.0183317967386898,
+      "chainMultiplier": 1.0183317967386898,
+      "agreesTo1e15": true,
+      "pending": null
+    }
+  ],
+  "declaredHistory": {
+    "AAPLx": [
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0032690125398187,
+        "previousMultiplier": 1.0026642075893797,
+        "activationDateTime": "2026-08-08T00:30:00.000Z",
+        "stepBps": 6.03
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0026642075893797,
+        "previousMultiplier": 1.002018559465695,
+        "activationDateTime": "2026-05-09T02:30:00.000Z",
+        "stepBps": 6.44
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.002018559465695,
+        "previousMultiplier": 1.0013934869619912,
+        "activationDateTime": "2026-02-12T23:55:00.000Z",
+        "stepBps": 6.24
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0013934869619912,
+        "previousMultiplier": 1.000781855115,
+        "activationDateTime": "2025-11-13T23:55:00.000Z",
+        "stepBps": 6.11
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.000781855115,
+        "previousMultiplier": 1,
+        "activationDateTime": "2025-08-14T23:55:00.000Z",
+        "stepBps": 7.82
+      }
+    ],
+    "SPYx": [
+      {
+        "reason": "Dividend",
+        "multiplier": 1.005714560286254,
+        "previousMultiplier": 1.003909240011759,
+        "activationDateTime": "2026-06-18T04:00:00.000Z",
+        "stepBps": 17.98
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.003909240011759,
+        "previousMultiplier": 1.0025607582229898,
+        "activationDateTime": "2026-05-01T00:15:00.000Z",
+        "stepBps": 13.45
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0025607582229898,
+        "previousMultiplier": 1.00099942056,
+        "activationDateTime": "2026-01-30T23:55:00.000Z",
+        "stepBps": 15.6
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.00099942056,
+        "previousMultiplier": 1,
+        "activationDateTime": "2025-10-31T23:55:00.000Z",
+        "stepBps": 9.99
+      }
+    ],
+    "NVDAx": [
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0009180758490996,
+        "previousMultiplier": 1.000103090792305,
+        "activationDateTime": "2026-06-04T00:30:00.000Z",
+        "stepBps": 8.15
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.000103090792305,
+        "previousMultiplier": 1.0000658218334353,
+        "activationDateTime": "2026-04-02T11:20:00.000Z",
+        "stepBps": 0.37
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0000658218334353,
+        "previousMultiplier": 1.00003086642674,
+        "activationDateTime": "2025-12-26T23:55:00.000Z",
+        "stepBps": 0.35
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.00003086642674,
+        "previousMultiplier": 1,
+        "activationDateTime": "2025-10-02T23:55:00.000Z",
+        "stepBps": 0.31
+      }
+    ],
+    "TSLAx": [],
+    "MSTRx": [],
+    "KOx": [
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0183317967386898,
+        "previousMultiplier": 1.013779482672994,
+        "activationDateTime": "2026-06-14T23:55:00.000Z",
+        "stepBps": 44.9
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.013779482672994,
+        "previousMultiplier": 1.0089563566803357,
+        "activationDateTime": "2026-03-13T00:15:00.000Z",
+        "stepBps": 47.8
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0089563566803357,
+        "previousMultiplier": 1.0053372508,
+        "activationDateTime": "2025-12-15T23:55:00.000Z",
+        "stepBps": 36
+      },
+      {
+        "reason": "Dividend",
+        "multiplier": 1.0053372508,
+        "previousMultiplier": 1,
+        "activationDateTime": "2025-10-01T23:55:00.000Z",
+        "stepBps": 53.37
+      }
+    ]
+  },
+  "findings": [
+    {
+      "name": "every sampled address holds code",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "on-chain symbol matches the registry",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "getCurrentMultiplier() answers",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "sharesOf() answers - the constant is here, not in balanceOf",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "ERC-8056 uiMultiplier() reverts - this is NOT Robinhood’s standard",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "ERC-8056 balanceOfUI() reverts",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "Coinbase B20’s bare multiplier() ALSO answers here, and agrees",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "a fee accrues in the multiplier (feePerPeriod answers)",
+      "holds": true,
+      "of": 12
+    },
+    {
+      "name": "the issuer’s API and the contract agree on the multiplier",
+      "holds": true,
+      "of": 6
+    },
+    {
+      "name": "the same address carries the same multiplier on Ethereum and BNB Chain",
+      "holds": true,
+      "of": 6
+    }
+  ]
+}

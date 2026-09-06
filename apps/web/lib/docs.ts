@@ -31,6 +31,10 @@ export const DOCS = [
   // asking - and so the reasons nothing is reserved yet are a published measurement rather than a
   // position stated in a conversation.
   { page: '/docs/open-core/', file: 'docs/open-core.md', raw: '/docs/open-core.md', name: 'Open core' },
+  // Also generated (scripts/build-issuer-mechanisms.mjs), from what was read on each chain. Served
+  // because "which issuers does this cover, and what does each actually do" is the question every
+  // integrator asks second, and the answer has three rows read and three marked unread.
+  { page: '/docs/issuers/', file: 'docs/issuer-mechanisms.md', raw: '/docs/issuers.md', name: 'Issuers' },
 ] as const
 export type DocPage = (typeof DOCS)[number]['page']
 
