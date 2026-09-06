@@ -162,3 +162,39 @@ describe('an outbox that is refusing, against one that has not run', () => {
     expect(summary.attempted.triedNotAccepted).toBe(1)
   })
 })
+
+describe('a leg with no sample, beside deliveries that exist', () => {
+  /**
+   * The state the outbox reached on 2026-09-06 the moment it was repaired: 45 deliveries accepted,
+   * none of them a `multiplier.scheduled`, so the leg a subscriber experiences has nothing in it
+   * while `sufficient` is true. Read as "sufficient means every figure is measured", that
+   * published `a median null s over 45 real deliveries`.
+   */
+  const noAnnouncement = (over = {}) =>
+    timing({ announcedAt: null, observedAt: 1_788_400_000, deliveredAt: 1_788_400_042, ...over })
+
+  it('states the total leg as absent rather than as zero', () => {
+    const summary = summarizeLatency([noAnnouncement({ eventId: 'a' }), noAnnouncement({ eventId: 'b' })])
+    expect(summary.sufficient).toBe(true)
+    expect(summary.delivered).toBe(2)
+    // n is the field that says whether there is a figure at all; the median stays null.
+    expect(summary.announceToDeliver).toEqual({ n: 0, medianSeconds: null, minSeconds: null, maxSeconds: null })
+    expect(summary.observeToDeliver.n).toBe(2)
+  })
+
+  it('counts how many went out first time, which is what makes a median readable', () => {
+    const summary = summarizeLatency([
+      noAnnouncement({ eventId: 'a', attempts: 1 }),
+      // Accepted on its sixth attempt: the duration carries the outage it waited through.
+      noAnnouncement({ eventId: 'b', attempts: 6, deliveredAt: 1_788_409_987 }),
+    ])
+    expect(summary.delivered).toBe(2)
+    expect(summary.deliveredFirstAttempt).toBe(1)
+    expect(summary.observeToDeliver.maxSeconds).toBe(9987)
+  })
+
+  it('counts none when every delivery took a retry', () => {
+    const summary = summarizeLatency([noAnnouncement({ attempts: 6 })])
+    expect(summary.deliveredFirstAttempt).toBe(0)
+  })
+})

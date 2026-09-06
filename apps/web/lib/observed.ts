@@ -370,10 +370,13 @@ const webhookLatency = webhookLatencyJson as unknown as {
   observedAt: string
   scope: string
   delivered: number
+  /** Null, not zero, when the API that answered predates the field: unknown is not "none". */
+  deliveredFirstAttempt?: number | null
   sufficient: boolean
   notComputed: string | null
   attempted?: { neverAttempted: number; triedNotAccepted: number; lastError: string | null } | null
   announceToObserve: { n: number; medianSeconds: number | null }
+  observeToDeliver?: { n: number; medianSeconds: number | null }
   announceToDeliver: { n: number; medianSeconds: number | null }
 }
 
@@ -852,15 +855,44 @@ export const delivery = (() => {
        * about latency rather than quoting the poll interval, which is a budget and not a
        * measurement. Same refusal as the off-hours share before it had sampled every session.
        */
-      delivery: webhookLatency.sufficient
-        ? {
-            deliveries: webhookLatency.delivered,
-            medianTotalSeconds: webhookLatency.announceToDeliver.medianSeconds,
-            medianObserveSeconds: webhookLatency.announceToObserve.medianSeconds,
-            observedAt: day(webhookLatency.observedAt),
-            scope: webhookLatency.scope,
-          }
-        : null,
+      /**
+       * The figure a subscriber experiences, and ONLY when it has a sample of its own.
+       *
+       * `sufficient` says a real delivery exists; it does not say this leg was measured. Both are
+       * needed, and conflating them published `a median null s ... over 45 real deliveries` the
+       * moment 45 deliveries landed that carry no on-chain announcement instant - only
+       * `multiplier.scheduled` has one. A leg with no sample is absent, not zero, which is the rule
+       * the module states and this is where it has to be honoured.
+       */
+      delivery:
+        webhookLatency.sufficient && webhookLatency.announceToDeliver.n > 0
+          ? {
+              deliveries: webhookLatency.announceToDeliver.n,
+              medianTotalSeconds: webhookLatency.announceToDeliver.medianSeconds,
+              medianObserveSeconds: webhookLatency.announceToObserve.medianSeconds,
+              observedAt: day(webhookLatency.observedAt),
+              scope: webhookLatency.scope,
+            }
+          : null,
+      /**
+       * What IS measured when the total is not: the outbox's own leg.
+       *
+       * Published with the share of deliveries that went out first time, because a median over
+       * deliveries retried across an outage measures the outage. On 2026-09-06 that was the whole
+       * figure: 45 deliveries accepted on their sixth attempt, a median of 9 987 s, and not one
+       * fact about how fast the outbox is.
+       */
+      outbox:
+        webhookLatency.sufficient && (webhookLatency.observeToDeliver?.n ?? 0) > 0
+          ? {
+              deliveries: webhookLatency.observeToDeliver!.n,
+              medianSeconds: webhookLatency.observeToDeliver!.medianSeconds,
+              // Carried through as null when it is unknown. Collapsing that to 0 would let the
+              // page assert "every one was a retry" on the strength of a field that was absent.
+              firstAttempt: webhookLatency.deliveredFirstAttempt ?? null,
+              observedAt: day(webhookLatency.observedAt),
+            }
+          : null,
       /**
        * Why there is no figure, when there is none.
        *

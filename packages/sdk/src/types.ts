@@ -410,6 +410,11 @@ export interface WebhookLatencyResponse {
   basis: string
   endpointsConfigured: number
   delivered: number
+  /**
+   * Of those, how many went out first time. The qualifier the medians need: a delivery accepted on
+   * its sixth attempt, after a subscriber was repaired, carries the outage in its duration.
+   */
+  deliveredFirstAttempt: number
   pending: number
   /**
    * Why `pending` is what it is.

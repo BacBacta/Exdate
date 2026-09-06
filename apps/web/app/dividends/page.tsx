@@ -156,6 +156,18 @@ export default function Page() {
                 {delivery.announced.delivery.medianObserveSeconds} s was exdate noticing. Measured{' '}
                 {delivery.announced.delivery.observedAt}; {delivery.announced.delivery.scope}.
               </p>
+            ) : delivery.announced.outbox ? (
+              <p>
+                How long the outbox itself took is measured; how long a subscriber waits after the
+                chain is not, because only an announced multiplier has an on-chain instant to be late
+                against and none of the {delivery.announced.outbox.deliveries} deliveries measured so
+                far is one.{' '}
+                {delivery.announced.outbox.firstAttempt === null
+                  ? 'How many went out first time is not recorded for these, so their median is not read as the speed of the path.'
+                  : delivery.announced.outbox.firstAttempt === 0
+                    ? 'Every one of them was accepted on a retry after a subscriber was unreachable, so their median carries that outage and not the speed of the path.'
+                    : `${delivery.announced.outbox.firstAttempt} of them went out first time.`}
+              </p>
             ) : delivery.announced.deliveryRefused?.reason === 'refused' ? (
               <p>
                 How fast that notice reaches a subscriber is not stated here: {delivery.announced.deliveryRefused.attempted}{' '}

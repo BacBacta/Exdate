@@ -63,6 +63,12 @@ const out = {
     'the subscriber is exdate’s own receiver on the same host, so public internet transit to a third party is not included',
   endpointsConfigured: answer.endpointsConfigured ?? null,
   delivered: answer.delivered,
+  /**
+   * Of those, how many went out first time. Without it the medians below cannot be read: 45
+   * deliveries accepted on their sixth attempt, the moment an unreachable subscriber was repaired,
+   * produce a true observe-to-deliver median of 9 987 s that says nothing about the delivery path.
+   */
+  deliveredFirstAttempt: answer.deliveredFirstAttempt ?? null,
   pending: answer.pending,
   /**
    * Why `pending` is what it is. A subscriber nobody can reach and an outbox that has not run yet
@@ -94,9 +100,15 @@ if (unchanged) {
   writeFileSync(OUT, JSON.stringify(out, null, 2) + '\n')
   const total = out.announceToDeliver
   const tried = out.attempted?.triedNotAccepted ?? 0
+  const outbox = out.observeToDeliver
   console.error(
     out.sufficient
-      ? `# ${out.delivered} real deliver${out.delivered === 1 ? 'y' : 'ies'}; announce -> deliver median ${total.medianSeconds ?? 'n/a'}s over n=${total.n} -> data/webhook-latency.observed.json`
+      ? // The leg that was measured, named. Reporting "announce -> deliver median n/a over n=0" as
+        // the headline says nothing and reads like a figure: only multiplier.scheduled carries an
+        // on-chain instant, so that leg is empty until one is delivered.
+        total.n > 0
+        ? `# ${out.delivered} real deliver${out.delivered === 1 ? 'y' : 'ies'}; announce -> deliver median ${total.medianSeconds}s over n=${total.n} -> data/webhook-latency.observed.json`
+        : `# ${out.delivered} real deliver${out.delivered === 1 ? 'y' : 'ies'}, ${out.deliveredFirstAttempt ?? '?'} first time; observe -> deliver median ${outbox?.medianSeconds ?? 'n/a'}s over n=${outbox?.n ?? 0}; announce -> deliver has no sample yet (no multiplier.scheduled delivered) -> data/webhook-latency.observed.json`
       : tried > 0
         ? // Not "no real delivery yet": deliveries were tried and refused, which is a different
           // thing and the one worth saying out loud.
