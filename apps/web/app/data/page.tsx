@@ -40,7 +40,7 @@ export default function Page() {
           <div className="wrap">
             <ul className="datasets">
               {files.map((dataset) => (
-                <li key={dataset.file}>
+                <li key={dataset.file} id={dataset.file}>
                   {dataset.issuer ? (
                     github ? (
                       <a href={`${github}/blob/HEAD/data/${dataset.file}`}>{dataset.file}</a>
@@ -55,10 +55,22 @@ export default function Page() {
                     {dataset.observedAt ? `${dateLong(dataset.observedAt)} · ` : ''}
                     {kb(dataset.bytes)}
                     {dataset.issuer ? ' · the issuer’s data, in the repository only' : ''}
+                    {dataset.page ? (
+                      <>
+                        {' · '}
+                        <a href={dataset.page}>where it is shown</a>
+                      </>
+                    ) : null}
                   </span>
                 </li>
               ))}
             </ul>
+            <p className="note-box">
+              Every past state of these files is in git, and{' '}
+              <a href="/data/history/index.json">/data/history/</a> indexes it: one line per change
+              of a published figure, derived from the commit history rather than captured, so the
+              index cannot drift from the record it describes.
+            </p>
             <p className="note-box">
               Rebuilt by the scripts in the repository; nothing here is typed by hand. The
               corporate-action archive and the session samples grow on a schedule, the rest when a

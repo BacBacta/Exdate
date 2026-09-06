@@ -176,7 +176,7 @@ export default function Page() {
               />
             </div>
             <Links>
-              <a href="/data/primary-flows.observed.json">Every window, as data</a>
+              <a href="/data/#primary-flows.observed.json">Every window, as data</a>
             </Links>
           </Section>
         ) : null}
