@@ -19,9 +19,9 @@ const GeistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'exdate — see what your Stock Tokens actually paid you',
+  title: 'exdate — every dividend declared, against what actually arrived',
   description:
-    'When a Stock Token pays a dividend, nothing lands in your wallet: the token becomes worth a little more. exdate measures how much, and how much went missing on the way.',
+    'When a Stock Token pays a dividend, nothing lands in your wallet: the token becomes worth a little more. exdate reads both sides — what the issuer declared and what the chain delivered — and publishes the difference, with the method that produced it.',
   // Every og:image and twitter:image is made absolute against this, so it decides
   // whose server answers when someone shares a page. It said `exdate.xyz`, which
   // belongs to an unrelated site. VERCEL_PROJECT_PRODUCTION_URL was tried next
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_EXDATE_SITE_URL || 'https://www.exdate.me'),
   openGraph: {
     title: 'exdate',
-    description: 'See what your Stock Tokens actually paid you.',
+    description: 'Every dividend declared, against what actually arrived.',
     type: 'website',
   },
   // Feed discovery: a reader that is handed any page can find the feed.
