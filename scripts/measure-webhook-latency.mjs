@@ -64,6 +64,12 @@ const out = {
   endpointsConfigured: answer.endpointsConfigured ?? null,
   delivered: answer.delivered,
   pending: answer.pending,
+  /**
+   * Why `pending` is what it is. A subscriber nobody can reach and an outbox that has not run yet
+   * both leave every delivery queued, so without this the file records the same thing for both -
+   * which is exactly what it did on 2026-09-06 while every delivery was answering `fetch failed`.
+   */
+  attempted: answer.attempted ?? null,
   failed: answer.failed,
   sufficient: answer.sufficient,
   notComputed: answer.notComputed,
@@ -87,9 +93,38 @@ if (unchanged) {
 } else {
   writeFileSync(OUT, JSON.stringify(out, null, 2) + '\n')
   const total = out.announceToDeliver
+  const tried = out.attempted?.triedNotAccepted ?? 0
   console.error(
     out.sufficient
       ? `# ${out.delivered} real deliver${out.delivered === 1 ? 'y' : 'ies'}; announce -> deliver median ${total.medianSeconds ?? 'n/a'}s over n=${total.n} -> data/webhook-latency.observed.json`
-      : `# no real delivery yet (${out.notComputed}); recorded as insufficient rather than estimated -> data/webhook-latency.observed.json`,
+      : tried > 0
+        ? // Not "no real delivery yet": deliveries were tried and refused, which is a different
+          // thing and the one worth saying out loud.
+          `# ${tried} deliver${tried === 1 ? 'y' : 'ies'} attempted and none accepted (${out.notComputed}) -> data/webhook-latency.observed.json`
+        : `# no real delivery yet (${out.notComputed}); recorded as insufficient rather than estimated -> data/webhook-latency.observed.json`,
   )
+}
+
+/*
+ * An outbox that is being drained and refused is BROKEN, not merely unmeasured, and it must not
+ * pass quietly as the second.
+ *
+ * This ran for hours on 2026-09-06 with a subscriber configured, 45 deliveries at five attempts
+ * each and every one answering `fetch failed` at the socket. Nothing failed, nothing alerted, and
+ * the committed file said `sufficient: false` - which was true and read exactly like an outbox
+ * waiting for its first event. A failed scheduled run emails the repository owner with no
+ * configuration at all, which is the alarm this had and never rang.
+ *
+ * AFTER the write, deliberately: failing first would discard the reading that explains the
+ * failure. The same order deploy/update-api.sh and the capture watchdog use.
+ */
+const attempted = out.attempted
+if (!out.sufficient && attempted && attempted.triedNotAccepted > 0) {
+  console.error(
+    `# BROKEN: ${attempted.triedNotAccepted} deliver${attempted.triedNotAccepted === 1 ? 'y has' : 'ies have'} been attempted and none accepted` +
+      `${attempted.lastError ? `; last answer: ${attempted.lastError}` : ''}` +
+      `${attempted.lastResponseStatus === null ? ' (no HTTP status, so the connection itself never happened)' : ` (HTTP ${attempted.lastResponseStatus})`}`,
+  )
+  console.error('# The subscriber is unreachable or refusing. Look at: docker compose logs receiver, on the API host.')
+  process.exit(1)
 }

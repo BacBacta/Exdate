@@ -642,6 +642,10 @@ export function createApi({
           observedAt: Number(event.createdAt),
           deliveredAt: delivery.deliveredAt === null ? null : Number(delivery.deliveredAt),
           attempts: delivery.attempts,
+          // What the socket actually answered. Without it, a subscriber nobody can reach and an
+          // outbox that has not run yet publish the same summary.
+          lastError: delivery.error,
+          lastResponseStatus: delivery.responseStatus,
         },
       ]
     })

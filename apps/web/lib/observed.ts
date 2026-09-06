@@ -372,6 +372,7 @@ const webhookLatency = webhookLatencyJson as unknown as {
   delivered: number
   sufficient: boolean
   notComputed: string | null
+  attempted?: { neverAttempted: number; triedNotAccepted: number; lastError: string | null } | null
   announceToObserve: { n: number; medianSeconds: number | null }
   announceToDeliver: { n: number; medianSeconds: number | null }
 }
@@ -860,6 +861,20 @@ export const delivery = (() => {
             scope: webhookLatency.scope,
           }
         : null,
+      /**
+       * Why there is no figure, when there is none.
+       *
+       * "Nothing has been delivered yet" and "every delivery was refused" are different sentences
+       * and only one of them was ever being said. On 2026-09-06 the second was true for hours -
+       * 45 deliveries, five attempts each, refused at the socket - and the page read exactly as it
+       * does on a quiet first day. A refusal has to name its own reason, the same rule the
+       * off-hours share and every reconciliation row follow.
+       */
+      deliveryRefused: webhookLatency.sufficient
+        ? null
+        : (webhookLatency.attempted?.triedNotAccepted ?? 0) > 0
+          ? { attempted: webhookLatency.attempted!.triedNotAccepted, reason: 'refused' as const }
+          : { attempted: 0, reason: 'none-yet' as const },
     },
     /** Landings: how long after the issuer's own process date the step appeared. */
     landed: {

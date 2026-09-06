@@ -4,6 +4,11 @@ node_modules
 **/out
 **/dist
 **/.ponder
+# Runtime state the indexer owns. WORKDIR is /app/packages/indexer, which is exactly where the
+# default journal path resolves - so a stray .exdate/ in the build context would be read as real
+# deliveries by the latency route. compose sets EXDATE_LATENCY_JOURNAL_FILE to the volume, and
+# this makes sure there is nothing for it to fall back onto.
+**/.exdate
 .git
 .vercel
 .env

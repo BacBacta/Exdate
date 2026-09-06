@@ -98,3 +98,67 @@ describe('announcedAtFromPayload', () => {
     expect(announcedAtFromPayload('multiplier.scheduled', '{"data":{"announcedAt":"nope"}}')).toBeNull()
   })
 })
+
+describe('an outbox that is refusing, against one that has not run', () => {
+  /**
+   * Measured on 2026-09-06 against the live API: exdate's own subscriber had 45 deliveries at five
+   * attempts each, every one answering `fetch failed` at the socket, and the published summary read
+   * `pending: 45, notComputed: "no_real_delivery_yet"` - true, and identical to what an outbox
+   * written a minute ago would say. The receiver had been unreachable for hours and the surface
+   * everyone reads could not show it.
+   */
+  const refused = (n: number) =>
+    Array.from({ length: n }, (_, i) =>
+      timing({ eventId: `dividend.pending:4663:${i}`, deliveredAt: null, attempts: 5, lastError: 'fetch failed', lastResponseStatus: null }),
+    )
+
+  it('says the deliveries were attempted and refused, not that none has happened yet', () => {
+    const summary = summarizeLatency(refused(45))
+    expect(summary.pending).toBe(45)
+    expect(summary.sufficient).toBe(false)
+    expect(summary.notComputed).toBe('deliveries_attempted_none_accepted')
+    expect(summary.attempted).toEqual({
+      neverAttempted: 0,
+      triedNotAccepted: 45,
+      lastError: 'fetch failed',
+      lastResponseStatus: null,
+    })
+  })
+
+  it('keeps saying nothing has been delivered yet when nothing has been tried', () => {
+    const summary = summarizeLatency([timing({ deliveredAt: null, attempts: 0 })])
+    expect(summary.notComputed).toBe('no_real_delivery_yet')
+    expect(summary.attempted.neverAttempted).toBe(1)
+    expect(summary.attempted.triedNotAccepted).toBe(0)
+    expect(summary.attempted.lastError).toBeNull()
+  })
+
+  it('separates the two when the outbox holds both', () => {
+    const summary = summarizeLatency([
+      timing({ eventId: 'a', deliveredAt: null, attempts: 0 }),
+      timing({ eventId: 'b', deliveredAt: null, attempts: 3, lastError: 'ECONNREFUSED', lastResponseStatus: null }),
+    ])
+    expect(summary.attempted.neverAttempted).toBe(1)
+    expect(summary.attempted.triedNotAccepted).toBe(1)
+    expect(summary.attempted.lastError).toBe('ECONNREFUSED')
+  })
+
+  it('reports the status of a subscriber that answers and rejects, not only one that refuses the socket', () => {
+    // A subscriber whose signature check fails answers 400. That is a different problem from an
+    // unreachable one and must not be reported as the same thing.
+    const summary = summarizeLatency([
+      timing({ deliveredAt: null, attempts: 2, lastError: 'HTTP 400', lastResponseStatus: 400 }),
+    ])
+    expect(summary.attempted.lastResponseStatus).toBe(400)
+    expect(summary.notComputed).toBe('deliveries_attempted_none_accepted')
+  })
+
+  it('says nothing about attempts once a real delivery exists', () => {
+    const summary = summarizeLatency([timing(), timing({ eventId: 'b', deliveredAt: null, attempts: 4, lastError: 'fetch failed' })])
+    expect(summary.sufficient).toBe(true)
+    expect(summary.notComputed).toBeNull()
+    // Still counted, because a subscriber that accepts one delivery and refuses the next is not
+    // healthy, and a summary that reported only the success would say it was.
+    expect(summary.attempted.triedNotAccepted).toBe(1)
+  })
+})

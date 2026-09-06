@@ -156,6 +156,13 @@ export default function Page() {
                 {delivery.announced.delivery.medianObserveSeconds} s was exdate noticing. Measured{' '}
                 {delivery.announced.delivery.observedAt}; {delivery.announced.delivery.scope}.
               </p>
+            ) : delivery.announced.deliveryRefused?.reason === 'refused' ? (
+              <p>
+                How fast that notice reaches a subscriber is not stated here: {delivery.announced.deliveryRefused.attempted}{' '}
+                deliveries have been attempted and none accepted, so there is a delivery path that is
+                not working rather than one that has not run yet. Saying only &ldquo;nothing measured
+                so far&rdquo; would describe the second.
+              </p>
             ) : (
               <p>
                 How fast that notice reaches a subscriber is not stated here yet: it is measured on

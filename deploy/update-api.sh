@@ -86,6 +86,50 @@ ensure_receiver_subscribed() {
   [ "$wrote" = 1 ]
 }
 
+# Bring the stack up, and always re-attach the receiver afterwards.
+#
+# `network_mode: service:indexer` puts the receiver inside the indexer's network namespace. Compose
+# recreates a container when ITS OWN configuration changed, so a run that recreates the indexer -
+# a new image, a new endpoint in .env, the schema-drop recovery - leaves the receiver running in a
+# namespace that no longer exists. It stays "up" by every check that asks whether it is running,
+# and the indexer's 127.0.0.1:8091 answers nothing.
+#
+# Measured on 2026-09-06: 45 deliveries, five attempts each, every one `fetch failed`, for hours,
+# with the published latency reporting "no real delivery yet" the whole time.
+#
+# Recreating the receiver unconditionally costs a fraction of a second - it is a single node
+# process with no state - and removes the whole class.
+compose_up() {
+  docker compose --profile public up -d "$@" </dev/null
+  docker compose --profile public up -d --force-recreate receiver </dev/null
+}
+
+# Can the indexer actually open a socket to the receiver? Re-attach it if not.
+#
+# "Running" is not the question. The receiver shares the indexer's network namespace, so a
+# recreated indexer leaves it running in a namespace nothing can reach - and every check that asks
+# whether it is running says yes. The only check worth making is the one the outbox itself makes.
+#
+# This runs on EVERY tick, including the quiet ones, and that is the point: the timer's usual tick
+# does nothing at all, so on 2026-09-06 a detached receiver went unseen for hours while the timer
+# reported success every fifteen minutes. A quiet tick that verifies nothing is how an outage
+# becomes long. Recreating costs a fraction of a second, so it is done rather than reported.
+receiver_reachable() {
+  docker compose exec -T indexer node -e "
+      fetch('http://127.0.0.1:'+(process.env.EXDATE_RECEIVER_PORT||8091)+'/health')
+        .then((r) => process.exit(r.ok ? 0 : 1))
+        .catch(() => process.exit(1))
+    " </dev/null >/dev/null 2>&1
+}
+
+ensure_receiver_reachable() {
+  receiver_reachable && return 0
+  log "the indexer cannot reach the receiver; re-attaching it"
+  docker compose --profile public up -d --force-recreate receiver </dev/null
+  receiver_reachable && { log "the receiver is reachable again"; return 0; }
+  die "the receiver is still unreachable on 127.0.0.1:${EXDATE_RECEIVER_PORT:-8091} after being recreated - every webhook delivery will answer 'fetch failed'. Look at: docker compose logs receiver"
+}
+
 # Assert the shape rather than trusting "containers up": that was true of the run
 # that once started a duplicate watcher and no proxy at all.
 assert_running() {
@@ -95,6 +139,8 @@ assert_running() {
     case " $running " in *" $want "*) ;; *) die "$want is not running; got: ${running:-none}. Look at: docker compose logs $want";; esac
   done
   case " $running " in *" watcher "*) die "the watcher service came up here, which must not happen: this machine runs it under systemd";; esac
+
+  ensure_receiver_reachable
 }
 
 api_healthy() {
@@ -142,7 +188,12 @@ recover_ponder_schema() {
   log "Ponder refuses the existing schema: its build id changed. Dropping \"$DB_SCHEMA\" and letting it rebuild."
   docker compose exec -T db psql -v ON_ERROR_STOP=1 -U "$DB_USER" -d "$DB_NAME" \
     -c "DROP SCHEMA IF EXISTS \"$DB_SCHEMA\" CASCADE" >/dev/null </dev/null || return 1
-  docker compose up -d --force-recreate indexer </dev/null
+  # The receiver goes with it. `network_mode: service:indexer` puts the receiver inside the
+  # indexer's network namespace, and recreating the indexer destroys that namespace: the receiver
+  # keeps RUNNING, attached to a namespace nothing lives in any more, so `ps --filter
+  # status=running` still lists it while the indexer's 127.0.0.1:8091 answers nothing. Measured
+  # 2026-09-06: 45 deliveries, five attempts each, every one `fetch failed`, for hours.
+  compose_up --force-recreate indexer
   return 0
 }
 
@@ -165,6 +216,9 @@ main() {
   # happen whether or not the branch moved.
   needs_up=0
   if ensure_receiver_subscribed; then needs_up=1; fi
+  # Before the early exits too: a detached receiver is invisible to everything else here, and the
+  # tick that would otherwise do nothing is the one that has to catch it.
+  ensure_receiver_reachable
 
   git fetch --quiet origin "$BRANCH" </dev/null || die "could not fetch origin/$BRANCH"
   before="$(git rev-parse HEAD)"
@@ -175,7 +229,7 @@ main() {
       # No rebuild: the images are current. `up -d` recreates only the containers
       # whose configuration changed - the indexer, which now has an endpoint, and
       # the receiver, which now has a secret.
-      docker compose --profile public up -d </dev/null
+      compose_up
       assert_running
       log "already at ${after:0:7}; applied the receiver subscription"
     else
@@ -190,7 +244,7 @@ main() {
     # rather than replaying the same skipped commits for ever.
     git reset --quiet --hard "$after" </dev/null
     if [ "$needs_up" = 1 ]; then
-      docker compose --profile public up -d </dev/null
+      compose_up
       assert_running
     fi
     log "${before:0:7} -> ${after:0:7}: nothing the image contains changed, not rebuilding"
@@ -199,7 +253,7 @@ main() {
 
   git reset --quiet --hard "$after" </dev/null
   log "${before:0:7} -> ${after:0:7}: rebuilding"
-  docker compose --profile public up -d --build </dev/null
+  compose_up --build
 
   # Assert the shape, not that a command returned zero: "containers up" was true of
   # the install run that started a duplicate watcher and no proxy at all.

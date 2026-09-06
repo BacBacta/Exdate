@@ -176,6 +176,12 @@ note "$ENV: api $API_HOST, status $STATUS_HOST"
 say "5. Build and start"
 cd "$DIR"
 docker compose --profile public up -d --build </dev/null
+# The receiver shares the indexer's network namespace (network_mode: service:indexer), and compose
+# recreates a container only when its own configuration changed - so any run that recreates the
+# indexer leaves the receiver running in a namespace nothing can reach. It stays "up" by every
+# check that asks whether it is running, and the indexer's 127.0.0.1:8091 answers nothing.
+# Recreating it costs a fraction of a second and removes the class. See deploy/update-api.sh.
+docker compose --profile public up -d --force-recreate receiver </dev/null
 # Assert the shape rather than trusting it. "containers up" was true of the run
 # that started a duplicate watcher and no proxy at all.
 running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
@@ -186,6 +192,17 @@ done
 case " $running " in
   *" watcher "*) die "the watcher service came up, which must not happen here: this machine runs it under systemd, and two would sample the same instants twice and race on one committed file. That means the checkout predates the watcher profile - re-run this script.";;
 esac
+# "Running" is not the question for the receiver: a detached one is running. The only check worth
+# making is the one the outbox itself makes - can the indexer open a socket to it?
+if docker compose exec -T indexer node -e "
+    fetch('http://127.0.0.1:'+(process.env.EXDATE_RECEIVER_PORT||8091)+'/health')
+      .then((r) => process.exit(r.ok ? 0 : 1))
+      .catch(() => process.exit(1))
+  " </dev/null >/dev/null 2>&1; then
+  note "the indexer can reach the receiver, so the outbox has somewhere to deliver"
+else
+  die "the receiver is running but the indexer cannot reach it on 127.0.0.1:${EXDATE_RECEIVER_PORT:-8091} - every webhook delivery would answer 'fetch failed'. Try: docker compose --profile public up -d --force-recreate indexer receiver"
+fi
 
 say "6. Follow the branch on its own"
 # The API compiles the generated registry into its image, so a container deployed
@@ -277,7 +294,7 @@ if ! api_healthy; then
     docker compose exec -T db psql -v ON_ERROR_STOP=1 -U exdate -d exdate \
       -c 'DROP SCHEMA IF EXISTS "exdate" CASCADE' >/dev/null </dev/null \
       || die "could not drop the schema: docker compose exec db psql -U exdate -d exdate"
-    docker compose up -d --force-recreate indexer </dev/null
+    docker compose --profile public up -d --force-recreate indexer receiver </dev/null
     api_healthy || die "the API still does not answer after dropping the schema: docker compose logs indexer"
     note "schema rebuilt; the poller refills it within one interval"
   else
