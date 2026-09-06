@@ -238,10 +238,8 @@
       "feed": {
         "proxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
         "verified": false,
-        "corroborated": true,
-        "corroboratedBy": [
-          "traded-price"
-        ]
+        "corroborated": false,
+        "corroboratedBy": []
       },
       "observedStepWad": "101323251417769",
       "impliedReinvestPrice": "17933.5540",
@@ -1190,5 +1188,6 @@
       "status": "pending",
       "note": "declared by the issuer, no multiplier step observed on chain"
     }
-  ]
+  ],
+  "stampedAt": "2026-09-06T11:26:52.971Z"
 }
