@@ -121,6 +121,7 @@ export function Footer() {
             <a href={links.sdkDocs}>SDK</a>
             <a href={links.data}>Data</a>
             <a href="/docs/methodology/">Méthode</a>
+            <a href="/docs/open-core/">Open core</a>
             <a href="/docs/changelog/">Changelog</a>
           </nav>
         </div>

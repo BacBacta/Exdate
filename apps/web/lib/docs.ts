@@ -26,6 +26,11 @@ export const DOCS = [
   // state a parameter the code does not hold. Served raw as well: a researcher citing it wants the
   // source, and its version changes only when a parameter does.
   { page: '/docs/methodology/', file: 'docs/methodology.md', raw: '/docs/methodology.md', name: 'Méthode' },
+  // Also generated (scripts/build-open-core.mjs), from the API's own source, the licence and the
+  // record. Served so a reader can tell which side of the line a route or a field is on without
+  // asking - and so the reasons nothing is reserved yet are a published measurement rather than a
+  // position stated in a conversation.
+  { page: '/docs/open-core/', file: 'docs/open-core.md', raw: '/docs/open-core.md', name: 'Open core' },
 ] as const
 export type DocPage = (typeof DOCS)[number]['page']
 

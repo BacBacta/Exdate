@@ -97,7 +97,10 @@ export default function Page() {
                 How a figure is produced — pairing, price, calculation, the states that refuse to be a
                 measurement — is in the <a href="/docs/methodology/">méthode</a>, generated from the
                 constants it describes so it cannot state a parameter the code does not hold.{' '}
-                exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT. The API is
+                exdate&rsquo;s observations are <a href={links.data}>CC BY 4.0</a>; the code is MIT. Nothing
+                is behind a key: which side of the line every route and field is on, and the measured
+                reasons nothing is reserved yet, are in the{' '}
+                <a href="/docs/open-core/">open-core boundary</a>. The API is
                 versioned by path (<code>/v1</code>) and every change is dated in the{' '}
                 <a href="/docs/changelog/">changelog</a>.
                 {links.github ? (
