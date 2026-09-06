@@ -117,6 +117,16 @@ export interface LatencySummary {
     lastError: string | null
     lastResponseStatus: number | null
   }
+  /**
+   * Of the accepted deliveries, how many went out on the first attempt.
+   *
+   * The qualifier the medians need. Measured 2026-09-06: 45 deliveries were accepted the moment a
+   * broken subscriber was repaired, on their sixth attempt, and the observe-to-deliver median came
+   * out at 9 987 s - a true measurement of an outage, and nothing at all about how fast the outbox
+   * is. A median over deliveries that were retried across an outage is not a latency; this is what
+   * lets a reader tell the two apart without being told.
+   */
+  deliveredFirstAttempt: number
   /** Given up on. Reported, because a latency computed over successes alone flatters itself. */
   failed: number
   /** exdate's own lag: chain announcement to outbox row. */
@@ -166,6 +176,7 @@ export function summarizeLatency(timings: readonly DeliveryTiming[]): LatencySum
 
   return {
     delivered: delivered.length,
+    deliveredFirstAttempt: delivered.filter((t) => t.attempts <= 1).length,
     pending,
     failed: failed.length,
     attempted: {
