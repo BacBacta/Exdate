@@ -1,16 +1,51 @@
 import { ROBINHOOD_CHAIN, failoverHttp, stockTokenAbi, tokenAddresses } from '@exdate/core'
+import { readFileSync } from 'node:fs'
 import { createConfig } from 'ponder'
 
 /**
  * Endpoints in order, tried left to right. RHC_RPC_URL_ARCHIVE alone wins when
  * set - that is the operator choosing to have Ponder own the whole history from
  * one archive provider. Otherwise RHC_RPC_URLS, then RHC_RPC_URL, then the
- * built-in order, which is the same one scripts/phase0/rpc.mjs carries (that
- * file imports nothing, so the list is written twice on purpose): a measured
- * third-party endpoint first, Robinhood's own only as the fallback. The reason
- * is in docs/terms-review.md and on failoverHttp.
+ * order DERIVED from the daily probe: a third party first, Robinhood's own only
+ * as the fallback. The reason is in docs/terms-review.md and on failoverHttp.
+ *
+ * It used to be a written-down pair naming pocket.network first, and it went
+ * stale: the probe measured pocket accepting zero blocks of eth_getLogs on
+ * 2026-09-06, so the config led with an endpoint chosen for a capability it had
+ * lost. scripts/phase0/rpc.mjs applies the same rule to the same file - it
+ * imports nothing by design, so the rule is written twice rather than shared -
+ * and the two lists are asserted equal in test/rpc-order.test.ts.
  */
-const DEFAULT_RPC_URLS = ['https://robinhood.api.pocket.network', ROBINHOOD_CHAIN.defaultRpcUrl]
+const PROBE = new URL('../../data/rpc-endpoints.observed.json', import.meta.url)
+/** Failover is sequential with a 25 s timeout, so every extra candidate is 25 s of silence in a
+ *  total outage. Two third parties plus the operator is the redundancy worth paying for. */
+const MAX_THIRD_PARTY_ENDPOINTS = 2
+const LAST_RESORT = ['https://rpc-robinhood.blockmachine.io', ROBINHOOD_CHAIN.defaultRpcUrl]
+
+function probedRpcUrls(): string[] {
+  try {
+    const probe = JSON.parse(readFileSync(PROBE, 'utf8')) as {
+      chainId: number
+      endpoints?: { url?: string; reachable?: boolean; chainId?: number; head?: number; widestLogSpan?: number }[]
+    }
+    const usable = (probe.endpoints ?? [])
+      // `head` must be a real block number, not just `reachable`: one endpoint answers
+      // eth_chainId and refuses eth_blockNumber with a rate-limit notice, so it passes a
+      // reachability test and fails every actual call.
+      .filter((e) => e.reachable && e.chainId === probe.chainId && Number(e.head) > 0 && e.url && e.url !== ROBINHOOD_CHAIN.defaultRpcUrl)
+      .sort((a, b) => (b.widestLogSpan ?? 0) - (a.widestLogSpan ?? 0))
+      .slice(0, MAX_THIRD_PARTY_ENDPOINTS)
+      .map((e) => e.url as string)
+    if (usable.length === 0) return LAST_RESORT
+    return [...usable, ROBINHOOD_CHAIN.defaultRpcUrl]
+  } catch {
+    return LAST_RESORT
+  }
+}
+
+/** Exported so test/rpc-order.test.ts can compare it with the sibling implementation, rather than
+ *  with a third copy of the rule written in the test - which would agree with itself for ever. */
+export const DEFAULT_RPC_URLS = probedRpcUrls()
 const rpcUrls = (process.env.RHC_RPC_URL_ARCHIVE || process.env.RHC_RPC_URLS || process.env.RHC_RPC_URL || '')
   .split(',')
   .map((u) => u.trim())

@@ -60,17 +60,28 @@ nowhere else.
     since 2026-09-04, for a terms reason (`docs/terms-review.md`): the chain is outside Robinhood's
     Terms, its public RPC is a "Service" bound to testing and development and "not intended for
     production-grade" use. `scripts/phase0/rpc.mjs` (`makeFailoverRpc`, `RHC_RPC_URLS`) and the
-    indexer's `failoverHttp` carry the same order: `robinhood.api.pocket.network`, then Robinhood's.
+    indexer's `failoverHttp` put third parties first and Robinhood's last. **The order is derived
+    from `data/rpc-endpoints.observed.json`, not written down** (since 2026-09-06): it was written
+    down, naming `pocket.network` first for a 2 000 000-block `eth_getLogs` no other third party
+    came close to, and the daily probe measured pocket accepting **zero** blocks while `ordofi`
+    accepted 100 000 — so the list led with an endpoint chosen for a capability it had lost. Now:
+    reachable endpoints that answer a real `eth_blockNumber` on this chain, widest log span first,
+    **capped at two** (failover is sequential with a 25 s timeout, so seven candidates would put
+    175 s between the watcher's 30 s tick and any answer), then Robinhood's.
     The wallet page's balance read stays on Robinhood's RPC from the visitor's own browser, because
     the browser-answering third parties cap logs at 1 000 blocks — stated on the page.
   - Archive is tested as **state that differs from latest**, never `block.number`: Multicall3's
     `getBlockNumber()` answers on any node, and an endpoint serving head state at every height
     would pass a naive test. The decisive check is `reachesOldestStep`, not an arbitrary depth: a
     node with a million blocks of history looks archival and fails on exactly the reads that need it.
-  - **Their capabilities do not overlap, so the project uses both.** Robinhood's own takes a
-    2 000 000-block `eth_getLogs` and serves no state; `pocket.network` serves 53 M of history and
-    refuses browsers; `blockmachine.io` serves 53 M and answers browsers but caps a log query at
-    1 000 blocks. Wide log scans still go to Robinhood's; state reads go to an archive one.
+  - **Their capabilities do not overlap, and none of them is stable — read the file, not this
+    line.** On 2026-09-06: Robinhood's own takes a 2 000 000-block `eth_getLogs` and serves no
+    state; `ordofi` takes 100 000 and serves no state; `blockmachine.io` takes 1 000, serves 54.7 M
+    of history, answers browsers, and is the **only** endpoint reaching the oldest multiplier step;
+    `pocket.network`, which was the default first endpoint for its wide log span, now takes zero.
+    Measured through the derived order, the watcher's 900 000-block cold-start scan pages down to
+    ordofi's cap and completes in **21 s** without touching Robinhood's endpoint at all — which is
+    the terms-driven answer working, at the cost of a slower cold start.
   - They are **third parties with no service commitment**. Sound for history, which can be re-read
     at any time; never for a capture that cannot be re-read, which is why the effective-price
     watcher does not depend on one.
