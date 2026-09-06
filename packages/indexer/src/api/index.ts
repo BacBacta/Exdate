@@ -61,6 +61,8 @@ async function loadTokens(chainId: number): Promise<TokenRow[]> {
         name: token.name,
         decimals: token.decimals,
         isin: token.isin,
+        figi: token.figi,
+        shareClassFigi: token.shareClassFigi,
         issuer: token.issuer,
         status: token.status,
         logoUrl: token.logoUrl,

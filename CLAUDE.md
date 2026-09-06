@@ -1792,6 +1792,46 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   script, its own imports using `.js` specifiers only a bundler resolves. The ladder now reads by
   name rather than by number. The version is a fingerprint of the constants and not a date: a
   citation has to survive the next hourly collector commit.
+- 2026-09-06 — **Institutional identifiers, and the join rule was decided by reading one real
+  answer rather than by assuming one.** exdate keyed on the address and published the ISIN; a
+  portfolio system, a tax package and an OMS each key on something else, so matching exdate's rows
+  to theirs needed a mapping table nobody would build. Now `identifiers { address, ticker, isin,
+  cusip, figi, shareClassFigi }` on both token routes, in the token list, the SDK, the registry and
+  each token page — with `address` still the key everywhere, because it is the only one of the six
+  that is first-party and readable from the chain.
+  **The CUSIP is read, not mapped.** A US ISIN is `US` + the nine-character CUSIP + a check digit,
+  so it is a substring of the ISIN printed beside it — derived at the point of use rather than
+  stored, precisely so a column cannot disagree with the ISIN. Its own check digit is verified
+  before it is published (modulus-10 double-add-double, in `packages/core/src/identifiers.ts`), and
+  the 16 non-US ISINs yield null rather than a plausible-looking wrong value: 178 CUSIPs from 178
+  US ISINs, 0 from the other 16, asserted over the whole registry.
+  **The FIGI join was wrong the first time, and one HTTP response settled it.** Joining on ISIN and
+  taking "the composite FIGI" refused 193 of 194 as `ambiguous_composite`, which read like an
+  OpenFIGI problem and was a modelling error: Apple's ISIN returns **263 rows across 86 composite
+  FIGIs** — every foreign listing of the same company — so *the* composite of an ISIN does not
+  exist. What does, identical on all 263 rows, is **one `shareClassFIGI`**. That is what a
+  tokenized share actually is: the share class, not any venue's line in it, and the token is listed
+  on no venue at all. Re-keyed on the share class: **194/194 in 20 requests, no key, no account**.
+  The country composite is published beside it where the ISIN's own country identifies one
+  unambiguously — 178 of 194, the other 16 carrying `no_listing_in_XX` rather than a blank.
+  Three things this cost that are worth keeping. The **token-list schema allows ten extensions per
+  token** and the list already carried eight, so the tenth slot went to `shareClassFigi` (never
+  null, never naming a venue the token is not on) and the composite stayed out — an eleventh
+  extension makes the whole list invalid, which every consumer ignores in silence. The **SDK's
+  contract assert compared top-level keys only**, and assignability does not close that gap
+  (excess properties are rejected only on object literals), so removing `shareClassFigi` from the
+  SDK's block left `tsc` green — proved, then fixed with a `NestedExtra` that walks one level and
+  names the path (`identifiers.shareClassFigi`); arrays are skipped explicitly, because
+  `keyof string[]` carries `pop` while `keyof readonly string[]` does not, which reported
+  `feedCorroboratedBy.pop` as drift on the first run. And the collector is **incremental and
+  idempotent** — only tokens absent from the file or whose ISIN changed are asked for, and an
+  unchanged answer leaves the file byte-identical — which took a second pass: the refusal tallies
+  are objects, and counting over rows in discovery order made a no-op rebuild differ in the *key
+  order* of `compositeRefusals` alone. Found by printing the first differing byte, which is the
+  same instrument that settled the history index's `%cI`/`%ct` difference the day before.
+  `data/figi.observed.json` records each ISIN's venue-row count, so a pairing is re-checkable
+  rather than trusted; OpenFIGI's content is named as OpenFIGI's in `DATA-LICENSE.md`, which is
+  neither exdate's to license nor the issuer's to restrict.
 - _(append decisions here as they are made)_
 
 ## Status

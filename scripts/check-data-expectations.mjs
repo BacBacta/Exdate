@@ -51,6 +51,23 @@ const registry = new Map(assets.assets.map((a) => [low(a.deployments[0].contract
   check('assets: fetchedAt present', typeof assets.fetchedAt === 'string')
 }
 
+/**
+ * The CUSIP a US ISIN contains, checked - the same modulus-10 double-add-double
+ * packages/core/src/identifiers.ts implements, written out again here on purpose: this script is
+ * plain node over committed JSON so CI can run it with no install step, and a check that imports
+ * the code it checks cannot catch that code being wrong.
+ */
+const cusipOf = (isin) => {
+  if (!isin || !/^US[0-9A-Z]{9}[0-9]$/.test(isin)) return null
+  const cusip = isin.slice(2, 11)
+  const val = (c) => (c >= '0' && c <= '9' ? c.charCodeAt(0) - 48 : c >= 'A' && c <= 'Z' ? c.charCodeAt(0) - 55 : NaN)
+  let sum = 0
+  for (let i = 0; i < 8; i++) { let d = val(cusip[i]); if (Number.isNaN(d)) return null; if (i % 2 === 1) d *= 2; sum += Math.floor(d / 10) + (d % 10) }
+  return (10 - (sum % 10)) % 10 === val(cusip[8]) ? cusip : null
+}
+const figiRows = read('data/figi.observed.json').rows
+const figiByToken = new Map(figiRows.map((r) => [low(r.token), r]))
+
 const caSnap = read('data/robinhood-corporate-actions.snapshot.json')
 const archive = read('data/corporate-actions.archive.json')
 const caKey = (r) => `${r.id}:${iso(r.processDate)}`
@@ -191,6 +208,34 @@ const list = read('data/exdate.tokenlist.json')
   check('tokenlist: underlyingSharesPerToken equals the last observed multiplier', shareDrift.length === 0, shareDrift.join(' '))
   const owedBad = list.tokens.filter((t) => t.extensions?.dividendOwedPerToken).filter((t) => { const x = t.extensions; const rate = archive.actions.find((r) => r.deployments.some((d) => low(d.contractAddress) === low(t.address)) && iso(r.processDate) === x.dividendProcessDate)?.details?.cashDividend?.rate; if (!rate) return true; const owed = dec(rate, 18) * dec(x.underlyingSharesPerToken, 18) / 10n ** 18n; const o6 = owed / 10n ** 12n; const want = dec(x.dividendOwedPerToken, 6); return !(o6 === want || o6 + 1n === want) }).map((t) => `${t.symbol}:${t.extensions.dividendOwedPerToken}`)
   check('tokenlist: dividendOwedPerToken = rate x multiplier at 6 dp', owedBad.length === 0, owedBad.join(' '))
+  const figiDrift = list.tokens.filter((t) => (t.extensions?.shareClassFigi ?? null) !== (figiByToken.get(low(t.address))?.shareClassFigi ?? null)).map((t) => t.symbol)
+  check('tokenlist: shareClassFigi equals the join (else rebuild: node scripts/build-token-list.mjs)', figiDrift.length === 0, figiDrift.join(' '))
+  const cusipDrift = list.tokens.filter((t) => (t.extensions?.cusip ?? null) !== cusipOf(registry.get(low(t.address))?.isin ?? null)).map((t) => t.symbol)
+  check('tokenlist: cusip equals what the ISIN yields', cusipDrift.length === 0, cusipDrift.join(' '))
+}
+
+// --- identifiers ------------------------------------------------------------
+// The FIGI join is the one identifier here that comes from a third party, so it is checked
+// against the registry it claims to describe rather than trusted: every token covered, every
+// value shaped like a FIGI, and no two tokens sharing a share class - which would mean the ISIN
+// join collapsed two assets onto one row.
+{
+  check('figi: one row per registry token', figiRows.length === 194 && figiRows.every((r) => registry.has(low(r.token))), `${figiRows.length} rows`)
+  check('figi: unique tokens', new Set(figiRows.map((r) => low(r.token))).size === figiRows.length)
+  check('figi: every ISIN equals the registry\'s', figiRows.every((r) => (r.isin ?? null) === (registry.get(low(r.token))?.isin ?? null)))
+  const shaped = /^BBG[0-9A-Z]{9}$/
+  const malformed = figiRows.filter((r) => (r.shareClassFigi && !shaped.test(r.shareClassFigi)) || (r.figi && !shaped.test(r.figi))).map((r) => r.symbol)
+  check('figi: every published FIGI is shaped like one', malformed.length === 0, malformed.join(' '))
+  check('figi: every token has a share class', figiRows.every((r) => r.shareClassFigi), figiRows.filter((r) => !r.shareClassFigi).map((r) => r.symbol).join(' '))
+  const classes = new Map()
+  const collisions = []
+  for (const r of figiRows) { if (!r.shareClassFigi) continue; const first = classes.get(r.shareClassFigi); if (first) collisions.push(`${first}=${r.symbol}`); else classes.set(r.shareClassFigi, r.symbol) }
+  check('figi: no two tokens share a share class', collisions.length === 0, collisions.join(' '))
+  // A null composite must carry its reason, or "absent" and "not looked for" read alike.
+  const unexplained = figiRows.filter((r) => !r.figi && !r.compositeRefusal).map((r) => r.symbol)
+  check('figi: every missing composite states why', unexplained.length === 0, unexplained.join(' '))
+  const badCusip = [...registry.values()].filter((a) => { const c = cusipOf(a.isin); return a.isin?.startsWith('US') ? c === null : c !== null }).map((a) => a.tokenSymbol)
+  check('figi: a CUSIP for every US ISIN and none for the rest', badCusip.length === 0, badCusip.join(' '))
 }
 
 const share = read('data/session-share.observed.json')

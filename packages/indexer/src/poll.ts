@@ -168,6 +168,8 @@ ponder.on('Poll:block', async ({ event, context }) => {
       name: token.name,
       decimals: token.decimals,
       isin: token.isin,
+      figi: token.figi,
+      shareClassFigi: token.shareClassFigi,
       status: token.status,
       logoUrl: token.logoUrl,
       feedProxy: token.feedProxy,

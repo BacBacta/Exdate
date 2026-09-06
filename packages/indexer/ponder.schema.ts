@@ -20,6 +20,17 @@ export const tokens = onchainTable(
      */
     decimals: t.integer(),
     isin: t.text(),
+    /**
+     * OpenFIGI's country composite and share class, joined on the ISIN above.
+     *
+     * Stored rather than derived at serialisation because they come from a third party's
+     * mapping and the ISIN alone does not produce them: a row must be able to say which FIGI
+     * exdate published for this token, not which one a later join would produce. The CUSIP is
+     * deliberately NOT a column - it is the ISIN's own substring, so a column for it could
+     * disagree with the ISIN beside it, and the pair would be published as two facts.
+     */
+    figi: t.text(),
+    shareClassFigi: t.text(),
     issuer: t.text().notNull(),
     status: t.text().notNull(),
     logoUrl: t.text(),

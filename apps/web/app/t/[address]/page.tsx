@@ -357,6 +357,48 @@ export default async function Page({ params }: { params: Promise<{ address: stri
               <p>No Chainlink price feed. A lending protocol cannot price this token from Chainlink, and exdate can state what is owed but not measure a gap.</p>
             )}
           </Method>
+          <Method title="Identifiers">
+            <p>
+              The joins a portfolio system already keys on. The address is the only one read from
+              the chain; the rest come from the issuer&rsquo;s registry and from OpenFIGI.
+            </p>
+            <dl>
+              <dt>Address</dt>
+              <dd className="mono">{token.address}</dd>
+              {token.identifiers.isin ? (
+                <>
+                  <dt>ISIN</dt>
+                  <dd className="mono">{token.identifiers.isin}</dd>
+                </>
+              ) : null}
+              {token.identifiers.cusip ? (
+                <>
+                  <dt>CUSIP</dt>
+                  <dd className="mono">{token.identifiers.cusip}</dd>
+                </>
+              ) : null}
+              {token.identifiers.shareClassFigi ? (
+                <>
+                  <dt>Share class FIGI</dt>
+                  <dd className="mono">{token.identifiers.shareClassFigi}</dd>
+                </>
+              ) : null}
+              {token.identifiers.figi ? (
+                <>
+                  <dt>Composite FIGI</dt>
+                  <dd className="mono">{token.identifiers.figi}</dd>
+                </>
+              ) : null}
+            </dl>
+            <p>
+              {token.identifiers.cusip
+                ? 'The CUSIP is the ISIN’s own nine characters, checked before it is shown.'
+                : 'No CUSIP: this asset’s ISIN is not a US one, so there is none to read out of it.'}
+              {token.identifiers.figi
+                ? ''
+                : ' No composite FIGI either: the asset lists on no venue in the country its ISIN names. The share class is the identifier a Stock Token actually has, since the token itself is listed nowhere.'}
+            </p>
+          </Method>
           <Embed site={observed.links.site} address={key} name={token.name} alt={tokenBadgeText(token.address)?.title ?? `${token.name} on exdate`} />
           <p className="observed-line">Observed {dateLong(token.observedAt)} from Robinhood Chain and the issuer&rsquo;s own feed. Nothing here is estimated.</p>
         </div>

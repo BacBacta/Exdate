@@ -15,6 +15,21 @@ measurements behind them, is `CLAUDE.md` in the repository.
   issuer verbatim shrinks the clause that applies at no product cost.
 - `/tokenlist.json` drops the per-token `logoURI` for the same reason, version `1.0.6`. The
   list-level `logoURI` is exdate's own mark and is unchanged.
+- **New: `identifiers` on the token routes.** `GET /v1/:chain/tokens` and
+  `/v1/:chain/tokens/:address` now carry `identifiers: { address, ticker, isin, cusip, figi,
+  shareClassFigi }`, so exdate's rows join to a portfolio system without a mapping table. `address`
+  stays the key — it is the only one of the six that is first-party and readable from the chain.
+  The `cusip` is **derived** from a US ISIN and its check digit verified, so it cannot disagree
+  with the `isin` beside it, and it is `null` for the 16 non-US ISINs rather than invented. The
+  two FIGIs come from OpenFIGI, joined on the ISIN: `shareClassFigi` resolves for all 194 and is
+  the one to key on, because a Stock Token represents a share class and is listed on no venue at
+  all; the country composite `figi` is `null` for 16, where the asset lists in no venue in its
+  ISIN's country. The join is committed at `data/figi.observed.json` with each ISIN's venue-row
+  count, so it can be re-checked rather than trusted.
+- `/tokenlist.json` gains `extensions.cusip` and `extensions.shareClassFigi`, version `1.0.7`. The
+  country composite is not there: the schema allows ten extensions per token, and the tenth slot
+  goes to the identifier that is never null and never names a venue the token is not on. It is
+  served in full by the API and by `data/figi.observed.json`.
 
 ## 2026-09-05
 

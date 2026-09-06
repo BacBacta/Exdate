@@ -27,7 +27,19 @@ it and carry issuer fields inside them:
 |---|---|---|
 | `data/reconciliations.observed.json` | `rows[].actionId`, `.type`, `.actionStatus`, `.processDate`, `.rate`, `.oldRate`, `.newRate`, `.symbol`, `.issuerSpotToday`, and `.price` where `price.source` is `robinhood:/rhj/prices` | everything else: the status, the note, the expected and observed steps, what arrived, the haircut, the implied reinvestment price, the feed pairing. The file's own `sources` block is the authoritative split. |
 | `data/effective-prices.observed.json` | every quote under `steps[].quotes` (`bid`, `ask`, `mid`, `generatedAt`, `isTradingHalt`) | which quote was captured, when, how far from `effectiveAt` it landed, and the refusal and its reason when none was |
-| `data/exdate.tokenlist.json` | `tokens[].name`, `.symbol`, `.logoURI`, `extensions.isin`, `extensions.dividendProcessDate`, and the declared rate inside `extensions.dividendOwedPerToken` | `extensions.underlyingSharesPerToken`, `extensions.priceFeed`, `extensions.priceFeedCorroboratedBy`, `extensions.dividendDeclaredNotOnChain`, and the arithmetic in `dividendOwedPerToken` |
+| `data/exdate.tokenlist.json` | `tokens[].name`, `.symbol`, `.logoURI`, `extensions.isin`, `extensions.dividendProcessDate`, and the declared rate inside `extensions.dividendOwedPerToken` | `extensions.underlyingSharesPerToken`, `extensions.priceFeed`, `extensions.priceFeedCorroboratedBy`, `extensions.dividendDeclaredNotOnChain`, the arithmetic in `dividendOwedPerToken`, and `extensions.cusip`, which is derived from the ISIN |
+
+One file is neither the issuer's nor exdate's:
+
+| File | Whose | What exdate adds |
+|---|---|---|
+| `data/figi.observed.json` | every `figi`, `shareClassFigi`, `name` and `securityType` is **OpenFIGI's**, from Bloomberg's open symbology, retrieved through their public `/mapping` endpoint | the ISIN it was joined on (the issuer's), the join rule, how many venue rows the ISIN returned, and the refusal and its reason wherever a value was not published |
+
+OpenFIGI's own terms govern that content, not this licence and not Robinhood's. The FIGI standard
+is open and the identifiers are published for reuse; exdate states the origin so a re-user can
+check those terms rather than inheriting an assumption. The `cusip` exdate publishes is not from
+that file: it is the ISIN's own substring, derived and checked, so it carries whatever the ISIN
+carries.
 
 The token list carries no `sources` block of its own on purpose: its schema rejects unknown
 top-level fields, and an invalid list is silently ignored by every consumer.

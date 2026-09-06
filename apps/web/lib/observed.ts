@@ -8,6 +8,7 @@
  */
 
 import { ROBINHOOD_CHAIN } from '@exdate/core/chains'
+import { cusipFromIsin } from '@exdate/core/identifiers'
 import baseJson from '../../../data/base-b20-verification.json'
 import archiveJson from '../../../data/corporate-actions.archive.json'
 import effectiveBlocksJson from '../../../data/effective-blocks.json'
@@ -17,6 +18,7 @@ import reconciliationsJson from '../../../data/reconciliations.observed.json'
 import registryJson from '../../../data/robinhood-assets.snapshot.json'
 import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
+import figiJson from '../../../data/figi.observed.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 import gapJson from '../../../data/dex-feed-gap.observed.json'
 import stateVerificationJson from '../../../data/multiplier-state-verification.json'
@@ -343,6 +345,17 @@ const tokenIndex: TokenSummary[] = tokens
   })
   .sort((a, b) => a.name.localeCompare(b.name))
 
+/**
+ * FIGIs by token, joined on the issuer's ISIN by scripts/build-figi-map.mjs.
+ * A token absent from the join renders no FIGI rather than an empty string.
+ */
+const figiByToken = new Map(
+  (figiJson.rows as { token: string; figi: string | null; shareClassFigi: string | null }[]).map((row) => [
+    row.token.toLowerCase(),
+    row,
+  ]),
+)
+
 /** Events are sorted ascending, so the last write per token is its latest step. */
 const lastStepByToken = new Map<string, MultiplierEvent>()
 for (const event of distinctEvents) lastStepByToken.set(event.token.toLowerCase(), event)
@@ -524,6 +537,20 @@ export function tokenPage(address: string) {
     lastMeasured,
     lastMoved,
     steps,
+    /**
+     * The identifiers an integrator already keys on. The address stays the key on every page:
+     * it is the only one of these that is first-party and readable from the chain.
+     *
+     * The CUSIP is derived from the ISIN rather than stored - it is the ISIN's own substring for
+     * a US ISIN, and checked - so the page cannot print a CUSIP that disagrees with the ISIN
+     * above it. Null for a non-US ISIN, where none exists to extract.
+     */
+    identifiers: {
+      isin: summary.isin,
+      cusip: cusipFromIsin(summary.isin),
+      figi: figiByToken.get(summary.address.toLowerCase())?.figi ?? null,
+      shareClassFigi: figiByToken.get(summary.address.toLowerCase())?.shareClassFigi ?? null,
+    },
     observedAt: observedDay,
   }
 }

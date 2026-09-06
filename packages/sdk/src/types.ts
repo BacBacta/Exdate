@@ -39,6 +39,25 @@ export interface TokenView {
   status: string
   logoUrl: string | null
   explorerUrl: string
+  /**
+   * The joins an integrator already keys on, so exdate's rows match theirs without a mapping
+   * table. `address` is the key: the only one of these that is first-party, unambiguous and
+   * readable from the chain.
+   *
+   * `cusip` is the ISIN's own substring for a US ISIN, checked, and null for every other
+   * jurisdiction - it is derived rather than stored, so it cannot disagree with the ISIN.
+   * `figi` is OpenFIGI's country composite and is null where the asset lists in no venue in its
+   * ISIN's country; `shareClassFigi` is the share class, which is what a Stock Token actually
+   * represents, and resolves for all 194.
+   */
+  identifiers: {
+    address: string
+    ticker: string
+    isin: string | null
+    cusip: string | null
+    figi: string | null
+    shareClassFigi: string | null
+  }
   /** Where the symbol, name, ISIN and feed pairing came from, and how old that snapshot is. */
   registry: { source: string; generatedAt: string }
   /** 'not_yet_polled' until the poller has read the ERC-8056 views at least once. */

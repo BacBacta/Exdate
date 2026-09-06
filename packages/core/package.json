@@ -33,7 +33,8 @@
     "./chains": "./src/chains.ts",
     "./quotes": "./src/quotes.ts",
     "./pools": "./src/pools.ts",
-    "./tokenlist": "./src/tokenlist.ts"
+    "./tokenlist": "./src/tokenlist.ts",
+    "./identifiers": "./src/identifiers.ts"
   },
   "files": [
     "dist",
@@ -79,6 +80,10 @@
       "./tokenlist": {
         "types": "./dist/tokenlist.d.ts",
         "default": "./dist/tokenlist.js"
+      },
+      "./identifiers": {
+        "types": "./dist/identifiers.d.ts",
+        "default": "./dist/identifiers.js"
       }
     }
   },
