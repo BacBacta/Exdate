@@ -170,7 +170,13 @@ export default function Page() {
               {capture.watcher && !capture.watcher.stale
                 ? `A watcher process${capture.watcher.host ? ` on ${capture.watcher.host}` : ''} does that capture and last reported in on ${dateLong(capture.watcher.heartbeatAt)}.`
                 : 'That capture runs on GitHub’s schedule, which is best-effort.'}{' '}
-              Landing dates and surviving fractions are not predicted.
+              {capture.landing
+                ? `It has a second trigger that needs no announcement: all ${capture.landing.observations} landings on record fell on the next business day after the issuer’s declared date, between ${capture.landing.fromUtc} and ${capture.landing.toUtc} UTC. So a sampling window opens from a date the issuer publishes days ahead, and a quote caught in it is attached to the step once the chain says when it took effect.`
+                : ''}
+            </p>
+            <p>
+              A window says when to look. It is never published as a landing date, and no surviving
+              fraction is predicted before a dividend lands.
             </p>
           </Method>
         </div>

@@ -30,6 +30,7 @@ import {
   loadSymbolMap,
   pendingCaptures,
   sampleCaptures,
+  samplePredictedFromRecord,
   scanAnnouncements,
   writeState,
 } from './lib/effective-prices.mjs'
@@ -54,7 +55,7 @@ const LOOKBACK_BLOCKS = Number(process.env.EXDATE_CAPTURE_LOOKBACK_BLOCKS || 900
 /** In watchdog mode: a heartbeat older than this means the watcher is not running. It commits one every six hours. */
 const STALE_AFTER_MS = Number(process.env.EXDATE_WATCHDOG_STALE_MS || 7 * 3_600_000)
 const METHOD =
-  "A run scans for UIMultiplierUpdated, which fires about nine minutes before the change, and returns to sample the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. Work beyond a run's budget is handed to the next run through this file."
+  "A run scans for UIMultiplierUpdated, which fires about nine minutes before the change, and returns to sample the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It also samples across a window predicted from the issuer's own declared processDate - every landing on record fell on the next business day at the same time of day - so a step whose announcement was missed can still be priced. Work beyond a run's budget is handed to the next run through this file."
 
 const log = (line) => console.error(line)
 const { state, captures, byKey } = loadState(root, OUT)
@@ -103,14 +104,28 @@ const scanned = await scanAnnouncements({ rpc, lookbackBlocks: LOOKBACK_BLOCKS, 
 // --- 2. capture at effectiveAt, waiting only within this run's budget ---------
 const sampled = await sampleCaptures({ pending: pendingCaptures(captures, Date.now()), deadline: Date.now() + RUN_BUDGET_MS, log })
 
+// --- 2b. the second trigger: a window predicted from the issuer's own declared date ----------
+// The announcement is the only trigger the capture had, and it fires nine minutes before the
+// instant - so a process that was restarting during those nine minutes had no second chance, and
+// the issuer serves only the present. Measured: 0 of 4 steps have a quote at the instant. Every
+// landing on record fell on the next business day after the declared processDate, at the same
+// time of day, so a window can be armed days ahead from a date the issuer publishes.
+const predicted = (state.predicted ??= {})
+const predictedChanged = await samplePredictedFromRecord({ root, captures, byKey, predicted, deadline: Date.now() + RUN_BUDGET_MS, log })
+
 // --- 3. close out anything the clock has put out of reach ---------------------
 const closed = closeOut(captures, Date.now())
 
-const changed = scanned.changed || sampled || closed || Object.keys(watchdogPatch).length > 0
+const changed = scanned.changed || sampled || closed || predictedChanged || Object.keys(watchdogPatch).length > 0
 if (!changed) {
   log('# nothing to record')
   process.exit(0)
 }
 
-const written = await writeState(root, OUT, { previous: state, captures, method: MODE === 'watchdog' ? (state.method ?? METHOD) : METHOD, patch: watchdogPatch })
+const written = await writeState(root, OUT, {
+  previous: state,
+  captures,
+  method: MODE === 'watchdog' ? (state.method ?? METHOD) : METHOD,
+  patch: { ...watchdogPatch, predicted },
+})
 log(`# wrote ${OUT}: ${written.summary.steps} step(s), ${written.summary.withQuoteAtEffect} with a quote within ${written.toleranceSeconds} s of effect`)

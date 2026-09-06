@@ -1038,6 +1038,24 @@ export const capture = (() => {
     intervalMinutes: { samples: number; median: number; max: number; shareWithinNominal: number } | null
     expectedCatchShare: { value: number } | null
   }
+  const profile = (reconciliationsJson as unknown as {
+    landing?: {
+      sufficient: boolean
+      observations: number
+      onNextBusinessDay: number
+      earliestSecondOfDay: number | null
+      latestSecondOfDay: number | null
+      spreadSeconds?: number
+    }
+  }).landing
+  const clock = (second: number) => {
+    const h = Math.floor(second / 3600)
+    const m = Math.floor((second % 3600) / 60)
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+  }
+  const predicted = Object.values(
+    (effectivePricesJson as unknown as { predicted?: Record<string, { quotes?: unknown[] }> }).predicted ?? {},
+  )
   const STALE_AFTER_MINUTES = 7 * 60
   const watcher = prices.watcher
     ? (() => {
@@ -1051,6 +1069,22 @@ export const capture = (() => {
     givenUp: prices.summary.givenUp,
     /** Null until a persistent watcher has committed a heartbeat. */
     watcher,
+    /**
+     * The second trigger: a window armed from the date the issuer declares, days before any log
+     * exists, rather than from the nine-minute announcement lead. Null - never a stated rule -
+     * while the record holds too few landings to say what the rule is.
+     */
+    landing:
+      profile?.sufficient && profile.onNextBusinessDay === profile.observations && profile.earliestSecondOfDay !== null && profile.latestSecondOfDay !== null
+        ? {
+            observations: profile.observations,
+            fromUtc: clock(profile.earliestSecondOfDay),
+            toUtc: clock(profile.latestSecondOfDay),
+            spreadSeconds: profile.spreadSeconds ?? profile.latestSecondOfDay - profile.earliestSecondOfDay,
+            windowsArmed: predicted.length,
+            quotesCaught: predicted.reduce((n, w) => n + (w.quotes?.length ?? 0), 0),
+          }
+        : null,
     /** Null until GitHub's run log holds enough scheduled runs to measure. */
     cadence:
       cadence.intervalMinutes && cadence.expectedCatchShare && cadence.budgetMinutes > 0

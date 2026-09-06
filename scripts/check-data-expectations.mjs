@@ -9,6 +9,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { classifyMarketSession, MARKET_SESSIONS } from './lib/market-session.mjs'
+import { landingProfile, nextBusinessDay } from './lib/landing-window.mjs'
 
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'))
 const iso = (d) => (typeof d === 'string' ? d : `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`)
@@ -147,6 +148,23 @@ const prices = read('data/effective-prices.observed.json')
   check('effective-prices: summary equals the recount', prices.summary.steps === prices.steps.length && prices.summary.givenUp === prices.steps.filter((s) => s.givenUp).length)
   if (prices.watcher?.heartbeatAt) within('effective-prices: watcher heartbeat within cadence (6 h)', prices.watcher.heartbeatAt, 6, 1.2)
   else warn('effective-prices: a watcher heartbeat is recorded', false, 'no watcher block')
+
+  // The second trigger samples across a window PREDICTED from the issuer's declared date. A
+  // prediction and an observation must never end up looking alike in this file, so the three
+  // things that keep them apart are asserted rather than trusted to the writer.
+  const windows = Object.entries(prices.predicted ?? {})
+  const quotesIn = (e) => e.quotes ?? []
+  check('effective-prices: a predicted window is keyed on token:processDate', windows.every(([k, e]) => k === `${low(e.token)}:${e.processDate}`), windows.filter(([k, e]) => k !== `${low(e.token)}:${e.processDate}`).map(([k]) => k).join(' '))
+  check('effective-prices: a predicted window says it is predicted', windows.every(([, e]) => e.window?.basis?.predicted === true), windows.filter(([k, e]) => e.window?.basis?.predicted !== true).map(([k]) => k).join(' '))
+  // No distanceSeconds: there is no instant to be distant from until the chain says what it was.
+  check('effective-prices: a predicted quote carries no distance from an instant', windows.every(([, e]) => quotesIn(e).every((q) => q.distanceSeconds === undefined)), windows.filter(([k, e]) => quotesIn(e).some((q) => q.distanceSeconds !== undefined)).map(([k]) => k).join(' '))
+  check('effective-prices: a predicted window lands on the next business day after its processDate', windows.every(([, e]) => nextBusinessDay(e.processDate) === e.window?.day), windows.filter(([k, e]) => nextBusinessDay(e.processDate) !== e.window?.day).map(([k]) => k).join(' '))
+  // A quote caught in a window whose day the chain has since confirmed belongs on that step. Left
+  // unadopted it would sit in the file looking captured while the step reads unrecoverable.
+  const unadopted = windows.flatMap(([k, e]) => prices.steps
+    .filter((st) => low(st.token) === low(e.token) && st.effectiveAt?.slice(0, 10) === e.window?.day)
+    .flatMap((st) => quotesIn(e).filter((q) => !(st.quotes ?? []).some((x) => x.generatedAt === q.generatedAt)).map((q) => `${k}@${q.generatedAt}`)))
+  check('effective-prices: every predicted quote whose day the chain confirmed is adopted onto that step', unadopted.length === 0, unadopted.join(' '))
 }
 
 const rec = read('data/reconciliations.observed.json')
@@ -169,6 +187,13 @@ const rec = read('data/reconciliations.observed.json')
   const absent = [...A.values()].filter((r) => r.inWindow && !declared.some((d) => `${d.actionId}:${d.processDate}` === caKey(r))).map((r) => `${r.tokenSymbol}@${iso(r.processDate)}`)
   check('reconciliations: every in-window archive row is present (else rebuild from the archive: node scripts/build-reconciliations.mjs)', absent.length === 0, absent.join(' '))
   check('reconciliations: carries its own timestamp', typeof (rec.builtAt ?? rec.generatedAt) === 'string')
+  // The landing rule is what lets a capture window be armed from a date the issuer publishes,
+  // days before any log exists. Recomputed here rather than trusted, and asserted to still be the
+  // rule: if a landing ever misses the next business day, the window it predicts is not a window.
+  const landing = landingProfile(rows)
+  check('reconciliations: the published landing profile equals a recount', JSON.stringify(rec.landing) === JSON.stringify(landing), `published ${JSON.stringify(rec.landing)}`)
+  if (landing.sufficient) check('reconciliations: every landing is on the next business day after the declared date', landing.onNextBusinessDay === landing.observations, `${landing.onNextBusinessDay} of ${landing.observations}`)
+  else warn('reconciliations: enough landings to predict a window', false, landing.notComputed)
   check('reconciliations: built from the archive rather than the one-month snapshot', rec.builtFrom?.corporateActions === 'data/corporate-actions.archive.json', `builtFrom.corporateActions = ${rec.builtFrom?.corporateActions}`)
   check('reconciliations: every priced Chainlink row keeps the aggregator\'s own answer', rows.filter((r) => r.price?.source === 'chainlink:getRoundData').every((r) => /^\d+$/.test(String(r.price.answer)) && Number.isInteger(r.price.answerDecimals)))
   check('reconciliations: the stored price equals the raw answer at its decimals', rows.filter((r) => r.price?.answer).every((r) => dec(r.price.value, 18) === BigInt(r.price.answer) * 10n ** BigInt(18 - r.price.answerDecimals)))

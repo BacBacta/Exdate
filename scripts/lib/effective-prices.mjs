@@ -27,6 +27,7 @@
 
 import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
+import { landingProfile, predictLandingWindow } from './landing-window.mjs'
 
 export const UI_MULTIPLIER_UPDATED = '0x2205df4534432b2f60654a3fdb48737ffdaf3e9edb1a498bd985bc026b15b055'
 export const DEFAULT_OUT = 'data/effective-prices.observed.json'
@@ -51,6 +52,10 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 export const iso = (ms) => new Date(ms).toISOString()
 export const hex = (n) => '0x' + BigInt(n).toString(16)
 export const keyOf = (token, effectiveAt) => `${token.toLowerCase()}:${effectiveAt}`
+
+// The landing prediction, so the capture has a trigger that does not depend on catching the
+// nine-minute announcement lead. See scripts/lib/landing-window.mjs for what it rests on.
+export { landingProfile, predictLandingWindow, insideWindow } from './landing-window.mjs'
 
 const read = (root, path) => JSON.parse(readFileSync(new URL(path, root), 'utf8'))
 
@@ -239,6 +244,234 @@ export async function scanAnnouncements({
     if (capture.symbol && secondsAway > -GIVE_UP_AFTER_SECONDS && record(capture, await quoteImpl(capture.symbol))) changed = true
   }
   return { changed, found, head }
+}
+
+/**
+ * A predicted watch is a (token, processDate) the issuer has declared and the chain has not yet
+ * moved for. It carries a WINDOW, never an instant: the landing is predicted from the seven that
+ * already happened, not observed, and the two must never share a field.
+ *
+ * The key is `${token}:${processDate}` rather than the step key, because at this point there is no
+ * step - that is the entire reason this exists.
+ */
+export const predictedKey = (token, processDate) => `${token.toLowerCase()}:${processDate}`
+
+/**
+ * Which declared dividends to sample for, and when.
+ *
+ * `declared` is the reconciliation record: rows with a processDate and no `change` are the ones
+ * still owed. A row whose token already has a step at the predicted day is skipped - the
+ * announcement path has it, and that path knows the real instant.
+ *
+ * Returns an empty list, never a guessed window, when the profile refuses itself.
+ */
+export function predictedWatches({ declared, profile, byKey, nowMs, aheadMs = 30 * 60_000 }) {
+  if (!profile?.sufficient) return []
+  const watches = []
+  for (const row of declared ?? []) {
+    if (!row?.processDate || row.change) continue
+    const token = row.token
+    if (!token) continue
+    const window = predictLandingWindow(row.processDate, profile)
+    if (!window) continue
+    const from = Date.parse(window.from)
+    const to = Date.parse(window.to)
+    // Past its window, or too far ahead to be this run's business.
+    if (nowMs > to || from - nowMs > aheadMs) continue
+    // The announcement path already owns this landing day for this token.
+    if (byKey && [...byKey.keys()].some((k) => k.startsWith(`${token.toLowerCase()}:${window.day}`))) continue
+    watches.push({
+      key: predictedKey(token, row.processDate),
+      token: token.toLowerCase(),
+      symbol: row.symbol ?? null,
+      processDate: row.processDate,
+      window,
+    })
+  }
+  return watches.sort((a, b) => Date.parse(a.window.from) - Date.parse(b.window.from))
+}
+
+/** The instant the newest quote on an entry was captured, or -Infinity when it holds none. */
+const newestCapturedAt = (entry) =>
+  entry.quotes?.length ? Math.max(...entry.quotes.map((q) => Date.parse(q.capturedAt))) : -Infinity
+
+/**
+ * Sample the issuer's quote across a predicted window.
+ *
+ * Every quote is stored with its own timestamps and NO distanceSeconds: there is no instant to be
+ * distant from yet. `adoptPredictedQuotes` computes that later, once the chain says what the
+ * instant was. Sampling is capped per window so a wide prediction cannot spend a whole run.
+ *
+ * The spacing is measured from the newest quote ALREADY on the entry, not from the start of this
+ * call, because two callers with very different budgets share this function: the one-shot has nine
+ * minutes and sleeps inside one call, the watcher has a thirty-second tick and calls it again and
+ * again. Measured from the start of each call, the watcher would sample twice a minute rather than
+ * once, and commit each one.
+ */
+export async function samplePredicted({
+  watches,
+  predicted,
+  deadline,
+  now = Date.now,
+  sleepImpl = sleep,
+  quoteImpl = quote,
+  everySeconds = 60,
+  maxPerWindow = 30,
+  log = () => {},
+}) {
+  let changed = false
+  for (const watch of watches) {
+    if (!watch.symbol) continue
+    const entry = (predicted[watch.key] ??= {
+      token: watch.token,
+      symbol: watch.symbol,
+      processDate: watch.processDate,
+      window: watch.window,
+      quotes: [],
+    })
+    const closesAt = Date.parse(watch.window.to)
+    let nextAt = Math.max(Date.parse(watch.window.from), newestCapturedAt(entry) + everySeconds * 1000)
+    while (entry.quotes.length < maxPerWindow && nextAt <= closesAt) {
+      if (nextAt > deadline) {
+        log(`# ${watch.symbol} predicted window continues past this run; the next one picks it up`)
+        break
+      }
+      if (nextAt > now()) await sleepImpl(nextAt - now())
+      const q = await quoteImpl(watch.symbol)
+      // Advanced on every attempt, not only on a new quote: a refused quote and a repeated
+      // generatedAt would otherwise spin this loop against the issuer at full speed.
+      nextAt = now() + everySeconds * 1000
+      if (q && !entry.quotes.some((existing) => existing.generatedAt === q.generatedAt)) {
+        entry.quotes.push(q)
+        changed = true
+        log(`# ${watch.symbol} predicted-window quote mid=${q.mid} generatedAt=${q.generatedAt}`)
+      }
+    }
+  }
+  return changed
+}
+
+/**
+ * Merge another writer's predicted windows into this process's own.
+ *
+ * The capture file has two writers - the watcher on the machine and the watchdog on GitHub - and
+ * the rule everywhere else in this file is that each owns a field and steps merge by key. Predicted
+ * windows need the same treatment one level deeper: the entry merges by key and its quotes merge by
+ * the issuer's own `generatedAt`, so neither writer erases a quote the other caught. Returns true
+ * when anything was taken.
+ */
+export function mergePredicted(mine, theirs) {
+  let changed = false
+  for (const [key, entry] of Object.entries(theirs ?? {})) {
+    const own = mine[key]
+    if (!own) {
+      mine[key] = entry
+      changed = true
+      continue
+    }
+    own.quotes ??= []
+    for (const q of entry.quotes ?? []) {
+      if (own.quotes.some((existing) => existing.generatedAt === q.generatedAt)) continue
+      own.quotes.push(q)
+      changed = true
+    }
+    own.quotes.sort((a, b) => String(a.generatedAt).localeCompare(String(b.generatedAt)))
+  }
+  return changed
+}
+
+/**
+ * Move predicted quotes onto the step they turned out to belong to.
+ *
+ * Once the chain has said when a change took effect, a quote captured in the predicted window is
+ * an ordinary observation of the issuer's price at a known distance from that instant - so it goes
+ * through `record()` like any other and is subject to the same tolerance. Matched on the token and
+ * the landing DAY, which is what the prediction was about; a quote whose day does not match the
+ * step stays where it is rather than being attached to a step it does not describe.
+ */
+export function adoptPredictedQuotes(captures, predicted) {
+  let changed = false
+  for (const capture of captures) {
+    const day = capture.effectiveAt?.slice(0, 10)
+    if (!day) continue
+    for (const entry of Object.values(predicted ?? {})) {
+      if (entry.token !== capture.token.toLowerCase()) continue
+      if (entry.window?.day !== day) continue
+      for (const q of entry.quotes ?? []) if (record(capture, q)) changed = true
+    }
+    // A step given up for want of a quote near the instant, that an adopted quote has now put
+    // inside the tolerance, is no longer unrecoverable - and the record must stop saying it is.
+    // The reason string is the assertion being withdrawn: "no quote within two minutes of
+    // effectiveAt", which the adopted quote has just made false.
+    if (capture.givenUp && closestDistance(capture) <= TOLERANCE_SECONDS) {
+      delete capture.givenUp
+      delete capture.givenUpReason
+      changed = true
+    }
+  }
+  return changed
+}
+
+/**
+ * The whole second trigger, from the committed record to the quotes it caught.
+ *
+ * Both runners call this - the one-shot on GitHub's schedule and the watcher on the machine - so
+ * the glue between the record, the profile, the windows and the adoption exists once. Written
+ * twice it would drift, which is the same reason the announcement path lives here rather than in
+ * each runner.
+ *
+ * The record is read at call time, not at boot, so a dividend declared while the watcher is running
+ * arms a window without a restart. A failure is logged and returns false: this is the second
+ * trigger, and it must never cost the first one a tick.
+ */
+export async function samplePredictedFromRecord({
+  root,
+  declared = 'data/reconciliations.observed.json',
+  captures,
+  byKey,
+  predicted,
+  deadline,
+  now = Date.now,
+  quoteImpl,
+  sleepImpl,
+  everySeconds,
+  log = () => {},
+}) {
+  try {
+    const record = read(root, declared)
+    const profile = landingProfile(record.rows)
+    const watches = predictedWatches({ declared: record.rows, profile, byKey, nowMs: now() })
+    if (watches.length) {
+      log(`# ${watches.length} declared dividend(s) in a predicted landing window: ${watches.map((w) => w.symbol ?? w.token).join(' ')}`)
+    }
+    let changed = await samplePredicted({ watches, predicted, deadline, now, quoteImpl, sleepImpl, everySeconds, log })
+    // A quote captured in a predicted window becomes an ordinary observation once the chain says
+    // what the instant was, and goes through the same tolerance as any other.
+    if (adoptPredictedQuotes(captures, predicted)) changed = true
+    return changed
+  } catch (error) {
+    log(`# predicted-window capture skipped: ${String(error.message).split('\n')[0]}`)
+    return false
+  }
+}
+
+/**
+ * What a watcher tick should do with what it found.
+ *
+ * Pure, and separate from the loop that calls it, because this is the decision that can silently
+ * stop the record being written: three booleans and a wrong `&&` turn a working watcher into one
+ * that samples and never commits, and nothing about the process would look wrong. Every
+ * combination is in the table test.
+ *
+ * The asymmetry between `persist` and `publish` is deliberate. A quote caught in a predicted window
+ * cannot be re-read from the issuer, so it is written to disk on the tick that caught it; a window
+ * is twenty minutes wide and sampled once a minute, so committing each one would put twenty-odd
+ * commits on the branch per declared dividend, and those go out on their own slower clock.
+ */
+export function tickOutcome({ changed, predictedChanged, heartbeatDue, predictedCommitDue }) {
+  if (!changed && !heartbeatDue && !predictedChanged) return { persist: false, publish: null }
+  if (!changed && !heartbeatDue && !predictedCommitDue) return { persist: true, publish: null }
+  return { persist: true, publish: changed ? 'capture' : heartbeatDue ? 'heartbeat' : 'predicted' }
 }
 
 /** The steps still worth sampling, soonest first: not given up, not yet sampled at the instant, not out of reach. */

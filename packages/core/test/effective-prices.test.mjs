@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { GIVE_UP_AFTER_SECONDS, SAMPLE_OFFSETS, TOLERANCE_SECONDS, closeOut, closestDistance, decodeAnnouncement, getLogsPaged, keyOf, pendingCaptures, record, sampleCaptures, scanAnnouncements, summarize, writeState } from '../../../scripts/lib/effective-prices.mjs'
+import { adoptPredictedQuotes, mergePredicted, predictedWatches, samplePredicted, samplePredictedFromRecord, tickOutcome, GIVE_UP_AFTER_SECONDS, SAMPLE_OFFSETS, TOLERANCE_SECONDS, closeOut, closestDistance, decodeAnnouncement, getLogsPaged, keyOf, pendingCaptures, record, sampleCaptures, scanAnnouncements, summarize, writeState } from '../../../scripts/lib/effective-prices.mjs'
 
 const WAD = 10n ** 18n
 const word = (n) => BigInt(n).toString(16).padStart(64, '0')
@@ -351,5 +351,343 @@ describe('scanAnnouncements, incremental', () => {
     expect(seen).toHaveLength(0)
     expect(result.changed).toBe(false)
     expect(result.head).toBe(1_000_000)
+  })
+})
+
+describe('the predicted window, as a second trigger', () => {
+  // The announcement log is the only trigger today, and it fires nine minutes before the instant.
+  // A watcher that was restarting during those nine minutes has no second chance, because the
+  // issuer serves only the present. These tests are about the trigger that needs no log at all.
+  const profile = {
+    sufficient: true,
+    observations: 7,
+    onNextBusinessDay: 7,
+    earliestSecondOfDay: 54_624, // 15:10:24
+    latestSecondOfDay: 54_766, // 15:12:46
+  }
+  const UPS = '0xf23250dac154d05bb671cb0d0ebef3c635c79ce2'
+  const declared = [{ token: UPS, symbol: 'UPS', processDate: '2026-09-03' }]
+  const inWindow = Date.parse('2026-09-04T15:05:00Z')
+
+  it('watches a declared dividend whose window is now', () => {
+    const watches = predictedWatches({ declared, profile, byKey: new Map(), nowMs: inWindow })
+    expect(watches).toHaveLength(1)
+    expect(watches[0]).toMatchObject({ symbol: 'UPS', processDate: '2026-09-03' })
+    expect(watches[0].window.day).toBe('2026-09-04')
+  })
+
+  it('ignores a row the chain has already answered', () => {
+    const landed = [{ ...declared[0], change: { effectiveAt: '2026-09-04T15:10:26.000Z' } }]
+    expect(predictedWatches({ declared: landed, profile, byKey: new Map(), nowMs: inWindow })).toEqual([])
+  })
+
+  it('stands down when the announcement path already owns that landing day', () => {
+    // Two processes sampling the same instant is waste, and the announcement path knows the real
+    // instant where this one only knows a window.
+    const byKey = new Map([[`${UPS}:2026-09-04T15:10:26.000Z`, {}]])
+    expect(predictedWatches({ declared, profile, byKey, nowMs: inWindow })).toEqual([])
+  })
+
+  it('ignores a window that is past, or too far ahead to be this run’s business', () => {
+    expect(predictedWatches({ declared, profile, byKey: new Map(), nowMs: Date.parse('2026-09-04T18:00:00Z') })).toEqual([])
+    expect(predictedWatches({ declared, profile, byKey: new Map(), nowMs: Date.parse('2026-09-04T09:00:00Z') })).toEqual([])
+  })
+
+  it('watches nothing at all when the profile refuses itself', () => {
+    // No window is better than a guessed one: three landings is the floor, and below it the
+    // capture keeps only the trigger it can defend.
+    expect(predictedWatches({ declared, profile: { sufficient: false }, byKey: new Map(), nowMs: inWindow })).toEqual([])
+  })
+
+  it('stores a predicted quote with no distanceSeconds, because there is no instant yet', async () => {
+    const predicted = {}
+    const watches = predictedWatches({ declared, profile, byKey: new Map(), nowMs: inWindow })
+    let clock = Date.parse('2026-09-04T15:10:00Z')
+    await samplePredicted({
+      watches,
+      predicted,
+      deadline: clock + 5_000,
+      now: () => clock,
+      sleepImpl: async (ms) => { clock += ms },
+      quoteImpl: async () => ({ bid: '103.03', ask: '103.12', mid: '103.075000', generatedAt: '2026-09-04T15:10:20.000Z', capturedAt: '2026-09-04T15:10:20.100Z', isTradingHalt: false }),
+    })
+    const entry = Object.values(predicted)[0]
+    expect(entry.quotes).toHaveLength(1)
+    expect(entry.quotes[0].distanceSeconds).toBeUndefined()
+    expect(entry.window.basis.predicted).toBe(true)
+  })
+
+  it('adopts a predicted quote onto the step it turned out to belong to, with its real distance', () => {
+    const capture = { token: UPS, symbol: 'UPS', effectiveAt: '2026-09-04T15:10:26.000Z', quotes: [] }
+    const predicted = {
+      [`${UPS}:2026-09-03`]: {
+        token: UPS,
+        symbol: 'UPS',
+        processDate: '2026-09-03',
+        window: { day: '2026-09-04' },
+        quotes: [{ mid: '103.075000', generatedAt: '2026-09-04T15:10:20.000Z' }],
+      },
+    }
+    expect(adoptPredictedQuotes([capture], predicted)).toBe(true)
+    // Six seconds before the instant: well inside the two-minute tolerance UPS's real capture missed
+    // by 350 s. This is the whole point of the second trigger.
+    expect(capture.quotes[0].distanceSeconds).toBe(-6)
+    expect(Math.abs(capture.quotes[0].distanceSeconds)).toBeLessThanOrEqual(TOLERANCE_SECONDS)
+  })
+
+  it('leaves a predicted quote alone when its day is not the step’s day', () => {
+    const capture = { token: UPS, symbol: 'UPS', effectiveAt: '2026-09-10T15:10:26.000Z', quotes: [] }
+    const predicted = {
+      [`${UPS}:2026-09-03`]: { token: UPS, window: { day: '2026-09-04' }, quotes: [{ mid: '1', generatedAt: '2026-09-04T15:10:20.000Z' }] },
+    }
+    expect(adoptPredictedQuotes([capture], predicted)).toBe(false)
+    expect(capture.quotes).toEqual([])
+  })
+})
+
+describe('sampling a predicted window from a caller that ticks faster than the spacing', () => {
+  const UPS = '0x' + 'ups'.padEnd(40, '0')
+  const declared = [{ token: UPS, symbol: 'UPS', processDate: '2026-09-03' }]
+  const profile = { sufficient: true, observations: 7, onNextBusinessDay: 7, earliestSecondOfDay: 54_624, latestSecondOfDay: 54_766, medianSecondOfDay: 54_626, spreadSeconds: 142 }
+
+  /** Runs `ticks` calls of samplePredicted, each with a 30 s budget, on one shared clock. */
+  async function tick30s({ ticks, everySeconds }) {
+    const predicted = {}
+    let clock = Date.parse('2026-09-04T15:05:00Z')
+    const asked = []
+    for (let i = 0; i < ticks; i++) {
+      const began = clock
+      await samplePredicted({
+        watches: predictedWatches({ declared, profile, byKey: new Map(), nowMs: clock }),
+        predicted,
+        deadline: began + 30_000,
+        everySeconds,
+        now: () => clock,
+        sleepImpl: async (ms) => { clock += ms },
+        quoteImpl: async () => {
+          asked.push(clock)
+          return { bid: '1', ask: '1', mid: '1.000000', generatedAt: new Date(clock).toISOString(), capturedAt: new Date(clock).toISOString(), isTradingHalt: false }
+        },
+      })
+      // The watcher's loop sleeps out the rest of its tick whatever this call did.
+      clock = Math.max(clock, began + 30_000)
+    }
+    return { predicted, asked }
+  }
+
+  it('spaces quotes by everySeconds across calls, not from the start of each call', async () => {
+    // The watcher calls this every 30 s. Measured from the start of each call, a 60 s spacing
+    // would still produce a quote every 30 s - twice the intended rate, and a commit for each.
+    const { asked } = await tick30s({ ticks: 10, everySeconds: 60 })
+    expect(asked.length).toBeGreaterThan(1)
+    for (let i = 1; i < asked.length; i++) expect(asked[i] - asked[i - 1]).toBeGreaterThanOrEqual(60_000)
+  })
+
+  it('still samples often enough that any instant in the window has a quote within the tolerance', async () => {
+    // 5 minutes of window covered by 30 s ticks: the widest hole between two quotes must stay
+    // inside TOLERANCE_SECONDS, or a landing between them would be unpriceable after all.
+    const { predicted } = await tick30s({ ticks: 10, everySeconds: 60 })
+    const at = Object.values(predicted)[0].quotes.map((q) => Date.parse(q.generatedAt))
+    for (let i = 1; i < at.length; i++) expect((at[i] - at[i - 1]) / 1000).toBeLessThanOrEqual(TOLERANCE_SECONDS)
+  })
+
+  it('does not spin against the issuer when a quote is refused', async () => {
+    const asked = []
+    const predicted = {}
+    let clock = Date.parse('2026-09-04T15:05:00Z')
+    await samplePredicted({
+      watches: predictedWatches({ declared, profile, byKey: new Map(), nowMs: clock }),
+      predicted,
+      deadline: clock + 300_000,
+      everySeconds: 60,
+      now: () => clock,
+      sleepImpl: async (ms) => { clock += ms },
+      // The issuer answers `local_rate_limited` with HTTP 200, so a refusal is a normal outcome.
+      quoteImpl: async () => { asked.push(clock); return null },
+    })
+    expect(asked.length).toBeLessThanOrEqual(6)
+    for (let i = 1; i < asked.length; i++) expect(asked[i] - asked[i - 1]).toBeGreaterThanOrEqual(60_000)
+  })
+})
+
+describe('two writers on one predicted window', () => {
+  const KEY = '0xups:2026-09-03'
+  const entry = (quotes) => ({ token: '0xups', symbol: 'UPS', processDate: '2026-09-03', window: { day: '2026-09-04' }, quotes })
+  const q = (iso) => ({ mid: '103.07', generatedAt: iso, capturedAt: iso })
+
+  it('takes a window the other writer opened', () => {
+    const mine = {}
+    expect(mergePredicted(mine, { [KEY]: entry([q('2026-09-04T15:10:00.000Z')]) })).toBe(true)
+    expect(mine[KEY].quotes).toHaveLength(1)
+  })
+
+  it('keeps both writers’ quotes on one window, in order, without duplicating a generatedAt', () => {
+    const mine = { [KEY]: entry([q('2026-09-04T15:11:00.000Z')]) }
+    const theirs = { [KEY]: entry([q('2026-09-04T15:10:00.000Z'), q('2026-09-04T15:11:00.000Z')]) }
+    expect(mergePredicted(mine, theirs)).toBe(true)
+    expect(mine[KEY].quotes.map((x) => x.generatedAt)).toEqual(['2026-09-04T15:10:00.000Z', '2026-09-04T15:11:00.000Z'])
+  })
+
+  it('reports no change when the other writer has nothing this one lacks', () => {
+    const mine = { [KEY]: entry([q('2026-09-04T15:10:00.000Z')]) }
+    expect(mergePredicted(mine, { [KEY]: entry([q('2026-09-04T15:10:00.000Z')]) })).toBe(false)
+  })
+
+  it('is a no-op against a file that carries no predicted block at all', () => {
+    const mine = { [KEY]: entry([q('2026-09-04T15:10:00.000Z')]) }
+    expect(mergePredicted(mine, undefined)).toBe(false)
+    expect(mine[KEY].quotes).toHaveLength(1)
+  })
+})
+
+describe('a step given up, then reached by a predicted quote', () => {
+  const UPS = '0x' + 'ups'.padEnd(40, '0')
+
+  it('withdraws the unrecoverable verdict, because the sentence it rests on is now false', () => {
+    // Given up an hour after the instant for want of a quote near it. If a window armed from the
+    // declared date caught one after all, the record must stop saying the instant is unrecoverable.
+    const capture = { token: UPS, symbol: 'UPS', effectiveAt: '2026-09-04T15:10:26.000Z', quotes: [], givenUp: true, givenUpReason: 'no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable' }
+    const predicted = { [`${UPS}:2026-09-03`]: { token: UPS, window: { day: '2026-09-04' }, quotes: [{ mid: '103.07', generatedAt: '2026-09-04T15:10:20.000Z' }] } }
+    expect(adoptPredictedQuotes([capture], predicted)).toBe(true)
+    expect(capture.givenUp).toBeUndefined()
+    expect(capture.givenUpReason).toBeUndefined()
+  })
+
+  it('leaves the verdict standing when the adopted quote is still outside the tolerance', () => {
+    const capture = { token: UPS, symbol: 'UPS', effectiveAt: '2026-09-04T15:10:26.000Z', quotes: [], givenUp: true, givenUpReason: 'no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable' }
+    // 350 s late - UPS's real first quote on 2026-09-04, which is why that step is published givenUp.
+    const predicted = { [`${UPS}:2026-09-03`]: { token: UPS, window: { day: '2026-09-04' }, quotes: [{ mid: '103.07', generatedAt: '2026-09-04T15:16:16.000Z' }] } }
+    adoptPredictedQuotes([capture], predicted)
+    expect(capture.givenUp).toBe(true)
+  })
+})
+
+describe('what a watcher tick does with what it found', () => {
+  // The gate that can silently stop the record being written: a wrong && here and the watcher
+  // samples for ever and commits nothing, with nothing about the process looking wrong. Every
+  // combination, not a sample of them.
+  const T = true, F = false
+  const table = [
+    // changed  predicted  heartbeat  commitDue -> persist  publish
+    [F, F, F, F, F, null],
+    [F, F, F, T, F, null],
+    [F, F, T, F, T, 'heartbeat'],
+    [F, F, T, T, T, 'heartbeat'],
+    [F, T, F, F, T, null], // written to disk, held back from the branch
+    [F, T, F, T, T, 'predicted'],
+    [F, T, T, F, T, 'heartbeat'],
+    [F, T, T, T, T, 'heartbeat'],
+    [T, F, F, F, T, 'capture'],
+    [T, F, F, T, T, 'capture'],
+    [T, F, T, F, T, 'capture'],
+    [T, F, T, T, T, 'capture'],
+    [T, T, F, F, T, 'capture'],
+    [T, T, F, T, T, 'capture'],
+    [T, T, T, F, T, 'capture'],
+    [T, T, T, T, T, 'capture'],
+  ]
+  for (const [changed, predictedChanged, heartbeatDue, predictedCommitDue, persist, publish] of table) {
+    it(`changed=${changed} predicted=${predictedChanged} heartbeat=${heartbeatDue} commitDue=${predictedCommitDue}`, () => {
+      expect(tickOutcome({ changed, predictedChanged, heartbeatDue, predictedCommitDue })).toEqual({ persist, publish })
+    })
+  }
+
+  it('never publishes without persisting first', () => {
+    for (const [changed, predictedChanged, heartbeatDue, predictedCommitDue] of table) {
+      const out = tickOutcome({ changed, predictedChanged, heartbeatDue, predictedCommitDue })
+      if (out.publish) expect(out.persist).toBe(true)
+    }
+  })
+
+  it('holds a predicted quote back from the branch but never from the disk', () => {
+    // The quote cannot be re-read from the issuer, so it is written the tick it was caught;
+    // twenty commits per landing is the thing being avoided, not durability.
+    expect(tickOutcome({ changed: false, predictedChanged: true, heartbeatDue: false, predictedCommitDue: false }))
+      .toEqual({ persist: true, publish: null })
+  })
+})
+
+describe('the second trigger, from the committed record', () => {
+  const UPS = '0x' + 'ups'.padEnd(40, '0')
+  // Three landings, each on the next business day after its processDate, all at 15:10 UTC - the
+  // shape of the real record, so the profile is sufficient and the rule holds.
+  const landed = [
+    { token: '0xa', processDate: '2026-08-10', change: { effectiveAt: '2026-08-11T15:10:24.000Z' } },
+    { token: '0xb', processDate: '2026-08-17', change: { effectiveAt: '2026-08-18T15:10:30.000Z' } },
+    { token: '0xc', processDate: '2026-08-24', change: { effectiveAt: '2026-08-25T15:12:46.000Z' } },
+  ]
+  const declaredRow = { token: UPS, symbol: 'UPS', processDate: '2026-09-03' }
+  const inWindow = Date.parse('2026-09-04T15:11:00Z')
+
+  async function withRecord(rows, run) {
+    const dir = await mkdtemp(join(tmpdir(), 'exdate-declared-'))
+    const root = pathToFileURL(dir + '/')
+    await writeFile(join(dir, 'record.json'), JSON.stringify({ rows }))
+    return run(root)
+  }
+
+  it('reads the record, opens the window and adopts what it caught onto the step', async () => {
+    await withRecord([...landed, declaredRow], async (root) => {
+      const predicted = {}
+      // The step the chain has not announced yet at sampling time.
+      const captures = []
+      let clock = inWindow
+      const changed = await samplePredictedFromRecord({
+        root,
+        declared: 'record.json',
+        captures,
+        byKey: new Map(),
+        predicted,
+        deadline: clock + 1_000,
+        now: () => clock,
+        sleepImpl: async (ms) => { clock += ms },
+        quoteImpl: async () => ({ bid: '103.03', ask: '103.12', mid: '103.075000', generatedAt: '2026-09-04T15:11:00.000Z', capturedAt: '2026-09-04T15:11:00.100Z', isTradingHalt: false }),
+      })
+      expect(changed).toBe(true)
+      expect(Object.values(predicted)[0].quotes).toHaveLength(1)
+
+      // Now the chain announces, and the same function adopts the quote onto the real step.
+      captures.push({ token: UPS, symbol: 'UPS', effectiveAt: '2026-09-04T15:10:26.000Z', quotes: [] })
+      await samplePredictedFromRecord({
+        root,
+        declared: 'record.json',
+        captures,
+        byKey: new Map(),
+        predicted,
+        deadline: clock,
+        now: () => clock,
+        sleepImpl: async () => {},
+        quoteImpl: async () => null,
+      })
+      expect(captures[0].quotes[0].distanceSeconds).toBe(34)
+    })
+  })
+
+  it('returns false rather than throwing when the record cannot be read', async () => {
+    const lines = []
+    const changed = await samplePredictedFromRecord({
+      root: pathToFileURL('/nonexistent-' + 'x'.repeat(8) + '/'),
+      captures: [],
+      byKey: new Map(),
+      predicted: {},
+      deadline: 0,
+      log: (line) => lines.push(line),
+    })
+    // The announcement path must not lose a tick because the second trigger could not read a file.
+    expect(changed).toBe(false)
+    expect(lines.join(' ')).toContain('predicted-window capture skipped')
+  })
+
+  it('opens no window at all when the record holds too few landings', async () => {
+    await withRecord([landed[0], declaredRow], async (root) => {
+      const predicted = {}
+      const changed = await samplePredictedFromRecord({
+        root, declared: 'record.json', captures: [], byKey: new Map(), predicted,
+        deadline: inWindow + 1_000, now: () => inWindow,
+        quoteImpl: async () => { throw new Error('must not ask the issuer without a profile') },
+      })
+      expect(changed).toBe(false)
+      expect(predicted).toEqual({})
+    })
   })
 })

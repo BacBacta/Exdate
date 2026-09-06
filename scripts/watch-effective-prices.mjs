@@ -14,6 +14,12 @@
 // the watchdog on GitHub (capture-effective-prices.yml in watchdog mode) can tell
 // a quiet day from a dead process.
 //
+// It also carries the second trigger: a window predicted from the issuer's own
+// declared processDate, so a landing whose announcement this process was not alive
+// to see is still priced. The announcement gives an instant nine minutes ahead;
+// the declaration gives a window days ahead. Only the first is an observation, and
+// the two never share a field.
+//
 // It shares one file with that watchdog. Each owns its own field - `watcher` here,
 // `watchdog` there - and the steps are merged by key before every write, so
 // neither erases what the other recorded. Same logic as the one-shot, from the
@@ -34,11 +40,13 @@ import {
   keyOf,
   loadState,
   loadSymbolMap,
-  pendingCaptures,
+  mergePredicted,
   sampleCaptures,
+  samplePredictedFromRecord,
   scanAnnouncements,
   sleep,
   summarize,
+  tickOutcome,
   writeState,
 } from './lib/effective-prices.mjs'
 import { commitAndPush } from './lib/git.mjs'
@@ -56,9 +64,26 @@ const HEARTBEAT_MS = Number(process.env.EXDATE_WATCH_HEARTBEAT_MS || 6 * 3_600_0
 const PUSH = process.env.EXDATE_WATCH_PUSH !== 'false'
 const AUTHOR = { name: 'exdate-watcher', email: 'noreply@users.noreply.github.com' }
 const METHOD =
-  'A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.'
+  "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It also samples across a window predicted from the issuer's own declared processDate, so a landing whose announcement was missed is still priced. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching."
 /** Alert once per streak of failed ticks, not once per failure. */
 const FAILURES_BEFORE_ALERT = 20
+/**
+ * How often a predicted window's quotes are committed when nothing else changed.
+ *
+ * They are written to the file on every tick regardless - that is what makes them survive a crash -
+ * but a window is 22 minutes wide and sampled once a minute, so committing each one would put
+ * twenty-odd commits on the branch per declared dividend. A push every five minutes keeps the
+ * record off one machine's disk without that.
+ */
+const PREDICTED_COMMIT_MS = Number(process.env.EXDATE_WATCH_PREDICTED_COMMIT_MS || 5 * 60_000)
+/**
+ * The reconciliation record, which carries the declared dates and every landing already observed.
+ *
+ * Overridable so the predicted path can be rehearsed against a fixture: a window opens for about
+ * twenty minutes a day, so without this the only way to exercise it here is to wait for one. This
+ * repository's own history says a path that has only been read is not a path that works.
+ */
+const DECLARED = process.env.EXDATE_WATCH_DECLARED || 'data/reconciliations.observed.json'
 
 if (!(TICK_MS >= 5_000)) throw new Error(`EXDATE_WATCH_TICK_MS must be at least 5000 ms, got ${TICK_MS}`)
 if (!(HEARTBEAT_MS >= TICK_MS)) throw new Error(`EXDATE_WATCH_HEARTBEAT_MS must be at least one tick, got ${HEARTBEAT_MS}`)
@@ -68,7 +93,9 @@ const sinks = sinksFromEnv()
 const symbolByToken = loadSymbolMap(root)
 const startedAt = iso(Date.now())
 
-let { captures, byKey } = loadState(root, OUT)
+let { captures, byKey, state } = loadState(root, OUT)
+/** Predicted windows and the quotes caught in them, keyed on token:processDate. */
+const predicted = state.predicted ?? {}
 /**
  * The head of the last successful scan. Null means a cold start, which scans the
  * whole lookback so an outage loses nothing; after that only the blocks that
@@ -81,6 +108,7 @@ let scans = 0
 let lastHeartbeatAt = 0
 let failureStreak = 0
 let alertedOnStreak = false
+let lastPredictedCommitAt = 0
 
 /**
  * Takes whatever the file on disk holds that memory does not: steps another
@@ -101,6 +129,7 @@ function mergeFromDisk() {
       if (step[field] !== undefined && mine[field] === undefined) mine[field] = step[field]
     }
   }
+  mergePredicted(predicted, disk.state?.predicted)
   return disk.state
 }
 
@@ -118,6 +147,7 @@ async function persist() {
     // and lookback, and only a diff caught it.
     patch: PUSH
       ? {
+          predicted,
           watcher: {
             heartbeatAt: iso(Date.now()),
             startedAt,
@@ -127,7 +157,7 @@ async function persist() {
             lookbackBlocks: LOOKBACK_BLOCKS,
           },
         }
-      : {},
+      : { predicted },
   })
 }
 
@@ -149,6 +179,13 @@ async function publish(message) {
   if (result.committed) log(`# pushed ${result.sha}: ${message}`)
 }
 
+/** One line naming what is being sampled now, for the commit message. */
+function predictedSummary() {
+  const entries = Object.values(predicted)
+  const quotes = entries.reduce((n, e) => n + (e.quotes?.length ?? 0), 0)
+  return `${entries.length} window(s), ${quotes} quote(s)`
+}
+
 async function tick() {
   const scanned = await scanAnnouncements({
     rpc,
@@ -162,25 +199,36 @@ async function tick() {
   scannedThrough = scanned.head
   const pending = pendingCaptures(captures, Date.now())
   const sampled = await sampleCaptures({ pending, deadline: Date.now() + TICK_MS, log })
+  const predictedChanged = await samplePredictedFromRecord({ root, declared: DECLARED, captures, byKey, predicted, deadline: Date.now() + TICK_MS, log })
   const closed = closeOut(captures, Date.now())
   scans++
 
-  const changed = scanned.changed || sampled || closed
-  const heartbeatDue = Date.now() - lastHeartbeatAt >= HEARTBEAT_MS
-  if (!changed && !heartbeatDue) return
-
+  const outcome = tickOutcome({
+    changed: scanned.changed || sampled || closed,
+    predictedChanged,
+    heartbeatDue: Date.now() - lastHeartbeatAt >= HEARTBEAT_MS,
+    predictedCommitDue: Date.now() - lastPredictedCommitAt >= PREDICTED_COMMIT_MS,
+  })
+  if (!outcome.persist) return
   await persist()
-  if (changed) {
+  if (!outcome.publish) return
+
+  if (outcome.publish === 'capture') {
     await notify()
     mergeFromDisk()
     await persist()
   }
   const s = summarize(captures)
   await publish(
-    changed
-      ? `Capture issuer quotes at effect: ${s.steps} steps, ${s.withQuoteAtEffect} priced at effect, ${s.givenUp} unrecoverable`
-      : `Watcher heartbeat: ${scans} scans since ${startedAt}, ${s.steps} steps on record`,
+    {
+      capture: `Capture issuer quotes at effect: ${s.steps} steps, ${s.withQuoteAtEffect} priced at effect, ${s.givenUp} unrecoverable`,
+      heartbeat: `Watcher heartbeat: ${scans} scans since ${startedAt}, ${s.steps} steps on record`,
+      predicted: `Capture issuer quotes in a predicted landing window: ${predictedSummary()}`,
+    }[outcome.publish],
   )
+  if (predictedChanged) lastPredictedCommitAt = Date.now()
+  // Any commit proves the process is alive, so any commit postpones the next heartbeat - the
+  // heartbeat exists to make a quiet day distinguishable from a dead machine, not to count itself.
   lastHeartbeatAt = Date.now()
 }
 
