@@ -3,6 +3,29 @@
 Everything here is blocked on a decision, an account or a payment, not on code. The code
 side of each is already in the repository and named below. Delete an entry when it is done.
 
+> **The infrastructure roadmap is finished in code as of 2026-09-06.** All eight chantiers of
+> `docs/roadmap-2026-09-05.md` have shipped, one merged pull request each, except the two below
+> that are physically a person's: the letter to Robinhood (§7, Appendix B) and the arbitration
+> opt-out, **which closes on 2026-10-31** (§7, Appendix C). Everything else — the point-in-time
+> index, the generated methodology note, institutional identifiers, the webhook latency and its
+> first real subscriber, the editorial reframing, the open-core boundary, three issuers read on
+> chain including Ethereum and BNB Chain, and the registry instrument — is in the repository and
+> checked in CI.
+>
+> **What changed in the plan while doing it, and is worth knowing:**
+>
+> - **xStocks does not work like Robinhood.** On EVM its `balanceOf()` is the *adjusted* view and
+>   `sharesOf()` is the constant — the inverse of ERC-8056. The roadmap recorded the opposite from
+>   a research summary. `docs/third-issuer-xstocks.md`, `docs/issuer-mechanisms.md`.
+> - **It also cannot produce a haircut**, because Backed publishes the step and no declared cash
+>   rate. A haircut there needs a rate from a source that is not the issuer, and none has been
+>   named. That is the one genuinely new owner-facing question this work raised.
+> - **Chantier 2 found its first instances on the second issuer**: 8 splits and 2 reverse splits in
+>   Backed's history, where Robinhood's 45 archived actions are all cash dividends.
+> - **Nothing is reserved and nothing should be yet**: `docs/open-core.md` computes five
+>   prerequisites of a paid tier from the record and **0 of 5 are met**. Items 1, 2 and 3 below are
+>   three of those five.
+
 ## 1. Arm the alerts — one paste, and the machine dying is already covered
 
 Two different notices, and only one of them still needs you.
