@@ -155,7 +155,9 @@ set_env EXDATE_STATUS_HOST "$STATUS_HOST"
 # namespace - so it needs no name, no certificate and no open port, and it satisfies the loopback
 # exception in @exdate/core rather than widening it. The secret is generated here and never
 # printed: both ends read it from this file.
-if ! grep -q '^EXDATE_RECEIVER_SECRET=' "$ENV"; then
+# `.\+`, not the bare key: an empty EXDATE_RECEIVER_SECRET= line - the shape .env.example
+# ships - must count as absent, or the receiver starts with no secret and refuses.
+if ! grep -q '^EXDATE_RECEIVER_SECRET=.\+' "$ENV"; then
   set_env EXDATE_RECEIVER_SECRET "$(head -c 32 /dev/urandom | base64 | tr -d '/+=' | head -c 40)"
   note "generated a receiver secret into $ENV"
 fi

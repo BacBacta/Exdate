@@ -28,7 +28,7 @@ DIR="${EXDATE_DIR:-/opt/exdate-api}"
 WATCHER_DIR="${EXDATE_WATCHER_DIR:-/opt/exdate}"
 
 # Paths whose contents end up in one of the two images.
-IMAGE_INPUTS='^(packages/|apps/status/|Dockerfile$|deploy/status.Dockerfile$|deploy/Caddyfile$|docker-compose.yml$|package.json$|pnpm-lock.yaml$|pnpm-workspace.yaml$|tsconfig.base.json$)'
+IMAGE_INPUTS='^(packages/|apps/status/|deploy/receiver/|Dockerfile$|deploy/status.Dockerfile$|deploy/Caddyfile$|docker-compose.yml$|package.json$|pnpm-lock.yaml$|pnpm-workspace.yaml$|tsconfig.base.json$)'
 
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
 die() { log "stopped: $*" >&2; exit 1; }
@@ -38,6 +38,64 @@ die() { log "stopped: $*" >&2; exit 1; }
 DB_SCHEMA=exdate
 DB_USER=exdate
 DB_NAME=exdate
+
+set_env() {
+  # Rewrites the key in place if present, appends it otherwise. The watcher's own
+  # settings live in this same file and must survive.
+  if grep -q "^$1=" "$ENV"; then
+    sed -i "s#^$1=.*#$1=$2#" "$ENV"
+  else
+    printf '%s=%s\n' "$1" "$2" >> "$ENV"
+  fi
+}
+
+# Make sure exdate's own receiver is subscribed, and say whether anything was written.
+#
+# This is the twin of the step in deploy/install-api.sh, and it lives here too because
+# the installer runs when a person runs it and this runs every fifteen minutes: the
+# receiver shipped on 2026-09-06 in a commit the timer rebuilt within the hour, and
+# the API then answered `endpointsConfigured: 0` for as long as nobody re-ran the
+# installer - a subscriber deployed and subscribed to nothing, which is the exact
+# state the latency route exists to refuse. Idempotent: a second run writes nothing.
+#
+# `.\+` on both greps, not `=` alone: an empty `EXDATE_RECEIVER_SECRET=` line - the
+# shape .env.example ships - must count as absent, or the receiver starts with no
+# secret and refuses. The installer's first version matched the bare key.
+#
+# Returns 0 when .env changed (the caller must `up -d` so the containers see it), 1
+# when there was nothing to do.
+ensure_receiver_subscribed() {
+  ENV="$DIR/.env"
+  [ -f "$ENV" ] || { log "no $ENV yet; deploy/install-api.sh writes it"; return 1; }
+  local wrote=0
+  if ! grep -q '^EXDATE_RECEIVER_SECRET=.\+' "$ENV"; then
+    set_env EXDATE_RECEIVER_SECRET "$(head -c 32 /dev/urandom | base64 | tr -d '/+=' | head -c 40)"
+    log "generated a receiver secret into $ENV"
+    wrote=1
+  fi
+  local secret
+  secret="$(sed -n 's/^EXDATE_RECEIVER_SECRET=//p' "$ENV" | head -1)"
+  # Only when the operator has configured nothing of their own: their endpoints are
+  # their decision, and a timer that rewrote them would replace a curator's URL with
+  # exdate's every fifteen minutes.
+  if ! grep -q '^EXDATE_WEBHOOK_ENDPOINTS=.\+' "$ENV"; then
+    set_env EXDATE_WEBHOOK_ENDPOINTS "[{\"id\":\"exdate-receiver\",\"url\":\"http://127.0.0.1:8091/hook\",\"secret\":\"$secret\"}]"
+    log "subscribed exdate's own receiver: the outbox now has somewhere to deliver"
+    wrote=1
+  fi
+  [ "$wrote" = 1 ]
+}
+
+# Assert the shape rather than trusting "containers up": that was true of the run
+# that once started a duplicate watcher and no proxy at all.
+assert_running() {
+  local running
+  running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
+  for want in db indexer status caddy receiver; do
+    case " $running " in *" $want "*) ;; *) die "$want is not running; got: ${running:-none}. Look at: docker compose logs $want";; esac
+  done
+  case " $running " in *" watcher "*) die "the watcher service came up here, which must not happen: this machine runs it under systemd";; esac
+}
 
 api_healthy() {
   for _ in $(seq 1 "${1:-30}"); do
@@ -103,12 +161,26 @@ main() {
   [ -d "$DIR/.git" ] || die "$DIR is not a checkout; run deploy/install-api.sh first"
   cd "$DIR"
 
+  # Before any early exit: a subscription is configuration, not code, and it has to
+  # happen whether or not the branch moved.
+  needs_up=0
+  if ensure_receiver_subscribed; then needs_up=1; fi
+
   git fetch --quiet origin "$BRANCH" </dev/null || die "could not fetch origin/$BRANCH"
   before="$(git rev-parse HEAD)"
   after="$(git rev-parse "origin/$BRANCH")"
 
   if [ "$before" = "$after" ] && [ "${1:-}" != "--force" ]; then
-    log "already at ${after:0:7}"
+    if [ "$needs_up" = 1 ]; then
+      # No rebuild: the images are current. `up -d` recreates only the containers
+      # whose configuration changed - the indexer, which now has an endpoint, and
+      # the receiver, which now has a secret.
+      docker compose --profile public up -d </dev/null
+      assert_running
+      log "already at ${after:0:7}; applied the receiver subscription"
+    else
+      log "already at ${after:0:7}"
+    fi
     exit 0
   fi
 
@@ -117,6 +189,10 @@ main() {
     # Move the checkout forward anyway, so the next comparison is against the tip
     # rather than replaying the same skipped commits for ever.
     git reset --quiet --hard "$after" </dev/null
+    if [ "$needs_up" = 1 ]; then
+      docker compose --profile public up -d </dev/null
+      assert_running
+    fi
     log "${before:0:7} -> ${after:0:7}: nothing the image contains changed, not rebuilding"
     exit 0
   fi
@@ -127,13 +203,7 @@ main() {
 
   # Assert the shape, not that a command returned zero: "containers up" was true of
   # the install run that started a duplicate watcher and no proxy at all.
-  running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
-  for want in db indexer status caddy; do
-    case " $running " in *" $want "*) ;; *) die "$want is not running after the rebuild; got: ${running:-none}";; esac
-  done
-  case " $running " in
-    *" watcher "*) die "the watcher came up here; this machine runs it under systemd and two would race on one committed file";;
-  esac
+  assert_running
 
   if ! api_healthy 30; then
     if recover_ponder_schema; then
