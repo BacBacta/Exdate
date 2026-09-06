@@ -39,6 +39,12 @@ if [ -d .git ] && [ "${EXDATE_DEPLOY_ALLOW_BEHIND:-}" != "1" ]; then
   fi
 fi
 
+# The commit this tree came from, read HERE because the copy below has no .git and Vercel
+# therefore cannot read it itself. It is handed to the build, which writes it into /build.json so
+# the published site can be checked from outside against the record
+# (scripts/check-site-freshness.mjs). Empty rather than guessed when there is no git to ask.
+commit="$(git rev-parse HEAD 2>/dev/null || true)"
+
 tree="$(mktemp -d)"
 trap 'rm -rf "$tree"' EXIT
 tar --exclude=.git --exclude=node_modules --exclude=.next --exclude=out --exclude=.ponder \
@@ -46,4 +52,7 @@ tar --exclude=.git --exclude=node_modules --exclude=.next --exclude=out --exclud
 mkdir -p "$tree/.vercel" && cp .vercel/project.json "$tree/.vercel/project.json"
 
 target=(--prod); [ "${1:-}" = "--preview" ] && target=()
-cd "$tree" && vercel deploy --yes --archive=tgz "${target[@]}" --token "$VERCEL_TOKEN"
+build_env=()
+[ -n "$commit" ] && build_env=(--build-env "EXDATE_BUILD_COMMIT=$commit")
+
+cd "$tree" && vercel deploy --yes --archive=tgz "${target[@]}" "${build_env[@]}" --token "$VERCEL_TOKEN"

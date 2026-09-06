@@ -144,8 +144,14 @@ jobs:
             code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "https://$name$path" || echo 000)
             echo "  https://$name$path -> $code"
           done
-          if curl -s --max-time 30 https://www.exdate.me/ | grep -q 'CC BY 4.0'; then
-            echo "www.exdate.me serves a build carrying the licence line."
+          # And the decisive one: does the site now serve a build of THIS commit, with every
+          # dataset it carries no older than the record? Grepping for a licence line, which is
+          # what this step did before, is satisfied by any build ever made - including the one
+          # that was already there when the deployment failed.
+          node scripts/check-site-freshness.mjs
+          served=$(curl -s --max-time 30 https://www.exdate.me/build.json | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{try{process.stdout.write(JSON.parse(s).commit||"")}catch{}})')
+          if [ "$served" = "$GITHUB_SHA" ]; then
+            echo "www.exdate.me serves ${GITHUB_SHA:0:8}, the commit this run deployed."
           else
-            echo "::warning::www.exdate.me answered, but not with the expected build."
+            echo "::warning::www.exdate.me serves '${served:-none}', not $GITHUB_SHA — a newer deployment may have won the race, or this one did not land."
           fi
