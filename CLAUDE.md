@@ -1875,6 +1875,26 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   What this does **not** measure is stated in the data, in the API and on the page: the subscriber
   is exdate's own receiver on the same host, so the figure covers signing, the HTTP round trip and
   verification, and excludes public internet transit to somebody else's server.
+- 2026-09-06 — **The lede claimed a decomposition the record refuses, and that is what the
+  repositioning actually fixed.** The brief asked for a neutral reconciliation framing so that
+  issuers could be readers rather than targets; the roadmap warned against softening until the
+  reason to exist is gone. Both are right, and looking at the words settled which is which: the
+  site said *see what your Stock Tokens actually paid you* / *exdate measures how much, and how
+  much went missing*, and the README said exdate publishes *"the net yield after the fees and
+  withholding nobody documents"*. That last one is not a tone problem — it asserts the split of a
+  difference this file explicitly refuses to split (*"Mid-30s on two independent tokens is
+  consistent with 30 % US non-resident withholding plus something unexplained. Report the observed
+  number; never claim the decomposition"*). The site was breaking its own rule in its opening
+  sentence.
+  So the title is ***every dividend declared, against what actually arrived*** — the method, not a
+  verdict — and the lede says exdate reads both sides and publishes the difference with the method
+  that produced it. **Every figure is untouched**: Apple's 36 %, the ring, the words *never
+  arrived*, the ledger's *Never arrived* column. Those are measurements — declared $0.27, arrived
+  $0.172751 — and the roadmap's warning applies to them, not to a sentence that explains a number
+  nobody explained. `/about/` gains one line to *what it refuses to do*: **explain the
+  difference**, because the fees and the withholding applied to these distributions are documented
+  nowhere and the measurement is the whole claim. That line is worth more to a reader than the
+  accusation it replaces, and it is the one an issuer can read without reaching for counsel.
 - _(append decisions here as they are made)_
 
 ## Status

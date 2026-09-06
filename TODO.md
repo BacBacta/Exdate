@@ -409,9 +409,11 @@ legal advice; it is what makes counsel's hour count. The short version:
 - **§5.2 is contractual and non-sublicensable**: the exposure is revocation, blocking and the
   indemnity, personal to exdate — not a claim over facts. And exdate cannot license on the issuer's
   fields it republishes, so any data licence must carve them out by column.
-- **§5.7(j) forbids "tokenized stocks / equities"** as a description of Stock Tokens. The site's
-  title is *see what your tokenized stock actually paid you*. Owner's call: change the words or
-  accept the risk knowingly. **§5.7(b)(ii) requires a not-affiliated disclaimer**, which is absent.
+- **§5.7(j) forbids "tokenized stocks / equities"** as a description of Stock Tokens. The phrase is
+  gone from every surface (2026-09-04), and the title that carried it is now *every dividend
+  declared, against what actually arrived* (2026-09-06), which describes the method rather than the
+  product. **§5.7(b)(ii) requires a not-affiliated disclaimer**, which is in the footer and the
+  README.
 - **No `LICENSE` file exists** while three packages claim MIT; the data has no licence at all.
 - **EU database right** (Directive 96/9/EC) is a separate question the US Terms do not address.
 - **Arbitration opt-out closes on 2026-10-31** (§12.13, sixty days from first access, by post only).

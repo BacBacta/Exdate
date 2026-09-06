@@ -26,10 +26,11 @@ export default function Page() {
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="wrap hero-grid">
             <div>
-              <h1 id="hero-title">See what your Stock Tokens actually paid you.</h1>
+              <h1 id="hero-title">Every dividend declared, against what actually arrived.</h1>
               <p className="lede">
                 A dividend on a Stock Token never lands in your wallet: the token becomes worth a little more.
-                exdate measures how much, and how much went missing.
+                exdate reads both sides &mdash; what the issuer declared and what the chain delivered &mdash; and
+                publishes the difference, with the method that produced it.
               </p>
               <div className="hero-find">
                 <Finder tokens={observed.tokens} />

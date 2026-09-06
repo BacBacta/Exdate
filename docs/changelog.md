@@ -7,6 +7,14 @@ measurements behind them, is `CLAUDE.md` in the repository.
 
 ## 2026-09-06
 
+- **Editorial.** The site's title and lede describe the reconciliation rather than an accusation:
+  *every dividend declared, against what actually arrived*. Every figure is unchanged — Apple's
+  36 % and the words *never arrived* are measurements and stay exactly where they were. What went
+  is the claim the record refuses: the README said exdate publishes "the net yield after the fees
+  and withholding nobody documents", which asserts a decomposition of a difference that two
+  independent tokens put in the mid-thirties and that nobody has ever documented. `/about/` now
+  lists *explain the difference* among the things exdate refuses to do.
+
 - `GET /v1/:chain/tokens` and `/v1/:chain/tokens/:address` now serve `logoUrl: null` for every
   token. The key stays — its type already admitted `null`, so nothing under `/v1` breaks on a
   missing field — but exdate no longer redistributes the issuer's CDN logo. It is a third-party

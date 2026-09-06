@@ -7,8 +7,13 @@ changes how many underlying shares each token represents, while raw balances sta
 tooling ignores this, which is why public data on these assets has been off by 10x to 100x.
 
 exdate indexes what actually happens: every multiplier update, every corporate action, the dividend
-that is owed but not yet reflected, the net yield after the fees and withholding nobody documents,
-and the health of every Chainlink feed.
+that is owed but not yet reflected, the difference between what was declared and what the multiplier
+delivered, and the health of every Chainlink feed.
+
+That difference is reported as a measurement and never as an explanation. Two independent tokens
+land in the mid-thirties, which is consistent with 30 % US non-resident withholding plus something
+unaccounted for — but the fees and the withholding applied to these distributions are documented
+nowhere, so exdate publishes the observed number and refuses the decomposition.
 
 > **Status: M1 to M5 shipped.** The indexer, the API, the reconciliation table and
 > the status page run against Robinhood Chain mainnet today: 194 tokens polled, 35 Chainlink
@@ -23,7 +28,7 @@ and the health of every Chainlink feed.
 | | |
 |---|---|
 | **Pending dividend** | Between ex-date and multiplier application, a token is worth more than the oracle says. Undervalued collateral, predictable DEX/NAV premium. |
-| **Observed haircut** | Reconciling declared dividends against observed multiplier steps measures the real cost of the structure. Published nowhere else. |
+| **Declared against delivered** | Reconciling each declared dividend against the observed multiplier step measures what the structure actually delivered, per token, at the price in force at that instant. Published nowhere else. |
 | **Feed health** | Feeds are 24/5 and freeze off-hours, while the chain does not. exdate samples the off-hours share hourly instead of repeating the brief's ~46% — the answer is published only once every session has been sampled. Lending protocols need to know before they liquidate. |
 
 None of that is hypothetical. On 2026-09-02, mid-session, the SPY feed was **18 hours** stale and

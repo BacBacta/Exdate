@@ -78,6 +78,11 @@ export default function Page() {
         <Section id="rules" title="What it refuses to do" tight>
           <ul className="rules">
             <li>Invent a number. No data, the page says so: a token without a feed gets no gap, a dividend not landed gets no landing date.</li>
+            <li>
+              Explain the difference. What the issuer declared and what the multiplier delivered are
+              both read; why they differ is not published, because the fees and the withholding
+              applied to these distributions are documented nowhere. The measurement is the claim.
+            </li>
             <li>Estimate. Nothing is annualised, modelled or projected; every API answer lists what it refused and why.</li>
             <li>Multiply a Chainlink price by the multiplier: the feeds already include it.</li>
             <li>Identify a token by its ticker. Always by address.</li>
