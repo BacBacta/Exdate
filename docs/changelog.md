@@ -5,6 +5,17 @@ What changed in the API, the SDK and the published files, by date. The API is ve
 added is listed here on the day it appears. The site's own record of decisions, with the
 measurements behind them, is `CLAUDE.md` in the repository.
 
+## 2026-09-06
+
+- `GET /v1/:chain/tokens` and `/v1/:chain/tokens/:address` now serve `logoUrl: null` for every
+  token. The key stays — its type already admitted `null`, so nothing under `/v1` breaks on a
+  missing field — but exdate no longer redistributes the issuer's CDN logo. It is a third-party
+  mark served from the issuer's own host under a licence that is personal and non-sublicensable
+  (`docs/terms-review.md` §5.2, §5.7), no exdate surface renders it, and serving less of the
+  issuer verbatim shrinks the clause that applies at no product cost.
+- `/tokenlist.json` drops the per-token `logoURI` for the same reason, version `1.0.6`. The
+  list-level `logoURI` is exdate's own mark and is unchanged.
+
 ## 2026-09-05
 
 - **API.** Self-service webhook subscriptions: `POST /v1/webhooks/subscriptions` takes an https URL

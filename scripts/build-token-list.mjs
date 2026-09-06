@@ -96,7 +96,12 @@ for (const asset of registry.assets ?? registry) {
     name: asset.tokenName.replace(/\s*[•·-]\s*Robinhood Token$/i, '').trim(),
     symbol: asset.tokenSymbol,
     decimals: asset.tokenDecimals ?? 18,
-    ...(asset.logoUrl ? { logoURI: asset.logoUrl } : {}),
+    // No per-token logoURI. The issuer's CDN logo is a third-party mark served from the
+    // issuer's own host, under a licence that is personal and non-sublicensable
+    // (docs/terms-review.md §5.2, §5.7), and a token list is precisely the surface that
+    // redistributes it - wallets and aggregators fetch it by URL. No exdate page renders it,
+    // so dropping it costs the product nothing and removes the clause entirely. The list-level
+    // logoURI below is exdate's own mark and stays.
     extensions,
   })
 }
