@@ -28,9 +28,9 @@ pre-dividend one.
 | **Declared cash rate** | yes — `/rhj/corporate-actions`, a one-month window with no pagination | no corporate-action feed found | no — the issuer publishes the step, not the cash rate | — not probed | — not probed | — not probed |
 | **Declared step history** | no — a row that falls out is unrecoverable | n/a | yes — every step back to 2025, with its reason | — not probed | — not probed | — not probed |
 | **Tokens** | 194 | 13 | 726 | — not probed | — not probed | — not probed |
-| **Steps observed** | 13 | 0 | 4 of 6 distinct tokens sampled have moved; 17 steps in the issuer's history | — not probed | — not probed | — not probed |
+| **Steps observed** | 13 | 0 | 305 of 726 tokens have moved; 603 declared steps (3 Administrative, 590 Dividend, 2 ReverseSplit, 8 Split) | — not probed | — not probed | — not probed |
 | **What exdate could produce** | **haircuts** — declared rate and observed step both available | **nothing yet** — every multiplier is exactly 1.0 | **a step ledger** — a haircut needs a cash rate from a source that is not the issuer | — not probed | — not probed — their page names dividends, splits, ticker changes and mergers; the mechanism is not stated | — not probed |
-| **Evidence** | `data/robinhood-assets.snapshot.json`, `data/multiplier-events.observed.json` | `data/base-b20-verification.json` | `data/xstocks-verification.json` | not read | not read | not read |
+| **Evidence** | `data/robinhood-assets.snapshot.json`, `data/multiplier-events.observed.json` | `data/base-b20-verification.json` | `data/xstocks-verification.json`, `data/xstocks-steps.observed.json` | not read | not read | not read |
 
 ## The three things that differ, and why each one matters
 
@@ -44,10 +44,17 @@ that loses rows; Backed gives the **full step history** and no cash rate. So the
 has opposite gaps: exdate archives Robinhood's feed daily because it disappears, and would need a
 non-issuer source for a rate on Backed. **Only Robinhood supports a haircut end to end today.**
 
-**3. Whether anything has moved.** Coinbase: nothing, ever — 13 tokens at exactly 1.0. Backed: four
-of six sampled have moved, with steps of 36 to 48 bps. Robinhood: 13 distinct steps. An
-adapter for an issuer with no events is untestable against reality, which is why Base is verified
-and unwired.
+**3. Whether anything has moved.** Coinbase: nothing, ever — 13 tokens at exactly 1.0. Backed:
+305 of 726 tokens, 603 declared steps. Robinhood: 13 distinct steps.
+An adapter for an issuer with no events is untestable against reality, which is why Base is
+verified and unwired.
+
+**And one thing only Backed has, which chantier 2 was waiting for.** Robinhood's 45 archived actions
+are all cash dividends — zero splits, zero reverse splits, zero anything else, which is why no
+handler for them exists here. Backed's history holds
+8 splits, 2 reverse splits and 3 administrative steps,
+each labelled by the issuer. `reconcileSplit()` has existed and been tested since M3 and has never
+run end to end for want of a declared ratio; these are the first real instances exdate has seen.
 
 ## What this says about the interface
 

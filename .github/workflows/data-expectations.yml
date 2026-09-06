@@ -30,6 +30,7 @@ on:
       - 'DATA-LICENSE.md'
       - 'docs/open-core.md'
       - 'scripts/build-issuer-mechanisms.mjs'
+      - 'scripts/measure-xstocks-steps.mjs'
       - 'scripts/phase0/verify-xstocks.mjs'
       - 'docs/issuer-mechanisms.md'
       - 'scripts/lib/market-session.mjs'

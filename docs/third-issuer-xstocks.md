@@ -116,6 +116,30 @@ the issuer, and a figure sourced there is not first-party in the sense this proj
 haircut.** Stating it now is the point: it is exactly the assumption that, left unexamined, would
 have been discovered after an adapter was written.
 
+## The step ledger, measured
+
+`scripts/measure-xstocks-steps.mjs` reads every multiplier in **one Multicall3 batch per chain,
+pinned to one block**, then asks the issuer for the history of each token that moved.
+`data/xstocks-steps.observed.json`, refreshed daily.
+
+| | |
+|---|---|
+| Tokens | 726 |
+| Moved away from 1.0 | **305** |
+| Declared steps | **603** — 3 Administrative, 590 Dividend, 2 ReverseSplit, 8 Split |
+| Chain disagrees with the issuer's own table | **0** |
+| Ethereum disagrees with BNB Chain | **0** |
+
+Two cross-checks, both clean on 305 tokens: the contract against the issuer's own
+declared history, and Ethereum against BNB Chain address for address.
+
+**And this is where chantier 2 gets its first real instances.** Robinhood's 45 archived actions are
+all cash dividends — zero splits, zero reverse splits, zero anything else, which is why no handler
+for them exists in this repository. Backed's history holds **8 splits,
+2 reverse splits and 3 administrative steps**,
+each labelled by the issuer. `reconcileSplit()` has existed and been tested since M3 and has never
+run end to end for want of a declared ratio; these are the first real ones exdate has seen.
+
 ## Still open
 
 - **The pending shape.** `newMultiplier`, `activationDateTime` and `reason` are in the API and were

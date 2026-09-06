@@ -238,6 +238,27 @@ const list = read('data/exdate.tokenlist.json')
   check('figi: a CUSIP for every US ISIN and none for the rest', badCusip.length === 0, badCusip.join(' '))
 }
 
+// --- xStocks, the second issuer ---------------------------------------------
+// The claims worth guarding here are the two cross-checks and the refusal. The ledger will keep
+// growing - 603 steps today - and the thing that must not quietly change with it is that exdate
+// still says it cannot price a haircut for this issuer.
+{
+  const xs = read('data/xstocks-steps.observed.json')
+  const steps = xs.tokens.flatMap((t) => t.steps)
+  check('xstocks: every token that moved has a declared history', xs.tokens.every((t) => t.declaredSteps > 0 || t.historyRefusal), xs.tokens.filter((t) => !t.declaredSteps && !t.historyRefusal).map((t) => t.symbol).slice(0, 3).join(' '))
+  check('xstocks: the chain agrees with the issuer on every token that moved', xs.summary.chainDisagreesWithDeclared === 0 && xs.tokens.every((t) => t.chainAgreesWithDeclared !== false), String(xs.summary.chainDisagreesWithDeclared))
+  check('xstocks: Ethereum and BNB Chain agree, address for address', xs.summary.chainsDisagreeWithEachOther === 0 && xs.tokens.every((t) => t.bnbMultiplier === null || t.bnbAgrees))
+  check('xstocks: the tallies agree with the tokens', xs.summary.movedFromOne === xs.tokens.length && xs.summary.declaredSteps === steps.length)
+  // The refusal, in both places it lives. A ledger that started claiming haircuts without a rate
+  // being found is the one regression this dataset can have.
+  check('xstocks: still refuses to price a haircut, and says why', xs.summary.producesHaircuts === false && /no declared cash rate/.test(xs.summary.whyNot))
+  const badBps = steps.filter((s) => s.previousMultiplier && Math.abs(((s.multiplier - s.previousMultiplier) / s.previousMultiplier) * 10000 - s.stepBps) > 0.02).length
+  check('xstocks: every stepBps equals its own multipliers', badBps === 0, String(badBps))
+  const unlabelled = [...new Set(steps.map((s) => s.reason).filter((r) => !['Dividend', 'Split', 'ReverseSplit', 'Administrative'].includes(r)))]
+  check('xstocks: every step carries a known reason', unlabelled.length === 0, unlabelled.join(' '))
+  check('xstocks: no multiplier is zero or negative', xs.tokens.every((t) => BigInt(t.chainMultiplier) > 0n))
+}
+
 // --- registry transitions ---------------------------------------------------
 // The correct state today is "none observed", so the checks are about the watcher being able to
 // see one rather than about a count: it must cover every asset in the registry, and a transition
