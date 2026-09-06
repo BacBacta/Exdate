@@ -2070,6 +2070,21 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   reader to raw JSON — the off-hours tile on the home page and *Every window, as data* on
   `/market/`. Both lead to the file's described entry now, `/data/#<file>`, where the download is
   one click further and labelled as a file.
+- 2026-09-06 — **The receiver was deployed and subscribed to nothing, for nine hours, and the
+  route built to refuse exactly that state is what showed it.** Asked whether the data were
+  complete, the latency route was re-read rather than recalled: live, so the timer had rebuilt
+  the image — and `endpointsConfigured: 0`. The subscription is written by `install-api.sh`,
+  which a person runs; `update-api.sh`, which runs every fifteen minutes, rebuilt the code and
+  configured nothing, so the outbox had a subscriber standing next to it and no address for it.
+  "0 deliveries" read as "nothing has happened yet" and meant "nobody is listening".
+  The timer does the subscription now, **before its early exits** — a subscription is
+  configuration, not code, so it must not wait for a commit that touches the image — and forces
+  `up -d` only when it wrote something, so a quiet tick still costs the indexer no restart.
+  Rehearsed in five states, and the rehearsal found a defect in the installer from the day
+  before: `grep '^EXDATE_RECEIVER_SECRET='` matched an **empty** line, the very shape
+  `.env.example` ships, so a machine set up from the example would have started the receiver
+  with no secret and watched it refuse. Both greps take `.\+` now. `deploy/receiver/` also joins
+  the image inputs, since a change to the receiver's own file did not count as one.
 - _(append decisions here as they are made)_
 
 ## Status
