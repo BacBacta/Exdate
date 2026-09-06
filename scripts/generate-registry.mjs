@@ -73,7 +73,14 @@ const tokens = assets
         decimals: asset.tokenDecimals,
         isin: asset.isin ?? null,
         status: asset.status,
-        logoUrl: asset.logoUrl ?? null,
+        // Null on purpose, not missing. The issuer's CDN logo is the one column exdate
+        // redistributes that no exdate surface uses - no page renders it - and it is the
+        // riskiest one to pass on: a third-party mark served from the issuer's CDN, under a
+        // licence that is personal and non-sublicensable (docs/terms-review.md §5.2, §5.7).
+        // Serving less of the issuer verbatim costs the product nothing here and shrinks the
+        // clause that applies. The field stays in the shape - its type already admits null -
+        // so no consumer of /v1 breaks on a missing key.
+        logoUrl: null,
         feedProxy: feed?.feedProxy ?? null,
         feedSvrProxy: feed?.feedSvrProxy ?? null,
         feedDecimals: feed?.feedDecimals ?? null,
