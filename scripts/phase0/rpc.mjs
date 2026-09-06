@@ -18,22 +18,63 @@
 //   RHC_RPC_URLS=https://a,https://b   ordered list, tried left to right
 //   RHC_RPC_URL=https://a              one endpoint, no failover (kept for compatibility)
 
-const DEFAULT_RPC_URLS = [
-  // Chosen for ONE property, the only one these scripts need: a 2,000,000-block
-  // eth_getLogs, the same span Robinhood's takes. The watcher scans 900,000
-  // blocks a tick, and no other third-party endpoint comes close - blockmachine
-  // caps at 1,000 and ordofi at 10,000 (data/rpc-endpoints.observed.json).
-  //
-  // It is NOT the archive endpoint. It served state at any height on the morning
-  // of 2026-09-04 and had stopped by that evening, measured, within hours of
-  // being made the default here - which is what "third parties with no service
-  // commitment" means in practice, and the reason RHC_RPC_URLS should point at a
-  // keyed provider on any machine that matters. State reads go through
-  // RHC_RPC_URL_ARCHIVE, which is a different endpoint for a different reason.
-  'https://robinhood.api.pocket.network',
-  // The operator's own endpoint, fallback only.
-  'https://rpc.mainnet.chain.robinhood.com',
-]
+/**
+ * The endpoint of last resort, and the one the Terms are about.
+ *
+ * Robinhood's own RPC is a "Service" under terms that bind it to testing and development
+ * (docs/terms-review.md §2.4(a)), so a production read tries a third party first. It is never
+ * dropped, because it is the only endpoint that has always answered.
+ */
+import { readFileSync } from 'node:fs'
+
+const OPERATOR_RPC_URL = 'https://rpc.mainnet.chain.robinhood.com'
+/**
+ * Used only when the committed probe cannot be read at all - a checkout without data/, which is
+ * how a published package or a bare script directory would run this.
+ */
+const FALLBACK_RPC_URLS = ['https://rpc-robinhood.blockmachine.io', OPERATOR_RPC_URL]
+
+/**
+ * The failover order, DERIVED from the last probe rather than written down.
+ *
+ * It was written down, and it went stale in exactly the way this repository keeps recording. The
+ * list named pocket.network first, with a comment saying it was chosen for a 2,000,000-block
+ * eth_getLogs that "no other third-party endpoint comes close" to. Measured on 2026-09-06:
+ * pocket accepts ZERO blocks of eth_getLogs, and ordofi accepts 100,000 - so the endpoint was
+ * first for a capability it no longer has, and the best third party for the watcher's own scan
+ * was two places down the list. The set is not stable; the probe is
+ * (.github/workflows/probe-rpc-endpoints.yml, daily), so the order is read from it.
+ *
+ * Ordering: reachable third parties on this chain, widest eth_getLogs span first - that is the
+ * capability that decides whether the watcher's announcement scan works at all - then Robinhood's
+ * own, last, for the terms reason above.
+ *
+ * `head` must be a real block number, not just `reachable`: lb.routeme.sh answers eth_chainId and
+ * refuses eth_blockNumber with a rate-limit notice, so it passes a reachability test and fails
+ * every actual call.
+ *
+ * And only the best two third parties. Failover is sequential with a 25 s request timeout, so a
+ * total outage costs 25 s per candidate - seven of them would put 175 s between the watcher's
+ * thirty-second tick and any answer at all, which is worse than the redundancy is worth.
+ */
+const MAX_THIRD_PARTY_ENDPOINTS = 2
+
+function probedRpcUrls() {
+  try {
+    const probe = JSON.parse(readFileSync(new URL('../../data/rpc-endpoints.observed.json', import.meta.url), 'utf8'))
+    const usable = (probe.endpoints ?? [])
+      .filter((e) => e.reachable && e.chainId === probe.chainId && Number(e.head) > 0 && e.url && e.url !== OPERATOR_RPC_URL)
+      .sort((a, b) => (b.widestLogSpan ?? 0) - (a.widestLogSpan ?? 0))
+      .slice(0, MAX_THIRD_PARTY_ENDPOINTS)
+      .map((e) => e.url)
+    if (usable.length === 0) return FALLBACK_RPC_URLS
+    return [...usable, OPERATOR_RPC_URL]
+  } catch {
+    return FALLBACK_RPC_URLS
+  }
+}
+
+const DEFAULT_RPC_URLS = probedRpcUrls()
 /**
  * Only entries that are actually http(s) URLs survive. A bare API key pasted
  * here instead of a full URL is the plausible mistake - set-rpc.sh accepts one

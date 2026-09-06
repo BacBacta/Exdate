@@ -60,17 +60,28 @@ nowhere else.
     since 2026-09-04, for a terms reason (`docs/terms-review.md`): the chain is outside Robinhood's
     Terms, its public RPC is a "Service" bound to testing and development and "not intended for
     production-grade" use. `scripts/phase0/rpc.mjs` (`makeFailoverRpc`, `RHC_RPC_URLS`) and the
-    indexer's `failoverHttp` carry the same order: `robinhood.api.pocket.network`, then Robinhood's.
+    indexer's `failoverHttp` put third parties first and Robinhood's last. **The order is derived
+    from `data/rpc-endpoints.observed.json`, not written down** (since 2026-09-06): it was written
+    down, naming `pocket.network` first for a 2 000 000-block `eth_getLogs` no other third party
+    came close to, and the daily probe measured pocket accepting **zero** blocks while `ordofi`
+    accepted 100 000 — so the list led with an endpoint chosen for a capability it had lost. Now:
+    reachable endpoints that answer a real `eth_blockNumber` on this chain, widest log span first,
+    **capped at two** (failover is sequential with a 25 s timeout, so seven candidates would put
+    175 s between the watcher's 30 s tick and any answer), then Robinhood's.
     The wallet page's balance read stays on Robinhood's RPC from the visitor's own browser, because
     the browser-answering third parties cap logs at 1 000 blocks — stated on the page.
   - Archive is tested as **state that differs from latest**, never `block.number`: Multicall3's
     `getBlockNumber()` answers on any node, and an endpoint serving head state at every height
     would pass a naive test. The decisive check is `reachesOldestStep`, not an arbitrary depth: a
     node with a million blocks of history looks archival and fails on exactly the reads that need it.
-  - **Their capabilities do not overlap, so the project uses both.** Robinhood's own takes a
-    2 000 000-block `eth_getLogs` and serves no state; `pocket.network` serves 53 M of history and
-    refuses browsers; `blockmachine.io` serves 53 M and answers browsers but caps a log query at
-    1 000 blocks. Wide log scans still go to Robinhood's; state reads go to an archive one.
+  - **Their capabilities do not overlap, and none of them is stable — read the file, not this
+    line.** On 2026-09-06: Robinhood's own takes a 2 000 000-block `eth_getLogs` and serves no
+    state; `ordofi` takes 100 000 and serves no state; `blockmachine.io` takes 1 000, serves 54.7 M
+    of history, answers browsers, and is the **only** endpoint reaching the oldest multiplier step;
+    `pocket.network`, which was the default first endpoint for its wide log span, now takes zero.
+    Measured through the derived order, the watcher's 900 000-block cold-start scan pages down to
+    ordofi's cap and completes in **21 s** without touching Robinhood's endpoint at all — which is
+    the terms-driven answer working, at the cost of a slower cold start.
   - They are **third parties with no service commitment**. Sound for history, which can be re-read
     at any time; never for a capture that cannot be re-read, which is why the effective-price
     watcher does not depend on one.
@@ -2085,6 +2096,49 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `.env.example` ships, so a machine set up from the example would have started the receiver
   with no secret and watched it refuse. Both greps take `.\+` now. `deploy/receiver/` also joins
   the image inputs, since a change to the receiver's own file did not count as one.
+- 2026-09-06 — **The robustness list, and the two points that mattered most were both "nothing was
+  watching".** Five code items shipped; three remain the owner's, each blocked on one secret.
+  **1. The capture has a second trigger.** It had exactly one - the `UIMultiplierUpdated` log,
+  which fires nine minutes ahead - so a process restarting inside those nine minutes had no second
+  chance and the issuer serves the present only. UPS is the measured cost: first quote 350 s late,
+  published `givenUp`, unrecoverable by anyone. The declared side gives an independent trigger with
+  no log at all: **7 of 7 landings fell on the next business day after the issuer's `processDate`,
+  between 15:10:24 and 15:12:46 UTC, a spread of 142 s**, so a window is armed days ahead from a
+  date the issuer publishes. `scripts/lib/landing-window.mjs` computes the rule from the record at
+  call time and **refuses below three landings**; `predictLandingWindow` returns null the moment a
+  landing misses the next business day, because the rule would no longer be the rule. Three things
+  keep a prediction from ever reading as an observation: a window and never an instant, quotes with
+  no `distanceSeconds`, and `basis.predicted` travelling with it — asserted by five data
+  expectations, each proved to bite. A quote caught in a window becomes ordinary once the chain
+  says what the instant was (`adoptPredictedQuotes` → `record()`, same tolerance, same
+  `isTradingHalt` refusal) and **withdraws a `givenUp` verdict it has made false**, since that
+  verdict's own sentence is "no quote within two minutes of effectiveAt". Spacing is measured from
+  the newest quote on record, not from the start of the call: the one-shot sleeps inside one call,
+  the watcher ticks every 30 s, and measured per call the watcher would sample twice a minute and
+  commit each one. **2. The site is checked from outside.** It is static, so it can be internally
+  perfect and publish an older record than git holds — which happened twice on 2026-09-05, once as
+  a checkout a commit behind and once as a deleted Vercel project answering 404 for hours while
+  every collector kept committing. `/build.json` now carries the commit and every dataset's own
+  stamp; `check-site-freshness.mjs` fetches it three-hourly and compares. It writes nothing to
+  `data/`: a file about the site's freshness would be a commit that redeploys the site and changes
+  what it measures. A 404 is diagnosed by asking for the root too, because "the manifest is not
+  deployed yet" and "the site is gone" are the same status code. **3. The issuer's API is watched
+  by shape.** Three gRPC-transcoded endpoints, none versioned; a renamed field breaks nothing
+  loudly and leaves a hole that looks like a quiet month. New fields are news; a field exdate reads
+  going missing or changing type exits 1. It caught my own contract list on its first run — I had
+  written `corporateActions[]` with a flat `processDate` where the endpoint serves `corpActions[]`
+  with `{year, month, day}`. **4. The poller is replayed**, closing the oldest known gap:
+  `ponder:registry` aliased to a double that captures the handler, `context.db` a store over Maps
+  keyed by each table's real primary key, `context.client` answering with readings written in the
+  test. Fourteen cases pin the retrospective `effectiveAt`, the applied change that emits no log,
+  the pause baseline, the reverting token and the scan never overwriting an indexer row; five were
+  proved to bite by breaking the poller. The gap sweep's `eth_getLogs` path is still unreached and
+  says so. **5. The failover order is derived, not written down** — see the entry below it, and the
+  reason it was found: re-probing for a second archive witness (still one, `blockmachine.io`)
+  measured `pocket.network` at **zero** blocks of `eth_getLogs` while the comment beside it claimed
+  2 000 000 that "no other third-party endpoint comes close" to.
+  Left with the owner, one secret each: a second archive witness (`RHC_RPC_URLS_ARCHIVE`, and an
+  Alchemy key does it), a real-time alert sink, and an RPC provider with a service commitment.
 - _(append decisions here as they are made)_
 
 ## Status
@@ -2159,8 +2213,15 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   a bare ticker match. Read `data/token-feed-map.json` for today's split, never a number from here. No first-party link
   exists to close the gap; a second SGOV-like token (low-volatility underlying, large step) would
   causally corroborate another row. See `docs/phase-0-verification.md` §14.
-- The poller and the gap sweep have no tests of their own: they need a chain and a Ponder process,
-  so they are exercised by running the indexer. The webhook outbox is unit-tested
+- The poller is replayed in `packages/indexer/test/poll.test.ts`: `ponder:registry` is aliased to a
+  double that captures the handler instead of scheduling it, `context.db` is a store over Maps and
+  `context.client` answers with readings written in the test, so a sequence of polls can be driven
+  against one store. Fourteen cases pin the branches this file's traps live in - the retrospective
+  `effectiveAt`, the applied change that emits no log, the pause baseline, a reverting token, the
+  scan never overwriting an indexer row - and five were proved to bite by breaking the poller under
+  them. **The gap sweep's `eth_getLogs` path is still not reached**: `sweepClient` is built at
+  module scope from a real transport, so the cases keep the head inside `SWEEP_MIN_GAP_BLOCKS` of
+  the marker and the sweep returns before touching the network. The webhook outbox is unit-tested
   (`packages/indexer/test/webhooks.test.ts`) and was also verified live against a local receiver.
 - `tokenStates` is written every poll even when nothing moved. Deliberate: `sampledAt` is an
   observation, and skipping the write would make "checked, unchanged" read as "not checked since".

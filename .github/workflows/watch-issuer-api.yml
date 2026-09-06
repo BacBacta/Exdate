@@ -1,0 +1,84 @@
+# Watch the SHAPE of the issuer's API, so a renamed field is news rather than a hole.
+#
+# The declared side of every haircut comes from three gRPC-transcoded JSON endpoints,
+# none of them versioned or announced. A field renamed, retyped or removed breaks
+# nothing loudly: a rate becomes undefined, an amount becomes null, a row is dropped,
+# and the record goes on being written with a hole that looks exactly like a quiet
+# month. This repository has already paid for one instance - the issuer's `id` names a
+# dividend SERIES, not a payment, which silently dropped three pending rows.
+#
+# The run FAILS when a field exdate actually reads has gone or changed type. That is
+# deliberate: a failed scheduled run emails the repository owner with no configuration
+# at all, and this is exactly the class of thing nobody would otherwise notice.
+name: watch-issuer-api
+
+on:
+  schedule:
+    # Daily. A shape does not change hourly, and the endpoint is rate limited.
+    - cron: '18 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: watch-issuer-api
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # No install step: plain ESM with no dependency, like the other collectors that
+      # have to keep running when nothing else can.
+      - name: Read the three endpoints and describe their shape
+        id: watch
+        run: |
+          set +e
+          node scripts/watch-issuer-api.mjs
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+
+      # The commit happens BEFORE the failure is raised. Failing first would throw away
+      # the very transition that explains why the run failed - the same order the
+      # capture watchdog uses, and for the same reason.
+      - name: Commit a shape that moved
+        run: |
+          if git diff --quiet -- data/issuer-api-shape.observed.json; then
+            echo "the issuer serves the same shape as yesterday"
+            exit 0
+          fi
+          summary=$(node -e "
+            const s = require('./data/issuer-api-shape.observed.json')
+            const recent = s.transitions.filter((t) => t.at === s.observedAt)
+            const kinds = recent.reduce((m, t) => ((m[t.kind] = (m[t.kind] ?? 0) + 1), m), {})
+            const parts = Object.entries(kinds).map(([k, n]) => n + ' ' + k)
+            process.stdout.write(parts.length ? parts.join(', ') : 'no field moved')
+          ")
+          git config user.name 'exdate-issuer-api-watcher'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/issuer-api-shape.observed.json
+          git commit -m "Watch the issuer's API shape: $summary"
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1
+
+      - name: Did a field exdate reads go missing?
+        if: steps.watch.outputs.code != '0'
+        run: |
+          node -e "
+            const s = require('./data/issuer-api-shape.observed.json')
+            for (const b of s.contractBroken) console.log('BROKEN', b.endpoint, b.path, b.kind, '- read by:', b.readBy)
+            if (s.endpointsFailed.length) for (const f of s.endpointsFailed) console.log('UNREAD', f)
+          "
+          echo "::error::The issuer's API no longer serves something exdate reads, or could not be read at all. See the run log above and data/issuer-api-shape.observed.json."
+          exit 1

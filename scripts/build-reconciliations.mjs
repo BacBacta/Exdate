@@ -26,6 +26,7 @@
 // no action is `unmatched`; a token with no feed yields no haircut at all, only the
 // price the step would have implied - which is exactly how CCL and COST were caught.
 import { readFile, writeFile } from 'node:fs/promises'
+import { landingProfile } from './lib/landing-window.mjs'
 import { rpc, SELECTOR, decodeLatestRoundData } from './phase0/rpc.mjs'
 
 const ROBINHOOD_API_BASE = 'https://api.robinhood.com/rhj'
@@ -567,6 +568,15 @@ const payload = {
     unmatched: tally('unmatched'),
     unsupportedActionType: tally('unsupported_action_type'),
   },
+  /**
+   * When a declared dividend lands on chain, read off the ones that already have.
+   *
+   * Published here rather than computed wherever it is needed, so the capture, the checks and the
+   * site all quote one number. It is what lets a capture window be armed days ahead from a date the
+   * issuer publishes, instead of depending on catching the nine-minute announcement lead - and it
+   * refuses itself below three landings rather than describing one.
+   */
+  landing: landingProfile(rows),
   rows,
 }
 

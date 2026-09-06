@@ -1,6 +1,6 @@
 {
   "note": "Issuer corporate actions paired with the multiplier steps they produced, priced at the Chainlink round in force at effectiveAt. Every input is first-party or on-chain; nothing is estimated. Rebuild with: node scripts/build-reconciliations.mjs",
-  "builtAt": "2026-09-06T06:39:32.212Z",
+  "builtAt": "2026-09-06T10:46:39.210Z",
   "chainId": 4663,
   "rounding": "impliedHaircutBps is truncated toward zero; impliedHaircutBpsExact carries the same figure to two decimals. price.answer and price.answerDecimals are the aggregator's own integer answer; price.value and price.underlying are that answer in full precision, not a display rounding.",
   "matchWindowDays": 4,
@@ -56,6 +56,16 @@
     "pending": 38,
     "unmatched": 6,
     "unsupportedActionType": 0
+  },
+  "landing": {
+    "sufficient": true,
+    "notComputed": null,
+    "observations": 7,
+    "onNextBusinessDay": 7,
+    "earliestSecondOfDay": 54624,
+    "latestSecondOfDay": 54766,
+    "medianSecondOfDay": 54626,
+    "spreadSeconds": 142
   },
   "rows": [
     {
@@ -239,7 +249,7 @@
         "bid": "1699",
         "ask": "1714.87",
         "mid": "1706.9350",
-        "generatedAt": "2026-09-06T06:39:21.290519872Z",
+        "generatedAt": "2026-09-06T10:46:19.404020155Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 10.506
       },
@@ -313,7 +323,7 @@
         "bid": "100.42",
         "ask": "100.5",
         "mid": "100.4600",
-        "generatedAt": "2026-09-06T06:39:21.659659396Z",
+        "generatedAt": "2026-09-06T10:46:25.807320626Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.51
       },
@@ -394,7 +404,7 @@
         "bid": "911.33",
         "ask": "921.07",
         "mid": "916.2000",
-        "generatedAt": "2026-09-06T06:39:16.719439344Z",
+        "generatedAt": "2026-09-06T10:46:23.490835846Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 2.621
       },
@@ -435,7 +445,7 @@
         "bid": "300",
         "ask": "320.1",
         "mid": "310.0500",
-        "generatedAt": "2026-09-06T06:39:27.078496383Z",
+        "generatedAt": "2026-09-06T10:46:19.204089411Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 1.538
       },
@@ -548,7 +558,7 @@
         "bid": "23.27",
         "ask": "23.81",
         "mid": "23.5400",
-        "generatedAt": "2026-09-06T06:39:23.545891995Z",
+        "generatedAt": "2026-09-06T10:46:26.044858573Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 0.297
       },
@@ -582,7 +592,7 @@
         "bid": "14.42",
         "ask": "15",
         "mid": "14.7100",
-        "generatedAt": "2026-09-06T06:39:17.522185029Z",
+        "generatedAt": "2026-09-06T10:46:32.878728271Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 70.082
       },
@@ -696,7 +706,7 @@
         "bid": "101.56",
         "ask": "103.11",
         "mid": "102.3350",
-        "generatedAt": "2026-09-06T06:39:27.374270159Z",
+        "generatedAt": "2026-09-06T10:46:35.406372800Z",
         "note": "the issuer's quote when this file was last rebuilt, NOT the price at effectiveAt - a plausibility check, never a reconciliation input",
         "impliedOverSpot": 7.256
       },

@@ -1,0 +1,48 @@
+# Is the published site still a build of the record?
+#
+# The site is static: every figure on it is read at build time from data/. So it
+# can be internally perfect and still publish an older record than the one in
+# git, and nothing on a page can show it. Both failures have happened, on the
+# same day:
+#
+#   * a checkout one commit behind its branch published 74.1 % over 60 samples
+#     while data/ held 74.3 % over 61 (data audit F11);
+#   * the Vercel project was deleted, www.exdate.me answered 404 for hours, and
+#     every collector went on committing to a site nobody was serving.
+#
+# deploy-site.yml already checks this after it deploys. That is not enough: it
+# only runs when a deployment happens, and the two failures above are exactly
+# the case where one did not. So this asks the live host on its own schedule.
+#
+# It writes nothing. A file recording the site's freshness would be a commit
+# that redeploys the site and changes the thing it measures. A failed scheduled
+# run emails the repository owner with no configuration at all, which is the
+# same mechanism the capture watchdog relies on.
+name: check-site-freshness
+
+on:
+  schedule:
+    # Every three hours: the deploy path's own safety net runs six-hourly, so
+    # this notices a stuck deploy within one cycle of it rather than after two.
+    - cron: '20 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-site-freshness
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # No install step: the probe is plain ESM with no dependency, like the
+      # other collectors that must keep running when nothing else can.
+      - run: node scripts/check-site-freshness.mjs
