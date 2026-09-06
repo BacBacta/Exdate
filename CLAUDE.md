@@ -1895,6 +1895,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   difference**, because the fees and the withholding applied to these distributions are documented
   nowhere and the measurement is the whole claim. That line is worth more to a reader than the
   accusation it replaces, and it is the one an issuer can read without reaching for counsel.
+- 2026-09-06 — **The open-core boundary is drawn while there is nothing behind it, and generated
+  so it cannot drift.** The brief's chantier 6 read as a licensing task and the licensing was
+  already done — MIT on the code, CC BY 4.0 on the observations, the issuer's fields carved out by
+  column. What was missing is the thing a reader actually needs: **for any route, dataset or field,
+  which side of the line is it on?** `docs/open-core.md` answers it, and every fact in it is read
+  from the file that decides it — the 18 routes parsed out of `packages/api/src/index.ts`, the
+  quotas out of `limits.ts`, the carve-outs out of `DATA-LICENSE.md`, the prerequisites out of
+  `data/`. A route added without a line describing it **fails the build**, which is the state the
+  document exists to prevent: a served route nobody can place.
+  The answer today is *everything is open, nothing is reserved*, and the section worth having is
+  why. The roadmap's warning — do not sell an SLA before you can keep one — is turned into five
+  **measured** prerequisites rather than a position: **0 of 5 met.** One archive witness where
+  there should be two (and the record says so per step since the 2026-09-05 audit); production
+  reads on third parties with no service commitment, which is also the terms answer; a Ponder
+  schema dropped on every code deploy; a watchdog that emails a failed cron run and has no
+  real-time sink; and no measured delivery latency, which the receiver shipped hours earlier will
+  answer on the first real delivery. Each one recomputes from the record, so the table changes by
+  regenerating the file rather than by someone remembering to edit it — which is exactly how the
+  paid tier will become honest rather than announced.
+  It names in advance what a paid tier *would* reserve — `/v1/:chain/reconciliations` and the
+  signed webhooks that carry it inside the announcement lead — because a boundary published before
+  it matters is legible, and one announced afterwards reads as a withdrawal.
 - _(append decisions here as they are made)_
 
 ## Status

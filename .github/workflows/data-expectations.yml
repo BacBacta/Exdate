@@ -22,6 +22,13 @@ on:
       - 'scripts/check-data-expectations.mjs'
       - 'scripts/build-history.mjs'
       - 'scripts/build-methodology.mjs'
+      - 'scripts/build-open-core.mjs'
+      # The open-core boundary is generated from the API's own source, the quotas and the licence,
+      # so a route added or a quota changed has to re-run it - a route that is invisible in that
+      # table is exactly the state the document exists to prevent.
+      - 'packages/api/src/**'
+      - 'DATA-LICENSE.md'
+      - 'docs/open-core.md'
       - 'scripts/lib/market-session.mjs'
       - 'docs/methodology.md'
       # The methodology note is generated from these, so a constant moving here has to re-run the
@@ -76,6 +83,11 @@ jobs:
       # cited cannot be the fifth thing this project found drifting from its own code.
       - name: Does the methodology note still match the code?
         run: node --experimental-strip-types --no-warnings scripts/build-methodology.mjs --check
+
+      # Same reason, one level up: a route added without a line in the boundary document would be
+      # served with nobody able to say which side of the line it is on.
+      - name: Does the open-core boundary still match the code and the record?
+        run: node scripts/build-open-core.mjs --check
 
       - name: Is the history index still what git says?
         run: node scripts/build-history.mjs --check
