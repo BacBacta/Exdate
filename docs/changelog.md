@@ -7,6 +7,16 @@ measurements behind them, is `CLAUDE.md` in the repository.
 
 ## 2026-09-06
 
+- **New: `/subscribe/`.** The footer's *Subscribe* column linked the files themselves —
+  `/calendar.ics`, `/feed.xml`, `/badge.svg`, `/tokenlist.json` — under labels that read like
+  pages, so a person clicking *Calendar* landed on `BEGIN:VCALENDAR` and one clicking *Token list*
+  on 124 KB of JSON. The files are unchanged and stay at their addresses; what is new is a page
+  that says in plain words what each one is and where to paste it — the `webcal:` button and the
+  URL for Google Calendar, the feed address for a reader, the badge with its Markdown and HTML, the
+  token list with its version and what a wallet learns from it — with the file itself one click
+  further, labelled as a file. The calendar subscription component that had been written for
+  `/dividends/` and never mounted is mounted there now.
+
 - **Editorial.** The site's title and lede describe the reconciliation rather than an accusation:
   *every dividend declared, against what actually arrived*. Every figure is unchanged — Apple's
   36 % and the words *never arrived* are measurements and stay exactly where they were. What went

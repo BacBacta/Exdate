@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { CalendarFilter } from '../components/CalendarFilter'
 import { Footer, Nav } from '../components/Chrome'
+import { Subscribe } from '../components/Subscribe'
 import { Segments } from '../components/Segments'
-import { Chip, Links, Method, Section, Stats, Table } from '../components/Ui'
+import { Chip, Method, Section, Stats, Table } from '../components/Ui'
 import { ledgerMatched } from '../../lib/ledger'
 import { dateLong, dateShort, pctInt, usd } from '../../lib/format'
 import { calendar, capture, changes, delivery, observed, type CalendarGroup } from '../../lib/observed'
@@ -128,10 +129,12 @@ export default function Page() {
               }))}
             />
           </div>
-          <Links>
-            <a href="/calendar.ics">Subscribe (.ics)</a>
-            <a href="/feed.xml">RSS</a>
-          </Links>
+          <Subscribe
+            icsPath="/calendar.ics"
+            site={observed.links.site}
+            what="every declared dividend and every observed change"
+            more="/subscribe/"
+          />
         </Section>
 
         <div className="wrap stack" id="method">

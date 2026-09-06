@@ -2025,6 +2025,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   rejection "will not affect any other provision", so does §12.14's irrevocable venue consent
   survive it?** Read literally it does, and whether a US venue consent binds an EU-resident
   operator is a further question again.
+- 2026-09-06 — **The footer offered four machine files as if they were pages, and the component
+  that would have explained one of them was never mounted.** *Subscribe* → *Calendar (.ics)*
+  opened `BEGIN:VCALENDAR`; *RSS* raw XML; *Badges* one lone SVG bar; *Token list* 124 KB of JSON.
+  A `Subscribe` component with the `webcal:` button and the Google-Calendar hint existed in
+  `components/` and was imported nowhere — `/dividends/` and the home page linked the raw `.ics`
+  beside it. So: **`/subscribe/`**, one section per thing in plain words with the file one click
+  further and labelled as a file; the footer's four links lead to its sections; the component is
+  mounted on `/dividends/` at last. Nothing about the files changed, and nothing may — external
+  consumers fetch them by URL.
+  Measured before shipping, and the measurement found two things a reading would not have.
+  The page overflowed at 320 and 360 px and my first detector blamed a `<code>` 1 248 px wide,
+  which was the badge's Markdown snippet — inside a `<pre>` with no `overflow-x`, because
+  `.embed pre` carries that rule and the snippets sat in a `<Method>` without `.embed`. Wrapped.
+  It still overflowed, at **exactly 361 px on both widths**, and the detector now blamed a
+  1 059 px `<code>`: the *same* snippet, now scrolling harmlessly inside its box. **A detector
+  that names the widest element names the wrong one** — the true culprit was the site badge, an
+  `<img>` of an SVG with `width="341"` and no `max-width`, plus 20 px of wrap padding. `.embed
+  .badge` gets `max-width: 100%; height: auto`, which also protects the 194 token pages. The
+  detector now skips anything with a scrolling or clipping ancestor, and it is **in the repository**
+  (`apps/web/scripts/measure-pages.mjs`, `pnpm --filter @exdate/web measure`), because the audit's
+  version lived in a scratchpad and was gone when it was needed. `playwright-core` and `axe-core`
+  are devDependencies of the site; neither downloads a browser, so Vercel's install is unaffected.
 - _(append decisions here as they are made)_
 
 ## Status
