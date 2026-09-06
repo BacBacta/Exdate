@@ -2,7 +2,7 @@
   "note": "How long a signed webhook took to reach a subscriber, over real deliveries only. Never derived from the poll interval: a delivery path with nothing subscribed to it has no latency, it has a budget. The three legs are apart because they fail for different reasons - exdate's own observation lag, the outbox, and the total a subscriber experiences.",
   "source": "https://api.exdate.me/v1/4663/webhooks/latency",
   "chainId": 4663,
-  "observedAt": "2026-09-06T14:21:53.319Z",
+  "observedAt": "2026-09-06T14:43:30.467Z",
   "legs": {
     "announceToObserve": "the chain carried the announcement, to exdate writing it to the outbox",
     "observeToDeliver": "the outbox row, to a subscriber accepting the signed POST",
@@ -12,7 +12,7 @@
   "scope": "the subscriber is exdate’s own receiver on the same host, so public internet transit to a third party is not included",
   "endpointsConfigured": 1,
   "delivered": 45,
-  "deliveredFirstAttempt": null,
+  "deliveredFirstAttempt": 0,
   "pending": 0,
   "attempted": {
     "neverAttempted": 0,
@@ -45,6 +45,7 @@
     {
       "type": "dividend.pending",
       "delivered": 38,
+      "deliveredFirstAttempt": 0,
       "pending": 0,
       "failed": 0,
       "attempted": {
@@ -77,6 +78,7 @@
     {
       "type": "dividend.reconciled",
       "delivered": 7,
+      "deliveredFirstAttempt": 0,
       "pending": 0,
       "failed": 0,
       "attempted": {
