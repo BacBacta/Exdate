@@ -1,0 +1,71 @@
+# The second issuer's step ledger, on a schedule.
+#
+# Backed publishes every multiplier step back to 2025 with its reason, so unlike Robinhood's
+# one-month window there is nothing here that disappears if nobody looks. That is exactly why this
+# runs daily rather than hourly: the point is to notice a NEW step and to keep the cross-check
+# alive - the chain against the issuer's own table, and Ethereum against BNB Chain - not to guard
+# against loss.
+#
+# The script leaves the file byte-identical when the ledger has not moved, so a quiet day commits
+# nothing. It refuses to publish an empty ledger, because a registry read that failed is not 726
+# tokens going to zero.
+name: measure-xstocks-steps
+
+on:
+  schedule:
+    # 05:10 UTC daily, before the Robinhood archive job at 06:20 so the two do not race on a push.
+    - cron: '10 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure-xstocks-steps
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Plain node, no install step: one Multicall3 batch per chain and one history request per
+      # token that actually moved. The endpoints are public and are confirmed by eth_chainId rather
+      # than trusted by name.
+      - name: Read the ledger
+        run: node scripts/measure-xstocks-steps.mjs
+
+      # The mechanism table quotes this ledger's counts, so it has to follow it in the same run -
+      # four surfaces rebuilt on four schedules is what let one pairing be described three ways
+      # (audit 2026-09-05, F03).
+      - name: Rebuild the issuer mechanism table
+        run: node scripts/build-issuer-mechanisms.mjs
+
+      - name: Check the record against its expectations
+        run: node scripts/check-data-expectations.mjs
+
+      - name: Commit only if the ledger moved
+        run: |
+          paths="data/xstocks-steps.observed.json docs/issuer-mechanisms.md"
+          if git diff --quiet -- $paths; then
+            echo "nothing changed"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/xstocks-steps.observed.json');process.stdout.write(d.summary.movedFromOne+' tokens moved, '+d.summary.declaredSteps+' declared steps')")
+          git config user.name 'exdate-xstocks'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add $paths
+          git commit -m "Measure xStocks steps: $summary"
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

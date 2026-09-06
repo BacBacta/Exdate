@@ -29,6 +29,7 @@ const registry = readJson('data/robinhood-assets.snapshot.json')
 const events = readJson('data/multiplier-events.observed.json')
 const base = readJson('data/base-b20-verification.json')
 const xstocks = readJson('data/xstocks-verification.json')
+const xsLedger = readJson('data/xstocks-steps.observed.json')
 const feeds = readJson('data/chainlink-feeds.snapshot.json')
 
 const NOT_PROBED = '— not probed'
@@ -108,9 +109,11 @@ const ISSUERS = [
     declaredRate: 'no — the issuer publishes the step, not the cash rate',
     declaredHistory: 'yes — every step back to 2025, with its reason',
     tokens: String(xsAssets),
-    stepsSeen: `${xsMoved} of ${xsSampled.length} distinct tokens sampled have moved; ${xsHistorySteps} steps in the issuer's history`,
+    stepsSeen: xsLedger
+      ? `${xsLedger.summary.movedFromOne} of ${xsLedger.summary.assets} tokens have moved; ${xsLedger.summary.declaredSteps} declared steps (${Object.entries(xsLedger.summary.stepsByReason).map(([reason, count]) => `${count} ${reason}`).join(', ')})`
+      : `${xsMoved} of ${xsSampled.length} distinct tokens sampled have moved; ${xsHistorySteps} steps in the issuer's history`,
     produces: '**a step ledger** — a haircut needs a cash rate from a source that is not the issuer',
-    evidence: '`data/xstocks-verification.json`',
+    evidence: xsLedger ? '`data/xstocks-verification.json`, `data/xstocks-steps.observed.json`' : '`data/xstocks-verification.json`',
   },
   {
     issuer: 'Ondo',
@@ -217,10 +220,17 @@ that loses rows; Backed gives the **full step history** and no cash rate. So the
 has opposite gaps: exdate archives Robinhood's feed daily because it disappears, and would need a
 non-issuer source for a rate on Backed. **Only Robinhood supports a haircut end to end today.**
 
-**3. Whether anything has moved.** Coinbase: nothing, ever — 13 tokens at exactly 1.0. Backed: four
-of six sampled have moved, with steps of 36 to 48 bps. Robinhood: ${rhSteps} distinct steps. An
-adapter for an issuer with no events is untestable against reality, which is why Base is verified
-and unwired.
+**3. Whether anything has moved.** Coinbase: nothing, ever — 13 tokens at exactly 1.0. Backed:
+${xsLedger ? `${xsLedger.summary.movedFromOne} of ${xsLedger.summary.assets} tokens, ${xsLedger.summary.declaredSteps} declared steps` : 'four of six sampled'}. Robinhood: ${rhSteps} distinct steps.
+An adapter for an issuer with no events is untestable against reality, which is why Base is
+verified and unwired.
+
+**And one thing only Backed has, which chantier 2 was waiting for.** Robinhood's 45 archived actions
+are all cash dividends — zero splits, zero reverse splits, zero anything else, which is why no
+handler for them exists here. Backed's history holds
+${xsLedger ? `${xsLedger.summary.stepsByReason.Split ?? 0} splits, ${xsLedger.summary.stepsByReason.ReverseSplit ?? 0} reverse splits and ${xsLedger.summary.stepsByReason.Administrative ?? 0} administrative steps` : 'splits and reverse splits'},
+each labelled by the issuer. \`reconcileSplit()\` has existed and been tested since M3 and has never
+run end to end for want of a declared ratio; these are the first real instances exdate has seen.
 
 ## What this says about the interface
 

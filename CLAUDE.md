@@ -1971,6 +1971,38 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   individually (`tradingCapabilities.overnight.fractional`). Seven expectation checks guard the
   watcher's own coverage rather than a count, because a watcher that quietly stopped covering the
   registry would report zero forever and look exactly like a quiet month.
+- 2026-09-06 — **The second adapter, then the interface — and the order paid for itself twice.**
+  1c is `scripts/measure-xstocks-steps.mjs`, written on Backed's own terms rather than through a
+  contract: every multiplier in **one Multicall3 batch per chain pinned to one block** (or the
+  numbers would measure the delay between reads), then the issuer's history for each token that
+  moved. **305 of 726 tokens have moved, 603 declared steps, and both cross-checks are clean** —
+  the chain against the issuer's own table, and Ethereum against BNB Chain address for address, 0
+  and 0. The file states in its own summary that it produces **no haircut**, with the reason, and
+  a check guards that refusal in both places it lives: 603 steps is not a reason to start pricing
+  them.
+  **What it found that Robinhood cannot show**: 590 Dividend, **8 Split, 2 ReverseSplit**, 3
+  Administrative. Robinhood's 45 archived actions are all cash dividends — zero of anything else,
+  which is why no merger or split handler exists here and why chantier 2 is an instrument rather
+  than a set of handlers. `reconcileSplit()` has been tested since M3 and has never run end to end
+  for want of a declared ratio; these are the first real instances exdate has ever seen.
+  1d is `packages/core/src/issuers.ts`, and it names **roles, never selectors**: `constantView` and
+  `adjustedView`, filled per issuer. The test that justifies the whole file asserts that
+  **Robinhood's `constantView` and Backed's `adjustedView` are the same four bytes** —
+  `balanceOf(address)` — so a contract that named the selector would have collapsed two opposite
+  meanings into one. `produces` is **derived** from what an issuer publishes rather than stored: a
+  step history without a cash rate cannot price a haircut however long it is, and a rate is worth
+  nothing until something moves.
+  Two helpers came out of it and both were checked against the issuer they were *not* written from:
+  `stepBpsExact` reproduces **all 603** of Backed's declared steps from Backed's own multipliers, in
+  integer WAD arithmetic because DELL's 0.64 bps rounds to 1 in whole bps; and `stepShape` names
+  only the two ends — at least doubled is a split, at least halved is a reverse split — and refuses
+  everything between, because this project already measured that the brief's magnitude band is
+  false (CCL, 214.86 bps, a dividend). Over 590 declared dividends it calls **none** of them a
+  split. That is what makes it an abstraction rather than a rename: it holds on the issuer whose
+  contract inverts the semantics it was derived from.
+  Deliberately left out of the common interface: Robinhood's nine-minute announcement lead,
+  Backed's step history, Coinbase's oracle registry. Each is real and each belongs to its own
+  adapter — an abstraction that carries one issuer's peculiarity has not abstracted anything.
 - _(append decisions here as they are made)_
 
 ## Status
