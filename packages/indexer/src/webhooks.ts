@@ -1,5 +1,6 @@
 import { webhookDeliveries, webhookEvents } from 'ponder:schema'
 import {
+  announcedAtFromPayload,
   WEBHOOK_DELIVERY_HEADER,
   WEBHOOK_EVENT_HEADER,
   WEBHOOK_EVENT_ID_HEADER,
@@ -17,6 +18,7 @@ import {
 } from '@exdate/core'
 import type { Context } from 'ponder:registry'
 import type { Address } from 'viem'
+import { deliveryJournal } from './latency-journal.js'
 import { subscriptionStore } from './subscriptions.js'
 
 /**
@@ -145,6 +147,44 @@ export async function enqueueWebhook<T extends WebhookEventType>(
  * how many were attempted; a cycle with no endpoints configured does no work
  * and no reads.
  */
+/**
+ * Write a concluded delivery to the durable journal.
+ *
+ * Denormalised on purpose: the instants come from the event row, and the event row is exactly what
+ * a schema drop removes. An entry that carried a reference instead of the values would survive the
+ * drop and mean nothing afterwards.
+ *
+ * A journal write must never cost a delivery. The POST already succeeded when this runs, so a
+ * failure here is logged and swallowed: losing one row of the measurement is bad, re-sending a
+ * delivery that a subscriber already accepted is worse.
+ */
+async function record(
+  row: { id: string; eventId: string; type: string; endpointId: string; host: string },
+  event: { createdAt: bigint; type: string; payload: string },
+  attempts: number,
+  now: bigint,
+  outcome: 'delivered' | 'failed',
+  responseStatus: number | null,
+): Promise<void> {
+  try {
+    await deliveryJournal.append({
+      eventId: row.eventId,
+      type: row.type,
+      endpointId: row.endpointId,
+      endpointHost: row.host,
+      announcedAt: announcedAtFromPayload(event.type, event.payload),
+      observedAt: Number(event.createdAt),
+      deliveredAt: outcome === 'delivered' ? Number(now) : null,
+      attempts,
+      responseStatus,
+      outcome,
+      recordedAt: new Date(Number(now) * 1000).toISOString(),
+    })
+  } catch (error) {
+    console.warn(`[exdate] could not journal delivery ${row.id}: ${String((error as Error).message).slice(0, 120)}`)
+  }
+}
+
 export async function deliverDueWebhooks(context: WebhookContext, now: bigint): Promise<number> {
   const live = currentEndpoints()
   if (live.length === 0) return 0
@@ -182,6 +222,7 @@ export async function deliverDueWebhooks(context: WebhookContext, now: bigint): 
         responseStatus: result.status,
         error: null,
       })
+      await record(row, event, attempts, now, 'delivered', result.status)
       continue
     }
 
@@ -195,6 +236,7 @@ export async function deliverDueWebhooks(context: WebhookContext, now: bigint): 
       error: result.error.slice(0, 200),
     })
     if (delay === null) {
+      await record(row, event, attempts, now, 'failed', result.status ?? null)
       console.warn(
         `[exdate] webhook ${row.type} to ${row.host} gave up after ${WEBHOOK_MAX_ATTEMPTS} attempts: ${result.error.slice(0, 120)}`,
       )

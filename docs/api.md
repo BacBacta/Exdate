@@ -439,6 +439,11 @@ something if the notice arrives inside it.
 }
 ```
 
+`source` says where the concluded deliveries were read from. **`journal`** is a file the process
+owns, which survives the schema drop a code deploy causes; **`outbox`** means the journal held
+nothing and the figures come from tables a deploy can drop, so the count can go backwards. The
+outbox is the queue; the journal is the record.
+
 **Read `sufficient` before quoting anything.** It is `false` until at least one delivery has been
 accepted by a subscriber, and every leg is `null` then rather than zero. Nothing here is derived
 from the poll interval: a delivery path with nothing subscribed to it has a budget, not a latency,

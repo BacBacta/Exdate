@@ -19,6 +19,8 @@ import {
   feedHealth,
   resolveChain,
   summarizeLatency,
+  timingsFromJournal,
+  type DeliveryJournal,
   type DeliveryTiming,
   type LatencySummary,
 } from '@exdate/core'
@@ -75,6 +77,12 @@ export interface ApiOptions {
    * operator's own endpoints in EXDATE_WEBHOOK_ENDPOINTS are unaffected.
    */
   subscriptions?: SubscriptionStore
+  /**
+   * Concluded deliveries, kept where a schema drop cannot reach them. Absent, the latency route
+   * falls back to the outbox tables and says so in `source`, because a figure that silently goes
+   * backwards after a deploy is worse than one that names where it came from.
+   */
+  deliveryJournal?: DeliveryJournal
   subscriptionPolicy?: SubscriptionPolicy
   /** Injected so the test delivery can be observed without a network. */
   fetchImpl?: typeof fetch
@@ -120,6 +128,7 @@ export function createApi({
   now = () => BigInt(Math.floor(Date.now() / 1000)),
   webhookEndpointsConfigured = 0,
   subscriptions,
+  deliveryJournal,
   subscriptionPolicy,
   fetchImpl = globalThis.fetch,
   limits = { keys: [], anonymousRequestsPerMinute: 60 },
@@ -636,10 +645,15 @@ export function createApi({
         },
       ]
     })
-    const summary = summarizeLatency(timings)
-    const byType = [...new Set(timings.map((timing) => timing.type))].sort().map((type) => ({
+    // The journal is authoritative for what concluded; the outbox for what is still in flight.
+    // Not merged by id: a row in both has already been journalled, so the outbox copy is dropped.
+    const journal = deliveryJournal ? await deliveryJournal.list().catch(() => []) : []
+    const source: 'journal' | 'outbox' = journal.length > 0 ? 'journal' : 'outbox'
+    const measured = journal.length > 0 ? timingsFromJournal(journal, timings) : timings
+    const summary = { ...summarizeLatency(measured), source }
+    const byType = [...new Set(measured.map((timing) => timing.type))].sort().map((type) => ({
       type,
-      ...summarizeLatency(timings.filter((timing) => timing.type === type)),
+      ...summarizeLatency(measured.filter((timing) => timing.type === type)),
     }))
     const body: WebhookLatencyResponse = {
       chainId: chain.id,
@@ -649,7 +663,8 @@ export function createApi({
         observeToDeliver: 'the outbox row, to a subscriber accepting the signed POST',
         announceToDeliver: 'the total a subscriber experiences',
       },
-      basis: 'real deliveries only; nothing here is derived from the poll interval',
+      basis:
+        'real deliveries only; nothing here is derived from the poll interval. Concluded deliveries are read from a journal the process owns, so they survive the schema drop a code deploy causes.',
       endpointsConfigured: endpointsConfigured(),
       ...summary,
       byType,

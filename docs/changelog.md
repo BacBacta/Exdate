@@ -7,6 +7,13 @@ measurements behind them, is `CLAUDE.md` in the repository.
 
 ## 2026-09-06
 
+- **`GET /v1/:chain/webhooks/latency` gains `source`, and its figures now survive a deploy.**
+  Concluded deliveries are journalled to a file the process owns, denormalised so they carry the
+  instants rather than pointing at the event row. A code deploy drops the Ponder schema and every
+  delivery row with it - measured this morning - and a delivery is not derived from anything, so
+  the published latency would have restarted from zero at every deploy. `source: "journal"` means
+  the figures survived; `source: "outbox"` means they came from tables a deploy can drop.
+
 - **`/data/` now lists every dataset it serves.** It listed 16 of 27, from a hand-maintained
   array: the sources of two headline figures — net creation on the home page and the DEX-to-feed
   gap behind `/market/` — were served at `/data/<file>` and absent from the page that calls itself

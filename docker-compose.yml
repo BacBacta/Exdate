@@ -55,6 +55,13 @@ services:
       # EXDATE_WEBHOOK_SELF_SERVICE=false to turn the routes off.
       EXDATE_WEBHOOK_SELF_SERVICE: ${EXDATE_WEBHOOK_SELF_SERVICE:-true}
       EXDATE_WEBHOOK_SUBSCRIPTIONS_FILE: /var/lib/exdate/webhook-subscriptions.json
+      # Concluded deliveries, on the same volume and for the same reason the subscriptions are:
+      # a code deploy drops the Ponder schema, and the delivery rows with it. Token states and
+      # reconciliations come back - the poller recomputes them from the chain within one interval -
+      # but a delivery happened once, at an instant, and nothing recreates it. Measured on
+      # 2026-09-06: the morning's deploy took every delivery row, so the published latency would
+      # have restarted from zero at every deploy for ever.
+      EXDATE_LATENCY_JOURNAL_FILE: /var/lib/exdate/webhook-deliveries.jsonl
     volumes:
       - subscriptions:/var/lib/exdate
     # Loopback only: Caddy reaches it over the compose network, and an API
