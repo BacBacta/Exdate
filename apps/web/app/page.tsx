@@ -101,8 +101,7 @@ export default function Page() {
           />
           <Links>
             <a href="/dividends/">All dividends</a>
-            <a href="/calendar.ics">Subscribe (.ics)</a>
-            <a href="/feed.xml">RSS</a>
+            <a href="/subscribe/">Subscribe</a>
           </Links>
         </Section>
 

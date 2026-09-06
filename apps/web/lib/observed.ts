@@ -20,6 +20,7 @@ import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
 import figiJson from '../../../data/figi.observed.json'
 import webhookLatencyJson from '../../../data/webhook-latency.observed.json'
+import tokenListJson from '../../../data/exdate.tokenlist.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 import gapJson from '../../../data/dex-feed-gap.observed.json'
 import stateVerificationJson from '../../../data/multiplier-state-verification.json'
@@ -1143,6 +1144,15 @@ export const observed = {
   chains: {
     robinhood: { name: 'Robinhood Chain', issuer: 'Robinhood Stock Tokens', tokens: tokens.length, feeds: robinhoodFeeds, measured: true },
     base: { name: 'Base', issuer: 'Coinbase tokenized stocks', tokens: base.summary.tokens, feeds: base.summary.feeds, measured: false, verifiedAt: base.verifiedAt },
+  },
+  /**
+   * The token list as published, so the subscribe page can say which version and how many tokens
+   * a wallet will import - read from the file rather than typed, like every other figure here.
+   */
+  tokenList: {
+    version: `${tokenListJson.version.major}.${tokenListJson.version.minor}.${tokenListJson.version.patch}`,
+    tokens: tokenListJson.tokens.length,
+    builtAt: tokenListJson.timestamp,
   },
   links: {
     /**

@@ -525,7 +525,7 @@ footer { border-top: 1px solid var(--line); padding: 4rem 0 4.5rem; }
 .method summary::-webkit-details-marker { display: none; }
 .method p { margin-top: 0.8rem; text-wrap: pretty; }
 .embed pre { margin-top: 0.6rem; padding: 0.7rem 0.9rem; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink-2); overflow-x: auto; white-space: pre; }
-.embed .badge { display: inline-block; height: 20px; }
+.embed .badge { display: inline-block; max-width: 100%; height: auto; }
 .cal-filter { margin-top: 1.2rem; font-size: 15px; color: var(--muted); }
 .cal-filter a { color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 .wallet-links { margin-top: 1rem; font-size: 15px; }

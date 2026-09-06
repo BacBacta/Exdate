@@ -5,7 +5,7 @@
  * passed in. Google Calendar takes the https URL pasted under "From URL",
  * which the line says.
  */
-export function Subscribe({ icsPath, site, what }: { icsPath: string; site: string; what: string }) {
+export function Subscribe({ icsPath, site, what, more }: { icsPath: string; site: string; what: string; more?: string }) {
   const https = `${site}${icsPath}`
   const webcal = https.replace(/^https?:\/\//, 'webcal://')
   return (
@@ -16,7 +16,7 @@ export function Subscribe({ icsPath, site, what }: { icsPath: string; site: stri
       <a href={icsPath} download>
         Download .ics
       </a>
-      <a href="/feed.xml">RSS</a>
+      {more ? <a href={more}>Other ways to follow</a> : null}
       <span className="subscribe-hint">
         A calendar of {what}, updated as the record is. In Google Calendar, add it from URL:{' '}
         <code>{https}</code>

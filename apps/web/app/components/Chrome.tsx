@@ -108,10 +108,14 @@ export function Footer() {
         <div>
           <h2>Subscribe</h2>
           <nav aria-label="Subscribe">
-            <a href="/calendar.ics">Calendar (.ics)</a>
-            <a href="/feed.xml">RSS</a>
-            <a href="/badge.svg">Badges</a>
-            <a href="/tokenlist.json">Token list</a>
+            {/* Each of these leads to a page that says what the thing is and how to use it. The
+                files themselves - .ics, .xml, .svg, .json - are one click further, labelled as
+                files: linked straight from here, a person clicking "Calendar" landed on
+                BEGIN:VCALENDAR. */}
+            <a href="/subscribe/#calendar">Calendar</a>
+            <a href="/subscribe/#rss">RSS feed</a>
+            <a href="/subscribe/#badges">Badges</a>
+            <a href="/subscribe/#tokenlist">Token list</a>
           </nav>
         </div>
         <div>
