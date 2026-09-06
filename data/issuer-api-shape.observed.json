@@ -1,0 +1,306 @@
+{
+  "note": "The SHAPE of the issuer’s API - field paths and their types, never values. New fields are news; a field exdate reads going missing is a failure, because everything downstream would keep working and be wrong.",
+  "source": "robinhood:/rhj/assets, /rhj/prices, /rhj/corporate-actions",
+  "exdateObserves": "which field paths were served, their JSON types, and how many values carried each; the transitions between one reading and the next",
+  "observedAt": "2026-09-06T10:54:54.964Z",
+  "offline": false,
+  "endpointsRead": [
+    "assets",
+    "prices",
+    "corporateActions"
+  ],
+  "endpointsFailed": [],
+  "contractBroken": [],
+  "transitions": [
+    {
+      "at": "2026-09-06T10:54:29.955Z",
+      "endpoint": "assets",
+      "kind": "baseline",
+      "detail": "18 field(s) recorded for the first time"
+    },
+    {
+      "at": "2026-09-06T10:54:29.955Z",
+      "endpoint": "prices",
+      "kind": "baseline",
+      "detail": "14 field(s) recorded for the first time"
+    },
+    {
+      "at": "2026-09-06T10:54:29.955Z",
+      "endpoint": "corporateActions",
+      "kind": "baseline",
+      "detail": "12 field(s) recorded for the first time"
+    }
+  ],
+  "shape": {
+    "assets": {
+      "assets[].currentMultiplier": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].deployments[].chainId": {
+        "types": [
+          "number"
+        ],
+        "count": 194
+      },
+      "assets[].deployments[].contractAddress": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].deployments[].networkName": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].id": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].isin": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].logoUrl": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].pendingMultiplier": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].status": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tokenDecimals": {
+        "types": [
+          "number"
+        ],
+        "count": 194
+      },
+      "assets[].tokenName": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tokenSymbol": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tradingCapabilities.extended.fractional": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tradingCapabilities.extended.whole": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tradingCapabilities.market.fractional": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tradingCapabilities.market.whole": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tradingCapabilities.overnight.fractional": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      },
+      "assets[].tradingCapabilities.overnight.whole": {
+        "types": [
+          "string"
+        ],
+        "count": 194
+      }
+    },
+    "prices": {
+      "quotes[].ask": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].bid": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].currency": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].dailyHigh": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].dailyLow": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].dailyTradingVolume": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].deployments[].chainId": {
+        "types": [
+          "number"
+        ],
+        "count": 1
+      },
+      "quotes[].deployments[].contractAddress": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].deployments[].networkName": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].generatedAt": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].isTradingHalt": {
+        "types": [
+          "boolean"
+        ],
+        "count": 1
+      },
+      "quotes[].mintBurnTokenVolume": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].mintBurnUsdVolume": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      },
+      "quotes[].tokenSymbol": {
+        "types": [
+          "string"
+        ],
+        "count": 1
+      }
+    },
+    "corporateActions": {
+      "corpActions[].deployments[].chainId": {
+        "types": [
+          "number"
+        ],
+        "count": 40
+      },
+      "corpActions[].deployments[].contractAddress": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].deployments[].networkName": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].details.cashDividend.rate": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].details.cashDividend.underlyingSymbol": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].id": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].processDate.day": {
+        "types": [
+          "number"
+        ],
+        "count": 40
+      },
+      "corpActions[].processDate.month": {
+        "types": [
+          "number"
+        ],
+        "count": 40
+      },
+      "corpActions[].processDate.year": {
+        "types": [
+          "number"
+        ],
+        "count": 40
+      },
+      "corpActions[].status": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].tokenSymbol": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      },
+      "corpActions[].type": {
+        "types": [
+          "string"
+        ],
+        "count": 40
+      }
+    }
+  }
+}

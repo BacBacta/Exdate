@@ -167,6 +167,21 @@ const prices = read('data/effective-prices.observed.json')
   check('effective-prices: every predicted quote whose day the chain confirmed is adopted onto that step', unadopted.length === 0, unadopted.join(' '))
 }
 
+// The issuer's API shape, watched daily. These assert the WATCHER's own coverage rather than a
+// count of fields: a watcher that quietly stopped reading an endpoint would report zero
+// transitions for ever and look exactly like a stable API.
+const shape = read('data/issuer-api-shape.observed.json')
+{
+  check('issuer-api-shape: all three endpoints were read', ['assets', 'prices', 'corporateActions'].every((e) => shape.endpointsRead?.includes(e)), (shape.endpointsFailed ?? []).join(' '))
+  check('issuer-api-shape: nothing exdate reads has gone missing', (shape.contractBroken ?? []).length === 0, (shape.contractBroken ?? []).map((b) => `${b.path} ${b.kind}`).join(' '))
+  // The paths the declared side of every haircut depends on, asserted here as well as in the
+  // watcher: the watcher runs daily against the network, this runs on every commit and offline.
+  const ca = shape.shape?.corporateActions ?? {}
+  const needed = ['corpActions[].id', 'corpActions[].processDate.year', 'corpActions[].status', 'corpActions[].type', 'corpActions[].details.cashDividend.rate']
+  check('issuer-api-shape: the declared side is still served field for field', needed.every((p) => p in ca), needed.filter((p) => !(p in ca)).join(' '))
+  within('issuer-api-shape: read within cadence (24 h)', shape.observedAt, 24)
+}
+
 const rec = read('data/reconciliations.observed.json')
 {
   const rows = rec.rows
