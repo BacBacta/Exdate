@@ -2047,6 +2047,29 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   (`apps/web/scripts/measure-pages.mjs`, `pnpm --filter @exdate/web measure`), because the audit's
   version lived in a scratchpad and was gone when it was needed. `playwright-core` and `axe-core`
   are devDependencies of the site; neither downloads a browser, so Vercel's install is unaffected.
+- 2026-09-06 — **"The data behind every figure" listed 16 of the 27 files it served, and the two
+  it was missing were behind two of the three headline figures.** Asked where the hole in the
+  shared data was, the first suspicion was the worst one — a multiplier that moved without an
+  announcement log, which would have meant every downstream surface was blind — and it was
+  ruled out by measurement before anything else: the live indexer's `uiMultiplier()` on all 194
+  tokens is away from 1.0 on exactly the 11 that have a log, and the seven dividends the issuer
+  calls *COMPLETED* for 12–32 days read `1.000000000` on an independent endpoint. The issuer is
+  not applying what it declares, and the site already says so.
+  The hole was `/data/`. `sync-public.mjs` copies every file (measured: all 27 answer 200), but
+  `datasets()` in `lib/docs.ts` read a hand-written array of 16, so `primary-flows` (net creation,
+  home page), `dex-feed-gap` (all of `/market/`), both xStocks files, the FIGI join, the registry
+  watcher and the webhook latency were served and invisible. That is audit finding F03 in another
+  costume — four surfaces on four schedules, here one surface on no schedule at all — and the fix
+  is the one `build-open-core.mjs` uses: **derive from the directory, describe each file from its
+  own `note`, and fail the build for a file nobody can describe.** 25 of 28 notes make a usable
+  first sentence; three files have no note (the token list's schema forbids one) and two notes are
+  pointers into the repository, so a small override map wins where it exists. Guarded in
+  `check-data-expectations.mjs` in both directions — every file listed, no issuer file served —
+  so it cannot drift back.
+  Found on the way, the same defect as `/subscribe/` the day before: two links on the site sent a
+  reader to raw JSON — the off-hours tile on the home page and *Every window, as data* on
+  `/market/`. Both lead to the file's described entry now, `/data/#<file>`, where the download is
+  one click further and labelled as a file.
 - _(append decisions here as they are made)_
 
 ## Status

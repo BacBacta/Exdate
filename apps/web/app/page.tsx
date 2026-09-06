@@ -125,7 +125,7 @@ export default function Page() {
                       value: `${sessionShare.offHoursPct}%`,
                       label: 'of transfers outside US market hours',
                       note: `${sessionShare.sampleCount} samples · ${dateRange(sessionShare.firstSampleAt, sessionShare.lastSampleAt)}${sessionShare.claimPct !== null ? ` · the figure to check was ${sessionShare.claimPct}%` : ''}`,
-                      href: '/data/session-share.observed.json',
+                      href: '/data/#session-share.observed.json',
                     },
                   ]
                 : []),

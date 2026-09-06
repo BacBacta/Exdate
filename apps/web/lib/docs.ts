@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { marked } from 'marked'
 
@@ -145,6 +145,8 @@ export function rawDoc(relativePath: string): string {
 export interface Dataset {
   file: string
   what: string
+  /** The page that renders this file's figures, when one does; a reader arriving from a tile wants the page, not the JSON. */
+  page: string | null
   observedAt: string | null
   bytes: number
   /**
@@ -160,36 +162,71 @@ export interface Dataset {
 /** Kept in step with ISSUER_FILES in scripts/sync-public.mjs, which is what actually withholds them. */
 const ISSUER_FILES = new Set(['robinhood-assets.snapshot.json', 'robinhood-corporate-actions.snapshot.json', 'corporate-actions.archive.json'])
 
-const DATASETS: [string, string][] = [
-  ['reconciliations.observed.json', 'Every dividend reconciled against its multiplier step: declared, arrived, the gap, the price at effect'],
-  ['multiplier-events.observed.json', 'Every UIMultiplierUpdated log since public mainnet, from a whole-chain scan'],
-  ['effective-blocks.json', 'The block at which each multiplier change took effect, resolved by bisection'],
-  ['multiplier-state-verification.json', "Every step read back in the chain's own state at the blocks straddling it, since nothing is emitted when a change takes effect"],
-  ['rpc-endpoints.observed.json', 'Every public RPC endpoint for this chain, probed for archive depth and log limits'],
-  ['corporate-actions.archive.json', "The issuer's corporate-action feed, archived daily since it keeps only a month"],
-  ['robinhood-assets.snapshot.json', "The issuer's token registry: 194 assets, addresses, ISINs, multipliers"],
-  ['chainlink-feeds.snapshot.json', "Chainlink's feed directory for Robinhood Chain"],
-  ['token-feed-map.json', 'Token → feed pairing by ticker, with what corroborates each row'],
-  ['feed-map-verification.json', 'How each feed pairing was checked against the chain'],
-  ['svr-proxy-check.json', 'Primary and SVR proxies compared on all 35 feeds'],
-  ['effective-prices.observed.json', "The issuer's own quote at the instant each multiplier change took effect, and whether something was watching"],
-  ['capture-cadence.observed.json', "How often GitHub actually ran the capture job, from its own run log, against the five minutes it was asked for"],
-  ['session-share.observed.json', 'Hourly samples of transfer rate by market session'],
-  ['transfer-volume.observed.json', 'Transfer volume measured across all 194 tokens'],
-  ['base-b20-verification.json', "Coinbase's tokens, oracle registry and feeds on Base, read back on chain"],
-]
+/**
+ * Descriptions that win over a file's own `note`, and cover the files that have none.
+ *
+ * The listing itself is derived from the directory - see datasets() - so a collector added
+ * anywhere in scripts/ appears here without anyone remembering to add a line. This map exists
+ * for two cases only: a file whose format forbids a `note` (the token list's schema rejects
+ * unknown top-level fields) or whose note reads as a pointer into the repository rather than as a
+ * sentence for a reader. A file with neither a note nor a line here fails the build, which is the
+ * state this page exists to prevent: a dataset served that nobody can describe.
+ *
+ * Measured before this existed: the page listed 16 of 27 served files, and the two headline
+ * figures on the home page - net creation and the DEX-to-feed gap - had no source on the page
+ * that calls itself "the data behind every figure".
+ */
+const DESCRIBED: Record<string, { what: string; page?: string }> = {
+  'effective-blocks.json': { what: 'The block at which each multiplier change took effect, resolved by bisection' },
+  'exdate.tokenlist.json': { what: 'The token list a wallet imports: all 194 tokens with what each represents in shares, what it is owed, its identifiers and its price feed', page: '/subscribe/#tokenlist' },
+  'robinhood-assets.snapshot.json': { what: "The issuer's token registry: 194 assets, addresses, ISINs, multipliers" },
+  'token-feed-map.json': { what: 'Token → feed pairing by ticker, with what corroborates each row' },
+  'feed-map-verification.json': { what: 'How each feed pairing was checked against the chain' },
+  'reconciliations.observed.json': { what: 'Every dividend reconciled against its multiplier step: declared, arrived, the gap, the price at effect', page: '/dividends/' },
+  'primary-flows.observed.json': { what: 'Creations and redemptions per token, from the chain, signed: the net flow nobody publishes', page: '/market/#creation' },
+  'dex-feed-gap.observed.json': { what: 'The distance between the price a token trades at on chain and the Chainlink answer a lending market would liquidate against', page: '/market/' },
+  'session-share.observed.json': { what: 'Hourly samples of transfer rate by market session, for the off-hours share', page: '/#off-hours' },
+  'xstocks-steps.observed.json': { what: "xStocks' multiplier steps on Ethereum and BNB Chain, cross-checked against the issuer's own history", page: '/docs/issuers/' },
+  'xstocks-verification.json': { what: 'xStocks (Backed) read back on chain from its own registry: the mechanism, and where it inverts ERC-8056', page: '/docs/issuers/' },
+  'webhook-latency.observed.json': { what: 'How long a signed webhook took to reach a subscriber, over real deliveries only - refused until there is one' },
+  'figi.observed.json': { what: "Every token's share-class and composite FIGI, joined on the ISIN through OpenFIGI" },
+  'registry-changes.observed.json': { what: "What the issuer changed about an asset - ticker, status, tradability, listing - recorded before any handler is written" },
+}
+
+/** The first sentence of a file's own `note`, which is how most datasets describe themselves. */
+const firstSentence = (note: unknown): string | null => {
+  if (typeof note !== 'string' || !note.trim()) return null
+  return note.trim().split(/(?<=[.!?])\s+/)[0] ?? null
+}
 
 const dateOf = (json: Record<string, unknown>): string | null => {
-  for (const key of ['observedAt', 'generatedAt', 'scannedAt', 'fetchedAt', 'resolvedAt', 'lastArchivedAt', 'lastSampleAt', 'verifiedAt', 'measuredAt', 'checkedAt']) {
+  for (const key of ['observedAt', 'generatedAt', 'scannedAt', 'fetchedAt', 'resolvedAt', 'lastArchivedAt', 'lastSampleAt', 'verifiedAt', 'measuredAt', 'checkedAt', 'lastRunAt', 'builtAt', 'timestamp']) {
     const value = json[key]
     if (typeof value === 'string') return value
   }
   return null
 }
 
+/**
+ * Every JSON file under data/, described, dated and sized - read from the directory, the same
+ * rule scripts/sync-public.mjs applies when it copies them, so the page and the files it serves
+ * cannot disagree about what exists. exdate's own files first, alphabetically; the issuer's last.
+ */
 export function datasets(): Dataset[] {
-  return DATASETS.map(([file, what]) => {
-    const raw = readFileSync(join(ROOT, 'data', file), 'utf8')
-    return { file, what, observedAt: dateOf(JSON.parse(raw) as Record<string, unknown>), bytes: Buffer.byteLength(raw), issuer: ISSUER_FILES.has(file) }
-  })
+  const rows = readdirSync(join(ROOT, 'data'))
+    .filter((file) => file.endsWith('.json'))
+    .sort()
+    .map((file) => {
+      const raw = readFileSync(join(ROOT, 'data', file), 'utf8')
+      const json = JSON.parse(raw) as Record<string, unknown>
+      const described = DESCRIBED[file]
+      const what = described?.what ?? firstSentence(json.note)
+      if (!what) {
+        throw new Error(
+          `data/${file} has no top-level "note" and no entry in DESCRIBED (apps/web/lib/docs.ts); a served dataset must be describable`,
+        )
+      }
+      return { file, what, page: described?.page ?? null, observedAt: dateOf(json), bytes: Buffer.byteLength(raw), issuer: ISSUER_FILES.has(file) }
+    })
+  return [...rows.filter((row) => !row.issuer), ...rows.filter((row) => row.issuer)]
 }

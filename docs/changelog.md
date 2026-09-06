@@ -7,6 +7,15 @@ measurements behind them, is `CLAUDE.md` in the repository.
 
 ## 2026-09-06
 
+- **`/data/` now lists every dataset it serves.** It listed 16 of 27, from a hand-maintained
+  array: the sources of two headline figures — net creation on the home page and the DEX-to-feed
+  gap behind `/market/` — were served at `/data/<file>` and absent from the page that calls itself
+  *the data behind every figure*, along with the second issuer entirely. The listing is derived
+  from the directory now, each file described by its own `note` unless a better line exists, and
+  a file with neither fails the build. Each entry is an anchor (`/data/#<file>`), links to the page
+  that shows its figures, and the point-in-time index under `/data/history/` is named. The two
+  links on the site that led to raw JSON lead to the described entry instead.
+
 - **New: `/subscribe/`.** The footer's *Subscribe* column linked the files themselves —
   `/calendar.ics`, `/feed.xml`, `/badge.svg`, `/tokenlist.json` — under labels that read like
   pages, so a person clicking *Calendar* landed on `BEGIN:VCALENDAR` and one clicking *Token list*

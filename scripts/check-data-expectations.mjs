@@ -6,7 +6,7 @@
 // Plain ESM, no dependency: viem is used for EIP-55 checksums only when it resolves from
 // packages/core, and the checksum check is reported as skipped otherwise, never as passed.
 // Every check names the file and the field it reads, so a failure can be reproduced by hand.
-import { readFileSync, existsSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { classifyMarketSession, MARKET_SESSIONS } from './lib/market-session.mjs'
 
@@ -363,6 +363,22 @@ const gap = read('data/dex-feed-gap.observed.json')
     const net = Math.round(Number(flows.windows.at(-1).netCreated)).toLocaleString('en-US')
     check('site: home net creation equals the last window', html.includes(net), net)
   } else skip('site: home figures equal their dataset fields', 'apps/web/out/index.html not built')
+  // "The data behind every figure" must list every file it serves. Before this check the page
+  // listed 16 of 27, from a hand-maintained array: the sources of two headline figures were served
+  // and invisible. Derived from the directory now, and guarded here so it cannot drift back.
+  const dataPage = 'apps/web/out/data/index.html'
+  if (existsSync(dataPage)) {
+    const page = readFileSync(dataPage, 'utf8')
+    const issuer = new Set(['robinhood-assets.snapshot.json', 'robinhood-corporate-actions.snapshot.json', 'corporate-actions.archive.json'])
+    const served = readdirSync('data').filter((f) => f.endsWith('.json'))
+    const unlisted = served.filter((f) => !page.includes(`id="${f}"`))
+    check('site: /data/ lists every dataset in data/', unlisted.length === 0, unlisted.join(' '))
+    const unserved = served.filter((f) => !issuer.has(f) && !existsSync(`apps/web/out/data/${f}`))
+    check('site: every non-issuer dataset is served at /data/<file>', unserved.length === 0, unserved.join(' '))
+    const leaked = [...issuer].filter((f) => existsSync(`apps/web/out/data/${f}`))
+    check('site: no issuer file is served', leaked.length === 0, leaked.join(' '))
+    check('site: /data/ links the point-in-time index', page.includes('/data/history/'))
+  } else skip('site: /data/ lists every dataset', 'apps/web/out/data/index.html not built')
   const ics = 'apps/web/out/calendar.ics'
   if (existsSync(ics)) {
     const buf = readFileSync(ics)
