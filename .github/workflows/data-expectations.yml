@@ -29,6 +29,9 @@ on:
       - 'packages/api/src/**'
       - 'DATA-LICENSE.md'
       - 'docs/open-core.md'
+      - 'scripts/build-issuer-mechanisms.mjs'
+      - 'scripts/phase0/verify-xstocks.mjs'
+      - 'docs/issuer-mechanisms.md'
       - 'scripts/lib/market-session.mjs'
       - 'docs/methodology.md'
       # The methodology note is generated from these, so a constant moving here has to re-run the
@@ -88,6 +91,12 @@ jobs:
       # served with nobody able to say which side of the line it is on.
       - name: Does the open-core boundary still match the code and the record?
         run: node scripts/build-open-core.mjs --check
+
+      # One row per issuer, generated from what was read on each chain. It exists before any common
+      # interface does, and reading a third issuer already broke the assumption an interface written
+      # from one would have carried - so it must not drift from the verification files.
+      - name: Does the issuer mechanism table still match what was read?
+        run: node scripts/build-issuer-mechanisms.mjs --check
 
       - name: Is the history index still what git says?
         run: node scripts/build-history.mjs --check

@@ -1917,6 +1917,39 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   It names in advance what a paid tier *would* reserve — `/v1/:chain/reconciliations` and the
   signed webhooks that carry it inside the announcement lead — because a boundary published before
   it matters is legible, and one announced afterwards reads as a withdrawal.
+- 2026-09-06 — **A third issuer read on chain, on Ethereum and BNB Chain, and it inverts the one
+  assumption everything here shares.** The roadmap recorded two things about xStocks (Backed) from
+  research summaries and flagged both as unverified. Reading them settled both, and both were
+  wrong. `docs.xstocks.fi` answers **200**, not the 403 on record. And the mechanism does **not**
+  transpose: their own page says *"On EVM chains … `balanceOf()` always returns the current
+  equity-adjusted value"*, and the chain confirms it on 12 of 12 sampled tokens across two chains —
+  **`sharesOf()` is the constant and `balanceOf()` is the adjusted view, the exact inverse of
+  ERC-8056**, while `uiMultiplier()` and `balanceOfUI()` revert. An interface extracted from
+  Robinhood alone would have said "balanceOf is the raw amount" and been wrong in the direction
+  that reports a post-dividend balance as a pre-dividend one. That is the roadmap's 1c-before-1d
+  order, measured rather than argued, and `docs/issuer-mechanisms.md` is generated so it cannot
+  drift from the verification files.
+  What the reads establish, all from `eth_call` or the issuer's own endpoint
+  (`scripts/phase0/verify-xstocks.mjs`, `data/xstocks-verification.json`): **726 assets across
+  eleven networks** from an address-keyed registry, including **726 on Ethereum and 726 on BNB
+  Chain**; the same address carrying the same multiplier on both, 6 of 6; `getCurrentMultiplier()`
+  returning **three words**, of which the first is the WAD — the first run parsed all 96 bytes as
+  one integer and published a multiplier of 1.34e154, which is why the extra two words are recorded
+  and deliberately **not named**, since no first-party source says what they are; and a fee
+  machinery that is live with a rate of zero (`periodLength` 7 days, `feePerPeriod` 0), so a
+  reconciliation here must read the fee at the instant of a step rather than assume it away.
+  Two findings worth more than the rest. **`multiplier()` — Coinbase B20's bare selector on Base —
+  answers here too, with the same value.** The script asserted it would revert; it does not, and
+  the finding is published as measured. One selector, one meaning, two unrelated issuers. And
+  **unlike Base, xStocks has real events**: KOx 1.0183, SPYx 1.0057, AAPLx 1.0033, with the
+  issuer's own history giving every step back to 2025 with its reason, agreeing with the chain to
+  1e-15 on 6 of 6. Two independent first-party sources for one number, which Robinhood Chain has
+  nowhere.
+  **And the gap is the opposite one.** Robinhood publishes the declared cash rate and loses old
+  rows; Backed publishes the whole step history and **no cash rate at all**. So exdate could
+  produce a step ledger for xStocks and *not* a haircut, until a non-issuer source for the
+  underlying's declared dividend is named and read. Saying that now is the point — it is exactly
+  the assumption that, left unexamined, gets discovered after an adapter is written.
 - _(append decisions here as they are made)_
 
 ## Status
