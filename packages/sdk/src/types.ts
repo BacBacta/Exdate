@@ -414,6 +414,11 @@ export interface WebhookLatencyResponse {
   failed: number
   sufficient: boolean
   notComputed: string | null
+  /**
+   * Where the concluded deliveries were read from. `journal` survives a code deploy; `outbox`
+   * means the figures come from tables a deploy can drop, so the count can go backwards.
+   */
+  source?: 'journal' | 'outbox'
   /** exdate's own lag: the chain carried the announcement, to exdate writing it to the outbox. */
   announceToObserve: WebhookLatencyLeg
   /** The outbox: the row written, to a subscriber accepting the signed POST. */

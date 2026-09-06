@@ -35,6 +35,39 @@ export interface DeliveryTiming {
   attempts: number
 }
 
+/**
+ * One concluded delivery, written to a durable journal the moment it reaches a terminal state.
+ *
+ * This exists because the outbox does not survive a code deploy. Ponder refuses a schema written
+ * by a different build, so `deploy/update-api.sh` drops it and lets the poller rebuild - and the
+ * derived tables coming back is fine for token states and reconciliations, which are recomputed
+ * from the chain within one poll. Deliveries are not derived: they are the record of something
+ * that happened once, at an instant, and nothing recreates them. Measured on 2026-09-06, the
+ * morning's deploy took every delivery row with it and the published latency would have restarted
+ * from zero at every deploy for ever.
+ *
+ * So the journal is denormalised on purpose. It carries the instants the latency needs rather than
+ * pointing at the event row that holds them, because that row is exactly what a drop removes.
+ */
+export interface DeliveryJournalEntry extends DeliveryTiming {
+  /** When the entry was written, ISO. Distinct from `deliveredAt`, which is the delivery itself. */
+  recordedAt: string
+  /** Host only, never a URL: the journal is read by a route the public can call. */
+  endpointHost: string
+  responseStatus: number | null
+  outcome: 'delivered' | 'failed'
+}
+
+/**
+ * Where concluded deliveries are kept. The host injects an implementation - a file on a volume in
+ * the indexer, the same shape as the self-service subscription store, and for the same reason:
+ * something the process owns that a schema drop cannot reach.
+ */
+export interface DeliveryJournal {
+  append(entry: DeliveryJournalEntry): Promise<void>
+  list(): Promise<DeliveryJournalEntry[]>
+}
+
 export interface LatencyLeg {
   /** How many deliveries carried this leg. Never inferred: a leg with no sample is absent, not zero. */
   n: number
@@ -46,6 +79,12 @@ export interface LatencyLeg {
 export interface LatencySummary {
   /** Deliveries that reached a subscriber and were accepted by it. */
   delivered: number
+  /**
+   * Where the concluded deliveries were read from. `journal` survives a code deploy; `outbox`
+   * means the journal held nothing and the figures come from tables a deploy can drop, so a
+   * reader knows the count can go backwards. Stated rather than left to be inferred.
+   */
+  source?: 'journal' | 'outbox'
   /** Written but not yet accepted, so counted nowhere below. */
   pending: number
   /** Given up on. Reported, because a latency computed over successes alone flatters itself. */
@@ -102,6 +141,22 @@ export function summarizeLatency(timings: readonly DeliveryTiming[]): LatencySum
     sufficient: delivered.length > 0,
     notComputed: delivered.length > 0 ? null : 'no_real_delivery_yet',
   }
+}
+
+/**
+ * The journal's entries as timings, plus whatever is still queued in the outbox.
+ *
+ * The two sources are authoritative for different things and are not merged by id: the journal
+ * holds every delivery that CONCLUDED, the outbox holds those still in flight. A row that appears
+ * in both would be one the journal has already recorded as concluded, so the outbox's copy is
+ * dropped rather than counted twice.
+ */
+export function timingsFromJournal(
+  journal: readonly DeliveryJournalEntry[],
+  queued: readonly DeliveryTiming[],
+): DeliveryTiming[] {
+  const concluded = new Set(journal.map((entry) => `${entry.eventId}|${entry.endpointId}`))
+  return [...journal, ...queued.filter((row) => !concluded.has(`${row.eventId}|${row.endpointId}`))]
 }
 
 /**
