@@ -2003,6 +2003,28 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   Deliberately left out of the common interface: Robinhood's nine-minute announcement lead,
   Backed's step history, Coinbase's oracle registry. Each is real and each belongs to its own
   adapter — an abstraction that carries one issuer's peculiarity has not abstracted anything.
+- 2026-09-06 — **The terms review had read §12's headline and not §12's operative clause.** Asked
+  what the arbitration opt-out is for, the honest answer needed the section itself, and reading it
+  end to end found **§12.14**, which the first pass missed entirely: Robinhood — *and only
+  Robinhood* — may take a trademark, trade-secret or copyright claim to a court of its choosing,
+  including **an injunction over "any actual or threatened breach of Sections 5.5 through 5.12"**,
+  ex parte if it chooses, with venue at its election and the user's irrevocable consent. Those are
+  the sections §4 of the review already analyses, and §8's worst case — revocation, blocking, a
+  demand to delete the archive — is injunction-shaped. So **without a rejection the forum is
+  one-way**: Robinhood litigates its most likely claim while exdate arbitrates everything it might
+  bring. Recorded as a correction under its own heading rather than folded in, because a review
+  that misses the operative clause is worth less than one that says which clause it missed.
+  The argument *against* rejecting is real and is recorded beside it: **§12.8 is favourable** —
+  AAA Consumer Rules, and Robinhood reimburses the AAA fees if the arbitrator rules for you — but
+  it only helps a *claimant*, and the exposure here puts exdate as *respondent*, where it does
+  nothing. Add §12.9's explicit bar on **public injunctive relief** for a project whose purpose is
+  publishing what nobody publishes, and the recommendation is to send the notice. The deadline was
+  computed rather than recalled: 60 days from first access on 2026-09-01 is **2026-10-31**, and
+  from 2026-09-02 it is 2026-11-01 — the earlier date is the one to work to.
+  One new question for counsel, which the clause creates rather than answers: **§12.13 says a
+  rejection "will not affect any other provision", so does §12.14's irrevocable venue consent
+  survive it?** Read literally it does, and whether a US venue consent binds an EU-resident
+  operator is a further question again.
 - _(append decisions here as they are made)_
 
 ## Status
