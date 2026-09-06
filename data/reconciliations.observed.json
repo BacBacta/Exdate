@@ -197,8 +197,10 @@
       "feed": {
         "proxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
         "verified": false,
-        "corroborated": false,
-        "corroboratedBy": []
+        "corroborated": true,
+        "corroboratedBy": [
+          "traded-price"
+        ]
       },
       "status": "unmatched",
       "note": "on-chain step with no issuer row - the issuer's feed only goes back about a month"
@@ -1179,5 +1181,5 @@
       "note": "declared by the issuer, no multiplier step observed on chain"
     }
   ],
-  "stampedAt": "2026-09-05T21:26:49.901Z"
+  "stampedAt": "2026-09-06T01:09:00.700Z"
 }
