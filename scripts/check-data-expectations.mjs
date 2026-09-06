@@ -238,6 +238,26 @@ const list = read('data/exdate.tokenlist.json')
   check('figi: a CUSIP for every US ISIN and none for the rest', badCusip.length === 0, badCusip.join(' '))
 }
 
+// --- registry transitions ---------------------------------------------------
+// The correct state today is "none observed", so the checks are about the watcher being able to
+// see one rather than about a count: it must cover every asset in the registry, and a transition
+// it does record must name a field it actually watches. A watcher that silently stopped covering
+// the registry would report zero transitions forever and look exactly like a quiet month.
+{
+  const changes = read('data/registry-changes.observed.json')
+  const watched = new Set(changes.watches)
+  check('registry-changes: covers every asset in the registry', Object.keys(changes.assets).length === assets.assets.length, `${Object.keys(changes.assets).length} vs ${assets.assets.length}`)
+  const unknown = new Set(Object.keys(changes.assets).filter((id) => !assets.assets.some((a) => a.id === id)))
+  check('registry-changes: every recorded asset is in the registry', unknown.size === 0, [...unknown].slice(0, 3).join(' '))
+  const badField = changes.transitions.filter((t) => t.kind === 'changed' && !watched.has(String(t.field).split('.')[0])).map((t) => t.field)
+  check('registry-changes: every transition names a watched field', badField.length === 0, [...new Set(badField)].join(' '))
+  const noMove = changes.transitions.filter((t) => t.kind === 'changed' && t.from === t.to).length
+  check('registry-changes: no transition records a value changing to itself', noMove === 0, String(noMove))
+  check('registry-changes: the multiplier is not watched, so a dividend is not a transition', !watched.has('currentMultiplier') && !watched.has('pendingMultiplier'))
+  check('registry-changes: the tallies agree with the transitions', changes.summary.transitions === changes.transitions.length && changes.summary.added === changes.transitions.filter((t) => t.kind === 'added').length && changes.summary.removed === changes.transitions.filter((t) => t.kind === 'removed').length)
+  check('registry-changes: dated from the snapshot, not from the run', changes.observedAt === assets.fetchedAt, `${changes.observedAt} vs ${assets.fetchedAt}`)
+}
+
 // --- webhook latency --------------------------------------------------------
 // The one dataset here whose correct state today is a refusal. Its checks are therefore about the
 // refusal holding: a figure must never appear while `sufficient` is false, and `sufficient` must
