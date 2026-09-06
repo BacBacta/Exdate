@@ -189,8 +189,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 44,
+          "samples": 46,
+          "corroborating": 45,
           "medianSeparation": 21.2,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -225,9 +225,9 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
-          "medianSeparation": 16.1,
+          "samples": 46,
+          "corroborating": 46,
+          "medianSeparation": 16.7,
           "lastRefusal": null,
           "verdict": "corroborates"
         }
@@ -261,8 +261,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 60.7,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -297,9 +297,9 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 31,
-          "medianSeparation": 4.5,
+          "samples": 46,
+          "corroborating": 32,
+          "medianSeparation": 4.7,
           "lastRefusal": null,
           "verdict": "corroborates"
         }
@@ -333,9 +333,9 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 44,
-          "corroborating": 43,
-          "medianSeparation": 34.4,
+          "samples": 45,
+          "corroborating": 44,
+          "medianSeparation": 34.3,
           "lastRefusal": null,
           "verdict": "corroborates"
         }
@@ -435,11 +435,11 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
+          "samples": 46,
           "corroborating": 14,
           "medianSeparation": 2.3,
           "lastRefusal": "insufficient_separation",
-          "verdict": "only 14 of 45 readings agree"
+          "verdict": "only 14 of 46 readings agree"
         }
       },
       "corroborated": false,
@@ -502,8 +502,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 30,
+          "samples": 46,
+          "corroborating": 31,
           "medianSeparation": 4.5,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -571,8 +571,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 41,
+          "samples": 46,
+          "corroborating": 42,
           "medianSeparation": 16.2,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -607,8 +607,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 44,
+          "samples": 46,
+          "corroborating": 45,
           "medianSeparation": 13.8,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -643,8 +643,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 13.6,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -712,9 +712,9 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
-          "medianSeparation": 72.7,
+          "samples": 46,
+          "corroborating": 46,
+          "medianSeparation": 73.4,
           "lastRefusal": null,
           "verdict": "corroborates"
         }
@@ -748,8 +748,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 34.6,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -784,11 +784,11 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
+          "samples": 46,
           "corroborating": 4,
           "medianSeparation": 1.4,
-          "lastRefusal": "insufficient_separation",
-          "verdict": "only 4 of 45 readings agree"
+          "lastRefusal": "not_closest",
+          "verdict": "only 4 of 46 readings agree"
         }
       },
       "corroborated": false,
@@ -818,8 +818,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 170.7,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -887,8 +887,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 31.1,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -956,8 +956,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 38,
+          "samples": 46,
+          "corroborating": 39,
           "medianSeparation": 7.3,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -992,8 +992,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 77.8,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1102,8 +1102,8 @@
           }
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 9.9,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1139,9 +1139,9 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
-          "medianSeparation": 25.8,
+          "samples": 46,
+          "corroborating": 46,
+          "medianSeparation": 26.5,
           "lastRefusal": null,
           "verdict": "corroborates"
         }
@@ -1175,11 +1175,11 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
+          "samples": 46,
           "corroborating": 16,
           "medianSeparation": 1.6,
           "lastRefusal": "insufficient_separation",
-          "verdict": "only 16 of 45 readings agree"
+          "verdict": "only 16 of 46 readings agree"
         }
       },
       "corroborated": false,
@@ -1209,8 +1209,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 13.7,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1245,8 +1245,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 27.8,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1281,8 +1281,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 24.9,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1317,8 +1317,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 36.8,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1353,8 +1353,8 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
-          "corroborating": 45,
+          "samples": 46,
+          "corroborating": 46,
           "medianSeparation": 18,
           "lastRefusal": null,
           "verdict": "corroborates"
@@ -1389,11 +1389,11 @@
           "best": null
         },
         "tradedPrice": {
-          "samples": 45,
+          "samples": 46,
           "corroborating": 21,
           "medianSeparation": 2.6,
           "lastRefusal": "not_closest",
-          "verdict": "only 21 of 45 readings agree"
+          "verdict": "only 21 of 46 readings agree"
         }
       },
       "corroborated": false,
@@ -1408,5 +1408,5 @@
   "corroboratedByStep": 1,
   "corroboratedByPrice": 22,
   "corroborationNote": "A pairing is corroborated when its own multiplier step was seen moving this feed (causal, strongest), or when its traded price repeatedly sits far closer to this feed than to any other (identification, weaker: two unrelated assets can trade at one price). corroboratedBy names which. Neither is a first-party statement, and none reaches `high`.",
-  "corroboratedAt": "2026-09-06T01:09:00.624Z"
+  "corroboratedAt": "2026-09-06T01:39:48.005Z"
 }
