@@ -50,6 +50,15 @@ jobs:
       - name: Refresh the issuer registry
         run: node scripts/phase0/snapshot-registry.mjs
 
+      # Immediately after the registry refresh, and before anything derived from it: this diffs the
+      # snapshot against what it held last time, so it has to see the new one and the old record in
+      # the same run. It is the whole of chantier 2 - a merger, a ticker change or a delisting
+      # handler written against an imagined payload is untestable code that looks like coverage, so
+      # nothing is written until the record holds a real transition. Zero so far, which is the
+      # finding rather than a gap.
+      - name: Record what the issuer changed about an asset
+        run: node scripts/watch-registry-changes.mjs
+
       # The FIGI join covers the registry, so it has to follow it: an asset the issuer added this
       # morning would otherwise be published with no identifiers until someone noticed. Costs zero
       # requests on a day when the registry did not move - only tokens absent from the file, or
@@ -74,7 +83,7 @@ jobs:
 
       - name: Commit only if something actually changed
         run: |
-          paths="data/corporate-actions.archive.json data/robinhood-assets.snapshot.json data/reconciliations.observed.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json data/figi.observed.json"
+          paths="data/corporate-actions.archive.json data/robinhood-assets.snapshot.json data/reconciliations.observed.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json data/figi.observed.json data/registry-changes.observed.json"
           if git diff --quiet -- $paths; then
             echo "nothing changed"
             exit 0

@@ -1950,6 +1950,27 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   produce a step ledger for xStocks and *not* a haircut, until a non-issuer source for the
   underlying's declared dividend is named and read. Saying that now is the point — it is exactly
   the assumption that, left unexamined, gets discovered after an adapter is written.
+- 2026-09-06 — **Chantier 2 is an instrument, not a set of handlers, and the record says why.**
+  The brief asked for mergers, ticker changes and delistings. The facts refuse them: all 45
+  archived actions are `CASH_DIVIDEND`, the only detail field ever seen is `cashDividend`, all 194
+  assets are `ASSET_STATUS_ACTIVE`. A handler written against an imagined payload is untestable
+  code that looks like coverage — so `scripts/watch-registry-changes.mjs` records transitions and
+  nothing else is written until one exists.
+  Three decisions inside it are the whole design. **The multiplier is deliberately not watched**:
+  it moves on every dividend, it is measured everywhere else here, and including it would bury a
+  real transition under a hundred routine ones. **A first run records the baseline and zero
+  transitions** — 194 assets appearing at once is the watcher starting, not the issuer listing 194
+  tokens, which is the same distinction `pauseTransition()` makes for a token already paused the
+  first time exdate looks. And **an empty registry is refused rather than recorded as 194
+  delistings**, because a read that failed is not a mass delisting.
+  Rehearsed against a stub registry through all five kinds before shipping: a ticker change, a
+  status change, a tradability flag, an added asset, a delisting, plus the no-op and the refusal.
+  The rehearsal is what produced the one real correction: `tradingCapabilities` is six flags
+  flattened into one string, and reporting the whole string made a reader diff two 250-character
+  lines by eye to find that overnight fractional stopped trading — so the changed flags are named
+  individually (`tradingCapabilities.overnight.fractional`). Seven expectation checks guard the
+  watcher's own coverage rather than a count, because a watcher that quietly stopped covering the
+  registry would report zero forever and look exactly like a quiet month.
 - _(append decisions here as they are made)_
 
 ## Status
