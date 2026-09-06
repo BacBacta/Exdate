@@ -182,6 +182,26 @@ describe('scanning for announcements', () => {
     expect(captures).toHaveLength(1)
   })
 
+  it('stamps when exdate first saw the announcement, and never re-stamps it', async () => {
+    // announcedAt is when the chain carried it; firstSeenAt is when exdate looked. Their
+    // difference is exdate's own observation lag - the leg of the published latency that exdate
+    // owns, and the one that decides whether a nine-minute lead is usable. A value rewritten on a
+    // later scan would measure that scan instead, so a second pass must leave it exactly as it was.
+    const captures = []
+    const byKey = new Map()
+    const symbolByToken = new Map([['0xaf3d76f1834a1d425780943c99ea8a608f8a93f9', 'AAPL']])
+    const seenAt = EFFECTIVE - 500_000
+    const args = { rpc, lookbackBlocks: 100, captures, byKey, symbolByToken, now: () => seenAt, quoteImpl: async () => quoteAt(seenAt) }
+    await scanAnnouncements(args)
+    expect(captures[0].firstSeenAt).toBe(new Date(seenAt).toISOString())
+    // 585 s of chain time between the announcement and this observation, per the block above.
+    const lag = (Date.parse(captures[0].firstSeenAt) - Date.parse(captures[0].announcedAt)) / 1000
+    expect(lag).toBe(85)
+
+    await scanAnnouncements({ ...args, now: () => seenAt + 600_000 })
+    expect(captures[0].firstSeenAt).toBe(new Date(seenAt).toISOString())
+  })
+
   it('does not quote a step it is already an hour late for', async () => {
     const asked = []
     const captures = []

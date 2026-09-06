@@ -26,6 +26,19 @@ measurements behind them, is `CLAUDE.md` in the repository.
   all; the country composite `figi` is `null` for 16, where the asset lists in no venue in its
   ISIN's country. The join is committed at `data/figi.observed.json` with each ISIN's venue-row
   count, so it can be re-checked rather than trusted.
+- **New: `GET /v1/:chain/webhooks/latency`.** How long deliveries actually took, over real
+  deliveries only, in three legs — exdate's own observation lag, the outbox, and the total a
+  subscriber experiences. `sufficient` is `false` with a reason until at least one delivery has
+  been accepted, and every leg is `null` then rather than zero: nothing here is derived from the
+  poll interval, because a delivery path with nothing subscribed to it has a budget and not a
+  latency. `delivered` means the signature verified at the receiving end, since a subscriber that
+  rejects one returns a non-2xx and the outbox records that as a failure. The SDK gains
+  `webhooks.latency()`.
+- **exdate is now subscribed to its own outbox.** The signed outbox had existed since M4 and
+  delivered nothing, because nothing was subscribed to it. `deploy/receiver/` is a dependency-free
+  subscriber that runs inside the indexer's network namespace — reached at `http://127.0.0.1:8091`
+  and by nothing else, so it needed no name, no certificate and no open port — verifies each
+  signature independently of `@exdate/core`, and returns 200 only when it checks out.
 - `/tokenlist.json` gains `extensions.cusip` and `extensions.shareClassFigi`, version `1.0.7`. The
   country composite is not there: the schema allows ten extensions per token, and the tenth slot
   goes to the identifier that is never null and never names a venue the token is not on. It is

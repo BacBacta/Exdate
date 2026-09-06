@@ -9,6 +9,7 @@ import type {
   serializeSubscriptionCreated,
   serializeSubscriptionStatus,
   TestDeliveryResult as ServedTestDeliveryResult,
+  WebhookLatencyResponse as ServedLatency,
 } from '@exdate/api'
 import type {
   CorporateActionView,
@@ -16,6 +17,7 @@ import type {
   MultiplierEventView,
   ReconciliationView,
   TokenView,
+  WebhookLatencyResponse,
   WebhookOutboxResponse,
   WebhookSubscriptionCreated,
   WebhookSubscriptionStatus,
@@ -99,6 +101,14 @@ type SdkWebhookEvent = WebhookOutboxResponse['events'][number]
 const _webhookMatches: (row: ApiWebhookEvent) => SdkWebhookEvent = (row) => row
 never_<Extra<ApiWebhookEvent, SdkWebhookEvent>>()
 never_<NestedExtra<ApiWebhookEvent, SdkWebhookEvent>>()
+
+// --- the delivery latency ---------------------------------------------------
+// The route is a plain object, so its type is checked in both directions like /v1/me: the SDK
+// must not promise a leg the API never sends, and a field the API adds must not stay invisible.
+declare const servedLatency: ServedLatency
+declare const sdkLatency: WebhookLatencyResponse
+export const latencyIsCompatible: WebhookLatencyResponse = servedLatency
+export const latencyIsComplete: ServedLatency = sdkLatency
 
 // /v1/me is a plain object in the route, typed there as MeResponse; both directions must hold.
 declare const servedMe: ServedMe

@@ -19,6 +19,7 @@ import registryJson from '../../../data/robinhood-assets.snapshot.json'
 import sessionShareJson from '../../../data/session-share.observed.json'
 import feedMapJson from '../../../data/token-feed-map.json'
 import figiJson from '../../../data/figi.observed.json'
+import webhookLatencyJson from '../../../data/webhook-latency.observed.json'
 import primaryFlowsJson from '../../../data/primary-flows.observed.json'
 import gapJson from '../../../data/dex-feed-gap.observed.json'
 import stateVerificationJson from '../../../data/multiplier-state-verification.json'
@@ -355,6 +356,24 @@ const figiByToken = new Map(
     row,
   ]),
 )
+
+/**
+ * How long a signed webhook took to reach a subscriber, over real deliveries only.
+ *
+ * Read here rather than from the API for the same reason as every other figure on this site: the
+ * pages are built, not served, so a number they show is a number in git with a date on it. The
+ * file carries its own refusal - `sufficient: false` while nothing has been delivered - and the
+ * pages honour it rather than deciding for themselves.
+ */
+const webhookLatency = webhookLatencyJson as unknown as {
+  observedAt: string
+  scope: string
+  delivered: number
+  sufficient: boolean
+  notComputed: string | null
+  announceToObserve: { n: number; medianSeconds: number | null }
+  announceToDeliver: { n: number; medianSeconds: number | null }
+}
 
 /** Events are sorted ascending, so the last write per token is its latest step. */
 const lastStepByToken = new Map<string, MultiplierEvent>()
@@ -823,6 +842,23 @@ export const delivery = (() => {
         leads.length > 1 && (leads.at(-1) ?? 0) > 2 * (middle(leads) ?? 0)
           ? (distinctEvents.find((e) => e.leadMinutes === leads.at(-1))?.symbol ?? null)
           : null,
+      /**
+       * How long the notice itself takes, over real deliveries only.
+       *
+       * The lead above is worth something only if the notice arrives inside it. Null until at
+       * least one signed delivery has been accepted by a subscriber - the page then says nothing
+       * about latency rather than quoting the poll interval, which is a budget and not a
+       * measurement. Same refusal as the off-hours share before it had sampled every session.
+       */
+      delivery: webhookLatency.sufficient
+        ? {
+            deliveries: webhookLatency.delivered,
+            medianTotalSeconds: webhookLatency.announceToDeliver.medianSeconds,
+            medianObserveSeconds: webhookLatency.announceToObserve.medianSeconds,
+            observedAt: day(webhookLatency.observedAt),
+            scope: webhookLatency.scope,
+          }
+        : null,
     },
     /** Landings: how long after the issuer's own process date the step appeared. */
     landed: {

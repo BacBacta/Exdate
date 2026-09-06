@@ -411,6 +411,56 @@ The seven event types, as the catalogue states them:
 Retries after a non-2xx: 30 s, 2 min, 10 min, 30 min, 2 h, 6 h, 12 h - eight attempts in all, then
 `failed` and kept.
 
+## `GET /v1/:chain/webhooks/latency`
+
+How long deliveries actually took. This is the route behind the announcement lead: a change is
+published on chain nine to ten minutes before it takes effect, and that lead is only worth
+something if the notice arrives inside it.
+
+```json
+{
+  "chainId": 4663,
+  "legs": {
+    "announceToObserve": "the chain carried the announcement, to exdate writing it to the outbox",
+    "observeToDeliver": "the outbox row, to a subscriber accepting the signed POST",
+    "announceToDeliver": "the total a subscriber experiences"
+  },
+  "basis": "real deliveries only; nothing here is derived from the poll interval",
+  "endpointsConfigured": 1,
+  "delivered": 0,
+  "pending": 0,
+  "failed": 0,
+  "sufficient": false,
+  "notComputed": "no_real_delivery_yet",
+  "announceToObserve": { "n": 0, "medianSeconds": null, "minSeconds": null, "maxSeconds": null },
+  "observeToDeliver": { "n": 0, "medianSeconds": null, "minSeconds": null, "maxSeconds": null },
+  "announceToDeliver": { "n": 0, "medianSeconds": null, "minSeconds": null, "maxSeconds": null },
+  "byType": []
+}
+```
+
+**Read `sufficient` before quoting anything.** It is `false` until at least one delivery has been
+accepted by a subscriber, and every leg is `null` then rather than zero. Nothing here is derived
+from the poll interval: a delivery path with nothing subscribed to it has a budget, not a latency,
+and publishing the budget as the latency is precisely what this shape exists to prevent.
+
+Three legs rather than one total, because they fail for different reasons and different people own
+them. `announceToObserve` is exdate's own lag and the one that decides whether the lead is usable;
+`observeToDeliver` is the outbox, bounded by the poll interval; `announceToDeliver` is what a
+subscriber experiences. A single total would let a fast outbox hide a slow observation.
+
+- **`delivered` means the signature verified at the other end.** A subscriber that rejects a
+  signature returns a non-2xx, which the outbox records as a failure and retries — so a delivery
+  counted here was received, not merely connected to.
+- **`failed` is reported, not dropped.** A latency computed over successes alone, with the
+  give-ups quietly absent, is the flattering version of the same number.
+- **Only `multiplier.scheduled` has an announce leg.** It is the one event type with a log and a
+  block timestamp behind it. Nothing is emitted on chain when a multiplier takes effect, and a
+  reconciled dividend is an observation by the poller, so those have no on-chain instant to be
+  late against — their `announceToObserve` count is zero rather than a lag of zero.
+- **A negative duration is dropped.** Two clocks disagreeing is not a fast delivery, and it would
+  otherwise pull a median down.
+
 ## `GET /v1/:chain/webhooks/events`
 
 The outbox: every event recorded, with each delivery's attempts, `responseStatus` and `error`.

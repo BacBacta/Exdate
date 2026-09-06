@@ -387,6 +387,43 @@ export interface WebhookTestResult {
   sentAt: string
 }
 
+/** One leg of the delivery path, with the count it was computed from beside every figure. */
+export interface WebhookLatencyLeg {
+  /** How many deliveries carried this leg. A leg with no sample is absent, never zero. */
+  n: number
+  medianSeconds: number | null
+  minSeconds: number | null
+  maxSeconds: number | null
+}
+
+/**
+ * How long a webhook actually took, over real deliveries and nothing else.
+ *
+ * `sufficient` is false with a reason in `notComputed` until at least one delivery has been
+ * accepted by a subscriber. Nothing here is derived from the poll interval: a delivery path with
+ * nothing subscribed to it has a budget, not a latency, and publishing the budget as the latency
+ * is the failure this shape exists to prevent.
+ */
+export interface WebhookLatencyResponse {
+  chainId: number
+  legs: { announceToObserve: string; observeToDeliver: string; announceToDeliver: string }
+  basis: string
+  endpointsConfigured: number
+  delivered: number
+  pending: number
+  failed: number
+  sufficient: boolean
+  notComputed: string | null
+  /** exdate's own lag: the chain carried the announcement, to exdate writing it to the outbox. */
+  announceToObserve: WebhookLatencyLeg
+  /** The outbox: the row written, to a subscriber accepting the signed POST. */
+  observeToDeliver: WebhookLatencyLeg
+  /** The total a subscriber experiences. The only leg worth quoting on its own. */
+  announceToDeliver: WebhookLatencyLeg
+  /** The same figures per event type, so one slow type cannot hide inside the median. */
+  byType: ({ type: string } & Omit<WebhookLatencyResponse, 'chainId' | 'legs' | 'basis' | 'endpointsConfigured' | 'byType'>)[]
+}
+
 export interface WebhookOutboxResponse {
   chainId: number
   counts: { events: number; deliveries: number; queued: number; delivered: number; failed: number }

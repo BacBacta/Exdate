@@ -13,10 +13,14 @@ import {
   WEBHOOK_RETRY_SCHEDULE_SECONDS,
   WEBHOOK_SIGNATURE_HEADER,
   WEBHOOK_TOLERANCE_SECONDS,
+  announcedAtFromPayload,
   buildPendingView,
   buildYieldLedger,
   feedHealth,
   resolveChain,
+  summarizeLatency,
+  type DeliveryTiming,
+  type LatencySummary,
 } from '@exdate/core'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -94,6 +98,21 @@ export interface MeResponse {
   remaining: number
   resetAt: string
   keysConfigured: number
+}
+
+/**
+ * What GET /v1/:chain/webhooks/latency serves.
+ *
+ * Declared rather than inferred, so the SDK's contract assert has a counterpart to compile
+ * against in both directions: the SDK must not promise a leg this never sends, and a leg added
+ * here must not stay invisible to consumers.
+ */
+export interface WebhookLatencyResponse extends LatencySummary {
+  chainId: number
+  legs: { announceToObserve: string; observeToDeliver: string; announceToDeliver: string }
+  basis: string
+  endpointsConfigured: number
+  byType: ({ type: string } & LatencySummary)[]
 }
 
 export function createApi({
@@ -578,6 +597,64 @@ export function createApi({
         .slice(0, limit)
         .map((event) => serializeWebhookEvent(event, byEvent.get(event.id) ?? [])),
     })
+  })
+
+  /**
+   * How long a webhook actually took, over real deliveries and nothing else.
+   *
+   * The product claims a nine-to-ten-minute announcement lead. That is only worth something if
+   * the notice arrives inside it, so this is the route that says whether it does - and it says
+   * so from deliveries that happened, never from the poll interval, which would be a budget
+   * dressed as a measurement.
+   *
+   * Refused with a reason until at least one delivery has been accepted by a subscriber. A
+   * subscriber that rejects a signature returns a non-2xx, so a delivery counted here is one that
+   * verified at the other end, not merely one that got a connection.
+   */
+  app.get('/v1/:chain/webhooks/latency', async (c) => {
+    const chain = resolveChain(c.req.param('chain'))
+    if (!chain) return c.json(unknownChain, 404)
+    const [events, deliveries] = await Promise.all([
+      repository.webhookEvents(chain.id),
+      repository.webhookDeliveries(chain.id),
+    ])
+    const eventById = new Map(events.map((event) => [event.id, event]))
+    const timings: DeliveryTiming[] = deliveries.flatMap((delivery) => {
+      const event = eventById.get(delivery.eventId)
+      // A delivery whose event has aged out of the outbox has no observation instant to be
+      // measured against, so it is left out rather than measured from its own row.
+      if (!event) return []
+      return [
+        {
+          eventId: delivery.eventId,
+          type: delivery.type,
+          endpointId: delivery.endpointId,
+          announcedAt: announcedAtFromPayload(event.type, event.payload),
+          observedAt: Number(event.createdAt),
+          deliveredAt: delivery.deliveredAt === null ? null : Number(delivery.deliveredAt),
+          attempts: delivery.attempts,
+        },
+      ]
+    })
+    const summary = summarizeLatency(timings)
+    const byType = [...new Set(timings.map((timing) => timing.type))].sort().map((type) => ({
+      type,
+      ...summarizeLatency(timings.filter((timing) => timing.type === type)),
+    }))
+    const body: WebhookLatencyResponse = {
+      chainId: chain.id,
+      /** What each leg does and does not include, served with the figures so it cannot be lost. */
+      legs: {
+        announceToObserve: 'the chain carried the announcement, to exdate writing it to the outbox',
+        observeToDeliver: 'the outbox row, to a subscriber accepting the signed POST',
+        announceToDeliver: 'the total a subscriber experiences',
+      },
+      basis: 'real deliveries only; nothing here is derived from the poll interval',
+      endpointsConfigured: endpointsConfigured(),
+      ...summary,
+      byType,
+    }
+    return c.json(body)
   })
 
   app.get('/v1/status', async (c) => {

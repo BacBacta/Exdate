@@ -1,0 +1,64 @@
+# Read how long deliveries actually took, and commit it.
+#
+# The announcement lead is the most perishable thing exdate measures - about nine to ten minutes
+# between the chain carrying a change and the change taking effect - and it is only worth something
+# if the notice arrives inside it. Until exdate subscribed an endpoint of its own, the signed
+# outbox had delivered nothing at all, so there was no latency to publish, only a budget derived
+# from the poll interval. This turns the first into a committed number and refuses to state the
+# second.
+#
+# Hourly rather than on every event: the figure is a median over deliveries, and a delivery that
+# lands between two runs is picked up by the next one. The script leaves the file byte-identical
+# when the counts have not moved, so a quiet day commits nothing.
+name: measure-webhook-latency
+
+on:
+  schedule:
+    # 40 past the hour. Off the top on purpose: scheduled runs cluster at :00.
+    - cron: '40 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure-webhook-latency
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Plain node over one HTTP read: no install step, so the measurement outlives any change to
+      # the workspace's dependencies. A read that fails leaves the committed file untouched rather
+      # than publishing "nothing was delivered", which is a different claim entirely.
+      - name: Read the latency the API measured
+        env:
+          EXDATE_API_URL: ${{ vars.EXDATE_API_URL || 'https://api.exdate.me' }}
+        run: node scripts/measure-webhook-latency.mjs
+
+      - name: Commit only if the counts moved
+        run: |
+          if git diff --quiet -- data/webhook-latency.observed.json; then
+            echo "nothing changed"
+            exit 0
+          fi
+          summary=$(node -e "const d=require('./data/webhook-latency.observed.json');process.stdout.write(d.sufficient ? d.delivered+' delivered, median '+d.announceToDeliver.medianSeconds+'s' : 'no real delivery yet')")
+          git config user.name 'exdate-latency'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add data/webhook-latency.observed.json
+          git commit -m "Measure webhook latency: $summary"
+
+          for attempt in 1 2 3 4; do
+            git push && exit 0
+            echo "push failed; rebasing and retrying ($attempt)"
+            sleep $((attempt * 3))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          exit 1

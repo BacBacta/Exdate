@@ -92,6 +92,29 @@ services:
       EXDATE_SITE_URL: ${EXDATE_SITE_URL:-}
     restart: unless-stopped
 
+  # exdate's own webhook subscriber - the first endpoint the outbox ever delivered to, and what
+  # makes the published latency a measurement rather than a budget.
+  #
+  # `network_mode: service:indexer` puts it inside the indexer's network namespace, so the indexer
+  # reaches it at http://127.0.0.1:8091 and nothing else can reach it at all: no port is published,
+  # no name resolves to it, and no DNS record or certificate had to exist for it. That also lets it
+  # satisfy the endpoint rule in @exdate/core unchanged - plain http is allowed for loopback and
+  # refused everywhere else - because this genuinely is loopback rather than an exception carved
+  # out for it. With no secret set the indexer subscribes nothing and this container refuses to
+  # start, which is the honest pair of behaviours: no half-configured subscriber.
+  receiver:
+    profiles: ["public"]
+    build:
+      context: .
+      dockerfile: deploy/receiver/Dockerfile
+    network_mode: "service:indexer"
+    depends_on:
+      - indexer
+    environment:
+      EXDATE_RECEIVER_SECRET: ${EXDATE_RECEIVER_SECRET:-}
+      EXDATE_RECEIVER_PORT: ${EXDATE_RECEIVER_PORT:-8091}
+    restart: unless-stopped
+
   # The status page, rendered on the server so the browser never learns the
   # API's address and the API needs no cross-origin grant for it.
   status:

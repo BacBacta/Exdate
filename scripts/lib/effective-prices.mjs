@@ -214,6 +214,18 @@ export async function scanAnnouncements({
       effectiveAt,
       announcedAt: iso(Number(BigInt(block.timestamp)) * 1000),
       announcedTx: raw.transactionHash,
+      /**
+       * When exdate first saw this announcement, against announcedAt, which is when the chain
+       * carried it. Their difference is exdate's own observation lag - the first leg of the
+       * latency the product claims, and the one it owns: a nine-minute lead minus a lag nobody
+       * measured is not a lead anyone can act on.
+       *
+       * Written once, on discovery, and never rewritten: a value re-stamped on a later run would
+       * measure that run rather than the observation. The four steps already in the file carry no
+       * firstSeenAt at all, because nobody recorded when they were seen and filling it in now
+       * would be inventing a measurement.
+       */
+      firstSeenAt: iso(now()),
       oldMultiplier,
       newMultiplier,
       quotes: [],

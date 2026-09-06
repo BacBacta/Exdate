@@ -1832,6 +1832,49 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `data/figi.observed.json` records each ISIN's venue-row count, so a pairing is re-checkable
   rather than trusted; OpenFIGI's content is named as OpenFIGI's in `DATA-LICENSE.md`, which is
   neither exdate's to license nor the issuer's to restrict.
+- 2026-09-06 — **The signed outbox had never delivered anything, so its latency was a budget.**
+  M4 built webhooks in September and nothing was ever subscribed to them: seven event types, a
+  deterministic id, HMAC-SHA256, seven retries — and zero deliveries, which makes "how fast is it"
+  a question about the poll interval rather than about anything that happened. That matters more
+  here than anywhere else, because the perishable claim is the **nine-to-ten-minute announcement
+  lead**, and a lead is only worth something if the notice arrives inside it.
+  So exdate is now **subscribed to its own outbox**. `deploy/receiver/` is a dependency-free
+  subscriber that runs inside the indexer's own network namespace (`network_mode:
+  service:indexer`), which means the indexer reaches it at `http://127.0.0.1:8091` and **nothing
+  else can reach it at all** — no port published, no name resolving to it, no DNS record and no
+  certificate. That also let it satisfy `parseWebhookEndpoints`' rule **unchanged**: plain http is
+  allowed for loopback and refused everywhere else, and this genuinely is loopback rather than an
+  exception carved for it (checked both ways: the loopback form parses, `http://receiver:8091`
+  is still refused). It verifies each signature **independently of `@exdate/core`**, from the
+  documented scheme alone — two implementations that share code agree even when both are wrong —
+  and returns 200 only when it checks out, so **`delivered` in the record means a subscriber
+  checked the signature**, never that something answered. Driven by the sender's own `signBody`
+  over a real socket: genuine 200, forged 400, replayed 400, tampered 400, unsigned 400.
+  `GET /v1/:chain/webhooks/latency` computes the figure from tables that already existed — no
+  schema change — in **three legs, never one total**: announce → observe is exdate's own lag and
+  the one that decides whether the lead is usable, observe → deliver is the outbox, announce →
+  deliver is what a subscriber experiences. A single total would let a fast outbox hide a slow
+  observation. Only `multiplier.scheduled` has an announce leg, because it is the only event type
+  with a log and a block timestamp behind it; an applied multiplier emits nothing on chain, so its
+  count is zero rather than a lag of zero. Failures are counted, not dropped — a latency over
+  successes alone is the flattering version of the same number — and a negative duration is
+  dropped, because two clocks disagreeing is not a fast delivery.
+  **The refusal is the shipped state and it is tested as such.** `sufficient` is false with
+  `no_real_delivery_yet` until one delivery has been accepted, every leg is null rather than zero,
+  `data/webhook-latency.observed.json` says so, and the site prints *"a figure derived from how
+  often exdate polls would be a budget, not a latency"* instead of a number. Both branches were
+  rendered before shipping, not only the one that ships today. Eight checks in
+  `check-data-expectations.mjs` guard the pair in both directions, and they were proved to bite by
+  writing a 60-second median under `sufficient: false` and watching two of them fail by name.
+  Also closed here: the capture pipeline now stamps **`firstSeenAt`** on each announcement it
+  discovers, which is exdate's observation lag against the chain's own `announcedAt` — the leg
+  exdate owns, and the only one that was measurable nowhere. Written once, never re-stamped (a
+  value rewritten on a later scan measures that scan), and the four steps already in the file get
+  none, because nobody recorded when they were seen and filling it in now would be inventing a
+  measurement.
+  What this does **not** measure is stated in the data, in the API and on the page: the subscriber
+  is exdate's own receiver on the same host, so the figure covers signing, the HTTP round trip and
+  verification, and excludes public internet transit to somebody else's server.
 - _(append decisions here as they are made)_
 
 ## Status
