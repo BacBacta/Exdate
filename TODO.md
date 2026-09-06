@@ -439,16 +439,30 @@ legal advice; it is what makes counsel's hour count. The short version:
   README.
 - **No `LICENSE` file exists** while three packages claim MIT; the data has no licence at all.
 - **EU database right** (Directive 96/9/EC) is a separate question the US Terms do not address.
-- **Arbitration opt-out closes on 2026-10-31** (§12.13, sixty days from first access, by post only).
+- **Arbitration opt-out closes on 2026-10-31** (§12.13, sixty days from first access, by post only),
+  and **§12 was read in full on 2026-09-06** — the first pass had recorded only its headline.
+  **§12.14 lets Robinhood, and only Robinhood, take a trademark or IP claim to a court of its
+  choosing**, including an injunction over "any actual or threatened breach of Sections 5.5 through
+  5.12" — the trademark licence — ex parte if it chooses, with venue at its election and your
+  irrevocable consent. That is the claim most likely to be brought here, and §8's worst case
+  (revocation, blocking, a demand to delete the archive) is injunction-shaped. Without a
+  rejection the forum is one-way: Robinhood in court, you in arbitration.
+  **Recommended: send it.** Against that recommendation sits §12.8, which is genuinely favourable —
+  AAA Consumer Rules, and Robinhood reimburses your AAA fees if the arbitrator rules for you — but
+  that only helps a claimant, and here you would be the respondent. A rejection makes the forum
+  symmetric and, in the Terms' own words, "will not affect any other provision". The reasoning is
+  `docs/terms-review.md` §5.1; the decision is yours with counsel.
 
 Cheap and lawyer-free, in the order Appendix A of the review gives them — **done on 2026-09-04
 unless marked**: production reads moved off Robinhood's RPC in code (item 3); the disclaimer; the
 wording ("Stock Tokens" everywhere Robinhood's product is described); the `LICENSE` file (MIT, as the
 packages already claimed); the issuer's files withheld from the site's `/data/` mirror; a data
 licence with a `source` carve-out (`DATA-LICENSE.md`). **Still yours**: the email in Appendix B, the
-arbitration notice in Appendix C before 2026-10-31, and a provider account (item 3). For counsel, in order: is `/rhj` a Service; does §2.4 permit a
-production product; the republication as it stands; the EU right; what can be licensed; the
-opt-out; Chainlink's terms, which render in JavaScript and were not readable from the workspace.
+arbitration notice in Appendix C before 2026-10-31 (**recommended**, see above), and a provider
+account (item 3). For counsel, in order: is `/rhj` a Service; does §2.4 permit a
+production product; the republication as it stands; the EU right; what can be licensed; whether
+§12.14's venue consent survives a §12.13 rejection; Chainlink's terms, which render in JavaScript
+and were not readable from the workspace.
 And one option that changes the whole picture: §5.11 gives `robinhoodchain@robinhood.com` — a
 written permission turns most of this into a document.
 

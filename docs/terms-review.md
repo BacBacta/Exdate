@@ -161,6 +161,10 @@ non-compliant use, without notice". Three conditions touch the site as it stands
 
    Not present anywhere on the site or in the README. One line in the footer satisfies it.
 
+   **And §12.14(b)(i) makes these sections the ones Robinhood may enforce in court** rather than in
+   arbitration, by injunction, ex parte if it chooses. That is what raises §§5.5-5.12 from a
+   wording question to the operative exposure — see §5.1.
+
 3. **§5.7(k), metrics — already met by design.** Every figure on the site names how it was derived,
    the period, and the source file, and Robinhood Chain figures are never blended with any other
    Robinhood product. This is the site's founding rule and happens to be the Terms' condition.
@@ -187,11 +191,64 @@ practice and low risk, but it is a question about Apple and Ford, not about Robi
   the aggregator contracts on chain, never from Chainlink's website or any Chainlink API, which is
   the same footing as the chain's own state in §1. **Question for counsel #4**: whether any
   Chainlink data-feed licence reaches on-chain reads and their republication.
-- **The arbitration opt-out has a clock.** §12.13: reject by mailing a signed notice to RHDA, LLC,
-  85 Willow Road, Menlo Park, CA 94025, "Attn: ROBINHOOD CHAIN Arbitration Rejection Notice",
-  **within sixty calendar days after first accessing or using the Services**. First access was on
-  or about 2026-09-01/02 (Phase 0). Sixty days from 2026-09-01 is **2026-10-31**. Whether to opt out
-  is for counsel; the deadline is a fact, and the Terms say "this is the only manner".
+- **The arbitration opt-out has a clock, and §12 is asymmetric.** Read in full on 2026-09-06 —
+  see §5.1 below, which is the correction that matters most in this document.
+
+### 5.1 Section 12 read in full, and the clause the first reading missed
+
+*Added 2026-09-06. The first pass recorded only §12's headline — "mandatory arbitration under the
+FAA with a class waiver" — and §12.13's mechanism. Reading the section end to end found a clause
+that changes the recommendation, and it is recorded here rather than quietly folded in: a review
+that misses the operative clause is worth less than one that says which clause it missed.*
+
+**§12.14 — Intellectual Property and Trademark Enforcement Exception. Robinhood, and only
+Robinhood, keeps the courts.** Notwithstanding the whole of §12, Robinhood may bring in any court
+of its choosing:
+
+> (a) Trademark and IP Infringement Claims […] (i) trademark infringement under the Lanham Act
+> […] (vi) trade secret misappropriation […] (vii) copyright infringement […]
+> (b) Injunctive Relief. Any action seeking temporary, preliminary, or permanent injunctive
+> relief […] in connection with: (i) any actual or threatened breach of **Sections 5.5 through
+> 5.12** of these Terms […]
+> (f) Emergency and Ex Parte Relief.
+
+Plus, in the same proceeding, statutory damages, **disgorgement of the infringer's profits**, and
+attorneys' fees under 15 U.S.C. §1117(a). Venue is Robinhood's election — Delaware, or "any court
+where personal jurisdiction over you may be obtained or where the infringing activity is
+occurring" — and the user "irrevocably consents".
+
+**Why that is the operative clause here.** §12.14(b)(i) names §§5.5–5.12, which is exactly the
+trademark licence this document analyses in §4: the words the site uses, the disclaimer, the
+"Misleading Use" definition. And §8's worst case — revocation, blocking, a demand to delete the
+archive — is an injunction-shaped claim. **So without a rejection, Robinhood litigates its most
+likely claim in court while exdate arbitrates everything it might bring.** The forum is one-way in
+the direction that costs exdate.
+
+The rest of §12, for completeness:
+
+| | What it says |
+|---|---|
+| §12.4 | Small claims court survives, either way, on an individual basis. Arbitrability is decided by a court, not the arbitrator. |
+| §12.6 | AAA, **Consumer Arbitration Rules**, single arbitrator. |
+| §12.7 | The arbitrator may award declaratory, injunctive and equitable relief, and attorneys' fees. Appeal only under the AAA Optional Appellate Rules. |
+| §12.8 | Costs allocated by the AAA rules; **if the arbitrator rules in your favour, Robinhood reimburses all AAA fees you paid**, and will "consider in good faith" bearing them if no waiver is available. Each party bears its own attorneys regardless of who prevails. |
+| §12.9 | Class-action waiver. Explicitly bars **public injunctive relief** and any award benefiting a non-party. |
+| §12.12 | Survives termination of the Terms and of the relationship. |
+| §12.13 | The rejection. Sixty calendar days from first access, by post, "the only manner"; a late one is invalid. A valid rejection means "**only a court may be used to resolve any Claim**" and "**will not affect any other provision**". |
+
+**The deadline, computed rather than recalled**: first access was 2026-09-01/02 (Phase 0). Sixty
+days from 2026-09-01 is **2026-10-31**; from 2026-09-02 it is 2026-11-01. The earlier date is the
+one to work to.
+
+**The recommendation, which is a reasoning and not legal advice:** reject. §12.8's fee allocation
+is genuinely favourable and is the strongest argument for staying in — but it only helps a
+*claimant*, and §8's exposure puts exdate as *respondent*, where it does nothing. Against that
+sits a one-way forum on the claim most likely to be brought, a bar on public injunctive relief for
+a project whose purpose is publishing what nobody publishes, a confidential forum instead of a
+public record, and an option that expires on 2026-10-31 and cannot be recovered. The cost of
+rejecting and being wrong is a stamp and a slightly more expensive forum; the cost of not
+rejecting and being wrong is permanent. Whether to reject remains the owner's call with counsel;
+what is decided here is that the recommendation is no longer "unexamined".
 
 ## 6. exdate's own licence position, which is the other half of "before any of it is sold"
 
@@ -240,7 +297,11 @@ practice and low risk, but it is a question about Apple and Ford, not about Robi
    destroy any copies" would mean for a public git history if access were revoked. (§2.2, §3.2)
 4. The EU database right, and whether RHDA, LLC can hold it. (§5)
 5. Selling or licensing: which columns can carry a licence and which cannot. (§6)
-6. The arbitration opt-out, before 2026-10-31. (§5)
+6. The arbitration opt-out, before 2026-10-31 — and specifically **whether §12.14's irrevocable
+   consent to personal jurisdiction and venue survives a valid §12.13 rejection**. §12.13 says a
+   rejection "will not affect any other provision", which read literally leaves the venue consent
+   standing; whether a US venue consent is enforceable against an EU-resident operator is a
+   separate question again. (§5.1)
 7. Chainlink's terms, unread here. (§5)
 
 **One option that changes the whole picture:** ask. §5.11 gives `robinhoodchain@robinhood.com`
@@ -260,8 +321,8 @@ and the first of those has a substitute today.
 
 ## Appendix A — Doing this without counsel
 
-*Status 2026-09-04: items 1, 3, 4, 5, 6 and 7 below are done in the repository; 2 and 8 need the
-owner's hand, and item 1's paid tier needs the owner's account. One use of Robinhood's RPC remains
+*Status 2026-09-06: items 1, 3, 4, 5, 6 and 7 below are done in the repository; **2 and 8 need the
+owner's hand**, and item 1's paid tier needs the owner's account. One use of Robinhood's RPC remains
 by design: `/wallet/` has each visitor's own browser read their balance through Robinhood's
 endpoint (one Multicall call, retried), because the third-party endpoints that answer browsers cap
 `eth_getLogs` at 1 000 blocks and the balance path needs none — that is a visitor evaluating their
@@ -277,9 +338,12 @@ knowingly, and §8 says what it is. In order:
    counsel questions 1, 2, 3 and 5. A no answers them too. Silence after a reasonable time is
    itself a fact to record.
 3. **Display the §5.7(b)(ii) disclaimer** — done 2026-09-04, footer and README.
-4. **Decide the words.** §5.7(j) is explicit and cheap: *see what your Stock Tokens actually paid
-   you*; "tokenized real-world assets such as Stock Tokens" where a plain description is wanted.
-   Leaving "tokenized stock" is a knowing choice against a written condition.
+4. **Decide the words.** §5.7(j) is explicit and cheap: "Stock Tokens", or "tokenized real-world
+   assets such as Stock Tokens" where a plain description is wanted. Leaving "tokenized stock" is
+   a knowing choice against a written condition. *Done 2026-09-04; the replacement title this
+   appendix first suggested was itself replaced on 2026-09-06 by* every dividend declared, against
+   what actually arrived, *for a reason that has nothing to do with the Terms — see the decision
+   log of that date.*
 5. **Add a `LICENSE` file** for the code once a licence is chosen — MIT is what three packages
    already claim. This is a grant to the world and is not undone by deleting the file later, so it
    is a yes to give, not a default to assume.
@@ -291,8 +355,12 @@ knowingly, and §8 says what it is. In order:
 7. **A data licence with a carve-out**, when the measurements are meant to be reused: CC-BY-4.0
    over exdate's own columns, with a sentence excluding every field whose `source` begins with
    `robinhood:`. That is a statement of what exdate can grant, and nothing it cannot.
-8. **The arbitration opt-out**, if wanted, before 2026-10-31, by post (Appendix C). It costs a
-   stamp, keeps a court available instead of an arbitrator, and cannot be done after the date.
+8. **The arbitration opt-out**, before 2026-10-31, by post (Appendix C). **Recommended** since
+   §12 was read in full on 2026-09-06: §12.14 lets Robinhood take its most likely claim against
+   exdate — an injunction over §§5.5-5.12 — to a court of its choosing while exdate arbitrates
+   everything it might bring. A rejection makes the forum symmetric and, in the Terms' own words,
+   "will not affect any other provision". It costs a stamp and cannot be done after the date.
+   The reasoning, and the argument against it, are in §5.1.
 
 ## Appendix B — The request to Robinhood
 
