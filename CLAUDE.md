@@ -2159,8 +2159,15 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   a bare ticker match. Read `data/token-feed-map.json` for today's split, never a number from here. No first-party link
   exists to close the gap; a second SGOV-like token (low-volatility underlying, large step) would
   causally corroborate another row. See `docs/phase-0-verification.md` §14.
-- The poller and the gap sweep have no tests of their own: they need a chain and a Ponder process,
-  so they are exercised by running the indexer. The webhook outbox is unit-tested
+- The poller is replayed in `packages/indexer/test/poll.test.ts`: `ponder:registry` is aliased to a
+  double that captures the handler instead of scheduling it, `context.db` is a store over Maps and
+  `context.client` answers with readings written in the test, so a sequence of polls can be driven
+  against one store. Fourteen cases pin the branches this file's traps live in - the retrospective
+  `effectiveAt`, the applied change that emits no log, the pause baseline, a reverting token, the
+  scan never overwriting an indexer row - and five were proved to bite by breaking the poller under
+  them. **The gap sweep's `eth_getLogs` path is still not reached**: `sweepClient` is built at
+  module scope from a real transport, so the cases keep the head inside `SWEEP_MIN_GAP_BLOCKS` of
+  the marker and the sweep returns before touching the network. The webhook outbox is unit-tested
   (`packages/indexer/test/webhooks.test.ts`) and was also verified live against a local receiver.
 - `tokenStates` is written every poll even when nothing moved. Deliberate: `sampledAt` is an
   observation, and skipping the write would make "checked, unchanged" read as "not checked since".
