@@ -411,6 +411,19 @@ export interface WebhookLatencyResponse {
   endpointsConfigured: number
   delivered: number
   pending: number
+  /**
+   * Why `pending` is what it is.
+   *
+   * A subscriber nobody can reach and an outbox that has not run yet both leave every delivery
+   * queued. Without this, the two publish the same summary - and `notComputed` reads
+   * `deliveries_attempted_none_accepted` rather than `no_real_delivery_yet` when it is the first.
+   */
+  attempted: {
+    neverAttempted: number
+    triedNotAccepted: number
+    lastError: string | null
+    lastResponseStatus: number | null
+  }
   failed: number
   sufficient: boolean
   notComputed: string | null

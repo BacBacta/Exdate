@@ -13,6 +13,10 @@ coverage/
 !*.example
 
 .ponder/
+# Runtime state the indexer owns: the delivery journal and the self-service subscriptions.
+# On the machine these live on a volume; here they are whatever a test or a local run produced,
+# and one of them was committed once as if it held real deliveries.
+.exdate/
 *.log
 .DS_Store
 .vscode/

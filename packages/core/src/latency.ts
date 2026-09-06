@@ -33,6 +33,18 @@ export interface DeliveryTiming {
   deliveredAt: number | null
   /** How many attempts it took. 1 means it went out first time. */
   attempts: number
+  /**
+   * What the last attempt got back, when it got anything.
+   *
+   * Carried because a delivery attempted and refused is a completely different state from one
+   * written a moment ago, and both are `pending`. Measured 2026-09-06: exdate's own subscriber had
+   * 45 deliveries at five attempts each, every one answering `fetch failed` at the socket, and the
+   * published summary said `no_real_delivery_yet` - true, and indistinguishable from an outbox
+   * that had simply not run yet. Null on a delivery nothing has been tried on.
+   */
+  lastError?: string | null
+  /** The HTTP status the last attempt got, or null when the connection itself never happened. */
+  lastResponseStatus?: number | null
 }
 
 /**
@@ -87,6 +99,24 @@ export interface LatencySummary {
   source?: 'journal' | 'outbox'
   /** Written but not yet accepted, so counted nowhere below. */
   pending: number
+  /**
+   * Every delivery no subscriber has accepted, split by whether anything was even tried.
+   *
+   * A cut ACROSS `pending` and `failed`, not a breakdown of either: what matters to a reader is
+   * "has anyone tried, and what came back", and a delivery on its fifth attempt and one that has
+   * been given up on are the same answer to that question. A subscriber nobody can reach and an
+   * outbox that has not run yet otherwise publish an identical summary, which is how a broken
+   * outbox reads as an idle one.
+   */
+  attempted: {
+    /** Written, and nothing has been tried on it yet. */
+    neverAttempted: number
+    /** Tried at least once and not accepted: a subscriber that is refusing, or unreachable. */
+    triedNotAccepted: number
+    /** What the most-tried unaccepted delivery last got back. Null when none has been tried. */
+    lastError: string | null
+    lastResponseStatus: number | null
+  }
   /** Given up on. Reported, because a latency computed over successes alone flatters itself. */
   failed: number
   /** exdate's own lag: chain announcement to outbox row. */
@@ -129,17 +159,37 @@ export function summarizeLatency(timings: readonly DeliveryTiming[]): LatencySum
   // rather than pulling a median down. Kept visible by the leg's own n falling short of `delivered`.
   const positive = (values: (number | null)[]) => values.filter((v): v is number => v !== null && v >= 0)
 
+  const unaccepted = timings.filter((t) => t.deliveredAt === null)
+  const tried = unaccepted.filter((t) => t.attempts > 0)
+  // The one that has been tried hardest is the one whose error says most about why.
+  const worst = tried.reduce<DeliveryTiming | null>((a, b) => (a === null || b.attempts > a.attempts ? b : a), null)
+
   return {
     delivered: delivered.length,
     pending,
     failed: failed.length,
+    attempted: {
+      neverAttempted: unaccepted.length - tried.length,
+      triedNotAccepted: tried.length,
+      lastError: worst?.lastError ?? null,
+      lastResponseStatus: worst?.lastResponseStatus ?? null,
+    },
     announceToObserve: leg(positive(timings.map((t) => (t.announcedAt === null ? null : t.observedAt - t.announcedAt)))),
     observeToDeliver: leg(positive(delivered.map((t) => t.deliveredAt! - t.observedAt))),
     announceToDeliver: leg(
       positive(delivered.map((t) => (t.announcedAt === null ? null : t.deliveredAt! - t.announcedAt))),
     ),
     sufficient: delivered.length > 0,
-    notComputed: delivered.length > 0 ? null : 'no_real_delivery_yet',
+    // Three states, not two. "Nothing has been delivered yet" is honest about the figures and
+    // silent about the cause; when deliveries have been tried and none accepted - whether they are
+    // still retrying or have been given up on - saying only that hides an outbox that is broken
+    // rather than young.
+    notComputed:
+      delivered.length > 0
+        ? null
+        : tried.length > 0
+          ? 'deliveries_attempted_none_accepted'
+          : 'no_real_delivery_yet',
   }
 }
 

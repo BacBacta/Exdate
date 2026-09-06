@@ -119,7 +119,10 @@ describe('the latency survives a schema drop', () => {
     expect(body.failed).toBe(1)
     expect(body.delivered).toBe(0)
     expect(body.sufficient).toBe(false)
-    expect(body.notComputed).toBe('no_real_delivery_yet')
+    // Not 'no_real_delivery_yet': something WAS tried, and it was refused. Saying only that
+    // nothing has arrived would describe a broken outbox in the words of a young one.
+    expect(body.notComputed).toBe('deliveries_attempted_none_accepted')
+    expect(body.attempted.triedNotAccepted).toBe(1)
   })
 })
 
