@@ -18,6 +18,7 @@ import type {
   TokensResponse,
   WebhookCatalogue,
   WebhookOutboxResponse,
+  WebhookLatencyResponse,
   WebhookSubscriptionCreated,
   WebhookSubscriptionStatus,
   WebhookTestResult,
@@ -142,6 +143,12 @@ export interface ExdateClient {
     catalogue(): Promise<WebhookCatalogue>
     /** The outbox: what was noticed, and what each delivery did. */
     events(query?: { type?: string; status?: string; limit?: number }): Promise<WebhookOutboxResponse>
+    /**
+     * How long deliveries actually took, over real deliveries only. Check `sufficient` before
+     * quoting a figure: it is false until at least one delivery has been accepted, and every leg
+     * is null then rather than zero.
+     */
+    latency(chain?: number | string): Promise<WebhookLatencyResponse>
     subscribe(input: SubscribeInput): Promise<WebhookSubscriptionCreated>
     subscription(id: string, secret: string): Promise<WebhookSubscriptionStatus>
     unsubscribe(id: string, secret: string): Promise<WebhookSubscriptionStatus>
@@ -258,6 +265,12 @@ export function createClient(options: ClientOptions): ExdateClient {
       /** The outbox: what was noticed, and what each delivery did. */
       events: (query?: { type?: string; status?: string; limit?: number }) =>
         get<WebhookOutboxResponse>(`/v1/${chain}/webhooks/events`, query),
+
+      /**
+       * How long deliveries actually took. Read `sufficient` before quoting any figure: it is
+       * false until at least one delivery has been accepted, and the legs are all null then.
+       */
+      latency: (chain: number | string = 4663) => get<WebhookLatencyResponse>(`/v1/${chain}/webhooks/latency`),
       /**
        * Subscribe an https endpoint. The answer carries the secret ONCE: it signs
        * every delivery and is what reads, tests and revokes the subscription.

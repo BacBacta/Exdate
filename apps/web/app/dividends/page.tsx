@@ -144,6 +144,22 @@ export default function Page() {
               {delivery.announced.outlierSymbol ? `, one (${delivery.announced.outlierSymbol}) ${delivery.announced.longestLeadMinutes} minutes ahead` : ''}. Nothing is emitted when it takes effect. Where the issuer&rsquo;s date and the step can both be dated, the step landed{' '}
               {delivery.landed.byLagDays.map((b, i) => `${i > 0 ? ', ' : ''}${b.days === 1 ? 'the next business day' : `${b.days} business days later`} in ${b.cases} case${b.cases === 1 ? '' : 's'}`).join('')}.
             </p>
+            {delivery.announced.delivery ? (
+              <p>
+                A signed webhook of that announcement reached a subscriber a median{' '}
+                {delivery.announced.delivery.medianTotalSeconds} s after the chain carried it, over{' '}
+                {delivery.announced.delivery.deliveries} real deliver
+                {delivery.announced.delivery.deliveries === 1 ? 'y' : 'ies'}, of which{' '}
+                {delivery.announced.delivery.medianObserveSeconds} s was exdate noticing. Measured{' '}
+                {delivery.announced.delivery.observedAt}; {delivery.announced.delivery.scope}.
+              </p>
+            ) : (
+              <p>
+                How fast that notice reaches a subscriber is not stated here yet: it is measured on
+                real deliveries, and until one has happened there is nothing to measure. A figure
+                derived from how often exdate polls would be a budget, not a latency.
+              </p>
+            )}
             <p>
               A gap is stated only where the step reconciles against the declared amount at the price in force at that instant: {delivery.measurable.reconciled} of {delivery.measurable.steps} steps. {delivery.measurable.noPriceFeed} have no price feed, {delivery.measurable.doesNotAddUp} does not add up against its feed, and {delivery.measurable.noDeclaration} predate the issuer&rsquo;s one-month feed and can never be matched. {delivery.measurable.tokensWithFeed} of {delivery.measurable.tokens} tokens have a feed at all; from the next dividend on, the issuer&rsquo;s own quote is captured at the instant of each step, which covers every token.
             </p>

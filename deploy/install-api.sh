@@ -144,6 +144,31 @@ if ! grep -q '^POSTGRES_PASSWORD=' "$ENV"; then
 fi
 set_env EXDATE_API_HOST "$API_HOST"
 set_env EXDATE_STATUS_HOST "$STATUS_HOST"
+
+# exdate's own subscriber. The signed outbox had existed since M4 and delivered nothing, because
+# nothing was ever subscribed to it - so the announcement lead, the most perishable thing this
+# project measures, had a delivery path that had never carried a delivery. Subscribing an endpoint
+# on this machine is what turns it into a measurement: /v1/4663/webhooks/latency is computed over
+# real deliveries and refuses to state a figure until there is at least one.
+#
+# The endpoint is 127.0.0.1 from the indexer's point of view - the receiver runs inside its network
+# namespace - so it needs no name, no certificate and no open port, and it satisfies the loopback
+# exception in @exdate/core rather than widening it. The secret is generated here and never
+# printed: both ends read it from this file.
+if ! grep -q '^EXDATE_RECEIVER_SECRET=' "$ENV"; then
+  set_env EXDATE_RECEIVER_SECRET "$(head -c 32 /dev/urandom | base64 | tr -d '/+=' | head -c 40)"
+  note "generated a receiver secret into $ENV"
+fi
+RECEIVER_SECRET="$(sed -n 's/^EXDATE_RECEIVER_SECRET=//p' "$ENV" | head -1)"
+# Only ever added when the operator has configured nothing of their own: their endpoints are their
+# decision, and an installer that rewrites them would replace a curator's URL with exdate's.
+if ! grep -q '^EXDATE_WEBHOOK_ENDPOINTS=.\+' "$ENV"; then
+  set_env EXDATE_WEBHOOK_ENDPOINTS "[{\"id\":\"exdate-receiver\",\"url\":\"http://127.0.0.1:8091/hook\",\"secret\":\"$RECEIVER_SECRET\"}]"
+  note "subscribed exdate's own receiver, so the outbox has somewhere to deliver"
+else
+  note "EXDATE_WEBHOOK_ENDPOINTS is already set; left alone, so exdate's own receiver stays running but unsubscribed and the published latency will be measured on your endpoints, not on it"
+fi
+
 note "$ENV: api $API_HOST, status $STATUS_HOST"
 
 say "5. Build and start"
@@ -153,8 +178,8 @@ docker compose --profile public up -d --build </dev/null
 # that started a duplicate watcher and no proxy at all.
 running="$(docker compose --profile public ps --services --filter status=running 2>/dev/null | sort | tr '\n' ' ')"
 note "running: ${running:-none}"
-for want in db indexer status caddy; do
-  case " $running " in *" $want "*) ;; *) die "$want is not running. Expected db, indexer, status and caddy; got: ${running:-none}. Look at: docker compose logs $want";; esac
+for want in db indexer status caddy receiver; do
+  case " $running " in *" $want "*) ;; *) die "$want is not running. Expected db, indexer, status, caddy and receiver; got: ${running:-none}. Look at: docker compose logs $want";; esac
 done
 case " $running " in
   *" watcher "*) die "the watcher service came up, which must not happen here: this machine runs it under systemd, and two would sample the same instants twice and race on one committed file. That means the checkout predates the watcher profile - re-run this script.";;

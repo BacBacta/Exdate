@@ -238,6 +238,29 @@ const list = read('data/exdate.tokenlist.json')
   check('figi: a CUSIP for every US ISIN and none for the rest', badCusip.length === 0, badCusip.join(' '))
 }
 
+// --- webhook latency --------------------------------------------------------
+// The one dataset here whose correct state today is a refusal. Its checks are therefore about the
+// refusal holding: a figure must never appear while `sufficient` is false, and `sufficient` must
+// never be true with nothing delivered. That is the pair a "publish the poll interval as the
+// latency" mistake would break, in one direction or the other.
+{
+  const lat = read('data/webhook-latency.observed.json')
+  const legs = ['announceToObserve', 'observeToDeliver', 'announceToDeliver']
+  check('latency: sufficient iff something was delivered', lat.sufficient === lat.delivered > 0, `sufficient=${lat.sufficient} delivered=${lat.delivered}`)
+  check('latency: a refusal carries its reason', lat.sufficient ? lat.notComputed === null : typeof lat.notComputed === 'string', String(lat.notComputed))
+  const leaked = legs.filter((leg) => !lat.sufficient && lat[leg].medianSeconds !== null)
+  check('latency: no figure while it is refused', leaked.length === 0, leaked.join(' '))
+  const shaped = legs.filter((leg) => !(lat[leg].n >= 0 && (lat[leg].n === 0) === (lat[leg].medianSeconds === null)))
+  check('latency: a leg with no sample states no median, and one with a sample states one', shaped.length === 0, shaped.join(' '))
+  const ordered = legs.filter((leg) => lat[leg].minSeconds !== null && !(lat[leg].minSeconds <= lat[leg].medianSeconds && lat[leg].medianSeconds <= lat[leg].maxSeconds))
+  check('latency: min <= median <= max on every leg', ordered.length === 0, ordered.join(' '))
+  // The total cannot be smaller than the part of it exdate owns, or the two legs disagree.
+  const both = lat.announceToDeliver.medianSeconds !== null && lat.announceToObserve.medianSeconds !== null
+  check('latency: the total is at least the observation lag', !both || lat.announceToDeliver.medianSeconds >= lat.announceToObserve.medianSeconds)
+  check('latency: says where the receiving end is', typeof lat.scope === 'string' && lat.scope.length > 20)
+  check('latency: counts add up', lat.delivered + lat.pending + lat.failed >= lat.delivered)
+}
+
 const share = read('data/session-share.observed.json')
 {
   const s = share.samples
