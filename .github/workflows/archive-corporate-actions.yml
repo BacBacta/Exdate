@@ -50,6 +50,14 @@ jobs:
       - name: Refresh the issuer registry
         run: node scripts/phase0/snapshot-registry.mjs
 
+      # The FIGI join covers the registry, so it has to follow it: an asset the issuer added this
+      # morning would otherwise be published with no identifiers until someone noticed. Costs zero
+      # requests on a day when the registry did not move - only tokens absent from the file, or
+      # whose ISIN changed, are asked for - and the file is left byte-identical when the answer is
+      # the same, so this commits only when the join actually moved.
+      - name: Join any new token to its FIGI
+        run: node scripts/build-figi-map.mjs
+
       # Everything downstream of the archive, in dependency order and in one place:
       # the reconciliations (which read the archive directly since the 2026-09-05
       # audit), the typed registry CI checks against its sources, and the token
@@ -66,7 +74,7 @@ jobs:
 
       - name: Commit only if something actually changed
         run: |
-          paths="data/corporate-actions.archive.json data/robinhood-assets.snapshot.json data/reconciliations.observed.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json"
+          paths="data/corporate-actions.archive.json data/robinhood-assets.snapshot.json data/reconciliations.observed.json packages/core/src/generated/registry.ts data/exdate.tokenlist.json data/figi.observed.json"
           if git diff --quiet -- $paths; then
             echo "nothing changed"
             exit 0

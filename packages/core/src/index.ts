@@ -1,6 +1,7 @@
 export * from './abi.js'
 export * from './chains.js'
 export * from './holdings.js'
+export * from './identifiers.js'
 export * from './logs.js'
 export * from './method.js'
 export * from './multiplier.js'

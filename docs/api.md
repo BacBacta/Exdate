@@ -128,6 +128,14 @@ token, in full:
   "decimals": 18,
   "isin": "US46436E7186",
   "issuer": "Robinhood Assets (Jersey) Limited",
+  "identifiers": {
+    "address": "0x92fd66527192e3e61d4ddd13322aa222de86f9b5",
+    "ticker": "SGOV",
+    "isin": "US46436E7186",
+    "cusip": "46436E718",
+    "figi": "BBG00TZR7XN3",
+    "shareClassFigi": "BBG00TZR7YF0"
+  },
   "registry": { "source": "robinhood:/rhj/assets", "generatedAt": "2026-09-02T15:14:00.463Z" },
   "state": "indexed",
   "multiplier": {
@@ -184,6 +192,38 @@ Four fields carry the traps this API exists to avoid:
 
 `state` is `not_yet_polled` until the poller has read the ERC-8056 views once — a token with no data
 says so rather than showing zeros. A single token 404s with `{"error":"unknown token", …}`.
+
+### Identifiers
+
+`identifiers` is the block that lets you join exdate's rows to your own system without a mapping
+table. **`address` is the key** — the only identifier here that is first-party, unambiguous and
+readable from the chain. The rest are joins, each with a stated origin and a stated failure mode:
+
+| Field | Where it comes from | Null when |
+|---|---|---|
+| `address` | the chain | never |
+| `ticker` | the issuer's registry | never — but it is a display value, not a key: two issuers can spell one asset differently |
+| `isin` | the issuer's registry | never today, on all 194 |
+| `cusip` | **derived** from a US ISIN, and checked | the ISIN is not a US one — 16 of 194 |
+| `figi` | OpenFIGI, joined on the ISIN | the asset lists on no venue in the country its ISIN names — 16 of 194 |
+| `shareClassFigi` | OpenFIGI, joined on the ISIN | never today, on all 194 |
+
+Two things worth knowing before you key on any of them.
+
+**The CUSIP is read, not mapped.** A US ISIN is `US` + the nine-character CUSIP + a check digit, so
+the CUSIP is a substring of the ISIN printed beside it. exdate verifies the CUSIP's own check digit
+before publishing it and returns `null` otherwise, so a malformed ISIN yields nothing rather than a
+plausible-looking wrong CUSIP. Nothing is inferred for a non-US ISIN: there is no CUSIP to read.
+
+**`shareClassFigi` is the one to key on, not `figi`.** A Stock Token represents a share class and is
+listed on no venue at all, so the venue-level FIGI a market-data system normally uses does not exist
+for it, and the country-level composite names a listing the token itself does not have. The share
+class resolves for all 194; the composite does not, and its absence is a property of the asset's
+listings rather than a gap in the join.
+
+The join itself is committed at `data/figi.observed.json` with the number of venue rows each ISIN
+returned, so a pairing can be re-checked rather than trusted. Rebuild it with
+`node scripts/build-figi-map.mjs`.
 
 ## `GET /v1/:chain/events`
 

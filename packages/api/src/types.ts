@@ -15,6 +15,10 @@ export interface TokenRow {
   /** Null for a token the registry does not know whose on-chain read failed. */
   decimals: number | null
   isin: string | null
+  /** OpenFIGI's country composite, joined on the ISIN. Null where the asset lists in no venue there. */
+  figi: string | null
+  /** OpenFIGI's share class, one across every country. What a Stock Token actually represents. */
+  shareClassFigi: string | null
   issuer: string
   status: string
   logoUrl: string | null

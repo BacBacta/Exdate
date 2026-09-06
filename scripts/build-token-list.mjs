@@ -12,6 +12,7 @@
 //   node scripts/build-token-list.mjs
 import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
+import { cusipFromIsin } from '../packages/core/src/identifiers.ts'
 import { nextTokenListVersion, validateTokenList } from '../packages/core/src/tokenlist.ts'
 
 const root = new URL('../', import.meta.url)
@@ -24,6 +25,14 @@ const registry = read('data/robinhood-assets.snapshot.json')
 const events = read('data/multiplier-events.observed.json').events
 const reconciliations = read('data/reconciliations.observed.json').rows
 const feedMap = read('data/token-feed-map.json')
+const figiRows = (() => {
+  try {
+    return read('data/figi.observed.json').rows
+  } catch {
+    return []
+  }
+})()
+const figiByToken = new Map(figiRows.map((row) => [row.token.toLowerCase(), row]))
 
 const feedByToken = new Map(feedMap.pairs.map((p) => [p.token.toLowerCase(), p]))
 
@@ -76,6 +85,23 @@ for (const asset of registry.assets ?? registry) {
     /** What one token represents in underlying shares today. 1 for a token that never moved. */
     underlyingSharesPerToken: formatWad(multiplier, 18),
     isin: asset.isin ?? null,
+    /**
+     * The identifiers an integrator already keys on. Flat strings rather than a nested block:
+     * the token-list schema types every extension value as a string, a number or a boolean, and
+     * an object here makes the whole list invalid - which every consumer ignores in silence.
+     *
+     * The CUSIP is the ISIN's own substring for a US ISIN, checked before it is published; null
+     * for the 16 non-US ones, where none exists to extract.
+     */
+    cusip: cusipFromIsin(asset.isin ?? null),
+    /**
+     * OpenFIGI's share class: what the token represents, and the one FIGI that resolves for all
+     * 194. The country-level composite is deliberately absent - the schema allows ten extensions
+     * per token and this list already carries eight that nobody else publishes, so the tenth slot
+     * goes to the identifier that is never null and never names a venue the token is not on. The
+     * composite is served in full by the API's `identifiers` block and by data/figi.observed.json.
+     */
+    shareClassFigi: figiByToken.get(key)?.shareClassFigi ?? null,
     /** The Chainlink proxy a lending market would price this against, or null: 159 of 194 have none. */
     priceFeed: pair?.feedProxy ?? null,
     /**

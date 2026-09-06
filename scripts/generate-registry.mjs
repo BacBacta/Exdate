@@ -26,6 +26,15 @@ if (!registrySnapshot.fetchedAt) {
 const feedMap = await read('data/token-feed-map.json')
 const scan = await read('data/multiplier-events.observed.json')
 const archive = await read('data/corporate-actions.archive.json').catch(() => ({ actions: [] }))
+/**
+ * FIGIs, joined on the issuer's own ISIN by scripts/build-figi-map.mjs.
+ *
+ * Optional on purpose: a checkout that has never run the join still generates a registry, with
+ * every FIGI null rather than with the field missing. A null says "not joined"; an absent field
+ * says "this build is older than the feature", and a consumer cannot tell those apart.
+ */
+const figiMap = await read('data/figi.observed.json').catch(() => ({ rows: [] }))
+const figiByToken = new Map((figiMap.rows ?? []).map((row) => [row.token.toLowerCase(), row]))
 
 /**
  * The issuer's window is about a month deep and has no pagination, so a row that
@@ -65,6 +74,7 @@ const tokens = assets
   .flatMap((asset) =>
     (asset.deployments ?? []).map((deployment) => {
       const feed = feedByToken.get(deployment.contractAddress.toLowerCase())
+      const figi = figiByToken.get(deployment.contractAddress.toLowerCase())
       return {
         chainId: deployment.chainId,
         address: deployment.contractAddress,
@@ -72,6 +82,15 @@ const tokens = assets
         name: asset.tokenName,
         decimals: asset.tokenDecimals,
         isin: asset.isin ?? null,
+        /**
+         * OpenFIGI's country composite and share class, joined on the ISIN above.
+         *
+         * The CUSIP is deliberately NOT stored here: it is the ISIN's own substring for a US
+         * ISIN, so storing it would be a second copy of a fact this file already carries, free to
+         * drift from it. It is derived at the point of use by cusipFromIsin().
+         */
+        figi: figi?.figi ?? null,
+        shareClassFigi: figi?.shareClassFigi ?? null,
         status: asset.status,
         // Null on purpose, not missing. The issuer's CDN logo is the one column exdate
         // redistributes that no exdate surface uses - no page renders it - and it is the
@@ -118,6 +137,17 @@ export interface RegistryToken {
   name: string
   decimals: number
   isin: string | null
+  /**
+   * OpenFIGI's country-level composite FIGI, joined on the ISIN. Null when the asset has no
+   * listing in the country its ISIN names - 16 of 194 today, every one of them non-US.
+   */
+  figi: string | null
+  /**
+   * OpenFIGI's share class FIGI: one value across every country and venue, and the identifier
+   * that actually describes a Stock Token, which represents the share class and is listed on no
+   * venue. 194 of 194 today.
+   */
+  shareClassFigi: string | null
   status: string
   logoUrl: string | null
   /** Chainlink aggregator proxy, or null when the token has no feed at all. */
@@ -226,6 +256,7 @@ await mkdir(new URL('packages/core/src/generated/', root), { recursive: true })
 await writeFile(new URL('packages/core/src/generated/registry.ts', root), out)
 
 const withFeed = tokens.filter((token) => token.feedProxy !== null).length
+const withShareClass = tokens.filter((token) => token.shareClassFigi !== null).length
 console.log(
-  `generated ${tokens.length} tokens (${withFeed} with a Chainlink feed), ${scan.events.length} scanned multiplier events and ${archivedActions.length} archived corporate actions -> packages/core/src/generated/registry.ts`,
+  `generated ${tokens.length} tokens (${withFeed} with a Chainlink feed, ${withShareClass} with a share-class FIGI), ${scan.events.length} scanned multiplier events and ${archivedActions.length} archived corporate actions -> packages/core/src/generated/registry.ts`,
 )

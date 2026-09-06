@@ -1,10 +1,10 @@
 {
   "name": "exdate Robinhood Stock Tokens",
-  "timestamp": "2026-09-06T00:06:24.639Z",
+  "timestamp": "2026-09-06T00:16:22.013Z",
   "version": {
     "major": 1,
     "minor": 0,
-    "patch": 6
+    "patch": 7
   },
   "keywords": [
     "stock tokens",
@@ -23,6 +23,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US03823U1025",
+        "cusip": "03823U102",
+        "shareClassFigi": "BBG001SG47G4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -40,6 +42,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.000566080061092436",
         "isin": "US0378331005",
+        "cusip": "037833100",
+        "shareClassFigi": "BBG001S5N8V8",
         "priceFeed": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -57,6 +61,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "CA00288U1066",
+        "cusip": null,
+        "shareClassFigi": "BBG00LLW2MH0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -74,6 +80,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US00724F1012",
+        "cusip": "00724F101",
+        "shareClassFigi": "BBG001S5NCQ5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -91,6 +99,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US00760J1088",
+        "cusip": "00760J108",
+        "shareClassFigi": "BBG001SB1CS4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -108,6 +118,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0079731008",
+        "cusip": "007973100",
+        "shareClassFigi": "BBG001S8L5Z6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -125,6 +137,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US04626A1034",
+        "cusip": "04626A103",
+        "shareClassFigi": "BBG00TDKHWK6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -142,6 +156,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0382221051",
+        "cusip": "038222105",
+        "shareClassFigi": "BBG001S5NMM7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -159,6 +175,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "KYG037AX1015",
+        "cusip": null,
+        "shareClassFigi": "BBG001V1SN18",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -176,6 +194,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US00165C3025",
+        "cusip": "00165C302",
+        "shareClassFigi": "BBG001SZYYL4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -193,6 +213,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0079031078",
+        "cusip": "007903107",
+        "shareClassFigi": "BBG001S5NN36",
         "priceFeed": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -210,6 +232,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0316521006",
+        "cusip": "031652100",
+        "shareClassFigi": "BBG001S64YF8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -227,6 +251,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0231351067",
+        "cusip": "023135106",
+        "shareClassFigi": "BBG001S5PQL7",
         "priceFeed": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -244,6 +270,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0404132054",
+        "cusip": "040413205",
+        "shareClassFigi": "BBG001T51KQ0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -261,6 +289,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0381692070",
+        "cusip": "038169207",
+        "shareClassFigi": "BBG001SK4K76",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -278,6 +308,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US03831W1080",
+        "cusip": "03831W108",
+        "shareClassFigi": "BBG006HFPX86",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -295,6 +327,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.000101323251417769",
         "isin": "USN070592100",
+        "cusip": "N07059210",
+        "shareClassFigi": "BBG001SCG0R3",
         "priceFeed": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -312,6 +346,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US00217D1000",
+        "cusip": "00217D100",
+        "shareClassFigi": "BBG00Q402TS1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -329,6 +365,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0517741072",
+        "cusip": "051774107",
+        "shareClassFigi": "BBG00Z92Y6Y0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -346,6 +384,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0080731088",
+        "cusip": "008073108",
+        "shareClassFigi": "BBG001SPPWP6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -363,6 +403,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US11135F1012",
+        "cusip": "11135F101",
+        "shareClassFigi": "BBG00KHY5SY8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -380,6 +422,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US05464C1018",
+        "cusip": "05464C101",
+        "shareClassFigi": "BBG001SB2HG5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -397,6 +441,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US00246W1036",
+        "cusip": "00246W103",
+        "shareClassFigi": "BBG001S7SPZ7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -414,6 +460,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0970231058",
+        "cusip": "097023105",
+        "shareClassFigi": "BBG001S5P0V3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -431,6 +479,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US01609W1027",
+        "cusip": "01609W102",
+        "shareClassFigi": "BBG006G2JWB1",
         "priceFeed": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -448,6 +498,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "CA09228F1036",
+        "cusip": null,
+        "shareClassFigi": "BBG001S60618",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -465,6 +517,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0937121079",
+        "cusip": "093712107",
+        "shareClassFigi": "BBG001T53509",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -482,6 +536,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US9219378356",
+        "cusip": "921937835",
+        "shareClassFigi": "BBG001SK7DK4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -499,6 +555,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "KYG9572D1034",
+        "cusip": null,
+        "shareClassFigi": "BBG01TF8MJF9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -516,6 +574,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US15675D1037",
+        "cusip": "15675D103",
+        "shareClassFigi": "BBG00FNFPQJ2",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -533,6 +593,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.021486444855206408",
         "isin": "BMG2004J1036",
+        "cusip": null,
+        "shareClassFigi": "BBG001S5PL01",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -550,6 +612,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US21037T1097",
+        "cusip": "21037T109",
+        "shareClassFigi": "BBG014KFRPJ9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -567,6 +631,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US15118V2079",
+        "cusip": "15118V207",
+        "shareClassFigi": "BBG001SQSKT3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -584,6 +650,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US1717793095",
+        "cusip": "171779309",
+        "shareClassFigi": "BBG001S61J73",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -601,6 +669,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US18914F1030",
+        "cusip": "18914F103",
+        "shareClassFigi": "BBG00SHY90K3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -618,6 +688,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "CA15101Q2071",
+        "cusip": null,
+        "shareClassFigi": "BBG001S9CXM7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -635,6 +707,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US18452B2097",
+        "cusip": "18452B209",
+        "shareClassFigi": "BBG001S7F576",
         "priceFeed": "0x810c12D3a554Bc47fd39597Fe3b3AAC4941F50eF",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -652,6 +726,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US19247G1076",
+        "cusip": "19247G107",
+        "shareClassFigi": "BBG001S5S6N6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -669,6 +745,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US19260Q1076",
+        "cusip": "19260Q107",
+        "shareClassFigi": "BBG00ZGF7799",
         "priceFeed": "0xA3a468A452940B7D6b69991207B508c609a98Ef2",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -686,6 +764,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.000612040296259656",
         "isin": "US22160K1051",
+        "cusip": "22160K105",
+        "shareClassFigi": "BBG001S9KRQ7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -703,6 +783,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US1725731079",
+        "cusip": "172573107",
+        "shareClassFigi": "BBG01T61V3Q7",
         "priceFeed": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -720,6 +802,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "KYG254571055",
+        "cusip": null,
+        "shareClassFigi": "BBG00T68J2H9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -737,6 +821,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US79466L3024",
+        "cusip": "79466L302",
+        "shareClassFigi": "BBG001SDLP09",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -754,6 +840,8 @@
       "extensions": {
         "underlyingSharesPerToken": "4",
         "isin": "US22788C1053",
+        "cusip": "22788C105",
+        "shareClassFigi": "BBG00BLYKRZ7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -771,6 +859,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US21873S1087",
+        "cusip": "21873S108",
+        "shareClassFigi": "BBG011ZTRJ49",
         "priceFeed": "0xe1b3aABCAFAd1c94708dc1367dcfF8Aa4407487C",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -788,6 +878,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US17275R1023",
+        "cusip": "17275R102",
+        "shareClassFigi": "BBG001S6HC62",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -805,6 +897,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US1924461023",
+        "cusip": "192446102",
+        "shareClassFigi": "BBG001S5STN6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -822,6 +916,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US1468691027",
+        "cusip": "146869102",
+        "shareClassFigi": "BBG00GCTWF71",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -839,6 +935,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US23804L1035",
+        "cusip": "23804L103",
+        "shareClassFigi": "BBG003NJHZW5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -856,6 +954,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.000063708620124549",
         "isin": "US24703L2025",
+        "cusip": "24703L202",
+        "shareClassFigi": "BBG00DW3SZT0",
         "priceFeed": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -873,6 +973,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US25400Q1058",
+        "cusip": "25400Q105",
+        "shareClassFigi": "BBG011744HJ8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -890,6 +992,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US25402D1028",
+        "cusip": "25402D102",
+        "shareClassFigi": "BBG00ZGF6TM7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -907,6 +1011,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US26856L1035",
+        "cusip": "26856L103",
+        "shareClassFigi": "BBG00DQ6VYQ2",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -924,6 +1030,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46434G7723",
+        "cusip": "46434G772",
+        "shareClassFigi": "BBG001SFGL81",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -941,6 +1049,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4642867729",
+        "cusip": "464286772",
+        "shareClassFigi": "BBG001SF9FC7",
         "priceFeed": "0xEFdf54610B62A7753Ec30bDc380847c12D32e1D1",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -958,6 +1068,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.000145502866134027",
         "isin": "US3453708600",
+        "cusip": "345370860",
+        "shareClassFigi": "BBG001S5TZ33",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -975,6 +1087,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US3032501047",
+        "cusip": "303250104",
+        "shareClassFigi": "BBG001S8ZT61",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -992,6 +1106,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US3168411052",
+        "cusip": "316841105",
+        "shareClassFigi": "BBG00BLZ2CF9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1009,6 +1125,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US3377381088",
+        "cusip": "337738108",
+        "shareClassFigi": "BBG001S5R6Q4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1026,6 +1144,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US1999081045",
+        "cusip": "199908104",
+        "shareClassFigi": "BBG001SB1GG8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1043,6 +1163,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US34379V1035",
+        "cusip": "34379V103",
+        "shareClassFigi": "BBG012QSDTD2",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1060,6 +1182,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US31816X1063",
+        "cusip": "31816X106",
+        "shareClassFigi": "BBG00NGNL3Y4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1077,6 +1201,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US34959E1091",
+        "cusip": "34959E109",
+        "shareClassFigi": "BBG001S77BL6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1094,6 +1220,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US36118L1061",
+        "cusip": "36118L106",
+        "shareClassFigi": "BBG00MYXW5H6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1111,6 +1239,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US3696043013",
+        "cusip": "369604301",
+        "shareClassFigi": "BBG001S5PVD5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1128,6 +1258,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US36828A1016",
+        "cusip": "36828A101",
+        "shareClassFigi": "BBG013G17W77",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1145,6 +1277,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US78463V1070",
+        "cusip": "78463V107",
+        "shareClassFigi": "BBG001SCPX28",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1162,6 +1296,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US2193501051",
+        "cusip": "219350105",
+        "shareClassFigi": "BBG001S5RLH1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1179,6 +1315,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US36317J2096",
+        "cusip": "36317J209",
+        "shareClassFigi": "BBG0120SWLT9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1196,6 +1334,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US36467W1099",
+        "cusip": "36467W109",
+        "shareClassFigi": "BBG001S5RLR0",
         "priceFeed": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -1213,6 +1353,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US02079K3059",
+        "cusip": "02079K305",
+        "shareClassFigi": "BBG009S39JY5",
         "priceFeed": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": true,
@@ -1230,6 +1372,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4464131063",
+        "cusip": "446413106",
+        "shareClassFigi": "BBG001V0PDL3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1247,6 +1391,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4330001060",
+        "cusip": "433000106",
+        "shareClassFigi": "BBG00Q5LQWK9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1264,6 +1410,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US42824C1099",
+        "cusip": "42824C109",
+        "shareClassFigi": "BBG0078W3NP4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1281,6 +1429,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4432011082",
+        "cusip": "443201108",
+        "shareClassFigi": "BBG00DYNJH69",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1298,6 +1448,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4592001014",
+        "cusip": "459200101",
+        "shareClassFigi": "BBG001S5S399",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1315,6 +1467,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US45256X1037",
+        "cusip": "45256X103",
+        "shareClassFigi": "BBG007T9DYX8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1332,6 +1486,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46429B5984",
+        "cusip": "46429B598",
+        "shareClassFigi": "BBG002DMN4B6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1349,6 +1505,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US45676K1034",
+        "cusip": "45676K103",
+        "shareClassFigi": "BBG01TR9ZK30",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1366,6 +1524,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4576422053",
+        "cusip": "457642205",
+        "shareClassFigi": "BBG001S7DVN3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1383,6 +1543,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4581401001",
+        "cusip": "458140100",
+        "shareClassFigi": "BBG001S5SF65",
         "priceFeed": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -1400,6 +1562,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4612021034",
+        "cusip": "461202103",
+        "shareClassFigi": "BBG001S6TWR2",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1417,6 +1581,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46222L1089",
+        "cusip": "46222L108",
+        "shareClassFigi": "BBG00XZP0LC3",
         "priceFeed": "0x22EfeC4919baf55F360E0EDee4AbEB26DE4971eb",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1434,6 +1600,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "AU0000185993",
+        "cusip": null,
+        "shareClassFigi": "BBG010J28KR1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1451,6 +1619,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4663131039",
+        "cusip": "466313103",
+        "shareClassFigi": "BBG001S7RB70",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1468,6 +1638,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4781601046",
+        "cusip": "478160104",
+        "shareClassFigi": "BBG001S5SHQ9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1485,6 +1657,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "KYG651631007",
+        "cusip": null,
+        "shareClassFigi": "BBG00X2MYTD1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1502,6 +1676,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4824801009",
+        "cusip": "482480100",
+        "shareClassFigi": "BBG001S5SLM4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1519,6 +1695,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5002551043",
+        "cusip": "500255104",
+        "shareClassFigi": "BBG001S71NV5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1536,6 +1714,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US50077B2079",
+        "cusip": "50077B207",
+        "shareClassFigi": "BBG001SD5VL1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1553,6 +1733,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5024311095",
+        "cusip": "502431109",
+        "shareClassFigi": "BBG001S5S0N9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1570,6 +1752,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US55024U1097",
+        "cusip": "55024U109",
+        "shareClassFigi": "BBG0073F9RS8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1587,6 +1771,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5324571083",
+        "cusip": "532457108",
+        "shareClassFigi": "BBG001S5STL8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1604,6 +1790,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5398301094",
+        "cusip": "539830109",
+        "shareClassFigi": "BBG001S7PS57",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -1621,6 +1809,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5128073062",
+        "cusip": "512807306",
+        "shareClassFigi": "BBG001S5SW40",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1638,6 +1828,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5500211090",
+        "cusip": "550021109",
+        "shareClassFigi": "BBG001STBM75",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1655,6 +1847,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46125A1007",
+        "cusip": "46125A100",
+        "shareClassFigi": "BBG00ZMYYP19",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1672,6 +1866,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US60937P1066",
+        "cusip": "60937P106",
+        "shareClassFigi": "BBG0022FDRZ7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1689,6 +1885,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US30303M1027",
+        "cusip": "30303M102",
+        "shareClassFigi": "BBG001SQCQC5",
         "priceFeed": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -1706,6 +1904,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US6078281002",
+        "cusip": "607828100",
+        "shareClassFigi": "BBG001S5T913",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1723,6 +1923,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US6098391054",
+        "cusip": "609839105",
+        "shareClassFigi": "BBG001SDRGP6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1740,6 +1942,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US60770K1079",
+        "cusip": "60770K107",
+        "shareClassFigi": "BBG003PHHZV8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1757,6 +1961,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5738741041",
+        "cusip": "573874104",
+        "shareClassFigi": "BBG00ZXBJ162",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1774,6 +1980,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5949181045",
+        "cusip": "594918104",
+        "shareClassFigi": "BBG001S5TD05",
         "priceFeed": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": true,
@@ -1791,6 +1999,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US5949724083",
+        "cusip": "594972408",
+        "shareClassFigi": "BBG001SC7PX1",
         "priceFeed": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1808,6 +2018,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US55405Y1001",
+        "cusip": "55405Y100",
+        "shareClassFigi": "BBG001T4BB37",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1825,6 +2037,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.000074823219171086",
         "isin": "US5951121038",
+        "cusip": "595112103",
+        "shareClassFigi": "BBG001S6P675",
         "priceFeed": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -1842,6 +2056,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US57776J1007",
+        "cusip": "57776J100",
+        "shareClassFigi": "BBG001S6MZV7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1859,6 +2075,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US6391931010",
+        "cusip": "639193101",
+        "shareClassFigi": "BBG00FVNPLY0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1876,6 +2094,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "NL0009805522",
+        "cusip": null,
+        "shareClassFigi": "BBG001TBY593",
         "priceFeed": "0xE1D87B116Ba0fe898998f1D140339D1fA1E09705",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1893,6 +2113,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US18915M1071",
+        "cusip": "18915M107",
+        "shareClassFigi": "BBG001WMKHJ3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1910,6 +2132,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US64110L1061",
+        "cusip": "64110L106",
+        "shareClassFigi": "BBG001SF6L46",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1927,6 +2151,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US63010H1086",
+        "cusip": "63010H108",
+        "shareClassFigi": "BBG01F7QNWH6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1944,6 +2170,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US81762P1021",
+        "cusip": "81762P102",
+        "shareClassFigi": "BBG001T4JFC0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1961,6 +2189,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "KYG6683N1034",
+        "cusip": null,
+        "shareClassFigi": "BBG0136WM2Y9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -1978,6 +2208,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US67066G1040",
+        "cusip": "67066G104",
+        "shareClassFigi": "BBG001S5TZJ6",
         "priceFeed": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": true,
@@ -1995,6 +2227,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US63942X1063",
+        "cusip": "63942X106",
+        "shareClassFigi": "BBG00YQ6KTM3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2012,6 +2246,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US02156V1098",
+        "cusip": "02156V109",
+        "shareClassFigi": "BBG0112CBMQ8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2029,6 +2265,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US6821891057",
+        "cusip": "682189105",
+        "shareClassFigi": "BBG001SF7RS6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2046,6 +2284,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US6833441057",
+        "cusip": "683344105",
+        "shareClassFigi": "BBG001S5THX0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2063,6 +2303,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.002210914971013375",
         "isin": "US68389X1054",
+        "cusip": "68389X105",
+        "shareClassFigi": "BBG001S5SJG6",
         "priceFeed": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2080,6 +2322,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US68989M2026",
+        "cusip": "68989M202",
+        "shareClassFigi": "BBG00XRTSTS0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2097,6 +2341,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US74624M1027",
+        "cusip": "74624M102",
+        "shareClassFigi": "BBG00212PW10",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2114,6 +2360,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US6974351057",
+        "cusip": "697435105",
+        "shareClassFigi": "BBG001T9NWN5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2131,6 +2379,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US90364P1057",
+        "cusip": "90364P105",
+        "shareClassFigi": "BBG00GKS1G12",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2148,6 +2398,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US7069151055",
+        "cusip": "706915105",
+        "shareClassFigi": "BBG00GLTQDM6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2165,6 +2417,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US7170811035",
+        "cusip": "717081103",
+        "shareClassFigi": "BBG001S5V466",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2182,6 +2436,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US72703X1063",
+        "cusip": "72703X106",
+        "shareClassFigi": "BBG00ZCV3Q27",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2199,6 +2455,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US69608A1088",
+        "cusip": "69608A108",
+        "shareClassFigi": "BBG001T53796",
         "priceFeed": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2216,6 +2474,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "CA73044W3021",
+        "cusip": null,
+        "shareClassFigi": "BBG001STSZP8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2233,6 +2493,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US7391281067",
+        "cusip": "739128106",
+        "shareClassFigi": "BBG001S5VBT5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2250,6 +2512,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US71424F1057",
+        "cusip": "71424F105",
+        "shareClassFigi": "BBG00D61Y2G3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2267,6 +2531,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US74762E1029",
+        "cusip": "74762E102",
+        "shareClassFigi": "BBG001S5VH85",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2284,6 +2550,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US26740W1099",
+        "cusip": "26740W109",
+        "shareClassFigi": "BBG0192379X7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2301,6 +2569,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US7475251036",
+        "cusip": "747525103",
+        "shareClassFigi": "BBG001S6VS70",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2318,6 +2588,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46090E1038",
+        "cusip": "46090E103",
+        "shareClassFigi": "BBG001S9GN63",
         "priceFeed": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2335,6 +2607,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US74766W1080",
+        "cusip": "74766W108",
+        "shareClassFigi": "BBG001SLKPP5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2352,6 +2626,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US7710491033",
+        "cusip": "771049103",
+        "shareClassFigi": "BBG001V1Y6Z1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2369,6 +2645,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US75644T1007",
+        "cusip": "75644T100",
+        "shareClassFigi": "BBG001SB7WF8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2386,6 +2664,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US75734B1008",
+        "cusip": "75734B100",
+        "shareClassFigi": "BBG015RGX648",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2403,6 +2683,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US75776W1036",
+        "cusip": "75776W103",
+        "shareClassFigi": "BBG00YGLXFH3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2420,6 +2702,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US76655K1034",
+        "cusip": "76655K103",
+        "shareClassFigi": "BBG00Z911SZ9",
         "priceFeed": "0x2A045cF1C49c61c166C036d2f06FA2D2d984f765",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2437,6 +2721,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US76954A1034",
+        "cusip": "76954A103",
+        "shareClassFigi": "BBG00741Y1P0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2454,6 +2740,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US7731211089",
+        "cusip": "773121108",
+        "shareClassFigi": "BBG01V7JN489",
         "priceFeed": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2471,6 +2759,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US86771W1053",
+        "cusip": "86771W105",
+        "shareClassFigi": "BBG0025XVR94",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2488,6 +2778,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US2787681061",
+        "cusip": "278768106",
+        "shareClassFigi": "BBG001T048Z5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2505,6 +2797,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US8085247976",
+        "cusip": "808524797",
+        "shareClassFigi": "BBG0025RWLM4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2522,6 +2816,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.005101770003214918",
         "isin": "US46436E7186",
+        "cusip": "46436E718",
+        "shareClassFigi": "BBG00TZR7YF0",
         "priceFeed": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
         "priceFeedCorroboratedBy": "multiplier-step,traded-price",
         "dividendDeclaredNotOnChain": true,
@@ -2539,6 +2835,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "CA82509L1076",
+        "cusip": null,
+        "shareClassFigi": "BBG004DW5NC7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2556,6 +2854,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4642874576",
+        "cusip": "464287457",
+        "shareClassFigi": "BBG001SKXPR1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2573,6 +2873,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US82706C1080",
+        "cusip": "82706C108",
+        "shareClassFigi": "BBG001SP0YQ8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2590,6 +2892,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US78392B2060",
+        "cusip": "78392B206",
+        "shareClassFigi": "BBG0238L5M11",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2607,6 +2911,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US81642T2096",
+        "cusip": "81642T209",
+        "shareClassFigi": "BBG001T223C9",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2624,6 +2930,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46428Q1094",
+        "cusip": "46428Q109",
+        "shareClassFigi": "BBG001SQLN69",
         "priceFeed": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2641,6 +2949,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US86800U3023",
+        "cusip": "86800U302",
+        "shareClassFigi": "BBG001SQGH95",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2658,6 +2968,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US92189F6768",
+        "cusip": "92189F676",
+        "shareClassFigi": "BBG002D68GN8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2675,6 +2987,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US67079K1007",
+        "cusip": "67079K100",
+        "shareClassFigi": "BBG00YG48PG8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2692,6 +3006,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US83304A1060",
+        "cusip": "83304A106",
+        "shareClassFigi": "BBG00441QMK5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2709,6 +3025,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US80004C2008",
+        "cusip": "80004C200",
+        "shareClassFigi": "BBG01R388JK6",
         "priceFeed": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2726,6 +3044,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US8334451098",
+        "cusip": "833445109",
+        "shareClassFigi": "BBG007DHGNK2",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2743,6 +3063,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US83406F1021",
+        "cusip": "83406F102",
+        "shareClassFigi": "BBG00YB1ZF08",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2760,6 +3082,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US8361001071",
+        "cusip": "836100107",
+        "shareClassFigi": "BBG017304PD5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2777,6 +3101,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US4642875235",
+        "cusip": "464287523",
+        "shareClassFigi": "BBG001SJ8F58",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2794,6 +3120,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US84615Q1031",
+        "cusip": "84615Q103",
+        "shareClassFigi": "BBG001SQPN65",
         "priceFeed": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2811,6 +3139,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US46138E3392",
+        "cusip": "46138E339",
+        "shareClassFigi": "BBG00B59HSJ0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2828,6 +3158,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US78462F1030",
+        "cusip": "78462F103",
+        "shareClassFigi": "BBG001S72SM3",
         "priceFeed": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2845,6 +3177,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US35834F1049",
+        "cusip": "35834F104",
+        "shareClassFigi": "BBG01KR6BS89",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2862,6 +3196,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US0494681010",
+        "cusip": "049468101",
+        "shareClassFigi": "BBG01BGWHFS4",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2879,6 +3215,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US88023B1035",
+        "cusip": "88023B103",
+        "shareClassFigi": "BBG01MZQYK84",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2896,6 +3234,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US8807701029",
+        "cusip": "880770102",
+        "shareClassFigi": "BBG001S5WMZ3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -2913,6 +3253,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "IL0010823792",
+        "cusip": null,
+        "shareClassFigi": "BBG001S68BK8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2930,6 +3272,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US88160R1014",
+        "cusip": "88160R101",
+        "shareClassFigi": "BBG001SQKGD7",
         "priceFeed": "0x4A1166a659A55625345e9515b32adECea5547C38",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2947,6 +3291,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US8740391003",
+        "cusip": "874039100",
+        "shareClassFigi": "BBG001S5WWW4",
         "priceFeed": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -2964,6 +3310,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US88339J1051",
+        "cusip": "88339J105",
+        "shareClassFigi": "BBG00629NGW8",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2981,6 +3329,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US8740541094",
+        "cusip": "874054109",
+        "shareClassFigi": "BBG001S9TN41",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -2998,6 +3348,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US9108734057",
+        "cusip": "910873405",
+        "shareClassFigi": "BBG001SG1LP6",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -3015,6 +3367,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US91324P1021",
+        "cusip": "91324P102",
+        "shareClassFigi": "BBG001S6WCJ1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -3032,6 +3386,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1.002208724969205741",
         "isin": "US9113121068",
+        "cusip": "911312106",
+        "shareClassFigi": "BBG001SDGSH1",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3049,6 +3405,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US91733P1075",
+        "cusip": "91733P107",
+        "shareClassFigi": "BBG01HFW5YQ6",
         "priceFeed": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
         "priceFeedCorroboratedBy": "traded-price",
         "dividendDeclaredNotOnChain": false,
@@ -3066,6 +3424,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US91232N2071",
+        "cusip": "91232N207",
+        "shareClassFigi": "BBG001SQNKR0",
         "priceFeed": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3083,6 +3443,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US9258151029",
+        "cusip": "925815102",
+        "shareClassFigi": "BBG001S6JQ96",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3100,6 +3462,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US92537N1081",
+        "cusip": "92537N108",
+        "shareClassFigi": "BBG00L2B8LM7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -3117,6 +3481,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US92552V1008",
+        "cusip": "92552V100",
+        "shareClassFigi": "BBG001S98NF2",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3134,6 +3500,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US92840M1027",
+        "cusip": "92840M102",
+        "shareClassFigi": "BBG00DXDL6R0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -3151,6 +3519,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US9229087690",
+        "cusip": "922908769",
+        "shareClassFigi": "BBG001SHTB03",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3168,6 +3538,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US98138H1014",
+        "cusip": "98138H101",
+        "shareClassFigi": "BBG001T21KQ7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3185,6 +3557,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US9581021055",
+        "cusip": "958102105",
+        "shareClassFigi": "BBG001S5XD28",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -3202,6 +3576,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US88080T1043",
+        "cusip": "88080T104",
+        "shareClassFigi": "BBG0122MC919",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3219,6 +3595,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "KYG961151035",
+        "cusip": null,
+        "shareClassFigi": "BBG01W345BR7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3236,6 +3614,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US81369Y8030",
+        "cusip": "81369Y803",
+        "shareClassFigi": "BBG001S7TCZ5",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3253,6 +3633,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "CA98390R1029",
+        "cusip": null,
+        "shareClassFigi": "BBG00KWYHNC3",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3270,6 +3652,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US30233Q1085",
+        "cusip": "30233Q108",
+        "shareClassFigi": "BBG023CY9NL0",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": true,
@@ -3287,6 +3671,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US98980L1017",
+        "cusip": "98980L101",
+        "shareClassFigi": "BBG0042V6JN7",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,
@@ -3304,6 +3690,8 @@
       "extensions": {
         "underlyingSharesPerToken": "1",
         "isin": "US98980G1022",
+        "cusip": "98980G102",
+        "shareClassFigi": "BBG003338H61",
         "priceFeed": null,
         "priceFeedCorroboratedBy": null,
         "dividendDeclaredNotOnChain": false,

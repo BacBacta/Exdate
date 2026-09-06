@@ -1,4 +1,4 @@
-import { REGISTRY_GENERATED_AT, feedHealth, findToken, isPending, WAD } from '@exdate/core'
+import { REGISTRY_GENERATED_AT, feedHealth, findToken, identifiersFor, isPending, WAD } from '@exdate/core'
 import { formatUnits } from 'viem'
 import type {
   CorporateActionRow,
@@ -68,6 +68,22 @@ export function serializeToken(row: TokenRow, options: SerializeOptions) {
     status: row.status,
     logoUrl: row.logoUrl,
     explorerUrl: `${explorerUrl}/token/${row.address}`,
+    /**
+     * The joins an integrator already has in their own system, so exdate's rows can be matched
+     * to theirs without a mapping table. `address` stays the key everywhere: it is the only one
+     * of these that is first-party, unambiguous and readable from the chain.
+     *
+     * The CUSIP is derived from the ISIN rather than stored - for a US ISIN it is the ISIN's own
+     * substring, checked - so it cannot disagree with the ISIN printed beside it. It is null for
+     * every non-US jurisdiction, where no CUSIP exists to extract.
+     */
+    identifiers: identifiersFor({
+      address: row.address,
+      symbol: row.symbol,
+      isin: row.isin,
+      figi: row.figi,
+      shareClassFigi: row.shareClassFigi,
+    }),
     /**
      * symbol, name, isin, status and the feed pairing come from the issuer's
      * registry as snapshotted at build time - not read live, and not on chain.

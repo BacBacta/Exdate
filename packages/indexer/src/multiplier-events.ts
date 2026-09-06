@@ -43,6 +43,8 @@ ponder.on('StockToken:UIMultiplierUpdated', async ({ event, context }) => {
       name: registryToken?.name ?? 'Unknown token',
       decimals,
       isin: registryToken?.isin ?? null,
+      figi: registryToken?.figi ?? null,
+      shareClassFigi: registryToken?.shareClassFigi ?? null,
       issuer: 'Robinhood Assets (Jersey) Limited',
       status: registryToken?.status ?? 'ASSET_STATUS_UNSPECIFIED',
       logoUrl: registryToken?.logoUrl ?? null,
