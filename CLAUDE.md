@@ -2096,6 +2096,49 @@ blocks ≈ 60 s). Until then the status page says so rather than showing zeros.
   `.env.example` ships, so a machine set up from the example would have started the receiver
   with no secret and watched it refuse. Both greps take `.\+` now. `deploy/receiver/` also joins
   the image inputs, since a change to the receiver's own file did not count as one.
+- 2026-09-06 — **The robustness list, and the two points that mattered most were both "nothing was
+  watching".** Five code items shipped; three remain the owner's, each blocked on one secret.
+  **1. The capture has a second trigger.** It had exactly one - the `UIMultiplierUpdated` log,
+  which fires nine minutes ahead - so a process restarting inside those nine minutes had no second
+  chance and the issuer serves the present only. UPS is the measured cost: first quote 350 s late,
+  published `givenUp`, unrecoverable by anyone. The declared side gives an independent trigger with
+  no log at all: **7 of 7 landings fell on the next business day after the issuer's `processDate`,
+  between 15:10:24 and 15:12:46 UTC, a spread of 142 s**, so a window is armed days ahead from a
+  date the issuer publishes. `scripts/lib/landing-window.mjs` computes the rule from the record at
+  call time and **refuses below three landings**; `predictLandingWindow` returns null the moment a
+  landing misses the next business day, because the rule would no longer be the rule. Three things
+  keep a prediction from ever reading as an observation: a window and never an instant, quotes with
+  no `distanceSeconds`, and `basis.predicted` travelling with it — asserted by five data
+  expectations, each proved to bite. A quote caught in a window becomes ordinary once the chain
+  says what the instant was (`adoptPredictedQuotes` → `record()`, same tolerance, same
+  `isTradingHalt` refusal) and **withdraws a `givenUp` verdict it has made false**, since that
+  verdict's own sentence is "no quote within two minutes of effectiveAt". Spacing is measured from
+  the newest quote on record, not from the start of the call: the one-shot sleeps inside one call,
+  the watcher ticks every 30 s, and measured per call the watcher would sample twice a minute and
+  commit each one. **2. The site is checked from outside.** It is static, so it can be internally
+  perfect and publish an older record than git holds — which happened twice on 2026-09-05, once as
+  a checkout a commit behind and once as a deleted Vercel project answering 404 for hours while
+  every collector kept committing. `/build.json` now carries the commit and every dataset's own
+  stamp; `check-site-freshness.mjs` fetches it three-hourly and compares. It writes nothing to
+  `data/`: a file about the site's freshness would be a commit that redeploys the site and changes
+  what it measures. A 404 is diagnosed by asking for the root too, because "the manifest is not
+  deployed yet" and "the site is gone" are the same status code. **3. The issuer's API is watched
+  by shape.** Three gRPC-transcoded endpoints, none versioned; a renamed field breaks nothing
+  loudly and leaves a hole that looks like a quiet month. New fields are news; a field exdate reads
+  going missing or changing type exits 1. It caught my own contract list on its first run — I had
+  written `corporateActions[]` with a flat `processDate` where the endpoint serves `corpActions[]`
+  with `{year, month, day}`. **4. The poller is replayed**, closing the oldest known gap:
+  `ponder:registry` aliased to a double that captures the handler, `context.db` a store over Maps
+  keyed by each table's real primary key, `context.client` answering with readings written in the
+  test. Fourteen cases pin the retrospective `effectiveAt`, the applied change that emits no log,
+  the pause baseline, the reverting token and the scan never overwriting an indexer row; five were
+  proved to bite by breaking the poller. The gap sweep's `eth_getLogs` path is still unreached and
+  says so. **5. The failover order is derived, not written down** — see the entry below it, and the
+  reason it was found: re-probing for a second archive witness (still one, `blockmachine.io`)
+  measured `pocket.network` at **zero** blocks of `eth_getLogs` while the comment beside it claimed
+  2 000 000 that "no other third-party endpoint comes close" to.
+  Left with the owner, one secret each: a second archive witness (`RHC_RPC_URLS_ARCHIVE`, and an
+  Alchemy key does it), a real-time alert sink, and an RPC provider with a service commitment.
 - _(append decisions here as they are made)_
 
 ## Status
