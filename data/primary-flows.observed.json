@@ -1,7 +1,7 @@
 {
   "note": "Creations and redemptions per Stock Token, from the chain: mint is a Transfer from address(0), burn is a Transfer to it. Mint minus burn is net creation, the signal an ETF publishes as net flow and that nobody publishes for these tokens. Amounts are raw tokens, 18 decimals; underlying shares are these times the multiplier in force.",
   "method": "Each run reads from the block after the last window to the current head, so windows are contiguous and disjoint. A range the node times out on is halved; one that still fails at the floor is listed in unreadRanges and the window is marked incomplete rather than published as if those logs were zero.",
-  "lastRunAt": "2026-09-06T05:19:54.852Z",
+  "lastRunAt": "2026-09-07T05:23:21.445Z",
   "windows": [
     {
       "fromBlock": 53846857,
@@ -2304,6 +2304,26 @@
       "readAt": "2026-09-06T05:19:54.852Z",
       "requests": 18,
       "readMs": 6552,
+      "incomplete": false,
+      "unreadRanges": [],
+      "precededByGap": false,
+      "tokensWithFlow": 0,
+      "mints": 0,
+      "burns": 0,
+      "totalMinted": "0",
+      "totalBurned": "0",
+      "netCreated": "0",
+      "tokens": []
+    },
+    {
+      "fromBlock": 55722562,
+      "toBlock": 56581245,
+      "fromTime": "2026-09-06T05:19:48.000Z",
+      "toTime": "2026-09-07T05:23:14.000Z",
+      "hours": 24.06,
+      "readAt": "2026-09-07T05:23:21.445Z",
+      "requests": 18,
+      "readMs": 6551,
       "incomplete": false,
       "unreadRanges": [],
       "precededByGap": false,
