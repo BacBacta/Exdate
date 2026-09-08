@@ -1,18 +1,18 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-08T20:36:01.859Z",
+  "lastRunAt": "2026-09-08T23:51:04.395Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 5,
+    "steps": 6,
     "withQuoteAtEffect": 1,
     "givenUp": 4
   },
   "watcher": {
-    "heartbeatAt": "2026-09-08T20:36:01.859Z",
+    "heartbeatAt": "2026-09-08T23:51:04.395Z",
     "startedAt": "2026-09-05T01:40:29.106Z",
     "host": "ubuntu-4gb-fsn1-1",
-    "scans": 10911,
+    "scans": 11301,
     "tickSeconds": 30,
     "lookbackBlocks": 900000
   },
@@ -152,6 +152,26 @@
           "capturedAt": "2026-09-08T02:33:59.121Z",
           "isTradingHalt": false,
           "distanceSeconds": -36
+        }
+      ]
+    },
+    {
+      "token": "0x12e3c047bf9aecaf9ddc98c05c31bfd1dd043993",
+      "symbol": "KSS",
+      "effectiveAt": "2026-09-09T00:00:27.000Z",
+      "announcedAt": "2026-09-08T23:50:53.000Z",
+      "announcedTx": "0x5f7066cbb048bfe76452fdafc353c75c03cf246c7e59b68f489f83d06eae21e3",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1004610068732316661",
+      "quotes": [
+        {
+          "bid": "18.5",
+          "ask": "18.79",
+          "mid": "18.645000",
+          "generatedAt": "2026-09-08T23:51:02.397358779Z",
+          "capturedAt": "2026-09-08T23:51:04.353Z",
+          "isTradingHalt": false,
+          "distanceSeconds": -565
         }
       ]
     }
