@@ -2,7 +2,7 @@
   "note": "The SHAPE of the issuer’s API - field paths and their types, never values. New fields are news; a field exdate reads going missing is a failure, because everything downstream would keep working and be wrong.",
   "source": "robinhood:/rhj/assets, /rhj/prices, /rhj/corporate-actions",
   "exdateObserves": "which field paths were served, their JSON types, and how many values carried each; the transitions between one reading and the next",
-  "observedAt": "2026-09-08T05:26:40.613Z",
+  "observedAt": "2026-09-09T05:26:58.541Z",
   "offline": false,
   "endpointsRead": [
     "assets",
@@ -233,73 +233,73 @@
         "types": [
           "number"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].deployments[].contractAddress": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].deployments[].networkName": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].details.cashDividend.rate": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].details.cashDividend.underlyingSymbol": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].id": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].processDate.day": {
         "types": [
           "number"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].processDate.month": {
         "types": [
           "number"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].processDate.year": {
         "types": [
           "number"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].status": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].tokenSymbol": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       },
       "corpActions[].type": {
         "types": [
           "string"
         ],
-        "count": 41
+        "count": 42
       }
     }
   }
