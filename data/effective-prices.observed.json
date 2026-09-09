@@ -1,18 +1,18 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-09T21:10:40.894Z",
+  "lastRunAt": "2026-09-09T23:51:12.303Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 7,
+    "steps": 8,
     "withQuoteAtEffect": 3,
     "givenUp": 4
   },
   "watcher": {
-    "heartbeatAt": "2026-09-09T21:10:40.894Z",
+    "heartbeatAt": "2026-09-09T23:51:12.303Z",
     "startedAt": "2026-09-05T01:40:29.106Z",
     "host": "ubuntu-4gb-fsn1-1",
-    "scans": 13860,
+    "scans": 14181,
     "tickSeconds": 30,
     "lookbackBlocks": 900000
   },
@@ -228,6 +228,26 @@
           "capturedAt": "2026-09-09T15:01:09.219Z",
           "isTradingHalt": false,
           "distanceSeconds": -566
+        }
+      ]
+    },
+    {
+      "token": "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+      "symbol": "NVDA",
+      "effectiveAt": "2026-09-10T00:00:30.000Z",
+      "announcedAt": "2026-09-09T23:50:42.000Z",
+      "announcedTx": "0x4ac23f2e58e2c4962dcd701c2beff581e87f3995152a29d527c07a3afd67d956",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000775159164630595",
+      "quotes": [
+        {
+          "bid": "223.49",
+          "ask": "223.52",
+          "mid": "223.505000",
+          "generatedAt": "2026-09-09T23:51:07.913722509Z",
+          "capturedAt": "2026-09-09T23:51:12.250Z",
+          "isTradingHalt": false,
+          "distanceSeconds": -562
         }
       ]
     }
