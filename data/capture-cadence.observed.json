@@ -1,23 +1,23 @@
 {
   "note": "When GitHub actually ran the capture job, from its own workflow-runs log. The job is scheduled every five minutes; the announcement lead it has to catch is about nine. GitHub schedules are best-effort, so the real gap between runs is what decides whether a step is caught, and this file measures it rather than assuming it.",
   "source": "https://api.github.com/repos/BacBacta/Exdate/actions/workflows/capture-effective-prices.yml/runs (event = schedule only)",
-  "observedAt": "2026-09-08T06:53:34.263Z",
+  "observedAt": "2026-09-09T06:53:35.117Z",
   "nominalMinutes": 5,
   "budgetMinutes": 9,
   "runs": 300,
-  "windowFrom": "2026-09-04T15:38:46.000Z",
-  "windowTo": "2026-09-08T06:20:28.000Z",
+  "windowFrom": "2026-09-05T03:35:05.000Z",
+  "windowTo": "2026-09-09T06:21:03.000Z",
   "intervalMinutes": {
     "samples": 299,
-    "min": 6.4,
-    "median": 15.8,
-    "mean": 17.4,
-    "p90": 27.9,
+    "min": 6.5,
+    "median": 17.7,
+    "mean": 19.8,
+    "p90": 29.9,
     "max": 53.8,
     "shareWithinNominal": 0
   },
   "expectedCatchShare": {
-    "value": 0.5,
+    "value": 0.4,
     "model": "a step landing at a uniformly random instant is caught when a run starts within budgetMinutes before it; computed over the observed gaps, each weighted by its length"
   },
   "notComputed": []
