@@ -1,18 +1,18 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-09T15:01:09.256Z",
+  "lastRunAt": "2026-09-09T15:09:56.164Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 7,
-    "withQuoteAtEffect": 2,
+    "withQuoteAtEffect": 3,
     "givenUp": 4
   },
   "watcher": {
-    "heartbeatAt": "2026-09-09T15:01:09.256Z",
+    "heartbeatAt": "2026-09-09T15:09:56.164Z",
     "startedAt": "2026-09-05T01:40:29.106Z",
     "host": "ubuntu-4gb-fsn1-1",
-    "scans": 13121,
+    "scans": 13138,
     "tickSeconds": 30,
     "lookbackBlocks": 900000
   },
@@ -202,6 +202,15 @@
       "oldMultiplier": "1000000000000000000",
       "newMultiplier": "1000021490286701962",
       "quotes": [
+        {
+          "bid": "267.94",
+          "ask": "268.1",
+          "mid": "268.020000",
+          "generatedAt": "2026-09-09T15:09:54.499338338Z",
+          "capturedAt": "2026-09-09T15:09:56.130Z",
+          "isTradingHalt": true,
+          "distanceSeconds": -32
+        },
         {
           "bid": "269.08",
           "ask": "269.22",
