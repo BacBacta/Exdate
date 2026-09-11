@@ -1,7 +1,7 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-11T15:10:00.497Z",
+  "lastRunAt": "2026-09-11T15:10:30.702Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 12,
@@ -9,10 +9,10 @@
     "givenUp": 4
   },
   "watcher": {
-    "heartbeatAt": "2026-09-11T15:10:00.497Z",
+    "heartbeatAt": "2026-09-11T15:10:30.702Z",
     "startedAt": "2026-09-05T01:40:29.106Z",
     "host": "ubuntu-4gb-fsn1-1",
-    "scans": 18898,
+    "scans": 18899,
     "tickSeconds": 30,
     "lookbackBlocks": 900000
   },
@@ -279,6 +279,15 @@
       "newMultiplier": "1000002288774375687",
       "quotes": [
         {
+          "bid": "1119.74",
+          "ask": "1120.26",
+          "mid": "1120.000000",
+          "generatedAt": "2026-09-11T15:10:22.173530824Z",
+          "capturedAt": "2026-09-11T15:10:30.121Z",
+          "isTradingHalt": true,
+          "distanceSeconds": -8
+        },
+        {
           "bid": "1119.44",
           "ask": "1120.05",
           "mid": "1119.745000",
@@ -307,6 +316,15 @@
       "oldMultiplier": "1000000000000000000",
       "newMultiplier": "1000044656302636618",
       "quotes": [
+        {
+          "bid": "461.78",
+          "ask": "461.99",
+          "mid": "461.885000",
+          "generatedAt": "2026-09-11T15:10:18.216897406Z",
+          "capturedAt": "2026-09-11T15:10:30.240Z",
+          "isTradingHalt": true,
+          "distanceSeconds": -12
+        },
         {
           "bid": "461.48",
           "ask": "461.92",
@@ -337,6 +355,15 @@
       "newMultiplier": "1001039563764661900",
       "quotes": [
         {
+          "bid": "164.56",
+          "ask": "164.59",
+          "mid": "164.575000",
+          "generatedAt": "2026-09-11T15:10:21.943663017Z",
+          "capturedAt": "2026-09-11T15:10:30.456Z",
+          "isTradingHalt": true,
+          "distanceSeconds": -8
+        },
+        {
           "bid": "164.61",
           "ask": "164.65",
           "mid": "164.630000",
@@ -365,6 +392,15 @@
       "oldMultiplier": "1000000000000000000",
       "newMultiplier": "1000412952576205964",
       "quotes": [
+        {
+          "bid": "494.03",
+          "ask": "494.1",
+          "mid": "494.065000",
+          "generatedAt": "2026-09-11T15:10:18.272911159Z",
+          "capturedAt": "2026-09-11T15:10:30.562Z",
+          "isTradingHalt": true,
+          "distanceSeconds": -12
+        },
         {
           "bid": "494.11",
           "ask": "494.22",
