@@ -2,7 +2,7 @@
   "note": "How long a signed webhook took to reach a subscriber, over real deliveries only. Never derived from the poll interval: a delivery path with nothing subscribed to it has no latency, it has a budget. The three legs are apart because they fail for different reasons - exdate's own observation lag, the outbox, and the total a subscriber experiences.",
   "source": "https://api.exdate.me/v1/4663/webhooks/latency",
   "chainId": 4663,
-  "observedAt": "2026-09-10T21:43:34.057Z",
+  "observedAt": "2026-09-11T16:44:35.035Z",
   "legs": {
     "announceToObserve": "the chain carried the announcement, to exdate writing it to the outbox",
     "observeToDeliver": "the outbox row, to a subscriber accepting the signed POST",
@@ -13,10 +13,10 @@
   "endpointsConfigured": 1,
   "delivered": 87,
   "deliveredFirstAttempt": 42,
-  "pending": 0,
+  "pending": 12,
   "attempted": {
     "neverAttempted": 0,
-    "triedNotAccepted": 5,
+    "triedNotAccepted": 17,
     "lastError": null,
     "lastResponseStatus": null
   },
@@ -24,7 +24,7 @@
   "sufficient": true,
   "notComputed": null,
   "announceToObserve": {
-    "n": 4,
+    "n": 8,
     "medianSeconds": 0,
     "minSeconds": 0,
     "maxSeconds": 0
@@ -79,11 +79,11 @@
       "type": "dividend.reconciled",
       "delivered": 7,
       "deliveredFirstAttempt": 0,
-      "pending": 0,
+      "pending": 4,
       "failed": 1,
       "attempted": {
         "neverAttempted": 0,
-        "triedNotAccepted": 1,
+        "triedNotAccepted": 5,
         "lastError": null,
         "lastResponseStatus": null
       },
@@ -145,11 +145,11 @@
       "type": "multiplier.applied",
       "delivered": 2,
       "deliveredFirstAttempt": 2,
-      "pending": 0,
+      "pending": 4,
       "failed": 2,
       "attempted": {
         "neverAttempted": 0,
-        "triedNotAccepted": 2,
+        "triedNotAccepted": 6,
         "lastError": null,
         "lastResponseStatus": null
       },
@@ -178,16 +178,16 @@
       "type": "multiplier.scheduled",
       "delivered": 2,
       "deliveredFirstAttempt": 2,
-      "pending": 0,
+      "pending": 4,
       "failed": 2,
       "attempted": {
         "neverAttempted": 0,
-        "triedNotAccepted": 2,
+        "triedNotAccepted": 6,
         "lastError": null,
         "lastResponseStatus": null
       },
       "announceToObserve": {
-        "n": 4,
+        "n": 8,
         "medianSeconds": 0,
         "minSeconds": 0,
         "maxSeconds": 0
