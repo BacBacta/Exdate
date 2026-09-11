@@ -1,18 +1,18 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-11T12:03:24.438Z",
+  "lastRunAt": "2026-09-11T15:01:57.156Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 8,
+    "steps": 12,
     "withQuoteAtEffect": 4,
     "givenUp": 4
   },
   "watcher": {
-    "heartbeatAt": "2026-09-11T12:03:24.438Z",
+    "heartbeatAt": "2026-09-11T15:01:57.156Z",
     "startedAt": "2026-09-05T01:40:29.106Z",
     "host": "ubuntu-4gb-fsn1-1",
-    "scans": 18525,
+    "scans": 18882,
     "tickSeconds": 30,
     "lookbackBlocks": 900000
   },
@@ -266,6 +266,86 @@
           "capturedAt": "2026-09-09T23:51:12.250Z",
           "isTradingHalt": false,
           "distanceSeconds": -562
+        }
+      ]
+    },
+    {
+      "token": "0x8005d266423c7ea827372c9c864491e5786600ea",
+      "symbol": "LLY",
+      "effectiveAt": "2026-09-11T15:10:30.000Z",
+      "announcedAt": "2026-09-11T15:01:30.000Z",
+      "announcedTx": "0xb20fb11da8a57ff41835258059c4c80ae7a5a454db171f9fdd30802924289c03",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000002288774375687",
+      "quotes": [
+        {
+          "bid": "1120.16",
+          "ask": "1120.62",
+          "mid": "1120.390000",
+          "generatedAt": "2026-09-11T15:01:50.015422118Z",
+          "capturedAt": "2026-09-11T15:01:55.997Z",
+          "isTradingHalt": false,
+          "distanceSeconds": -520
+        }
+      ]
+    },
+    {
+      "token": "0x36046893810a7e7fce501229d57dc3fc8c8716d0",
+      "symbol": "AMAT",
+      "effectiveAt": "2026-09-11T15:10:30.000Z",
+      "announcedAt": "2026-09-11T15:01:36.000Z",
+      "announcedTx": "0x2a3ed01be18866d44a1ca93b451caba9feaba045bff264bf6e1450b4dc2fcf98",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000044656302636618",
+      "quotes": [
+        {
+          "bid": "460.59",
+          "ask": "460.78",
+          "mid": "460.685000",
+          "generatedAt": "2026-09-11T15:01:52.659485656Z",
+          "capturedAt": "2026-09-11T15:01:56.337Z",
+          "isTradingHalt": true,
+          "distanceSeconds": -517
+        }
+      ]
+    },
+    {
+      "token": "0xf9b46d3d1b22199d4d1025a9cedb540a33f1a2d5",
+      "symbol": "XOM",
+      "effectiveAt": "2026-09-11T15:10:30.000Z",
+      "announcedAt": "2026-09-11T15:01:41.000Z",
+      "announcedTx": "0x2cd7aa15b670f84e1302097b2bc3e07282c6cef0148b70b7bc3b0f920a49cdbd",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1001039563764661900",
+      "quotes": [
+        {
+          "bid": "164.85",
+          "ask": "164.91",
+          "mid": "164.880000",
+          "generatedAt": "2026-09-11T15:01:52.442672840Z",
+          "capturedAt": "2026-09-11T15:01:56.680Z",
+          "isTradingHalt": false,
+          "distanceSeconds": -518
+        }
+      ]
+    },
+    {
+      "token": "0xe93237c50d904957cf27e7b1133b510c669c2e74",
+      "symbol": "MSFT",
+      "effectiveAt": "2026-09-11T15:10:30.000Z",
+      "announcedAt": "2026-09-11T15:01:46.000Z",
+      "announcedTx": "0x4df2fb31b1e2a4804e73bc8121b0186f3d56d642980de79f77c6fb55c8c82800",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000412952576205964",
+      "quotes": [
+        {
+          "bid": "492.85",
+          "ask": "492.93",
+          "mid": "492.890000",
+          "generatedAt": "2026-09-11T15:01:47.423944648Z",
+          "capturedAt": "2026-09-11T15:01:57.034Z",
+          "isTradingHalt": false,
+          "distanceSeconds": -523
         }
       ]
     }
