@@ -9,36 +9,36 @@
     "Only Transfer logs from the 194 Stock Tokens are counted. A transfer proves custody moved, not that a trade happened; provableTrades is the subset that also moves USDG in the same transaction."
   ],
   "firstSampleAt": "2026-09-03T07:48:09.000Z",
-  "lastSampleAt": "2026-09-11T20:21:29.000Z",
-  "sampleCount": 206,
+  "lastSampleAt": "2026-09-11T21:19:04.000Z",
+  "sampleCount": 207,
   "easternHourOfWeekSlotsCovered": 166,
   "easternHourOfWeekSlots": 168,
   "minSamplesPerSession": 3,
   "sufficient": true,
   "notComputed": [],
   "transferShare": {
-    "total": 35430808,
+    "total": 35295160,
     "bySession": {
-      "pre_market": 0.1369,
-      "regular": 0.2452,
-      "after_hours": 0.1503,
-      "overnight": 0.2158,
-      "weekend": 0.2519
+      "pre_market": 0.1374,
+      "regular": 0.2461,
+      "after_hours": 0.147,
+      "overnight": 0.2166,
+      "weekend": 0.2529
     },
-    "offHours": 0.7548
+    "offHours": 0.7539
   },
   "provableTradeShare": {
-    "total": 9157327,
+    "total": 9117223,
     "bySession": {
-      "pre_market": 0.1488,
-      "regular": 0.2382,
-      "after_hours": 0.1625,
-      "overnight": 0.2135,
-      "weekend": 0.237
+      "pre_market": 0.1494,
+      "regular": 0.2393,
+      "after_hours": 0.1588,
+      "overnight": 0.2145,
+      "weekend": 0.238
     },
-    "offHours": 0.7618
+    "offHours": 0.7607
   },
-  "pooledOffHoursShareOfSampledTransfers": 0.7417,
+  "pooledOffHoursShareOfSampledTransfers": 0.7423,
   "briefClaim": {
     "value": 0.46,
     "text": "the kickoff brief asserts ~46 % of transfers happen outside NYSE hours, weekends included",
@@ -76,13 +76,13 @@
       "label": "after-hours 16:00-20:00 ET",
       "offHours": true,
       "hoursPerWeek": 20,
-      "samples": 25,
-      "transfersSampled": 74236,
-      "secondsSampled": 1003,
-      "transfersPerSecondMean": 73.953,
+      "samples": 26,
+      "transfersSampled": 75260,
+      "secondsSampled": 1044,
+      "transfersPerSecondMean": 72.069,
       "transfersPerSecondMin": 12.425,
       "transfersPerSecondMax": 203.634,
-      "provableTradesPerSecondMean": 20.664
+      "provableTradesPerSecondMean": 20.107
     },
     {
       "session": "overnight",
@@ -2995,6 +2995,20 @@
       "transactionsMovingAToken": 340,
       "provableTrades": 263,
       "provableTradesPerSecond": 6.575
+    },
+    {
+      "observedAt": "2026-09-11T21:19:04.000Z",
+      "session": "after_hours",
+      "easternHourOfWeek": 137,
+      "fromBlock": 60568592,
+      "headBlock": 60568991,
+      "windowBlocks": 400,
+      "windowSeconds": 41,
+      "transfers": 1024,
+      "transfersPerSecond": 24.976,
+      "transactionsMovingAToken": 337,
+      "provableTrades": 254,
+      "provableTradesPerSecond": 6.195
     }
   ]
 }
