@@ -2,7 +2,7 @@
   "note": "How long a signed webhook took to reach a subscriber, over real deliveries only. Never derived from the poll interval: a delivery path with nothing subscribed to it has no latency, it has a budget. The three legs are apart because they fail for different reasons - exdate's own observation lag, the outbox, and the total a subscriber experiences.",
   "source": "https://api.exdate.me/v1/4663/webhooks/latency",
   "chainId": 4663,
-  "observedAt": "2026-09-12T15:43:33.857Z",
+  "observedAt": "2026-09-12T16:43:29.252Z",
   "legs": {
     "announceToObserve": "the chain carried the announcement, to exdate writing it to the outbox",
     "observeToDeliver": "the outbox row, to a subscriber accepting the signed POST",
@@ -11,12 +11,12 @@
   "basis": "real deliveries only; nothing here is derived from the poll interval. Concluded deliveries are read from a journal the process owns, so they survive the schema drop a code deploy causes.",
   "scope": "the subscriber is exdate’s own receiver on the same host, so public internet transit to a third party is not included",
   "endpointsConfigured": 1,
-  "delivered": 104,
-  "deliveredFirstAttempt": 44,
-  "pending": 1,
+  "delivered": 106,
+  "deliveredFirstAttempt": 45,
+  "pending": 0,
   "attempted": {
     "neverAttempted": 0,
-    "triedNotAccepted": 6,
+    "triedNotAccepted": 5,
     "lastError": null,
     "lastResponseStatus": null
   },
@@ -30,7 +30,7 @@
     "maxSeconds": 0
   },
   "observeToDeliver": {
-    "n": 104,
+    "n": 106,
     "medianSeconds": 9926,
     "minSeconds": 0,
     "maxSeconds": 74847
@@ -143,15 +143,15 @@
     },
     {
       "type": "feed.stale",
-      "delivered": 4,
-      "deliveredFirstAttempt": 2,
-      "pending": 1,
+      "delivered": 6,
+      "deliveredFirstAttempt": 3,
+      "pending": 0,
       "failed": 0,
       "attempted": {
         "neverAttempted": 0,
-        "triedNotAccepted": 1,
-        "lastError": "HTTP 400",
-        "lastResponseStatus": 400
+        "triedNotAccepted": 0,
+        "lastError": null,
+        "lastResponseStatus": null
       },
       "announceToObserve": {
         "n": 0,
@@ -160,10 +160,10 @@
         "maxSeconds": null
       },
       "observeToDeliver": {
-        "n": 4,
+        "n": 6,
         "medianSeconds": 62,
         "minSeconds": 61,
-        "maxSeconds": 254
+        "maxSeconds": 2699
       },
       "announceToDeliver": {
         "n": 0,
