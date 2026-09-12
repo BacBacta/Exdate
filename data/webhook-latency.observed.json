@@ -2,7 +2,7 @@
   "note": "How long a signed webhook took to reach a subscriber, over real deliveries only. Never derived from the poll interval: a delivery path with nothing subscribed to it has no latency, it has a budget. The three legs are apart because they fail for different reasons - exdate's own observation lag, the outbox, and the total a subscriber experiences.",
   "source": "https://api.exdate.me/v1/4663/webhooks/latency",
   "chainId": 4663,
-  "observedAt": "2026-09-12T17:43:17.212Z",
+  "observedAt": "2026-09-12T18:43:19.698Z",
   "legs": {
     "announceToObserve": "the chain carried the announcement, to exdate writing it to the outbox",
     "observeToDeliver": "the outbox row, to a subscriber accepting the signed POST",
@@ -11,8 +11,8 @@
   "basis": "real deliveries only; nothing here is derived from the poll interval. Concluded deliveries are read from a journal the process owns, so they survive the schema drop a code deploy causes.",
   "scope": "the subscriber is exdate’s own receiver on the same host, so public internet transit to a third party is not included",
   "endpointsConfigured": 1,
-  "delivered": 109,
-  "deliveredFirstAttempt": 47,
+  "delivered": 112,
+  "deliveredFirstAttempt": 50,
   "pending": 0,
   "attempted": {
     "neverAttempted": 0,
@@ -30,7 +30,7 @@
     "maxSeconds": 0
   },
   "observeToDeliver": {
-    "n": 109,
+    "n": 112,
     "medianSeconds": 9926,
     "minSeconds": 0,
     "maxSeconds": 74847
@@ -143,8 +143,8 @@
     },
     {
       "type": "feed.stale",
-      "delivered": 9,
-      "deliveredFirstAttempt": 5,
+      "delivered": 12,
+      "deliveredFirstAttempt": 8,
       "pending": 0,
       "failed": 0,
       "attempted": {
@@ -160,7 +160,7 @@
         "maxSeconds": null
       },
       "observeToDeliver": {
-        "n": 9,
+        "n": 12,
         "medianSeconds": 62,
         "minSeconds": 61,
         "maxSeconds": 2699
