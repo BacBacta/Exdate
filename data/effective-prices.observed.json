@@ -1,7 +1,9 @@
 {
   "note": "The issuer's own quote at the instant each multiplier change took effect. The quote is the raw underlying price (verified in data/issuer-quote-basis.json), which is the reconciliation's input, and it covers all 194 tokens rather than the 35 with a Chainlink feed. It cannot be read back later: /rhj/prices serves only the present.",
+  "source": "robinhood:/rhj/prices",
+  "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-12T03:11:29.905Z",
+  "lastRunAt": "2026-09-12T10:25:39.664Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 12,
@@ -17,11 +19,12 @@
     "lookbackBlocks": 900000
   },
   "watchdog": {
-    "checkedAt": "2026-09-04T21:33:16.936Z",
-    "stale": false,
-    "heartbeatAt": "2026-09-04T20:14:40.332Z",
+    "checkedAt": "2026-09-12T10:25:39.247Z",
+    "stale": true,
+    "heartbeatAt": "2026-09-12T03:11:29.905Z",
     "alertedAt": null
   },
+  "predicted": {},
   "steps": [
     {
       "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
