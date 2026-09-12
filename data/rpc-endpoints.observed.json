@@ -6,7 +6,7 @@
     "chainlist.org",
     "chainid.network"
   ],
-  "observedAt": "2026-09-11T04:57:45.711Z",
+  "observedAt": "2026-09-12T04:57:10.664Z",
   "summary": {
     "discovered": 9,
     "reachable": 6,
@@ -19,16 +19,6 @@
     ]
   },
   "crossChecks": [
-    {
-      "depth": 100000,
-      "witnesses": 3,
-      "agree": true,
-      "hosts": [
-        "robinhood.rpc.blxrbdn.com",
-        "rpc-robinhood.blockmachine.io",
-        "rpc.ordofi.network"
-      ]
-    },
     {
       "depth": 1000000,
       "witnesses": 3,
@@ -50,9 +40,10 @@
     },
     {
       "depth": 50000000,
-      "witnesses": 1,
-      "agree": null,
+      "witnesses": 2,
+      "agree": true,
       "hosts": [
+        "robinhood.api.pocket.network",
         "rpc-robinhood.blockmachine.io"
       ]
     }
@@ -64,34 +55,34 @@
       "host": "rpc.mainnet.chain.robinhood.com",
       "reachable": true,
       "chainId": 4663,
-      "head": 59990683,
-      "latestSupply": "17869248494740000000000",
+      "head": 60838647,
+      "latestSupply": "16232111245490000000000",
       "archive": {
         "5000": {
-          "block": 59985683,
+          "block": 60833647,
           "answered": true,
-          "supply": "17869248494740000000000",
+          "supply": "16232111245490000000000",
           "differsFromLatest": false
         },
         "100000": {
-          "block": 59890683,
+          "block": 60738647,
           "answered": false,
-          "error": "metadata is not found, 59890686"
+          "error": "metadata is not found, 60738650"
         },
         "1000000": {
-          "block": 58990683,
+          "block": 59838647,
           "answered": false,
-          "error": "metadata is not found, 58990686"
+          "error": "metadata is not found, 59838650"
         },
         "20000000": {
-          "block": 39990683,
+          "block": 40838647,
           "answered": false,
-          "error": "metadata is not found, 39990686"
+          "error": "metadata is not found, 40838650"
         },
         "50000000": {
-          "block": 9990683,
+          "block": 10838647,
           "answered": false,
-          "error": "metadata is not found, 9990686"
+          "error": "metadata is not found, 10838650"
         }
       },
       "deepestArchiveDepth": 0,
@@ -102,7 +93,7 @@
       "logs": {
         "2000000": {
           "accepted": true,
-          "logs": 3,
+          "logs": 5,
           "ms": 48
         }
       },
@@ -114,36 +105,36 @@
       "host": "robinhood.rpc.blxrbdn.com",
       "reachable": true,
       "chainId": 4663,
-      "head": 59990697,
-      "latestSupply": "17869248494740000000000",
+      "head": 60838662,
+      "latestSupply": "16232111245490000000000",
       "archive": {
         "5000": {
-          "block": 59985697,
+          "block": 60833662,
           "answered": true,
-          "supply": "17869248494740000000000",
+          "supply": "16232111245490000000000",
           "differsFromLatest": false
         },
         "100000": {
-          "block": 59890697,
+          "block": 60738662,
+          "answered": true,
+          "supply": "16232111245490000000000",
+          "differsFromLatest": false
+        },
+        "1000000": {
+          "block": 59838662,
           "answered": true,
           "supply": "17976110002570000000000",
           "differsFromLatest": true
         },
-        "1000000": {
-          "block": 58990697,
-          "answered": true,
-          "supply": "20561376534720000000000",
-          "differsFromLatest": true
-        },
         "20000000": {
-          "block": 39990697,
+          "block": 40838662,
           "answered": false,
-          "error": "missing trie node 3fd9f96d00abf66299d0f9fb7b49bcc35aedfbadd2ea06232a2c1f44add0b833 (path ) state 0x3fd9f96d00abf66299d0f"
+          "error": "missing trie node 27e7660d56a9f7d6b759063eddbdea7912dd75b9016e95e0d5e1172f87f75a6f (path ) state 0x27e7660d56a9f7d6b7590"
         },
         "50000000": {
-          "block": 9990697,
+          "block": 10838662,
           "answered": false,
-          "error": "missing trie node 0c14473910480a54e4d33433613f9cf350df78edb24c63f7702e97486519031e (path ) state 0x0c14473910480a54e4d33"
+          "error": "missing trie node eeeefcea4b78fe793ebf9e8aaaa7a315b8d0563756ad1e957f4f97144af18b21 (path ) state 0xeeeefcea4b78fe793ebf9"
         }
       },
       "deepestArchiveDepth": 1000000,
@@ -177,31 +168,31 @@
       "host": "robinhood-rpc.publicnode.com",
       "reachable": true,
       "chainId": 4663,
-      "head": 59990705,
-      "latestSupply": "17869248494740000000000",
+      "head": 60838665,
+      "latestSupply": "16232111245490000000000",
       "archive": {
         "5000": {
-          "block": 59985705,
+          "block": 60833665,
           "answered": false,
           "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
         },
         "100000": {
-          "block": 59890705,
+          "block": 60738665,
           "answered": false,
           "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
         },
         "1000000": {
-          "block": 58990705,
+          "block": 59838665,
           "answered": false,
           "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
         },
         "20000000": {
-          "block": 39990705,
+          "block": 40838665,
           "answered": false,
           "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
         },
         "50000000": {
-          "block": 9990705,
+          "block": 10838665,
           "answered": false,
           "error": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
         }
@@ -237,47 +228,47 @@
       "host": "robinhood.api.pocket.network",
       "reachable": true,
       "chainId": 4663,
-      "head": 59990722,
-      "latestSupply": "17869248494740000000000",
+      "head": 60838694,
+      "latestSupply": "16232111245490000000000",
       "archive": {
         "5000": {
-          "block": 59985722,
-          "answered": true,
-          "supply": "17869248494740000000000",
-          "differsFromLatest": false
+          "block": 60833694,
+          "answered": false,
+          "error": "historical state 235410ef44e930a379ef44eb68200e92920e82dc84c1443364cd3f56ab0d4aae is not available"
         },
         "100000": {
-          "block": 59890722,
-          "answered": false,
-          "error": "historical state 85a61bee5259b3bb4bedfd410b5a9438e3ad754ccc28c661ee493ebd6543a753 is not available"
+          "block": 60738694,
+          "answered": true,
+          "supply": "16232111245490000000000",
+          "differsFromLatest": false
         },
         "1000000": {
-          "block": 58990722,
+          "block": 59838694,
           "answered": false,
-          "error": "historical state bd64134127494ab99297d1f95c5671c9f99614f3fdc514d5110f2c219d58c3c0 is not available"
+          "error": "historical state 4fadfe76b77b6f942b25b7aa6eab9d9f6cd76f36141fe7b0aec0aceeff4e582f is not available"
         },
         "20000000": {
-          "block": 39990722,
+          "block": 40838694,
           "answered": true,
-          "supply": "5631474054820000000000",
+          "supply": "5357624075830000000000",
           "differsFromLatest": true
         },
         "50000000": {
-          "block": 9990722,
-          "answered": false,
-          "error": "historical state 9c10d15ceca0d560e37101cbc2d4e0f993621cc02b0af03526a7f7ac90a59434 is not available"
+          "block": 10838694,
+          "answered": true,
+          "supply": "1813909000000000000000",
+          "differsFromLatest": true
         }
       },
-      "deepestArchiveDepth": 20000000,
+      "deepestArchiveDepth": 50000000,
       "servesArchive": true,
       "oldestStepBlock": 1267585,
       "reachesOldestStep": false,
-      "oldestStepError": "historical state c0e16c2f17b4cedf87b199bf9d1327e7e1829aa8b78a7a4a1818a09ce18f946e is not available",
       "logs": {
         "100000": {
           "accepted": true,
           "logs": 0,
-          "ms": 7431
+          "ms": 143
         },
         "2000000": {
           "accepted": false,
@@ -304,41 +295,41 @@
       "host": "rpc-robinhood.blockmachine.io",
       "reachable": true,
       "chainId": 4663,
-      "head": 59990876,
-      "latestSupply": "17869248494740000000000",
+      "head": 60838721,
+      "latestSupply": "16232111245490000000000",
       "archive": {
         "5000": {
-          "block": 59985876,
+          "block": 60833721,
           "answered": true,
-          "supply": "17869248494740000000000",
+          "supply": "16232111245490000000000",
           "differsFromLatest": false
         },
         "100000": {
-          "block": 59890876,
+          "block": 60738721,
+          "answered": true,
+          "supply": "16232111245490000000000",
+          "differsFromLatest": false
+        },
+        "1000000": {
+          "block": 59838721,
           "answered": true,
           "supply": "17976110002570000000000",
           "differsFromLatest": true
         },
-        "1000000": {
-          "block": 58990876,
-          "answered": true,
-          "supply": "20561376534720000000000",
-          "differsFromLatest": true
-        },
         "20000000": {
-          "block": 39990876,
+          "block": 40838721,
           "answered": true,
-          "supply": "5631474054820000000000",
+          "supply": "5357624075830000000000",
           "differsFromLatest": true
         },
         "50000000": {
-          "block": 9990876,
+          "block": 10838721,
           "answered": true,
-          "supply": "1599257000000000000000",
+          "supply": "1813909000000000000000",
           "differsFromLatest": true
         }
       },
-      "deepestArchiveDepth": 58723291,
+      "deepestArchiveDepth": 59571136,
       "servesArchive": true,
       "oldestStepBlock": 1267585,
       "reachesOldestStep": true,
@@ -346,7 +337,7 @@
         "1000": {
           "accepted": true,
           "logs": 0,
-          "ms": 148
+          "ms": 104
         },
         "10000": {
           "accepted": false,
@@ -369,36 +360,36 @@
       "host": "rpc.ordofi.network",
       "reachable": true,
       "chainId": 4663,
-      "head": 59990894,
-      "latestSupply": "17869248494740000000000",
+      "head": 60838380,
+      "latestSupply": "16232111245490000000000",
       "archive": {
         "5000": {
-          "block": 59985894,
+          "block": 60833380,
           "answered": true,
-          "supply": "17869248494740000000000",
+          "supply": "16232111245490000000000",
           "differsFromLatest": false
         },
         "100000": {
-          "block": 59890894,
+          "block": 60738380,
+          "answered": true,
+          "supply": "16232111245490000000000",
+          "differsFromLatest": false
+        },
+        "1000000": {
+          "block": 59838380,
           "answered": true,
           "supply": "17976110002570000000000",
           "differsFromLatest": true
         },
-        "1000000": {
-          "block": 58990894,
-          "answered": true,
-          "supply": "20561376534720000000000",
-          "differsFromLatest": true
-        },
         "20000000": {
-          "block": 39990894,
+          "block": 40838380,
           "answered": false,
-          "error": "missing trie node 138be5c27186de513a63b6e1c4e2047f064f98a8223dbf94f9da523a5c975ece (path ) state 0x138be5c27186de513a63b"
+          "error": "missing trie node 4e262652a29a6ad43d6b55d02236b0c101ef79208d0ef0a4669ee9af4283f1b5 (path ) state 0x4e262652a29a6ad43d6b5"
         },
         "50000000": {
-          "block": 9990894,
+          "block": 10838380,
           "answered": false,
-          "error": "missing trie node 1aa41f1a9b09a5c800e60adab3d78c7afd9a79cc9685d8e47cb35d03f2c6aeb4 (path ) state 0x1aa41f1a9b09a5c800e60"
+          "error": "missing trie node 0e7e95ab44a601e520c4acce6d050f26a43f74ef23bb39cc84a0daa7c2fbe236 (path ) state 0x0e7e95ab44a601e520c4a"
         }
       },
       "deepestArchiveDepth": 1000000,
@@ -407,13 +398,10 @@
       "reachesOldestStep": false,
       "oldestStepError": "missing trie node c0e16c2f17b4cedf87b199bf9d1327e7e1829aa8b78a7a4a1818a09ce18f946e (path ) state 0xc0e16c2f17b4cedf87b19",
       "logs": {
-        "1000": {
-          "accepted": false,
-          "error": "the network is busy, please try again in a moment"
-        },
         "10000": {
-          "accepted": false,
-          "error": "the network is busy, please try again in a moment"
+          "accepted": true,
+          "logs": 0,
+          "ms": 1068
         },
         "100000": {
           "accepted": false,
@@ -424,7 +412,7 @@
           "error": "the network is busy, please try again in a moment"
         }
       },
-      "widestLogSpan": 0,
+      "widestLogSpan": 10000,
       "answersBrowsers": true
     },
     {
