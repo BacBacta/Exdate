@@ -3,7 +3,7 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-14T03:50:34.996Z",
+  "lastRunAt": "2026-09-14T15:21:13.959Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 14,
@@ -24,7 +24,100 @@
     "heartbeatAt": "2026-09-12T03:11:29.905Z",
     "alertedAt": null
   },
-  "predicted": {},
+  "predicted": {
+    "0xeb61c0ed490a367d4e3631ccf8a74b3bfc7e775d:2026-09-11": {
+      "token": "0xeb61c0ed490a367d4e3631ccf8a74b3bfc7e775d",
+      "symbol": "HII",
+      "processDate": "2026-09-11",
+      "window": {
+        "day": "2026-09-14",
+        "from": "2026-09-14T15:00:24.000Z",
+        "to": "2026-09-14T15:22:46.000Z",
+        "basis": {
+          "observations": 7,
+          "observedFrom": "2026-09-14T15:10:24.000Z",
+          "observedTo": "2026-09-14T15:12:46.000Z",
+          "padSeconds": 600,
+          "rule": "the next business day after the issuer’s processDate, at the time of day every observed step took effect",
+          "predicted": true
+        }
+      },
+      "quotes": [
+        {
+          "bid": "280.36",
+          "ask": "280.75",
+          "mid": "280.555000",
+          "generatedAt": "2026-09-14T15:13:04.277322717Z",
+          "capturedAt": "2026-09-14T15:13:12.650Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "280.45",
+          "ask": "280.87",
+          "mid": "280.660000",
+          "generatedAt": "2026-09-14T15:14:04.388004716Z",
+          "capturedAt": "2026-09-14T15:14:12.772Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "280.36",
+          "ask": "280.77",
+          "mid": "280.565000",
+          "generatedAt": "2026-09-14T15:15:04.533746595Z",
+          "capturedAt": "2026-09-14T15:15:12.952Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "280.14",
+          "ask": "280.36",
+          "mid": "280.250000",
+          "generatedAt": "2026-09-14T15:16:03.401709576Z",
+          "capturedAt": "2026-09-14T15:16:13.061Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "280.02",
+          "ask": "280.48",
+          "mid": "280.250000",
+          "generatedAt": "2026-09-14T15:17:03.494251571Z",
+          "capturedAt": "2026-09-14T15:17:13.273Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "279.93",
+          "ask": "280.48",
+          "mid": "280.205000",
+          "generatedAt": "2026-09-14T15:18:04.387606853Z",
+          "capturedAt": "2026-09-14T15:18:13.479Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "279.98",
+          "ask": "280.45",
+          "mid": "280.215000",
+          "generatedAt": "2026-09-14T15:19:04.971122614Z",
+          "capturedAt": "2026-09-14T15:19:13.683Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "279.93",
+          "ask": "280.45",
+          "mid": "280.190000",
+          "generatedAt": "2026-09-14T15:20:08.796791225Z",
+          "capturedAt": "2026-09-14T15:20:13.823Z",
+          "isTradingHalt": false
+        },
+        {
+          "bid": "279.93",
+          "ask": "280.4",
+          "mid": "280.165000",
+          "generatedAt": "2026-09-14T15:21:08.161359092Z",
+          "capturedAt": "2026-09-14T15:21:13.944Z",
+          "isTradingHalt": false
+        }
+      ]
+    }
+  },
   "steps": [
     {
       "token": "0x9651342cea770ae9a2969ba2a52611523146aef9",
