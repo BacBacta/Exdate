@@ -3,10 +3,10 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-12T10:25:39.664Z",
+  "lastRunAt": "2026-09-14T02:51:29.343Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 12,
+    "steps": 14,
     "withQuoteAtEffect": 8,
     "givenUp": 4
   },
@@ -421,6 +421,48 @@
           "capturedAt": "2026-09-11T15:01:57.034Z",
           "isTradingHalt": false,
           "distanceSeconds": -523
+        }
+      ]
+    },
+    {
+      "token": "0xfa78c12e6488814a0262e4e802749a4a737d5fb7",
+      "symbol": "VRT",
+      "effectiveAt": "2026-09-14T02:38:41.000Z",
+      "announcedAt": "2026-09-14T02:29:07.000Z",
+      "announcedTx": "0x71ff5185219e82e5cf2b360d0f9e6cf45738466c89025a3c9a60e7e8b8807e69",
+      "firstSeenAt": "2026-09-14T02:51:28.469Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000162788892052072",
+      "quotes": [
+        {
+          "bid": "248.26",
+          "ask": "249.37",
+          "mid": "248.815000",
+          "generatedAt": "2026-09-14T02:51:25.949679334Z",
+          "capturedAt": "2026-09-14T02:51:28.564Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 765
+        }
+      ]
+    },
+    {
+      "token": "0xcf364ea52787e289de6f32077834056e3e70d6a8",
+      "symbol": "UNH",
+      "effectiveAt": "2026-09-14T02:38:41.000Z",
+      "announcedAt": "2026-09-14T02:29:10.000Z",
+      "announcedTx": "0x1cf421a3d4491b59379495ea58f3f0a955776b12ee9917a381a2ef23f4efff5e",
+      "firstSeenAt": "2026-09-14T02:51:28.839Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1004241501039702113",
+      "quotes": [
+        {
+          "bid": "378.25",
+          "ask": "378.8",
+          "mid": "378.525000",
+          "generatedAt": "2026-09-14T02:51:24.214845294Z",
+          "capturedAt": "2026-09-14T02:51:28.904Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 763
         }
       ]
     }
