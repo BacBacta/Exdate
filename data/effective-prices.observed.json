@@ -3,7 +3,7 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-15T15:12:06.898Z",
+  "lastRunAt": "2026-09-15T15:28:07.532Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 15,
@@ -617,6 +617,15 @@
           "capturedAt": "2026-09-15T15:12:06.665Z",
           "isTradingHalt": true,
           "distanceSeconds": 90
+        },
+        {
+          "bid": "343.78",
+          "ask": "343.84",
+          "mid": "343.810000",
+          "generatedAt": "2026-09-15T15:27:58.772835219Z",
+          "capturedAt": "2026-09-15T15:28:07.277Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 1052
         }
       ]
     }
