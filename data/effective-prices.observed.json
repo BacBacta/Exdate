@@ -3,10 +3,10 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-15T15:44:26.803Z",
+  "lastRunAt": "2026-09-16T00:32:05.697Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 15,
+    "steps": 18,
     "withQuoteAtEffect": 9,
     "givenUp": 6
   },
@@ -635,6 +635,69 @@
           "capturedAt": "2026-09-15T15:44:26.600Z",
           "isTradingHalt": false,
           "distanceSeconds": 2027
+        }
+      ]
+    },
+    {
+      "token": "0x75742c18bc1f1c5c5f448f4c9d9c6f66dafaaa38",
+      "symbol": "SOXX",
+      "effectiveAt": "2026-09-16T00:10:33.000Z",
+      "announcedAt": "2026-09-16T00:00:52.000Z",
+      "announcedTx": "0x25ca20c977b0e0c206bd48e76515c85e9971b7397d950059cff00500ba912269",
+      "firstSeenAt": "2026-09-16T00:32:04.303Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1000450838210425960",
+      "quotes": [
+        {
+          "bid": "499.1",
+          "ask": "499.71",
+          "mid": "499.405000",
+          "generatedAt": "2026-09-16T00:31:57.519130687Z",
+          "capturedAt": "2026-09-16T00:32:04.434Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 1285
+        }
+      ]
+    },
+    {
+      "token": "0x58ffe4a942d3885baa22d7520691f611ef09e7aa",
+      "symbol": "TSM",
+      "effectiveAt": "2026-09-16T00:10:33.000Z",
+      "announcedAt": "2026-09-16T00:00:56.000Z",
+      "announcedTx": "0x53888b0500828784f8eb5e98b22e2becf1e5d9b00d4e48c26d0b440e08f34037",
+      "firstSeenAt": "2026-09-16T00:32:04.652Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1001463024159690554",
+      "quotes": [
+        {
+          "bid": "413.74",
+          "ask": "413.99",
+          "mid": "413.865000",
+          "generatedAt": "2026-09-16T00:31:52.801950872Z",
+          "capturedAt": "2026-09-16T00:32:04.718Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 1280
+        }
+      ]
+    },
+    {
+      "token": "0x4189f0c66ebbb0bfef1c31f763131361ef32f77c",
+      "symbol": "PR",
+      "effectiveAt": "2026-09-16T00:10:33.000Z",
+      "announcedAt": "2026-09-16T00:01:01.000Z",
+      "announcedTx": "0x81f4f290ae140538cda6ff63538b3eb5aee01c04dac6e9acb0c6eff7cd91d4f7",
+      "firstSeenAt": "2026-09-16T00:32:05.016Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1004477942292229526",
+      "quotes": [
+        {
+          "bid": "24.06",
+          "ask": "24.35",
+          "mid": "24.205000",
+          "generatedAt": "2026-09-16T00:31:58.924483261Z",
+          "capturedAt": "2026-09-16T00:32:05.081Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 1286
         }
       ]
     }
