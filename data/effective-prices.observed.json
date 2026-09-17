@@ -3,12 +3,12 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-17T13:44:54.084Z",
+  "lastRunAt": "2026-09-17T14:13:53.674Z",
   "toleranceSeconds": 120,
   "summary": {
     "steps": 20,
     "withQuoteAtEffect": 9,
-    "givenUp": 10
+    "givenUp": 11
   },
   "watcher": {
     "heartbeatAt": "2026-09-12T03:11:29.905Z",
@@ -776,7 +776,9 @@
           "isTradingHalt": false,
           "distanceSeconds": 2319
         }
-      ]
+      ],
+      "givenUp": true,
+      "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
     }
   ]
 }
