@@ -3,10 +3,10 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-16T01:10:43.786Z",
+  "lastRunAt": "2026-09-17T00:31:56.162Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 18,
+    "steps": 19,
     "withQuoteAtEffect": 9,
     "givenUp": 9
   },
@@ -706,6 +706,27 @@
       ],
       "givenUp": true,
       "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
+    },
+    {
+      "token": "0x59dd09d4900c2e4b5f75b7c0d4e6796fcc234cb1",
+      "symbol": "HPE",
+      "effectiveAt": "2026-09-17T00:15:33.000Z",
+      "announcedAt": "2026-09-17T00:05:53.000Z",
+      "announcedTx": "0x44d2c674d74b6bbb890c3e5822e909f4fe773b865bfe701ffa1612e757d0c1ea",
+      "firstSeenAt": "2026-09-17T00:31:55.947Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1001716957939304938",
+      "quotes": [
+        {
+          "bid": "57.27",
+          "ask": "57.44",
+          "mid": "57.355000",
+          "generatedAt": "2026-09-17T00:31:46.355481801Z",
+          "capturedAt": "2026-09-17T00:31:56.039Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 973
+        }
+      ]
     }
   ]
 }
