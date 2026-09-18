@@ -3,10 +3,10 @@
   "source": "robinhood:/rhj/prices",
   "exdateObserves": "which quote was captured, when, and how far from effectiveAt it landed; the refusal and its reason when none was",
   "method": "A persistent process scans for UIMultiplierUpdated every 30 s - it fires about nine minutes before the change - and samples the quote at effectiveAt-30s, effectiveAt and effectiveAt+30s. It commits what it caught, and a heartbeat every six hours, so the record shows both the captures and that something was watching.",
-  "lastRunAt": "2026-09-17T15:20:25.726Z",
+  "lastRunAt": "2026-09-18T00:32:17.136Z",
   "toleranceSeconds": 120,
   "summary": {
-    "steps": 20,
+    "steps": 21,
     "withQuoteAtEffect": 9,
     "givenUp": 11
   },
@@ -871,6 +871,27 @@
       ],
       "givenUp": true,
       "givenUpReason": "no quote within two minutes of effectiveAt, and the issuer publishes no history, so this instant is unrecoverable"
+    },
+    {
+      "token": "0x117cc2133c37b721f49de2a7a74833232b3b4c0c",
+      "symbol": "SPY",
+      "effectiveAt": "2026-09-18T00:10:33.000Z",
+      "announcedAt": "2026-09-18T00:00:49.000Z",
+      "announcedTx": "0x2fe45ab24d1b3fa87883f8b08daf29dae969c5b43d0afe9ccca299c11a641025",
+      "firstSeenAt": "2026-09-18T00:32:16.835Z",
+      "oldMultiplier": "1000000000000000000",
+      "newMultiplier": "1001717991187472003",
+      "quotes": [
+        {
+          "bid": "760.48",
+          "ask": "760.53",
+          "mid": "760.505000",
+          "generatedAt": "2026-09-18T00:32:06.992678831Z",
+          "capturedAt": "2026-09-18T00:32:16.940Z",
+          "isTradingHalt": false,
+          "distanceSeconds": 1294
+        }
+      ]
     }
   ]
 }
