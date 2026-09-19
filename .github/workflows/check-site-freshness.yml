@@ -21,10 +21,6 @@
 name: check-site-freshness
 
 on:
-  schedule:
-    # Every three hours: the deploy path's own safety net runs six-hourly, so
-    # this notices a stuck deploy within one cycle of it rather than after two.
-    - cron: '20 */3 * * *'
   workflow_dispatch:
 
 permissions:

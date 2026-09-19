@@ -12,9 +12,6 @@
 name: measure-xstocks-steps
 
 on:
-  schedule:
-    # 05:10 UTC daily, before the Robinhood archive job at 06:20 so the two do not race on a push.
-    - cron: '10 5 * * *'
   workflow_dispatch:
 
 permissions:

@@ -13,10 +13,6 @@
 name: measure-session-share
 
 on:
-  schedule:
-    # Every hour at :07. GitHub delays scheduled runs under load, which spreads
-    # the samples inside the hour rather than pinning them to one minute.
-    - cron: '7 * * * *'
   workflow_dispatch:
 
 permissions:

@@ -15,9 +15,6 @@
 name: rescan-chain
 
 on:
-  schedule:
-    # :47 to sit clear of the other schedules, which share this branch.
-    - cron: '47 */6 * * *'
   workflow_dispatch:
 
 permissions:

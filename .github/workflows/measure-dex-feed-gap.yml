@@ -13,9 +13,6 @@
 name: measure-dex-feed-gap
 
 on:
-  schedule:
-    # :23 to sit clear of the other schedules, which share this branch.
-    - cron: '23 * * * *'
   workflow_dispatch:
 
 permissions:

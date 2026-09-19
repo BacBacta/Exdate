@@ -35,10 +35,6 @@ on:
       - 'scripts/vercel-ignore.sh'
       - '.github/workflows/deploy-site.yml'
   workflow_dispatch:
-  schedule:
-    # A safety net: if a push slipped through the paths filter, or a deployment
-    # failed, the site is never more than six hours behind the record.
-    - cron: '0 */6 * * *'
 
 permissions:
   contents: read
