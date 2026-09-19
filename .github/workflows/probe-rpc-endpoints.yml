@@ -12,8 +12,6 @@
 name: probe-rpc-endpoints
 
 on:
-  schedule:
-    - cron: '52 4 * * *'
   workflow_dispatch:
 
 permissions:

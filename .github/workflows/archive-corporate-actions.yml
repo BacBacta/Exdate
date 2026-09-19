@@ -8,9 +8,6 @@
 name: archive-corporate-actions
 
 on:
-  schedule:
-    # 06:20 UTC daily. Off the hour on purpose: scheduled runs cluster there.
-    - cron: '20 6 * * *'
   workflow_dispatch:
 
 permissions:

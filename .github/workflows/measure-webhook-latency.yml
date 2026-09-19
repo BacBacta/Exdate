@@ -13,9 +13,6 @@
 name: measure-webhook-latency
 
 on:
-  schedule:
-    # 40 past the hour. Off the top on purpose: scheduled runs cluster at :00.
-    - cron: '40 * * * *'
   workflow_dispatch:
 
 permissions:

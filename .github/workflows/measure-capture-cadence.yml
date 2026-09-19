@@ -8,9 +8,6 @@
 name: measure-capture-cadence
 
 on:
-  schedule:
-    # 06:40 UTC daily. Off the hour on purpose: scheduled runs cluster there.
-    - cron: '40 6 * * *'
   workflow_dispatch:
 
 permissions:

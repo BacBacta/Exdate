@@ -13,9 +13,6 @@
 name: watch-issuer-api
 
 on:
-  schedule:
-    # Daily. A shape does not change hourly, and the endpoint is rate limited.
-    - cron: '18 5 * * *'
   workflow_dispatch:
 
 permissions:
